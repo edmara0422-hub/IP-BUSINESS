@@ -48,7 +48,7 @@ function ProfileButton() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="relative flex h-11 w-11 items-center justify-center rounded-[1rem] border border-white/14 text-white transition hover:border-white/24"
+        className="relative flex h-8 w-8 items-center justify-center rounded-[0.7rem] border border-white/14 text-white transition hover:border-white/24 md:h-11 md:w-11 md:rounded-[1rem]"
         style={{
           background: 'linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(220,225,232,0.08) 16%, rgba(76,80,87,0.94) 44%, rgba(10,10,12,0.98) 100%)',
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
@@ -223,7 +223,7 @@ export default function MainApp() {
       <ShellBackdrop />
       <TopBar />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-32 pt-24 md:px-8 md:pt-28">
+      <div className="relative z-10 mx-auto max-w-7xl px-2 pb-20 pt-16 md:px-8 md:pb-32 md:pt-28">
         <div className="command-stage overflow-hidden min-h-[calc(100vh-10rem)] rounded-[2.2rem]">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.06)_18%,rgba(255,255,255,0.36)_50%,rgba(255,255,255,0.06)_82%,transparent_100%)] opacity-60" />
           <div className="pointer-events-none absolute bottom-0 left-[7%] right-[7%] h-px bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.03)_20%,rgba(255,255,255,0.14)_50%,rgba(255,255,255,0.03)_80%,transparent_100%)] opacity-45" />
