@@ -106,7 +106,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
             transition={{ duration: 0.9, delay: 0.18, ease: 'easeOut' }}
           >
           <motion.h1
-            className="text-[clamp(4.6rem,12vw,9.6rem)] font-semibold uppercase tracking-[0.34em] text-white"
+            className="text-[clamp(3rem,10vw,9.6rem)] font-semibold uppercase tracking-[0.34em] text-white"
             style={{
               fontFamily: 'Poppins, sans-serif',
               paddingLeft: '0.34em',

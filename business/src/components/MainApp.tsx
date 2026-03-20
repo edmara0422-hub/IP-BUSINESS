@@ -211,7 +211,23 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
 
 export default function MainApp() {
   const [activeTab, setActiveTab] = useState<Tab>('business')
-  const { profile } = useAuth()
+  const { user, profile, loading } = useAuth()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      window.location.href = '/login'
+    }
+  }, [loading, user])
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#050507]">
+        <span className="text-[0.7rem] uppercase tracking-[0.3em] text-white/30">Carregando...</span>
+      </div>
+    )
+  }
+
+  if (!user) return null
 
   return (
     <motion.div

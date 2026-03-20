@@ -16,7 +16,7 @@ export default function SplashCanvas() {
       <svg
         viewBox="0 0 440 440"
         className="absolute"
-        style={{ width: 'min(72vw, 44rem)', height: 'min(72vw, 44rem)', animation: 'ipb-spin 4.8s linear infinite' }}
+        style={{ width: 'min(60vw, 44rem)', height: 'min(60vw, 44rem)', animation: 'ipb-spin 4.8s linear infinite' }}
       >
         <defs>
           <linearGradient id="arc-grad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -51,8 +51,8 @@ export default function SplashCanvas() {
       <div
         className="absolute rounded-full"
         style={{
-          width: 'min(84vw, 52rem)',
-          height: 'min(84vw, 52rem)',
+          width: 'min(68vw, 52rem)',
+          height: 'min(68vw, 52rem)',
           border: '1px solid rgba(255,255,255,0.05)',
           animation: 'ipb-pulse 3s ease-in-out infinite',
         }}
@@ -62,8 +62,8 @@ export default function SplashCanvas() {
       <div
         className="absolute rounded-full"
         style={{
-          width: 'min(56vw, 36rem)',
-          height: 'min(56vw, 36rem)',
+          width: 'min(46vw, 36rem)',
+          height: 'min(46vw, 36rem)',
           background:
             'radial-gradient(ellipse at center, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 50%, transparent 78%)',
           animation: 'ipb-pulse 3s ease-in-out infinite 1.5s',
