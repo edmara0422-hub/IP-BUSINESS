@@ -19,8 +19,27 @@ const LoginPage = dynamic(() => import('@/app/login/LoginForm'), {
 
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true)
+  const [loggedIn, setLoggedIn] = useState(false)
   const { user, loading } = useAuth()
 
+  // Quando user muda (login feito), marca como logado
+  if (user && !loggedIn) setLoggedIn(true)
+
+  // 1. Loading auth
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#050507]">
+        <span className="text-[0.7rem] uppercase tracking-[0.3em] text-white/30">Carregando...</span>
+      </main>
+    )
+  }
+
+  // 2. Não logado → Login primeiro
+  if (!user && !loggedIn) {
+    return <LoginPage />
+  }
+
+  // 3. Logado → Splash depois MainApp
   if (showSplash) {
     return (
       <main className="min-h-screen bg-ocean-900">
@@ -31,19 +50,9 @@ export default function Home() {
     )
   }
 
-  if (loading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-[#050507]">
-        <span className="text-[0.7rem] uppercase tracking-[0.3em] text-white/30">Carregando...</span>
-      </main>
-    )
-  }
-
   return (
     <main className="min-h-screen bg-ocean-900">
-      <AnimatePresence mode="wait">
-        {user ? <MainApp key="app" /> : <LoginPage key="login" />}
-      </AnimatePresence>
+      <MainApp />
     </main>
   )
 }
