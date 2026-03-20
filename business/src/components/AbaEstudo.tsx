@@ -32,10 +32,6 @@ import { useBusinessStore } from '@/store/business-store'
 import type { ContentBlock, TutorMessage } from '@/types/intelligence'
 import { INTELLIGENCE_CONTENT } from '@/data/intelligence-content'
 import { SIM_COMPONENTS } from '@/components/intelligence/SimulationsM3'
-import { SIM_M1_SUSTAINABILITY } from '@/components/intelligence/SimulationsM1Sustainability'
-import { SIM_M3_LEADERSHIP } from '@/components/intelligence/SimulationsM3Leadership'
-import { SIM_M4 } from '@/components/intelligence/SimulationsM4'
-import { SIM_M5 } from '@/components/intelligence/SimulationsM5'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -177,7 +173,7 @@ function CadernoBlock({ block }: { block: ContentBlock }) {
   }
 
   if (block.type === 'simulation') {
-    const SimComp = SIM_COMPONENTS[block.simulationId] || SIM_M1_SUSTAINABILITY[block.simulationId] || SIM_M3_LEADERSHIP[block.simulationId] || SIM_M4[block.simulationId] || SIM_M5[block.simulationId]
+    const SimComp = SIM_COMPONENTS[block.simulationId]
     return (
       <div id={`block-${block.id}`} className="scroll-mt-6 rounded-[1.3rem] border border-white/[0.08] p-5 space-y-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
         <div>
@@ -414,7 +410,7 @@ function StudySidebar({
     <div className="flex h-full flex-col rounded-[1.5rem] border border-white/[0.07] bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(6,6,8,0.06)_100%)] backdrop-blur-xl">
       {/* Tool tabs */}
       <div className="flex gap-1 border-b border-white/[0.06] p-2">
-        {SIDEBAR_TOOLS.filter(t => t.id !== 'revisao' || blocks.some(b => b.type === 'video')).map(({ id, label, icon: Icon }) => (
+        {SIDEBAR_TOOLS.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             onClick={() => onToolChange(id)}
