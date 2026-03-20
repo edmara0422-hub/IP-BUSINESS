@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 
 const client = new Anthropic()
 
+export const dynamic = 'force-static'
+
 interface AdvisorRequest {
   snapshot: {
     marginPct: number

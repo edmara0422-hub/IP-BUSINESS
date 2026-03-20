@@ -8,6 +8,8 @@ const adminClient = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 )
 
+export const dynamic = 'force-static'
+
 export async function POST(request: Request) {
   const supabase = await createServerClient()
   const { data: { user } } = await supabase.auth.getUser()

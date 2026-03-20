@@ -8,6 +8,8 @@ const adminClient = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 )
 
+export const dynamic = 'force-static'
+
 export async function POST(request: Request) {
   // Verifica se quem chama é admin
   const supabase = await createServerClient()

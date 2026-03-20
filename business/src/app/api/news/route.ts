@@ -69,6 +69,8 @@ const SOURCES = [
 let cache: { data: { news: NewsItem[]; updatedAt: string } | null; ts: number } = { data: null, ts: 0 }
 const CACHE_TTL = 60_000 // 60s — mesmo ritmo dos dados de mercado
 
+export const dynamic = 'force-static'
+
 export async function GET() {
   if (cache.data && Date.now() - cache.ts < CACHE_TTL) return NextResponse.json(cache.data)
 

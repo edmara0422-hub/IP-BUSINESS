@@ -33,6 +33,8 @@ function clamp(n: number, min: number, max: number) { return Math.max(min, Math.
 function r2(n: number) { return parseFloat(n.toFixed(2)) }
 function r1(n: number) { return parseFloat(n.toFixed(1)) }
 
+export const dynamic = 'force-static'
+
 // ══════════════════════════════════════════════════════════════════════════
 export async function GET() {
 
