@@ -1,0 +1,20 @@
+   ▲ Next.js 15.5.12
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 15.6min
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/5) ...
+   Generating static pages (1/5) 
+   Generating static pages (2/5) 
+   Generating static pages (3/5) 
+ ✓ Generating static pages (5/5)
+
+> Build error occurred
+[Error: ENOENT: no such file or directory, rename '/Users/edmararocha/Documents/IP BUSINESS/ege-business/.next/export/500.html' -> '/Users/edmararocha/Documents/IP BUSINESS/ege-business/.next/server/pages/500.html'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'rename',
+  path: '/Users/edmararocha/Documents/IP BUSINESS/ege-business/.next/export/500.html',
+  dest: '/Users/edmararocha/Documents/IP BUSINESS/ege-business/.next/server/pages/500.html'
+}

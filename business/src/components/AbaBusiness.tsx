@@ -1,0 +1,168 @@
+'use client'
+
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { motion } from 'framer-motion'
+import BusinessClock from '@/components/business/BusinessClock'
+import BusinessSectionNav from '@/components/business/BusinessSectionNav'
+import PanoramaSection from '@/components/business/PanoramaSection'
+import RiscosSection from '@/components/business/RiscosSection'
+import MacroSection from '@/components/business/MacroSection'
+import MarketingSection from '@/components/business/MarketingSection'
+import { useBusinessStore } from '@/store/business-store'
+
+// ── Types ──────────────────────────────────────────────────────────────────
+
+interface MacroPoint { value: number; delta: number; sentiment: string }
+interface Commodity  { value: number; delta: number; unit: string; label: string }
+interface Sector     { id: string; label: string; change: number; trend: string; heat: number }
+interface GlobalAgent { id: string; label: string; delta: number; impact: string }
+interface CentralProblem { id: string; label: string; affected: number; module: string; sem: string }
+interface Platform { id: string; label: string; cpm: number; cpmDelta: number; reach: string; trend: string; note: string; cpc?: number; cpcDelta?: number }
+interface MktMetric { value: number; delta: number; label: string }
+interface Opportunity { id: string; label: string; urgency: number; type: string }
+interface MarketData {
+  macro: { usdBrl: MacroPoint; ipca: MacroPoint; selic: MacroPoint; pib: MacroPoint }
+  commodities: Record<string, Commodity>
+  sectors: Sector[]
+  globalAgents: GlobalAgent[]
+  centralProblems: CentralProblem[]
+  platforms: Platform[]
+  marketing: Record<string, MktMetric>
+  opportunities: Opportunity[]
+  updatedAt: string
+}
+interface SimOffsets { selic: number; cambio: number; ipca: number; pib: number }
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function v(n: number | undefined, fb: number) { return (n != null && Number.isFinite(n)) ? n : fb }
+function clamp(n: number, min: number, max: number) { return Math.max(min, Math.min(max, n)) }
+
+function applySimulation(data: MarketData, sim: SimOffsets): MarketData {
+  const si = sim.selic, pi = sim.pib, ci = sim.cambio, ii = sim.ipca
+  const selicNew = clamp(v(data.macro.selic?.value, 10.5) + si, 2, 20)
+  const cambioNew = clamp(v(data.macro.usdBrl?.value, 5.72) + ci, 3, 8)
+  const ipcaNew = clamp(v(data.macro.ipca?.value, 4.8) + ii, 0.5, 15)
+  const pibNew = clamp(v(data.macro.pib?.value, 2.9) + pi, -3, 8)
+
+  const sectors = data.sectors.map(s => {
+    let a = 0
+    if (s.id === 'retail') a = -si * 3 + pi * 2
+    else if (s.id === 'fintech') a = si * 1.5 + pi
+    else if (s.id === 'tech') a = pi * 2.5 - si * 0.5
+    else if (s.id === 'agro') a = pi * 1.5 - ci * 2
+    else if (s.id === 'energy') a = ci * 2 + pi
+    else if (s.id === 'health') a = pi * 1.2
+    else if (s.id === 'logistics') a = -ci * 1.5 + pi
+    else if (s.id === 'services') a = pi * 1.8 - si * 0.8
+    else if (s.id === 'media') a = pi * 0.5 - si
+    const ch = parseFloat((s.change + a).toFixed(1))
+    return { ...s, change: ch, heat: clamp(Math.round(s.heat + a * 1.2), 0, 100), trend: ch > 3 ? 'up' : ch < -3 ? 'down' : 'neutral' }
+  })
+  const globalAgents = data.globalAgents.map(ag => {
+    let a = 0
+    if (['aapl','googl','meta'].includes(ag.id)) a = pi * 0.5 - si * 0.3
+    if (ag.id === 'amzn') a = -si * 0.4 + pi * 0.6
+    if (ag.id === 'vale') a = ci * 0.8
+    if (ag.id === 'petr') a = ci * 1.2
+    return { ...ag, delta: parseFloat((ag.delta + a).toFixed(1)) }
+  })
+  const centralProblems = data.centralProblems.map(p => {
+    let a = 0
+    if (p.id === 'margin') a = si * 3 + ci * 2
+    if (p.id === 'cac') a = si
+    if (p.id === 'credit') a = si * 5
+    if (p.id === 'talent') a = pi * 2
+    if (p.id === 'ai') a = pi * 1.5
+    return { ...p, affected: clamp(Math.round(p.affected + a), 5, 95) }
+  })
+  const opportunities = data.opportunities.map(o => {
+    let a = 0
+    if (o.id === 'tiktok_cpm') a = -si * 2
+    if (o.id === 'ai_content') a = pi * 2
+    if (o.id === 'pib_grow') a = pi * 5
+    if (o.id === 'organic') a = si * 2
+    if (o.id === 'agro_boom') a = pi * 3 - ci * 2
+    return { ...o, urgency: clamp(Math.round(o.urgency + a), 10, 99) }
+  })
+
+  return {
+    ...data,
+    macro: {
+      usdBrl: { ...data.macro.usdBrl, value: parseFloat(cambioNew.toFixed(2)) },
+      selic: { ...data.macro.selic, value: parseFloat(selicNew.toFixed(2)) },
+      ipca: { ...data.macro.ipca, value: parseFloat(ipcaNew.toFixed(2)) },
+      pib: { ...data.macro.pib, value: parseFloat(pibNew.toFixed(1)) },
+    },
+    sectors, globalAgents, centralProblems, opportunities,
+  }
+}
+
+// ── Placeholder sections ──────────────────────────────────────────────────
+
+function ComingSoonSection({ title }: { title: string }) {
+  return (
+    <motion.div
+      className="flex flex-col items-center justify-center gap-3 px-4 py-20"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="rounded-lg border border-white/[0.08] px-6 py-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/30">{title}</p>
+        <p className="mt-1 text-[10px] text-white/20">Em construção — Fase 2</p>
+      </div>
+    </motion.div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  MAIN
+// ════════════════════════════════════════════════════════════════════════════
+
+export default function AbaBusiness() {
+  const [rawData, setRawData] = useState<MarketData | null>(null)
+  const [sim, setSim] = useState<SimOffsets>({ selic: 0, cambio: 0, ipca: 0, pib: 0 })
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const activeSection = useBusinessStore((s) => s.businessActiveSection)
+
+  const fetchData = useCallback(async () => {
+    try { const res = await fetch('/api/market'); if (res.ok) setRawData(await res.json() as MarketData) } catch {}
+  }, [])
+
+  useEffect(() => { fetchData(); intervalRef.current = setInterval(fetchData, 60_000); return () => { if (intervalRef.current) clearInterval(intervalRef.current) } }, [fetchData])
+
+  const hasSim = sim.selic !== 0 || sim.cambio !== 0 || sim.ipca !== 0 || sim.pib !== 0
+  const data = useMemo(() => rawData ? (hasSim ? applySimulation(rawData, sim) : rawData) : null, [rawData, sim, hasSim])
+
+  if (!data) return (
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+        className="h-8 w-8 rounded-full border-2 border-white/10 border-t-white/40" />
+    </div>
+  )
+
+  return (
+    <motion.div className="flex h-[calc(100vh-8rem)] flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+
+      {/* ── Relógio (NÃO MEXER NUNCA) ── */}
+      <div className="shrink-0 px-4 pt-3 pb-3">
+        <BusinessClock variant="hero" showGreeting />
+      </div>
+
+      {/* ── Navegação por seções ── */}
+      <div className="shrink-0 mb-2">
+        <BusinessSectionNav />
+      </div>
+
+      {/* ── Conteúdo da seção ativa ── */}
+      <div className="flex-1 overflow-y-auto pt-1">
+        {activeSection === 'panorama' && <PanoramaSection data={data} />}
+        {activeSection === 'macro' && <MacroSection data={data} />}
+        {activeSection === 'plataformas' && <MarketingSection data={data} />}
+        {activeSection === 'problemas' && <RiscosSection data={data} />}
+        {activeSection === 'simulacao' && <ComingSoonSection title="Simulação 6D" />}
+      </div>
+    </motion.div>
+  )
+}
