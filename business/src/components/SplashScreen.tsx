@@ -14,7 +14,7 @@ const STEP = 2
 function ProgressRail({ progress }: { progress: number }) {
   return (
     <motion.div
-      className="mx-auto mt-12 w-[min(34rem,78vw)] overflow-hidden rounded-[1.8rem] border border-white/14 px-5 py-4"
+      className="mx-auto mt-8 w-[min(28rem,80vw)] overflow-hidden rounded-[1.4rem] border border-white/14 px-4 py-3"
       style={{
         background:
           'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(157,165,174,0.08) 12%, rgba(12,12,14,0.82) 48%, rgba(6,6,7,0.96) 100%)',
@@ -27,13 +27,13 @@ function ProgressRail({ progress }: { progress: number }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.45, ease: 'easeOut' }}
     >
-      <div className="mb-3 flex items-center justify-between">
-        <span className="text-[10px] uppercase tracking-[0.36em] text-white/36">IPB Boot Sequence</span>
-        <span className="text-sm font-semibold text-white/82">{progress}%</span>
+      <div className="mb-2 flex items-center justify-between">
+        <span className="text-[8px] uppercase tracking-[0.36em] text-white/36">IPB Boot Sequence</span>
+        <span className="text-xs font-semibold text-white/82">{progress}%</span>
       </div>
 
       <div
-        className="relative h-[7px] overflow-hidden rounded-full"
+        className="relative h-[5px] overflow-hidden rounded-full"
         style={{
           background: 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.3) 100%)',
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
@@ -97,16 +97,15 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.12),transparent_18%),radial-gradient(circle_at_50%_78%,rgba(173,181,192,0.06),transparent_24%),linear-gradient(180deg,rgba(3,3,3,0.12)_0%,rgba(3,3,3,0.62)_56%,rgba(3,3,3,0.92)_100%)]" />
 
-      <div className="relative flex min-h-screen items-center justify-center px-5 py-14 text-center">
+      <div className="relative flex min-h-screen items-center justify-center px-5 text-center">
         <div className="w-full max-w-4xl">
           <motion.div
-            className="translate-y-[10vh]"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, delay: 0.18, ease: 'easeOut' }}
           >
           <motion.h1
-            className="text-[clamp(3rem,10vw,9.6rem)] font-semibold uppercase tracking-[0.34em] text-white"
+            className="text-[clamp(3.2rem,11vw,9.6rem)] font-semibold uppercase tracking-[0.34em] text-white"
             style={{
               fontFamily: 'Poppins, sans-serif',
               paddingLeft: '0.34em',
@@ -121,7 +120,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           </motion.h1>
 
           <motion.p
-            className="mt-4 text-[11px] uppercase tracking-[0.42em] text-white/40"
+            className="mt-2 text-[clamp(7px,2vw,11px)] uppercase tracking-[0.42em] text-white/40"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.38, ease: 'easeOut' }}
