@@ -9,6 +9,8 @@ const config: CapacitorConfig = {
     contentInset: 'automatic',
     preferredContentMode: 'mobile',
     backgroundColor: '#060608',
+    scrollEnabled: true,
+    allowsLinkPreview: false,
   },
   server: {
     androidScheme: 'https',

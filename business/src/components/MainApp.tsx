@@ -126,20 +126,20 @@ function TopBar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="chrome-shell mx-auto flex h-[4.8rem] max-w-7xl items-center justify-between gap-4 rounded-[1.9rem] px-4 md:px-6">
-        <div className="flex items-center gap-4">
+      <div className="chrome-shell mx-auto flex h-[3.4rem] max-w-7xl items-center justify-between gap-3 rounded-[1.4rem] px-3 md:h-[4.8rem] md:gap-4 md:rounded-[1.9rem] md:px-6">
+        <div className="flex items-center gap-2 md:gap-4">
           <div
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[1.05rem] border border-white/16"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.7rem] border border-white/16 md:h-11 md:w-11 md:rounded-[1.05rem]"
             style={{
               background: 'linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(219,225,232,0.36) 16%, rgba(96,101,108,0.94) 42%, rgba(14,15,18,0.98) 100%)',
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.24), inset 0 -1px 0 rgba(255,255,255,0.05), 0 16px 32px rgba(0,0,0,0.36)',
             }}
           >
-            <span className="text-[0.8rem] font-semibold tracking-[0.32em] text-white" style={{ fontFamily: 'Poppins, sans-serif', paddingLeft: '0.32em' }}>
+            <span className="text-[0.6rem] font-semibold tracking-[0.32em] text-white md:text-[0.8rem]" style={{ fontFamily: 'Poppins, sans-serif', paddingLeft: '0.32em' }}>
               IPB
             </span>
           </div>
-          <p className="metal-text text-[10px] font-semibold uppercase tracking-[0.14em] text-white/74 md:text-[11px]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <p className="metal-text hidden text-[10px] font-semibold uppercase tracking-[0.14em] text-white/74 sm:block md:text-[11px]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Intelligence Platform BUSINESS
           </p>
         </div>
@@ -153,9 +153,9 @@ function TopBar() {
           <kbd className="rounded-md border border-white/12 px-1.5 py-0.5 text-[10px] text-white/32">⌘K</kbd>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 md:gap-2">
           <button
-            className="flex h-11 w-11 items-center justify-center rounded-[1rem] border border-white/12 text-white/70 transition hover:text-white"
+            className="flex h-8 w-8 items-center justify-center rounded-[0.7rem] border border-white/12 text-white/70 transition hover:text-white md:h-11 md:w-11 md:rounded-[1rem]"
             style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(18,18,20,0.84) 60%, rgba(8,8,10,0.98) 100%)' }}
           >
             <Bell className="h-4 w-4" />
@@ -173,34 +173,34 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
 
   return (
     <motion.div
-      className="fixed bottom-6 left-1/2 z-40 w-[min(40rem,calc(100vw-1.5rem))] -translate-x-1/2"
+      className="fixed bottom-3 left-1/2 z-40 w-[min(40rem,calc(100vw-1rem))] -translate-x-1/2"
       initial={{ y: 70, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className={`chrome-pill grid gap-1.5 rounded-[1.8rem] p-1.5 ${isAdmin ? 'grid-cols-3' : 'grid-cols-2'}`}>
+      <div className={`chrome-pill grid gap-1 rounded-[1.2rem] p-1 ${isAdmin ? 'grid-cols-3' : 'grid-cols-2'}`}>
         <button
           onClick={() => onSwitch('business')}
-          className={`flex items-center justify-center gap-2 rounded-[1.3rem] px-5 py-4 text-sm font-semibold tracking-[0.16em] transition-all duration-300 ${active === 'business' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
+          className={`flex items-center justify-center gap-1.5 rounded-[0.9rem] px-3 py-2.5 text-[10px] font-semibold tracking-[0.14em] transition-all duration-300 ${active === 'business' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
         >
-          <Globe className="h-4 w-4" />
+          <Globe className="h-3.5 w-3.5" />
           <span>BUSINESS</span>
         </button>
 
         <button
           onClick={() => onSwitch('estudo')}
-          className={`flex items-center justify-center gap-2 rounded-[1.3rem] px-5 py-4 text-sm font-semibold tracking-[0.16em] transition-all duration-300 ${active === 'estudo' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
+          className={`flex items-center justify-center gap-1.5 rounded-[0.9rem] px-3 py-2.5 text-[10px] font-semibold tracking-[0.14em] transition-all duration-300 ${active === 'estudo' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
         >
-          <BookOpen className="h-4 w-4" />
+          <BookOpen className="h-3.5 w-3.5" />
           <span>INTELLIGENCE</span>
         </button>
 
         {isAdmin && (
           <button
             onClick={() => onSwitch('admin')}
-            className={`flex items-center justify-center gap-2 rounded-[1.3rem] px-5 py-4 text-sm font-semibold tracking-[0.16em] transition-all duration-300 ${active === 'admin' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
+            className={`flex items-center justify-center gap-1.5 rounded-[0.9rem] px-3 py-2.5 text-[10px] font-semibold tracking-[0.14em] transition-all duration-300 ${active === 'admin' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
           >
-            <Shield className="h-4 w-4" />
+            <Shield className="h-3.5 w-3.5" />
             <span>ADMIN</span>
           </button>
         )}
