@@ -13,6 +13,10 @@ const config: CapacitorConfig = {
   server: {
     androidScheme: 'https',
     iosScheme: 'https',
+    // Dev: aponta para o servidor Next.js local
+    // Para produção: troque pela URL do servidor hospedado
+    url: 'http://192.168.18.9:3005',
+    cleartext: true,
   },
 }
 
