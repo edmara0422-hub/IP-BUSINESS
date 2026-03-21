@@ -1,4 +1,5 @@
 import UIKit
+import WebKit
 import Capacitor
 
 @UIApplicationMain
@@ -7,8 +8,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // Disable pinch-to-zoom on WKWebView
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if let webView = self.findWebView(in: self.window) {
+                webView.scrollView.minimumZoomScale = 1.0
+                webView.scrollView.maximumZoomScale = 1.0
+                webView.scrollView.isMultipleTouchEnabled = false
+            }
+        }
         return true
+    }
+
+    private func findWebView(in view: UIView?) -> WKWebView? {
+        guard let view = view else { return nil }
+        if let webView = view as? WKWebView { return webView }
+        for subview in view.subviews {
+            if let found = findWebView(in: subview) { return found }
+        }
+        return nil
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

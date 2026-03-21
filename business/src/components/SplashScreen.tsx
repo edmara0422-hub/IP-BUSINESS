@@ -98,7 +98,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.12),transparent_18%),radial-gradient(circle_at_50%_78%,rgba(173,181,192,0.06),transparent_24%),linear-gradient(180deg,rgba(3,3,3,0.12)_0%,rgba(3,3,3,0.62)_56%,rgba(3,3,3,0.92)_100%)]" />
 
       <div className="relative flex min-h-screen items-center justify-center px-5 text-center">
-        <div className="w-full max-w-4xl mt-[6vh]">
+        <div className="w-full max-w-4xl mt-[2vh]">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -120,7 +120,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           </motion.h1>
 
           <motion.p
-            className="mt-2 text-[clamp(6px,1.6vw,10px)] uppercase tracking-[0.3em] text-white/30"
+            className="mt-2 text-[5px] uppercase tracking-[0.18em] text-white/25 md:text-[10px] md:tracking-[0.42em]"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.38, ease: 'easeOut' }}
