@@ -9,11 +9,9 @@ const config: CapacitorConfig = {
     contentInset: 'automatic',
     preferredContentMode: 'mobile',
     backgroundColor: '#060608',
-    scrollEnabled: true,
   },
   server: {
-    url: 'http://192.168.18.9:3005',
-    cleartext: true,
+    iosScheme: 'https',
   },
 }
 
