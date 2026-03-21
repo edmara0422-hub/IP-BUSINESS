@@ -9,6 +9,7 @@ import RiscosSection from '@/components/business/RiscosSection'
 import MacroSection from '@/components/business/MacroSection'
 import MarketingSection from '@/components/business/MarketingSection'
 import { useBusinessStore } from '@/store/business-store'
+import { apiFetch } from '@/lib/api'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -127,18 +128,13 @@ export default function AbaBusiness() {
   const activeSection = useBusinessStore((s) => s.businessActiveSection)
 
   const fetchData = useCallback(async () => {
-    const urls = ['/api/market.json', '/api/market']
-    for (const url of urls) {
-      try {
-        const res = await fetch(url)
-        if (!res.ok) continue
-        const text = await res.text()
-        if (text && text.startsWith('{')) {
-          setRawData(JSON.parse(text) as MarketData)
-          return
-        }
-      } catch {}
-    }
+    try {
+      const res = await apiFetch('/api/market')
+      const text = await res.text()
+      if (text && text.startsWith('{')) {
+        setRawData(JSON.parse(text) as MarketData)
+      }
+    } catch {}
   }, [])
 
   useEffect(() => { fetchData(); intervalRef.current = setInterval(fetchData, 60_000); return () => { if (intervalRef.current) clearInterval(intervalRef.current) } }, [fetchData])
