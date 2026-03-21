@@ -3,6 +3,7 @@
 import { useMemo, useEffect, useState, useCallback, memo } from 'react'
 import { motion, useSpring, useTransform, AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
+import { apiFetch } from '@/lib/api'
 
 const Globe3D = dynamic(() => import('./Globe3D'), { ssr: false, loading: () => <div className="flex h-full items-center justify-center"><span className="text-[10px] text-white/20">Carregando globo...</span></div> })
 
@@ -317,12 +318,10 @@ function NewsFeed() {
 
   const fetchNews = useCallback(async () => {
     try {
-      let res: Response | null = null
-      try { res = await fetch('/api/news.json') } catch {}
-      if (!res?.ok) try { res = await fetch('/api/news') } catch {}
-      if (res?.ok) {
+      const res = await apiFetch('/api/news')
+      if (res.ok) {
         const text = await res.text()
-        const d = text.startsWith('{') || text.startsWith('[') ? JSON.parse(text) : { news: [] }
+        const d = (text.startsWith('{') || text.startsWith('[')) ? JSON.parse(text) : { news: [] }
         const items: NewsItem[] = d.news ?? []
         setNews(prev => {
           const prevIds = new Set(prev.map(n => n.id))
