@@ -31,7 +31,28 @@ import BusinessClock from '@/components/business/BusinessClock'
 import { useBusinessStore } from '@/store/business-store'
 import type { ContentBlock, TutorMessage } from '@/types/intelligence'
 import { INTELLIGENCE_CONTENT } from '@/data/intelligence-content'
-import { SIM_COMPONENTS } from '@/components/intelligence/SimulationsM3'
+import { SIM_COMPONENTS as SIM_M3 } from '@/components/intelligence/SimulationsM3'
+import { FallacyDetector, EthicsDilemmas, PhilosophyTribunal, ProfitOptimization, DataInterpretation, InvestmentCalculator, BreakevenSimulator, KPIDashboard, DataToDecision } from '@/components/intelligence/SimulationsM4'
+import { ArgumentBuilder, LeanCanvas, MacroScenario, TextReview, PitchEvaluation, ConjunturaAnalysis } from '@/components/intelligence/SimulationsM5'
+
+const SIM_COMPONENTS: Record<string, React.ComponentType> = {
+  ...SIM_M3,
+  'fallacy-detector': FallacyDetector,
+  'ethics-dilemmas': EthicsDilemmas,
+  'philosophy-tribunal': PhilosophyTribunal,
+  'profit-optimization': ProfitOptimization,
+  'investment-calculator': InvestmentCalculator,
+  'breakeven-simulator': BreakevenSimulator,
+  'data-interpretation': DataInterpretation,
+  'kpi-dashboard': KPIDashboard,
+  'data-to-decision': DataToDecision,
+  'argument-builder': ArgumentBuilder,
+  'text-review': TextReview,
+  'lean-canvas': LeanCanvas,
+  'pitch-evaluation': PitchEvaluation,
+  'macro-scenario': MacroScenario,
+  'conjuntura-analysis': ConjunturaAnalysis,
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
