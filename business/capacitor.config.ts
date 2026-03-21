@@ -10,12 +10,10 @@ const config: CapacitorConfig = {
     preferredContentMode: 'mobile',
     backgroundColor: '#060608',
     scrollEnabled: true,
-    allowsLinkPreview: false,
   },
   server: {
-    androidScheme: 'https',
-    iosScheme: 'https',
-    allowNavigation: ['*'],
+    url: 'http://192.168.18.9:3005',
+    cleartext: true,
   },
 }
 
