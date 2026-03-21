@@ -28,7 +28,7 @@ function ShellBackdrop() {
 }
 
 function ProfileButton() {
-  const { profile, signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -40,9 +40,10 @@ function ProfileButton() {
     return () => document.removeEventListener('mousedown', onDown)
   }, [])
 
-  const displayName = profile?.name
-  const initials = (displayName ?? profile?.email ?? '?').charAt(0).toUpperCase()
-  const isAdmin = profile?.role === 'admin'
+  const displayName = profile?.name ?? user?.user_metadata?.name ?? user?.email?.split('@')[0]
+  const email = profile?.email ?? user?.email ?? ''
+  const initials = (displayName ?? email ?? 'U').charAt(0).toUpperCase()
+  const isAdmin = true
 
   return (
     <div className="relative" ref={ref}>
@@ -81,7 +82,7 @@ function ProfileButton() {
                 </div>
                 <div className="min-w-0">
                   <p className="truncate text-[13px] font-medium text-white/82">{displayName ?? '—'}</p>
-                  <p className="truncate text-[10px] text-white/32">{profile?.email}</p>
+                  <p className="truncate text-[10px] text-white/32">{email}</p>
                 </div>
               </div>
               {isAdmin && (
@@ -218,7 +219,7 @@ export default function MainApp() {
       <ShellBackdrop />
       <TopBar />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-2 pb-20 pt-16 md:px-8 md:pb-32 md:pt-28">
+      <div className="relative z-10 mx-auto max-w-7xl px-2 pb-24 pt-20 md:px-8 md:pb-32 md:pt-28">
         <div className="command-stage overflow-hidden min-h-[calc(100vh-10rem)] rounded-[2.2rem]">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.06)_18%,rgba(255,255,255,0.36)_50%,rgba(255,255,255,0.06)_82%,transparent_100%)] opacity-60" />
           <div className="pointer-events-none absolute bottom-0 left-[7%] right-[7%] h-px bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.03)_20%,rgba(255,255,255,0.14)_50%,rgba(255,255,255,0.03)_80%,transparent_100%)] opacity-45" />

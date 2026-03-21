@@ -317,9 +317,12 @@ function NewsFeed() {
 
   const fetchNews = useCallback(async () => {
     try {
-      const res = await fetch('/api/news')
-      if (res.ok) {
-        const d = await res.json()
+      let res: Response | null = null
+      try { res = await fetch('/api/news.json') } catch {}
+      if (!res?.ok) try { res = await fetch('/api/news') } catch {}
+      if (res?.ok) {
+        const text = await res.text()
+        const d = text.startsWith('{') || text.startsWith('[') ? JSON.parse(text) : { news: [] }
         const items: NewsItem[] = d.news ?? []
         setNews(prev => {
           const prevIds = new Set(prev.map(n => n.id))

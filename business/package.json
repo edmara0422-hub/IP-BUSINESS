@@ -4,7 +4,7 @@
   "description": "EGE Business — Intelligence Platform",
   "scripts": {
     "dev": "next dev -p 3005",
-    "build": "next build && node -e \"const fs=require('fs');['api/market','api/news','api/healthz'].forEach(f=>{const p='out/'+f;if(fs.existsSync(p)&&!fs.statSync(p).isDirectory()){fs.cpSync(p,p+'.json')}})\"",
+    "build": "next build && node -e \"const fs=require('fs');const g=require('path');function fix(d){if(!fs.existsSync(d))return;fs.readdirSync(d,{withFileTypes:true}).forEach(e=>{const p=g.join(d,e.name);if(e.isDirectory())fix(p);else if(!e.name.includes('.')){try{const c=fs.readFileSync(p,'utf8');if(c.trim().startsWith('{'))fs.cpSync(p,p+'.json')}catch{}}})};fix('out/api')\"",
     "start": "next start -p 3005",
     "lint": "next lint",
     "cap:sync": "npx cap sync ios",
