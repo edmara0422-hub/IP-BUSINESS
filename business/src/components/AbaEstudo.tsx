@@ -320,12 +320,12 @@ function VideoPanel({ blocks }: { blocks: ContentBlock[] }) {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="mx-auto max-w-[260px] space-y-2 md:max-w-none">
       <p className="mb-3 text-[9px] uppercase tracking-[0.32em] text-white/28">Vídeos do tópico</p>
       {videos.map((block) =>
         openId === block.id ? (
-          <div key={block.id} className="space-y-2">
-            <div className="overflow-hidden rounded-[1rem] bg-black" style={{ aspectRatio: '16/9' }}>
+          <div key={block.id} className="mx-auto max-w-[280px] space-y-2 md:max-w-none">
+            <div className="overflow-hidden rounded-[0.75rem] bg-black md:rounded-[1rem]" style={{ aspectRatio: '16/9' }}>
               {/\.(mp4|webm|ogg|mov)(\?|$)/i.test(block.url) ? (
                 <VideoPlayer url={block.url} />
               ) : (

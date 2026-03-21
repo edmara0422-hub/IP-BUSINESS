@@ -249,15 +249,15 @@ export default function AbaAdmin() {
               Administração <span className="metal-text">IPB</span>
             </h2>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-1.5 md:gap-3">
             {[
               { label: 'Usuários', value: users.filter(u => u.role !== 'admin').length },
               { label: 'Alunos', value: students.length },
               { label: 'Equipe', value: users.filter(u => u.role === 'team').length },
             ].map(({ label, value }) => (
-              <div key={label} className="chrome-subtle rounded-[1.1rem] px-4 py-3 text-center">
-                <p className="text-[1.1rem] font-semibold text-white/86">{value}</p>
-                <p className="text-[8px] uppercase tracking-[0.18em] text-white/28">{label}</p>
+              <div key={label} className="chrome-subtle flex-1 rounded-[0.8rem] px-2 py-2 text-center md:rounded-[1.1rem] md:px-4 md:py-3">
+                <p className="text-[0.85rem] font-semibold text-white/86 md:text-[1.1rem]">{value}</p>
+                <p className="text-[6px] uppercase tracking-[0.14em] text-white/28 md:text-[8px] md:tracking-[0.18em]">{label}</p>
               </div>
             ))}
           </div>
@@ -265,15 +265,15 @@ export default function AbaAdmin() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 rounded-[1.3rem] border border-white/[0.06] bg-black/20 p-1">
+      <div className="flex gap-0.5 rounded-[1rem] border border-white/[0.06] bg-black/20 p-0.5 md:gap-1 md:rounded-[1.3rem] md:p-1">
         {TABS.map(({ id, label, icon: Icon }) => (
           <button key={id} onClick={() => setActiveTab(id)}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-[1rem] py-2.5 text-[10px] uppercase tracking-[0.18em] transition-all duration-200 ${
+            className={`flex flex-1 items-center justify-center gap-1 rounded-[0.7rem] py-1.5 text-[7px] uppercase tracking-[0.12em] transition-all duration-200 md:gap-2 md:rounded-[1rem] md:py-2.5 md:text-[10px] md:tracking-[0.18em] ${
               activeTab === id ? 'bg-white/[0.08] text-white/88' : 'text-white/28 hover:text-white/52'
             }`}
           >
-            <Icon className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">{label}</span>
+            <Icon className="h-2.5 w-2.5 md:h-3.5 md:w-3.5" />
+            <span>{label}</span>
           </button>
         ))}
       </div>
