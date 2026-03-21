@@ -127,14 +127,17 @@ export default function AbaBusiness() {
   const activeSection = useBusinessStore((s) => s.businessActiveSection)
 
   const fetchData = useCallback(async () => {
-    try {
-      const res = await fetch('/api/market', { cache: 'no-store' })
-      const text = await res.text()
-      if (text && text.startsWith('{')) {
-        setRawData(JSON.parse(text) as MarketData)
-      }
-    } catch (e) {
-      console.warn('[business] fetch error:', e)
+    const urls = ['/api/market.json', '/api/market']
+    for (const url of urls) {
+      try {
+        const res = await fetch(url)
+        if (!res.ok) continue
+        const text = await res.text()
+        if (text && text.startsWith('{')) {
+          setRawData(JSON.parse(text) as MarketData)
+          return
+        }
+      } catch {}
     }
   }, [])
 

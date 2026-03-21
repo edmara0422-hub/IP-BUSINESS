@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 
 type Mode = 'login' | 'signup'
 
-export default function LoginForm() {
+export default function LoginForm({ onLogin }: { onLogin?: () => void } = {}) {
   const [mode, setMode] = useState<Mode>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -29,6 +29,7 @@ export default function LoginForm() {
       if (mode === 'login') {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
+        if (onLogin) onLogin()
       } else {
         const { error } = await supabase.auth.signUp({
           email,
