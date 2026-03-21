@@ -211,7 +211,7 @@ export default function MainApp() {
 
   return (
     <motion.div
-      className="relative min-h-screen bg-ocean-900"
+      className="relative min-h-screen bg-ocean-900 mobile-scale"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.7 }}

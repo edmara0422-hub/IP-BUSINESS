@@ -10,12 +10,8 @@ body {
 }
 
 @media (max-width: 767px) {
-  html {
-    font-size: 14px;
-  }
-  body {
+  .mobile-scale {
     zoom: 0.78;
-    -webkit-text-size-adjust: 100%;
   }
 }
 
