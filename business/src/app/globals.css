@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* App nativo - escala mobile */
+/* App nativo */
 html {
   -webkit-text-size-adjust: 100%;
 }
@@ -10,8 +10,8 @@ body {
 }
 
 @media (max-width: 767px) {
-  #__next, main {
-    font-size: 85%;
+  html {
+    font-size: 12px;
   }
 }
 

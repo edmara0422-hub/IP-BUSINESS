@@ -168,9 +168,6 @@ function TopBar() {
 }
 
 function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) => void }) {
-  const { profile } = useAuth()
-  const isAdmin = profile?.role === 'admin'
-
   return (
     <motion.div
       className="fixed bottom-3 left-1/2 z-40 w-[min(40rem,calc(100vw-1rem))] -translate-x-1/2"
@@ -178,32 +175,30 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className={`chrome-pill grid gap-1 rounded-[1.2rem] p-1 ${isAdmin ? 'grid-cols-3' : 'grid-cols-2'}`}>
+      <div className="chrome-pill grid grid-cols-3 gap-1 rounded-[1.2rem] p-1">
         <button
           onClick={() => onSwitch('business')}
-          className={`flex items-center justify-center gap-1.5 rounded-[0.9rem] px-3 py-2.5 text-[10px] font-semibold tracking-[0.14em] transition-all duration-300 ${active === 'business' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
+          className={`flex items-center justify-center gap-1 rounded-[0.9rem] px-2 py-2 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'business' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
         >
-          <Globe className="h-3.5 w-3.5" />
+          <Globe className="h-3 w-3" />
           <span>BUSINESS</span>
         </button>
 
         <button
           onClick={() => onSwitch('estudo')}
-          className={`flex items-center justify-center gap-1.5 rounded-[0.9rem] px-3 py-2.5 text-[10px] font-semibold tracking-[0.14em] transition-all duration-300 ${active === 'estudo' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
+          className={`flex items-center justify-center gap-1 rounded-[0.9rem] px-2 py-2 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'estudo' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
         >
-          <BookOpen className="h-3.5 w-3.5" />
+          <BookOpen className="h-3 w-3" />
           <span>INTELLIGENCE</span>
         </button>
 
-        {isAdmin && (
-          <button
-            onClick={() => onSwitch('admin')}
-            className={`flex items-center justify-center gap-1.5 rounded-[0.9rem] px-3 py-2.5 text-[10px] font-semibold tracking-[0.14em] transition-all duration-300 ${active === 'admin' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
-          >
-            <Shield className="h-3.5 w-3.5" />
-            <span>ADMIN</span>
-          </button>
-        )}
+        <button
+          onClick={() => onSwitch('admin')}
+          className={`flex items-center justify-center gap-1 rounded-[0.9rem] px-2 py-2 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'admin' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
+        >
+          <Shield className="h-3 w-3" />
+          <span>ADMIN</span>
+        </button>
       </div>
     </motion.div>
   )
@@ -232,7 +227,7 @@ export default function MainApp() {
           <AnimatePresence mode="wait">
             {activeTab === 'business' && <AbaBusiness key="business" />}
             {activeTab === 'estudo'   && <AbaEstudo key="estudo" />}
-            {activeTab === 'admin'    && profile?.role === 'admin' && <AbaAdmin key="admin" />}
+            {activeTab === 'admin'    && <AbaAdmin key="admin" />}
           </AnimatePresence>
         </div>
       </div>
