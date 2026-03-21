@@ -8,7 +8,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Enable pinch-to-zoom
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.enableZoom()
+        }
         return true
+    }
+
+    private func enableZoom() {
+        guard let window = self.window else { return }
+        if let webView = self.findWebView(in: window) {
+            webView.scrollView.minimumZoomScale = 0.5
+            webView.scrollView.maximumZoomScale = 3.0
+            webView.scrollView.bouncesZoom = true
+            // Inject JS to allow zoom
+            let js = "document.querySelector('meta[name=viewport]').setAttribute('content','width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=3.0, user-scalable=yes, viewport-fit=cover');"
+            webView.evaluateJavaScript(js, completionHandler: nil)
+        }
+    }
+
+    private func findWebView(in view: UIView) -> WKWebView? {
+        if let wv = view as? WKWebView { return wv }
+        for sub in view.subviews {
+            if let found = findWebView(in: sub) { return found }
+        }
+        return nil
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
