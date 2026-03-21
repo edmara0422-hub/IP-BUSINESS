@@ -1,12 +1,18 @@
 @import "tailwindcss";
 
-/* App nativo */
+/* App nativo - escala mobile */
 html {
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   overscroll-behavior: none;
+}
+
+@media (max-width: 767px) {
+  #__next, main {
+    font-size: 85%;
+  }
 }
 
 @theme {
