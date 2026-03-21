@@ -128,12 +128,14 @@ export default function AbaBusiness() {
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await fetch('/api/market')
-      if (res.ok) {
-        const text = await res.text()
-        try { setRawData(JSON.parse(text) as MarketData) } catch {}
+      const res = await fetch('/api/market', { cache: 'no-store' })
+      const text = await res.text()
+      if (text && text.startsWith('{')) {
+        setRawData(JSON.parse(text) as MarketData)
       }
-    } catch {}
+    } catch (e) {
+      console.warn('[business] fetch error:', e)
+    }
   }, [])
 
   useEffect(() => { fetchData(); intervalRef.current = setInterval(fetchData, 60_000); return () => { if (intervalRef.current) clearInterval(intervalRef.current) } }, [fetchData])
