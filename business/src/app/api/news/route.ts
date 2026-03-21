@@ -102,8 +102,8 @@ export async function GET() {
 
     const data = { news: (fresh.length > 5 ? fresh : unique).slice(0, 20), updatedAt: new Date().toISOString() }
     cache = { data, ts: Date.now() }
-    return NextResponse.json(data)
+    return NextResponse.json(data, { headers: { 'Access-Control-Allow-Origin': '*' } })
   } catch {
-    return NextResponse.json({ news: [], updatedAt: new Date().toISOString() })
+    return NextResponse.json({ news: [], updatedAt: new Date().toISOString() }, { headers: { 'Access-Control-Allow-Origin': '*' } })
   }
 }
