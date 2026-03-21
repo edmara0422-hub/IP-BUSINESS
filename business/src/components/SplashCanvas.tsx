@@ -2,7 +2,7 @@
 
 export default function SplashCanvas() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+    <div className="absolute inset-0 flex items-center justify-center overflow-hidden" style={{ paddingBottom: '12vh' }}>
       {/* Fundo radial */}
       <div
         className="absolute inset-0"

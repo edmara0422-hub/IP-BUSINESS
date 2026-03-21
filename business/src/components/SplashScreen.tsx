@@ -97,8 +97,8 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.12),transparent_18%),radial-gradient(circle_at_50%_78%,rgba(173,181,192,0.06),transparent_24%),linear-gradient(180deg,rgba(3,3,3,0.12)_0%,rgba(3,3,3,0.62)_56%,rgba(3,3,3,0.92)_100%)]" />
 
-      <div className="relative flex min-h-screen items-center justify-center px-5 text-center">
-        <div className="w-full max-w-4xl">
+      <div className="relative flex min-h-screen flex-col items-center justify-center px-5 text-center" style={{ paddingBottom: '6vh' }}>
+        <div className="w-full max-w-4xl" style={{ marginTop: '-6vh' }}>
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
