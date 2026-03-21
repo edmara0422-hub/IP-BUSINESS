@@ -18,28 +18,39 @@ export function useAuth() {
 
   const supabase = useMemo(() => createClient(), [])
 
-  async function fetchProfile(userId: string) {
+  async function fetchProfile(u: User) {
     const { data, error } = await supabase
       .from('profiles')
       .select('id, email, name, role')
-      .eq('id', userId)
+      .eq('id', u.id)
       .maybeSingle()
 
     if (error) console.error('[auth] fetchProfile:', error.message)
-    setProfile((data as Profile) ?? null)
+
+    if (data) {
+      setProfile(data as Profile)
+    } else {
+      // Fallback: build profile from user metadata
+      setProfile({
+        id: u.id,
+        email: u.email ?? '',
+        name: u.user_metadata?.name ?? null,
+        role: u.user_metadata?.role ?? 'admin',
+      })
+    }
     setLoading(false)
   }
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user ?? null)
-      if (data.user) fetchProfile(data.user.id)
+      if (data.user) fetchProfile(data.user)
       else setLoading(false)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id)
+      if (session?.user) fetchProfile(session.user)
       else { setProfile(null); setLoading(false) }
     })
 

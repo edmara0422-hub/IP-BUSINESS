@@ -1,15 +1,12 @@
 @import "tailwindcss";
 
-/* Bloquear pinch-zoom no app nativo */
+/* App nativo */
 html {
-  touch-action: manipulation;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   overscroll-behavior: none;
-  -webkit-user-select: none;
-  user-select: none;
 }
 
 @theme {

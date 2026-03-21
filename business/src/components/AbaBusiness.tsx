@@ -149,7 +149,7 @@ export default function AbaBusiness() {
   )
 
   return (
-    <motion.div className="flex h-[calc(100vh-8rem)] flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <motion.div className="flex h-[calc(100vh-5rem)] flex-col md:h-[calc(100vh-8rem)]" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
 
       {/* ── Relógio (NÃO MEXER NUNCA) ── */}
       <div className="shrink-0 px-4 pt-3 pb-3">
