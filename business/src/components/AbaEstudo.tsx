@@ -32,11 +32,13 @@ import { useBusinessStore } from '@/store/business-store'
 import type { ContentBlock, TutorMessage } from '@/types/intelligence'
 import { INTELLIGENCE_CONTENT } from '@/data/intelligence-content'
 import { SIM_COMPONENTS as SIM_M3 } from '@/components/intelligence/SimulationsM3'
+import { SIM_M1_CREATIVITY } from '@/components/intelligence/SimulationsM1Creativity'
 import { FallacyDetector, EthicsDilemmas, PhilosophyTribunal, ProfitOptimization, DataInterpretation, InvestmentCalculator, BreakevenSimulator, KPIDashboard, DataToDecision } from '@/components/intelligence/SimulationsM4'
 import { ArgumentBuilder, LeanCanvas, MacroScenario, TextReview, PitchEvaluation, ConjunturaAnalysis } from '@/components/intelligence/SimulationsM5'
 
 const SIM_COMPONENTS: Record<string, React.ComponentType> = {
   ...SIM_M3,
+  ...SIM_M1_CREATIVITY,
   'fallacy-detector': FallacyDetector,
   'ethics-dilemmas': EthicsDilemmas,
   'philosophy-tribunal': PhilosophyTribunal,
