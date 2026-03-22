@@ -1,0 +1,6 @@
+out/
+ios/
+.next/cache/
+node_modules/
+*.xcodeproj
+*.xcworkspace
