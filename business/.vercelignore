@@ -4,5 +4,3 @@ ios/
 node_modules/
 *.xcodeproj
 *.xcworkspace
-.next-stale*
-.next
