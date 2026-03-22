@@ -219,8 +219,8 @@ export default function MainApp() {
       <ShellBackdrop />
       <TopBar />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-2 pb-24 pt-20 md:px-8 md:pb-32 md:pt-28">
-        <div className="command-stage overflow-hidden min-h-[calc(100vh-10rem)] rounded-[2.2rem]">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-start px-2 pb-24 pt-16 md:items-start md:px-8 md:pb-32 md:pt-28">
+        <div className="command-stage mt-auto mb-auto w-full overflow-hidden rounded-[2.2rem]">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.06)_18%,rgba(255,255,255,0.36)_50%,rgba(255,255,255,0.06)_82%,transparent_100%)] opacity-60" />
           <div className="pointer-events-none absolute bottom-0 left-[7%] right-[7%] h-px bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.03)_20%,rgba(255,255,255,0.14)_50%,rgba(255,255,255,0.03)_80%,transparent_100%)] opacity-45" />
           <div className="pointer-events-none absolute left-0 top-[8%] h-[76%] w-px bg-[linear-gradient(180deg,transparent_0%,rgba(255,255,255,0.06)_14%,rgba(255,255,255,0.18)_50%,rgba(255,255,255,0.06)_86%,transparent_100%)] opacity-55" />
