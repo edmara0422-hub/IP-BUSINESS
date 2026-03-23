@@ -1,7 +1,9 @@
 import Groq from 'groq-sdk'
 import { NextResponse } from 'next/server'
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+function getGroq() {
+  return new Groq({ apiKey: process.env.GROQ_API_KEY })
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -38,7 +40,7 @@ Regras de resposta:
       { role: 'user', content: question },
     ]
 
-    const completion = await groq.chat.completions.create({
+    const completion = await getGroq().chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages,
       max_tokens: 700,

@@ -1,7 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { NextResponse } from 'next/server'
 
-const client = new Anthropic()
+function getClient() {
+  return new Anthropic()
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -61,7 +63,7 @@ Forneça uma análise executiva estratégica. Responda APENAS com JSON válido n
 
 Seja direto, use os números, evite generalidades. Responda APENAS o JSON.`
 
-    const message = await client.messages.create({
+    const message = await getClient().messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 512,
       messages: [{ role: 'user', content: prompt }],
