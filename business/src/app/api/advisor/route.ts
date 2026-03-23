@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 
 const client = new Anthropic()
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 
 interface AdvisorRequest {
   snapshot: {

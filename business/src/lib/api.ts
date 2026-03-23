@@ -1,10 +1,12 @@
 export async function apiFetch(path: string): Promise<Response> {
-  // Tenta .json local (empacotado no app)
-  try {
-    const res = await fetch(`${path}.json`)
-    if (res.ok) return res
-  } catch {}
+  // Em ambiente Capacitor (app nativo), tenta .json local empacotado
+  if (typeof window !== 'undefined' && (window as any).Capacitor) {
+    try {
+      const res = await fetch(`${path}.json`)
+      if (res.ok) return res
+    } catch {}
+  }
 
-  // Fallback sem extensão
-  return fetch(path)
+  // Busca dados dinâmicos da API (tempo real)
+  return fetch(path, { cache: 'no-store' })
 }

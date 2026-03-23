@@ -8,7 +8,7 @@ const adminClient = createClient(
   { auth: { autoRefreshToken: false, persistSession: false } }
 )
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
   // Verifica se quem chama é admin

@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 
 interface TutorRequest {
   selectedText: string
