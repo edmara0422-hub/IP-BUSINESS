@@ -1,3 +1,4 @@
 {
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "buildCommand": "next build && cp .next/routes-manifest.json .next/routes-manifest-deterministic.json 2>/dev/null || true"
 }
