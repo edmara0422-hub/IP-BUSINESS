@@ -340,14 +340,6 @@ export default function PanoramaSection({ data }: { data: any }) {
       <div>
         <div className="relative rounded-lg border border-white/[0.06] overflow-hidden"
           style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.01) 0%, rgba(0,0,0,0.5) 80%)' }}>
-          {/* Question overlay */}
-          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 text-center">
-            <p className="font-mono text-[8px] font-bold tracking-[0.3em] text-white/20 uppercase">Intelligence Platform Business</p>
-            <h2 className="text-[15px] font-semibold text-white/60 mt-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              Como está o mercado <span className="text-white/90">AGORA</span>?
-            </h2>
-          </div>
-
           {/* Globo grande centralizado */}
           <div className="h-[480px] lg:h-[540px]">
             <Globe3D data={{ agents }} />
