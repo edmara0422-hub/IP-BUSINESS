@@ -227,11 +227,11 @@ function NewsTicker({ news }: { news: NewsItem[] }) {
     <div className="overflow-hidden relative" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
       <div className="flex items-center">
         {/* Badge LIVE fixo */}
-        <div className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 z-10"
+        <div className="shrink-0 flex items-center gap-1.5 px-2.5 py-1 z-10"
           style={{ background: 'rgba(0,0,0,0.8)', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
           <motion.div className="h-1.5 w-1.5 rounded-full bg-red-500"
             animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 0.8, repeat: Infinity }} />
-          <span className="font-mono text-[9px] font-bold tracking-[0.2em] text-red-400/80">LIVE</span>
+          <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-red-400/80">LIVE</span>
         </div>
         {/* Marquee */}
         <div className="flex-1 overflow-hidden">
@@ -240,7 +240,7 @@ function NewsTicker({ news }: { news: NewsItem[] }) {
               const m = CAT_META[n.category] ?? CAT_META.all
               return (
                 <a key={`${n.id}-${i}`} href={n.link} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-1.5 hover:bg-white/[0.03] transition-colors">
+                  className="inline-flex items-center gap-2 px-5 py-1 hover:bg-white/[0.03] transition-colors">
                   <span className="font-mono text-[8px] font-bold tracking-widest uppercase" style={{ color: m.color }}>{m.label}</span>
                   <span className="text-[10px] text-white/50 hover:text-white/80 transition-colors">{n.title}</span>
                   <span className="font-mono text-[8px] text-white/20">{timeAgo(n.pubDate)}</span>
@@ -395,7 +395,7 @@ function NewsFeed() {
         })}
       </div>
 
-      {/* Cards */}
+      {/* Cards — 3 columns on desktop, max 6 */}
       {loading ? (
         <div className="flex items-center justify-center py-8">
           <div className="h-4 w-4 animate-spin rounded-full border border-white/10 border-t-white/40" />
@@ -403,9 +403,9 @@ function NewsFeed() {
         </div>
       ) : (
         <AnimatePresence mode="wait">
-          <motion.div key={filter} className="grid grid-cols-1 lg:grid-cols-2 gap-2"
+          <motion.div key={filter} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
-            {filtered.slice(0, 8).map((n, i) => (
+            {filtered.slice(0, 6).map((n, i) => (
               <NewsCard key={n.id} item={n} index={i} isNew={isNew(n.id)} />
             ))}
           </motion.div>
@@ -667,6 +667,63 @@ export default function PanoramaSection({ data }: { data: any }) {
   const problems = data.centralProblems as Array<{ id: string; label: string; affected: number }>
   const opportunities = data.opportunities as Array<{ id: string; label: string; urgency: number }>
 
+  // ── Sector data ──
+  const sectorList = useMemo(() => {
+    const raw = data.sectors as Array<{ id: string; heat: number; change: number }>
+    return raw.map(s => ({
+      label: s.id.charAt(0).toUpperCase() + s.id.slice(1),
+      heat: s.heat,
+      change: s.change,
+      trend: s.change > 1 ? 'up' : s.change < -1 ? 'down' : 'neutral',
+    }))
+  }, [data.sectors])
+
+  const avgHeat = useMemo(() => {
+    if (sectorList.length === 0) return 0
+    return Math.round(sectorList.reduce((s, sec) => s + sec.heat, 0) / sectorList.length)
+  }, [sectorList])
+
+  const sectorsUp = useMemo(() => sectorList.filter(s => s.trend === 'up').length, [sectorList])
+  const sectorsDown = useMemo(() => sectorList.filter(s => s.trend === 'down').length, [sectorList])
+
+  const [activeSec, setActiveSec] = useState(0)
+
+  // Auto-rotate sector selection
+  useEffect(() => {
+    if (sectorList.length === 0) return
+    const t = setInterval(() => setActiveSec(i => (i + 1) % sectorList.length), 4000)
+    return () => clearInterval(t)
+  }, [sectorList.length])
+
+  // ── Dimension data ──
+  const dimensions = useMemo(() => buildDimensions(data), [data])
+
+  const marketScore = useMemo(() =>
+    Math.round(dimensions.reduce((s, d) => s + d.score * d.weight, 0)),
+    [dimensions]
+  )
+
+  const scoreColor = marketScore >= 65 ? GAUGE_GREEN : marketScore >= 42 ? GAUGE_AMBER : GAUGE_RED
+  const scoreLabel = marketScore >= 65 ? 'EXPANSÃO' : marketScore >= 42 ? 'NEUTRO' : 'CONTRAÇÃO'
+
+  const [activeDim, setActiveDim] = useState(0)
+
+  // Auto-rotate dimension selection
+  useEffect(() => {
+    const t = setInterval(() => setActiveDim(i => (i + 1) % 8), 5000)
+    return () => clearInterval(t)
+  }, [])
+
+  // ── Top risks & opportunities ──
+  const topRisks = useMemo(() =>
+    [...problems].sort((a, b) => b.affected - a.affected).slice(0, 3),
+    [problems]
+  )
+
+  const topOpps = useMemo(() =>
+    [...opportunities].sort((a, b) => b.urgency - a.urgency).slice(0, 3),
+    [opportunities]
+  )
 
   return (
     <div className="flex flex-col gap-5 px-4 pb-8">
@@ -824,12 +881,166 @@ export default function PanoramaSection({ data }: { data: any }) {
         </div>
       </div>
 
-      {/* ══ BLOCO 2.5: FEED DE NOTÍCIAS ══ */}
+      {/* ══ BLOCO 2: LEITURA DO MERCADO — 3 colunas ══ */}
+      <div>
+        <SectionLabel>Leitura do Mercado</SectionLabel>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+          {/* ── Column 1: Setores · Heat Map ── */}
+          <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${GAUGE_AMBER}60, transparent)` }} />
+            <div className="px-4 pt-3 pb-2">
+              <span className="font-mono text-[8px] font-bold uppercase tracking-[0.15em] text-white/20">Quais setores estão aquecidos?</span>
+              <div className="flex items-center justify-between mt-1">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-white/40">Setores · Heat Map</span>
+              </div>
+              <p className="font-mono text-[9px] text-white/30 mt-1">
+                {sectorsUp} {sectorsUp === 1 ? 'setor' : 'setores'} em alta, {sectorsDown} em queda · Média {avgHeat}/100
+              </p>
+            </div>
+            <div className="px-2 pb-2">
+              <SectorRadial sectors={sectorList} activeSec={activeSec} onSelect={setActiveSec} avgHeat={avgHeat} />
+            </div>
+            <div className="px-3 pb-3">
+              <AnimatePresence mode="wait">
+                {sectorList[activeSec] && (
+                  <SectorDetailPanel sector={sectorList[activeSec]} />
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* ── Column 2: Radar 8D · Score de Mercado ── */}
+          <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${scoreColor}60, transparent)` }} />
+            <div className="px-4 pt-3 pb-2">
+              <span className="font-mono text-[8px] font-bold uppercase tracking-[0.15em] text-white/20">Qual a saúde geral do mercado?</span>
+              <div className="flex items-center justify-between mt-1">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-white/40">Radar 8D · Score de Mercado</span>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="font-mono text-[18px] font-bold" style={{ color: scoreColor }}>{marketScore}</span>
+                <span className="font-mono text-[8px] tracking-widest px-1.5 py-0.5 rounded-sm" style={{ background: `${scoreColor}15`, color: scoreColor, border: `1px solid ${scoreColor}30` }}>{scoreLabel}</span>
+              </div>
+            </div>
+            <div className="px-2 pb-2">
+              <MultidimRadial
+                dimensions={dimensions}
+                activeDim={activeDim}
+                onSelect={setActiveDim}
+                marketScore={marketScore}
+                scoreColor={scoreColor}
+                scoreLabel={scoreLabel}
+              />
+            </div>
+            <div className="px-3 pb-3">
+              <AnimatePresence mode="wait">
+                {dimensions[activeDim] && (
+                  <DimDetailPanel dim={dimensions[activeDim]} scoreColor={scoreColor} />
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* ── Column 3: Pulso · Riscos & Oportunidades ── */}
+          <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${GAUGE_RED}60, transparent)` }} />
+            <div className="px-4 pt-3 pb-2">
+              <span className="font-mono text-[8px] font-bold uppercase tracking-[0.15em] text-white/20">O que pode impactar meu negócio?</span>
+              <div className="flex items-center justify-between mt-1">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-white/40">Pulso · Riscos & Oportunidades</span>
+              </div>
+              <p className="font-mono text-[9px] text-white/30 mt-1">
+                {topRisks.length} riscos + {topOpps.length} oportunidades priorizadas
+              </p>
+            </div>
+
+            <div className="px-3 pb-3 flex flex-col gap-3">
+              {/* Riscos */}
+              <div>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <span className="font-mono text-[8px] font-bold uppercase tracking-[0.15em]" style={{ color: GAUGE_RED }}>Riscos</span>
+                  <div className="flex-1 h-px" style={{ background: `${GAUGE_RED}20` }} />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  {topRisks.map((risk, i) => (
+                    <motion.div key={risk.id}
+                      className="rounded-md overflow-hidden"
+                      style={{ background: 'rgba(0,0,0,0.4)', border: `1px solid ${GAUGE_RED}18` }}
+                      initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.08 }}
+                    >
+                      <div className="h-[1.5px]" style={{ background: `linear-gradient(90deg, ${GAUGE_RED}50, transparent)` }} />
+                      <div className="px-3 py-2 flex items-start gap-2">
+                        <span className="font-mono text-[18px] font-bold leading-none shrink-0" style={{ color: GAUGE_RED, opacity: 0.2 }}>{i + 1}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] text-white/55 leading-snug">{risk.label}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="font-mono text-[8px] text-white/25">IMPACTO</span>
+                            <div className="flex-1 h-[2px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                              <motion.div className="h-full rounded-full" style={{ background: GAUGE_RED }}
+                                initial={{ width: 0 }}
+                                animate={{ width: `${Math.min(100, risk.affected)}%` }}
+                                transition={{ duration: 1, delay: i * 0.1 }}
+                              />
+                            </div>
+                            <span className="font-mono text-[9px] font-bold" style={{ color: GAUGE_RED }}>{risk.affected}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Oportunidades */}
+              <div>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <span className="font-mono text-[8px] font-bold uppercase tracking-[0.15em]" style={{ color: GAUGE_GREEN }}>Oportunidades</span>
+                  <div className="flex-1 h-px" style={{ background: `${GAUGE_GREEN}20` }} />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  {topOpps.map((opp, i) => (
+                    <motion.div key={opp.id}
+                      className="rounded-md overflow-hidden"
+                      style={{ background: 'rgba(0,0,0,0.4)', border: `1px solid ${GAUGE_GREEN}18` }}
+                      initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.08 + 0.25 }}
+                    >
+                      <div className="h-[1.5px]" style={{ background: `linear-gradient(90deg, ${GAUGE_GREEN}50, transparent)` }} />
+                      <div className="px-3 py-2 flex items-start gap-2">
+                        <span className="font-mono text-[18px] font-bold leading-none shrink-0" style={{ color: GAUGE_GREEN, opacity: 0.2 }}>{i + 1}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] text-white/55 leading-snug">{opp.label}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="font-mono text-[8px] text-white/25">URGÊNCIA</span>
+                            <div className="flex-1 h-[2px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                              <motion.div className="h-full rounded-full" style={{ background: GAUGE_GREEN }}
+                                initial={{ width: 0 }}
+                                animate={{ width: `${Math.min(100, opp.urgency)}%` }}
+                                transition={{ duration: 1, delay: i * 0.1 + 0.25 }}
+                              />
+                            </div>
+                            <span className="font-mono text-[9px] font-bold" style={{ color: GAUGE_GREEN }}>{opp.urgency}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ══ BLOCO 3: FEED DE NOTÍCIAS ══ */}
       <div className="rounded-sm px-4 py-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
         <NewsFeed />
       </div>
 
-      {/* ══ BLOCO 3: SIGNAL FEED — evento → impacto → oportunidade → ação ══ */}
+      {/* ══ BLOCO 4: SIGNAL FEED — evento → impacto → oportunidade → ação ══ */}
       <SignalFeedSection data={data} />
 
     </div>

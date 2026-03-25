@@ -9,15 +9,14 @@ const AMBER = '#9a7d0a'
 const BLUE  = '#1a5276'
 
 // ══════════════════════════════════════════════════════════════════════════
-// ██  RODAS SVG — DIMENSÕES + SETORES
+// ██  HELPERS
 // ══════════════════════════════════════════════════════════════════════════
 
 function dimColor(s: 'good' | 'warning' | 'critical') {
   return s === 'good' ? GREEN : s === 'warning' ? AMBER : RED
 }
-function sectorColor(trend: string) {
-  return trend === 'up' ? GREEN : trend === 'down' ? RED : AMBER
-}
+
+function v(n: number | undefined, fb: number) { return (n != null && Number.isFinite(n)) ? n : fb }
 
 interface DimScore {
   label: string; short: string; score: number; weight: number
@@ -94,7 +93,47 @@ function buildDimensions(data: any): DimScore[] {
   ]
 }
 
-// ── MultidimRadial ──────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// ██  "COMO ISSO AFETA SEU NEGÓCIO" — dynamic sentence per dimension
+// ══════════════════════════════════════════════════════════════════════════
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function businessImpactSentence(dim: DimScore, data: any): string {
+  const vv = (n: number | undefined, fb: number) => (n != null && Number.isFinite(n)) ? n : fb
+  const pib   = vv(data.macro.pib?.value, 2.9)
+  const ipca  = vv(data.macro.ipca?.value, 4.8)
+  const cacDelta = data.marketing?.cacTrend?.delta ?? 12
+  const comms = Object.values(data.commodities as Record<string, { delta: number }>)
+  const commAvgDelta = comms.reduce((s, c) => s + c.delta, 0) / Math.max(1, comms.length)
+  const sectors = data.sectors as Array<{ heat: number }>
+  const mktAvg = sectors.reduce((s, sec) => s + sec.heat, 0) / Math.max(1, sectors.length)
+
+  switch (dim.short) {
+    case 'ECON':
+      return `PIB ${pib > 0 ? '+' : ''}${pib.toFixed(1)}% significa ${pib > 1 ? 'mais' : 'menos'} demanda para seus produtos`
+    case 'IPCA':
+      return `Inflação ${ipca.toFixed(2)}% ${ipca > 4.75 ? 'corrói' : 'mantém'} o poder de compra do seu cliente`
+    case 'COMM':
+      return `Commodities ${commAvgDelta > 2 ? 'em alta' : commAvgDelta > -2 ? 'estáveis' : 'em queda'} ${commAvgDelta > 2 ? 'encarecem' : 'barateiam'} seus insumos`
+    case 'TECH':
+      return `Setor tech ${dim.score >= 65 ? 'aquecido' : 'frio'} ${dim.score >= 65 ? 'facilita' : 'dificulta'} adoção de ferramentas digitais`
+    case 'MKTD':
+      return `Mercado ${mktAvg >= 55 ? 'expandindo' : 'contraindo'} — ${mktAvg >= 55 ? 'bom' : 'ruim'} momento para escalar`
+    case 'INOV':
+      return `Ambiente ${dim.score >= 60 ? 'favorável' : 'desfavorável'} para inovação e novos produtos`
+    case 'ESG':
+      return `Pressão ESG ${dim.score >= 60 ? 'alta' : 'moderada'} — compliance ${dim.score >= 60 ? 'urgente' : 'pode esperar'}`
+    case 'MRKT':
+      return `CAC ${cacDelta > 0 ? 'subindo' : 'caindo'} — custo de aquisição ${cacDelta > 0 ? 'comprime' : 'libera'} margem`
+    default:
+      return ''
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ██  MultidimRadial (single, bigger, centered)
+// ══════════════════════════════════════════════════════════════════════════
+
 const CX = 155, CY = 155, R_INNER = 40, R_MAX = 114, SPOKE_LEN = 74, R_LABEL = 132
 
 const MultidimRadial = memo(function MultidimRadial({ dimensions, activeDim, onSelect, marketScore, scoreColor, scoreLabel }: {
@@ -144,62 +183,12 @@ const MultidimRadial = memo(function MultidimRadial({ dimensions, activeDim, onS
   )
 })
 
-// ── SectorRadial ────────────────────────────────────────────────────────────
-const SCX = 155, SCY = 155, SR_INNER = 40, SR_MAX = 114, SPOKE_S = 74, SR_LABEL = 132
+// ══════════════════════════════════════════════════════════════════════════
+// ██  DimDetailPanel (with business impact line)
+// ══════════════════════════════════════════════════════════════════════════
 
-const SectorRadial = memo(function SectorRadial({ sectors, activeSec, onSelect, avgHeat }: {
-  sectors: Array<{ label: string; heat: number; change: number; trend: string }>
-  activeSec: number; onSelect: (i: number) => void; avgHeat: number
-}) {
-  const n = sectors.length
-  return (
-    <svg viewBox="0 0 310 310" style={{ width: '100%', display: 'block', overflow: 'visible' }}>
-      <circle cx={SCX} cy={SCY} r={SR_MAX} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={1} strokeDasharray="3 5" />
-      <circle cx={SCX} cy={SCY} r={(SR_INNER + SR_MAX) / 2} fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth={1} />
-      {sectors.map((s, i) => {
-        const angle = (i * (360 / n) - 90) * (Math.PI / 180)
-        const cos = Math.cos(angle), sin = Math.sin(angle)
-        const x1 = SCX + SR_INNER * cos, y1 = SCY + SR_INNER * sin
-        const xFull = SCX + SR_MAX * cos, yFull = SCY + SR_MAX * sin
-        const scoreR = SR_INNER + (s.heat / 100) * SPOKE_S
-        const xScore = SCX + scoreR * cos, yScore = SCY + scoreR * sin
-        const xLabel = SCX + SR_LABEL * cos, yLabel = SCY + SR_LABEL * sin
-        const color = sectorColor(s.trend)
-        const isActive = activeSec === i
-        const short = s.label.split(' ')[0].substring(0, 6)
-        return (
-          <g key={s.label} style={{ cursor: 'pointer' }} onClick={() => onSelect(i)}>
-            <line x1={x1} y1={y1} x2={xFull} y2={yFull} stroke="rgba(255,255,255,0.06)" strokeWidth={1} />
-            <motion.path d={`M ${x1} ${y1} L ${xFull} ${yFull}`}
-              stroke={color} strokeWidth={isActive ? 3 : 1.5} strokeLinecap="round" fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: s.heat / 100, opacity: isActive ? 1 : 0.28 }}
-              transition={{ duration: 1.5, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
-              style={isActive ? { filter: `drop-shadow(0 0 4px ${color}99)` } : {}} />
-            <motion.circle cx={xScore} cy={yScore} fill={color}
-              animate={{ r: isActive ? [3, 4.5, 3] : 2, opacity: isActive ? 1 : 0.28 }}
-              transition={{ r: { duration: 1.4, repeat: Infinity }, opacity: { duration: 0.3 } }} />
-            <line x1={x1} y1={y1} x2={xFull} y2={yFull} stroke="transparent" strokeWidth={20} />
-            <text x={xLabel} y={yLabel} textAnchor="middle" dominantBaseline="middle"
-              fontSize={isActive ? 8.5 : 7.5} fontFamily="monospace" fontWeight={isActive ? 'bold' : 'normal'}
-              fill={isActive ? color : 'rgba(255,255,255,0.28)'} letterSpacing="0.08em">{short}</text>
-          </g>
-        )
-      })}
-      <circle cx={SCX} cy={SCY} r={SR_INNER} fill="rgba(0,0,0,0.85)"
-        stroke="rgba(192,192,192,0.5)" strokeWidth={1.5}
-        style={{ filter: 'drop-shadow(0 0 8px rgba(192,192,192,0.2))' }} />
-      <text x={SCX} y={SCY - 8} textAnchor="middle" dominantBaseline="middle"
-        fontSize={26} fontFamily="monospace" fontWeight="bold" fill="rgba(192,192,192,0.9)">{avgHeat}</text>
-      <text x={SCX} y={SCY + 13} textAnchor="middle" dominantBaseline="middle"
-        fontSize={6.5} fontFamily="monospace" fill="rgba(192,192,192,0.5)" letterSpacing="0.2em">HEAT AVG</text>
-    </svg>
-  )
-})
-
-// ── DimDetailPanel ──────────────────────────────────────────────────────────
-function DimDetailPanel({ dim, scoreColor, extra }: {
-  dim: DimScore; scoreColor: string; extra?: React.ReactNode
+function DimDetailPanel({ dim, scoreColor, extra, businessImpact }: {
+  dim: DimScore; scoreColor: string; extra?: React.ReactNode; businessImpact: string
 }) {
   const color = dimColor(dim.status)
   const statusLabel = dim.status === 'good' ? 'SAUDÁVEL' : dim.status === 'warning' ? 'MODERADO' : 'CRÍTICO'
@@ -228,6 +217,15 @@ function DimDetailPanel({ dim, scoreColor, extra }: {
           </div>
         </div>
       </div>
+      {/* COMO ISSO AFETA SEU NEGÓCIO */}
+      {businessImpact && (
+        <div className="px-3 pb-2">
+          <div className="rounded-sm px-2.5 py-2" style={{ background: `${BLUE}12`, border: `1px solid ${BLUE}25` }}>
+            <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: '#5dade2' }}>COMO ISSO AFETA SEU NEGÓCIO</span>
+            <p className="text-[10px] text-white/50 leading-relaxed">{businessImpact}</p>
+          </div>
+        </div>
+      )}
       {extra && <div className="px-3 pb-3">{extra}</div>}
       {!extra && (
         <div className="px-3 pb-2.5 flex flex-wrap gap-1.5">
@@ -243,63 +241,10 @@ function DimDetailPanel({ dim, scoreColor, extra }: {
   )
 }
 
-// ── SectorDetailPanel ───────────────────────────────────────────────────────
-function SectorDetailPanel({ sector, ctx }: {
-  sector: { id: string; label: string; heat: number; change: number; trend: string }
-  ctx?: { driver: string; macro: string }
-}) {
-  const color = sectorColor(sector.trend)
-  const trendLabel = sector.trend === 'up' ? 'ALTA' : sector.trend === 'down' ? 'BAIXA' : 'NEUTRO'
-  return (
-    <motion.div key={sector.label}
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-      transition={{ duration: 0.2 }}
-      className="rounded-lg overflow-hidden"
-      style={{ background: 'rgba(0,0,0,0.4)', border: `1px solid ${color}22` }}>
-      <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${color}80, transparent)` }} />
-      <div className="px-3 py-2.5 flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-1">
-            <span className="font-mono text-[10px] font-bold" style={{ color }}>{sector.label}</span>
-            <span className="font-mono text-[8px] px-1.5 py-0.5 rounded-sm" style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}>{trendLabel}</span>
-          </div>
-          <div className="flex items-center gap-4 mt-1">
-            <div><span className="font-mono text-[7px] text-white/20 block">HEAT</span>
-              <span className="font-mono text-[14px] font-bold" style={{ color }}>{sector.heat}/100</span></div>
-            <div><span className="font-mono text-[7px] text-white/20 block">YTD</span>
-              <span className="font-mono text-[14px] font-bold" style={{ color }}>{sector.change > 0 ? '+' : ''}{sector.change.toFixed(1)}%</span></div>
-          </div>
-        </div>
-        <span className="font-mono text-[38px] font-bold leading-none shrink-0" style={{ color, opacity: 0.12 }}>
-          {sector.trend === 'up' ? '▲' : sector.trend === 'down' ? '▼' : '–'}
-        </span>
-      </div>
-      <div className="px-3 pb-2.5">
-        <div className="h-[3px] w-full rounded-full overflow-hidden mb-2.5" style={{ background: 'rgba(255,255,255,0.06)' }}>
-          <motion.div className="h-full rounded-full" style={{ background: color }}
-            initial={{ width: 0 }} animate={{ width: `${sector.heat}%` }}
-            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }} />
-        </div>
-        {ctx && (
-          <div className="flex flex-col gap-1.5">
-            <div>
-              <span className="font-mono text-[7px] text-white/18 block mb-0.5">DRIVER</span>
-              <p className="text-[9px] text-white/40 leading-snug">{ctx.driver}</p>
-            </div>
-            <div>
-              <span className="font-mono text-[7px] text-white/18 block mb-0.5">CONTEXTO MACRO</span>
-              <p className="text-[9px] text-white/35 leading-snug">{ctx.macro}</p>
-            </div>
-          </div>
-        )}
-      </div>
-    </motion.div>
-  )
-}
+// ══════════════════════════════════════════════════════════════════════════
+// ██  Agente global detalhado
+// ══════════════════════════════════════════════════════════════════════════
 
-function v(n: number | undefined, fb: number) { return (n != null && Number.isFinite(n)) ? n : fb }
-
-// ── Agente global detalhado ────────────────────────────────────────────────
 interface AgentDetail {
   id: string; label: string; delta: number; impact: string
   sector: string; mktCap: string
@@ -402,7 +347,10 @@ function buildAgents(data: any): AgentDetail[] {
   }))
 }
 
-// ── Card do agente ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// ██  AgentCard
+// ══════════════════════════════════════════════════════════════════════════
+
 function AgentCard({ agent, index }: { agent: AgentDetail; index: number }) {
   const [open, setOpen] = useState(false)
   const col = agent.delta > 0 ? GREEN : agent.delta < 0 ? RED : AMBER
@@ -415,13 +363,10 @@ function AgentCard({ agent, index }: { agent: AgentDetail; index: number }) {
       style={{ border: `1px solid rgba(255,255,255,${open ? '0.1' : '0.05'})`, background: 'rgba(0,0,0,0.25)' }}>
 
       <button className="w-full flex items-center gap-3 px-4 py-3 text-left" onClick={() => setOpen(o => !o)}>
-        {/* Delta badge */}
         <div className="shrink-0 flex flex-col items-center gap-0.5 w-14">
           <span className="font-mono text-[18px] font-bold leading-none" style={{ color: col }}>{sign}{agent.delta.toFixed(1)}%</span>
           <div className="h-[2px] w-10 rounded-full" style={{ background: col, opacity: 0.5 }} />
         </div>
-
-        {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <span className="text-[13px] font-semibold text-white/75">{agent.label}</span>
@@ -429,8 +374,6 @@ function AgentCard({ agent, index }: { agent: AgentDetail; index: number }) {
           </div>
           <p className="text-[10px] text-white/35 truncate">{agent.impact}</p>
         </div>
-
-        {/* Market cap + expand */}
         <div className="shrink-0 flex flex-col items-end gap-1">
           <span className="font-mono text-[9px] text-white/20">{agent.mktCap}</span>
           <span className="text-white/20 text-[10px]">{open ? '▲' : '▼'}</span>
@@ -444,13 +387,10 @@ function AgentCard({ agent, index }: { agent: AgentDetail; index: number }) {
             exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
             className="overflow-hidden">
             <div className="px-4 pb-4 border-t border-white/[0.05]">
-              {/* Por que importa */}
               <div className="mt-3 rounded-sm p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">POR QUE ESSE AGENTE IMPORTA</span>
                 <p className="text-[10px] text-white/50 leading-relaxed">{agent.whyMatters}</p>
               </div>
-
-              {/* Cascata */}
               <div className="mt-3">
                 <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">EFEITOS EM CASCATA</span>
                 <div className="flex flex-col gap-1.5">
@@ -462,8 +402,6 @@ function AgentCard({ agent, index }: { agent: AgentDetail; index: number }) {
                   ))}
                 </div>
               </div>
-
-              {/* Efeito no Brasil */}
               <div className="mt-3 rounded-sm p-2.5" style={{ background: `${BLUE}15`, border: `1px solid ${BLUE}30` }}>
                 <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: '#5dade2' }}>IMPACTO DIRETO NO BRASIL</span>
                 <p className="text-[10px] text-white/40 leading-relaxed">{agent.brazilEffect}</p>
@@ -476,50 +414,80 @@ function AgentCard({ agent, index }: { agent: AgentDetail; index: number }) {
   )
 }
 
-// ── Card commodity ─────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// ██  CommodityCard (compact for 2x3 grid)
+// ══════════════════════════════════════════════════════════════════════════
+
 function CommodityCard({ name, value, delta, unit, label, index }: {
   name: string; value: number; delta: number; unit: string; label: string; index: number
 }) {
   const col = delta > 0 ? GREEN : delta < 0 ? RED : AMBER
   const context: Record<string, string> = {
-    gold:    'Ouro sobe em momentos de incerteza global. Alta = risco percebido no mundo. Impacta joalheria e reservas de valor.',
-    oil:     'Petróleo define custo do frete e combustível. Alta pressiona inflação em toda a cadeia produtiva brasileira.',
-    silver:  'Prata é insumo industrial (eletrônicos, energia solar). Alta indica demanda industrial aquecida.',
-    grains:  'Grãos afetam diretamente o preço de alimentos. Brasil como exportador ganha em receita de câmbio.',
-    copper:  'Cobre é termômetro da economia global. Alta indica expansão industrial. Insumo essencial em construção e eletrônicos.',
-    lithium: 'Lítio é insumo de baterias EV. Queda indica excesso de oferta — setor de veículos elétricos desacelerando.',
+    gold:    'Risco global: ouro sobe = incerteza',
+    oil:     'Define custo de frete e combustível',
+    silver:  'Demanda industrial aquecida',
+    grains:  'Preço de alimentos no Brasil',
+    copper:  'Termômetro de expansão industrial',
+    lithium: 'Insumo de baterias EV e tech',
   }
 
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: index * 0.05 }}
-      className="rounded-lg p-3 flex flex-col gap-2"
-      style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid rgba(255,255,255,0.06)` }}>
+      className="rounded-lg p-2.5 flex flex-col gap-1.5"
+      style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
 
       <div className="flex items-start justify-between">
-        <span className="font-mono text-[9px] font-bold tracking-widest text-white/30">{label.toUpperCase()}</span>
-        <span className={`font-mono text-[10px] font-bold`} style={{ color: col }}>{delta > 0 ? '+' : ''}{delta.toFixed(1)}%</span>
+        <span className="font-mono text-[8px] font-bold tracking-widest text-white/30">{label.toUpperCase()}</span>
+        <span className="font-mono text-[10px] font-bold" style={{ color: col }}>{delta > 0 ? '+' : ''}{delta.toFixed(1)}%</span>
       </div>
 
       <div>
-        <span className="font-mono text-[20px] font-bold text-white/80">
+        <span className="font-mono text-[18px] font-bold text-white/80">
           {value > 1000 ? value.toLocaleString('pt-BR', { maximumFractionDigits: 0 }) : value.toFixed(2)}
         </span>
-        <span className="font-mono text-[10px] text-white/25 ml-1">{unit}</span>
+        <span className="font-mono text-[9px] text-white/25 ml-1">{unit}</span>
       </div>
 
-      <div className="h-[2px] w-full rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
-        <motion.div className="h-full rounded-full" style={{ background: col }}
-          initial={{ width: 0 }} animate={{ width: `${Math.min(100, Math.abs(delta) * 10 + 20)}%` }}
-          transition={{ duration: 1, delay: index * 0.05 }} />
-      </div>
-
-      <p className="text-[9px] text-white/25 leading-relaxed">{context[name] ?? ''}</p>
+      <p className="text-[8px] text-white/25 leading-snug">{context[name] ?? ''}</p>
     </motion.div>
   )
 }
 
-// ── Indicador macro detalhado ──────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// ██  MacroCard (SELIC, IPCA, PIB, USD/BRL)
+// ══════════════════════════════════════════════════════════════════════════
+
+function MacroCard({ label, value, delta, meaning, index }: {
+  label: string; value: string; delta: number; meaning: string; index: number
+}) {
+  const deltaCol = delta > 0 ? RED : delta < 0 ? GREEN : AMBER
+  const arrow = delta > 0 ? '▲' : delta < 0 ? '▼' : '—'
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.06 }}
+      className="rounded-lg overflow-hidden flex flex-col"
+      style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${deltaCol}60, transparent)` }} />
+      <div className="px-2.5 py-2 flex flex-col gap-1">
+        <span className="font-mono text-[8px] font-bold tracking-[0.15em] text-white/30">{label}</span>
+        <div className="flex items-baseline gap-1.5">
+          <span className="font-mono text-[22px] font-bold leading-none text-white/85">{value}</span>
+          <span className="font-mono text-[10px] font-bold" style={{ color: deltaCol }}>
+            {arrow}{Math.abs(delta).toFixed(2)}
+          </span>
+        </div>
+        <p className="text-[8px] text-white/30 leading-snug mt-0.5">{meaning}</p>
+      </div>
+    </motion.div>
+  )
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ██  MacroIndicator (used inside dim extra panels)
+// ══════════════════════════════════════════════════════════════════════════
+
 function MacroIndicator({ label, value, unit, delta, status, description, context, index }: {
   label: string; value: string; unit: string; delta: number; status: 'critical' | 'risk' | 'ok'
   description: string; context: string; index: number
@@ -557,36 +525,28 @@ function MacroIndicator({ label, value, unit, delta, status, description, contex
   )
 }
 
-// ── Principal ──────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// ██  PRINCIPAL
+// ══════════════════════════════════════════════════════════════════════════
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function MacroSection({ data }: { data: any }) {
   const agents = useMemo(() => buildAgents(data), [data])
   const dimensions = useMemo(() => buildDimensions(data), [data])
-  const sectors = data.sectors as Array<{ id: string; label: string; change: number; trend: string; heat: number }>
 
-  // ── Estado das rodas ──
+  // ── Estado da roda ──
   const [activeDim, setActiveDim] = useState(0)
   const [manualLock, setManualLock] = useState(false)
-  const [activeSec, setActiveSec] = useState(0)
-  const [secLock, setSecLock] = useState(false)
 
   const handleDimSelect = useCallback((i: number) => {
     if (manualLock && activeDim === i) { setManualLock(false) } else { setActiveDim(i); setManualLock(true) }
   }, [manualLock, activeDim])
-  const handleSecSelect = useCallback((i: number) => {
-    if (secLock && activeSec === i) { setSecLock(false) } else { setActiveSec(i); setSecLock(true) }
-  }, [secLock, activeSec])
 
   useEffect(() => {
     if (manualLock) return
     const t = setInterval(() => setActiveDim(p => (p + 1) % 8), 2800)
     return () => clearInterval(t)
   }, [manualLock])
-  useEffect(() => {
-    if (secLock) return
-    const t = setInterval(() => setActiveSec(p => (p + 1) % sectors.length), 2400)
-    return () => clearInterval(t)
-  }, [secLock, sectors.length])
 
   const marketScore = useMemo(() => Math.round(dimensions.reduce((a, d) => a + d.score * d.weight, 0)), [dimensions])
   const scoreStatus = marketScore >= 65 ? 'good' : marketScore >= 45 ? 'warning' : 'critical'
@@ -603,22 +563,25 @@ export default function MacroSection({ data }: { data: any }) {
   const usdD   = v(data.macro.usdBrl?.delta, 0)
 
   const commodities = data.commodities as Record<string, { value: number; delta: number; unit: string; label: string }>
-
-  const sectorContext: Record<string, { driver: string; macro: string }> = {
-    tech:      { driver: `IA e digitalização acelerada`,       macro: `PIB +${pib.toFixed(1)}% aquece demanda por tech. SELIC alta encarece captação de startups.` },
-    agro:      { driver: `Exportação forte, câmbio favorável`, macro: `Dólar R$${usd.toFixed(2)} beneficia exportadores. PIB agro puxa crescimento nacional.` },
-    health:    { driver: `Envelhecimento pop. + MedTech`,      macro: `Independente de ciclo — demanda inelástica. SELIC alta limita expansão de clínicas alavancadas.` },
-    energy:    { driver: `Transição energética + ESG`,         macro: `Petróleo US$${v(data.commodities?.oil?.value, 74.2).toFixed(0)}/bbl + agenda ESG aceleram renováveis.` },
-    fintech:   { driver: `Bancarização + Open Finance`,        macro: `SELIC ${selic.toFixed(1)}% comprime margem de crédito. Spread bancário alto cria espaço para fintechs.` },
-    logistics: { driver: `E-commerce + last mile`,             macro: `Diesel afeta custo direto. PIB aquecido gera mais volume. Dólar encarece peças importadas.` },
-    services:  { driver: `Recuperação pós-pandemia`,           macro: `Emprego formal em alta → serviços crescem. SELIC alta desacelera serviços de alto ticket.` },
-    retail:    { driver: `Pressão do e-commerce`,              macro: `SELIC ${selic.toFixed(1)}% = crédito caro ao consumidor. IPCA ${ipca.toFixed(2)}% corrói poder de compra.` },
-    media:     { driver: `Migração para digital`,              macro: `Estrutural — não é cíclico. Anunciantes abandonam impresso independente do PIB.` },
-  }
+  const sectors = data.sectors as Array<{ id: string; label: string; change: number; trend: string; heat: number }>
 
   const dimShort = dimensions[activeDim]?.short
+  const currentBizImpact = businessImpactSentence(dimensions[activeDim], data)
 
-  // ── Extra content completo por dimensão ──
+  // ── Hero explanation ──
+  const heroExplanation = marketScore >= 65
+    ? 'O ambiente macro-econômico está favorável para crescimento. Aproveite para investir e escalar.'
+    : marketScore >= 45
+    ? 'Cenário misto — oportunidades existem, mas exigem cautela e seletividade.'
+    : 'Ambiente hostil para negócios. Foco em resiliência, caixa e eficiência operacional.'
+
+  // ── Macro card meanings ──
+  const selicMeaning = selic > 13 ? 'Crédito caro — financiamentos pesam' : selic > 10 ? 'Crédito moderado — juros elevados' : 'Crédito barato — bom para investir'
+  const ipcaMeaning  = ipca > 4.75 ? 'Inflação acima da meta — poder de compra cai' : ipca > 3.25 ? 'Inflação dentro da banda — controlada' : 'Inflação abaixo da meta — ambiente deflacionário'
+  const pibMeaning   = pib > 2 ? 'Economia aquecida — demanda forte' : pib > 0 ? 'Crescimento fraco — demanda tímida' : 'Recessão — demanda em queda'
+  const usdMeaning   = usd > 6 ? 'Real desvalorizado — importações caras' : usd > 5.3 ? 'Câmbio pressionado — atenção ao custo importado' : 'Câmbio controlado — importações viáveis'
+
+  // ── Extra content por dimensão ──
   const dimExtra: React.ReactNode = (() => {
     if (dimShort === 'ECON') return (
       <div className="flex flex-col gap-3 border-t border-white/[0.05] pt-3">
@@ -700,7 +663,7 @@ export default function MacroSection({ data }: { data: any }) {
     if (dimShort === 'MKTD') return (
       <div className="flex flex-col gap-2 border-t border-white/[0.05] pt-3">
         {[...sectors].sort((a, b) => b.heat - a.heat).map((s, i) => {
-          const col = sectorColor(s.trend)
+          const col = s.trend === 'up' ? GREEN : s.trend === 'down' ? RED : AMBER
           return (
             <div key={s.id} className="flex items-center gap-2">
               <span className="font-mono text-[9px] text-white/20 w-4 shrink-0">{i + 1}</span>
@@ -808,60 +771,86 @@ export default function MacroSection({ data }: { data: any }) {
   return (
     <div className="flex flex-col gap-4 px-4 pb-8">
 
-      {/* Header */}
-      <div className="flex items-center gap-2">
-        <motion.div className="h-1.5 w-1.5 rounded-full bg-blue-400/60"
-          animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />
-        <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em] text-white/20">
-          Macro & Micro — Agentes Econômicos
-        </span>
-      </div>
-
-      {/* ── RODAS — largura total ── */}
-      <div className="grid grid-cols-2 gap-3">
-        {/* Roda 8D */}
-        <div className="flex flex-col items-center w-full">
-          <div className="flex items-center justify-between w-full mb-1 px-1">
-            <span className="font-mono text-[8px] font-bold uppercase tracking-[0.15em] text-white/25">8 Dimensões</span>
-            {!manualLock && <span className="font-mono text-[6px] text-white/15 animate-pulse">AUTO</span>}
+      {/* ── 1. HERO: Market Score + Status ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+        className="rounded-lg overflow-hidden"
+        style={{ background: 'rgba(0,0,0,0.45)', border: `1px solid ${scoreColor}25` }}>
+        <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${scoreColor}80, ${scoreColor}20, transparent)` }} />
+        <div className="px-4 py-4 flex items-center gap-4">
+          <div className="flex flex-col items-center shrink-0">
+            <span className="font-mono text-[48px] font-bold leading-none" style={{ color: scoreColor }}>{marketScore}</span>
+            <span className="font-mono text-[9px] font-bold tracking-[0.2em] mt-1 px-2 py-0.5 rounded-sm"
+              style={{ background: `${scoreColor}15`, color: scoreColor, border: `1px solid ${scoreColor}30` }}>
+              {scoreLabel}
+            </span>
           </div>
+          <div className="flex-1 min-w-0">
+            <span className="font-mono text-[8px] font-bold tracking-[0.15em] text-white/25 block mb-1">MARKET SCORE PONDERADO</span>
+            <p className="text-[11px] text-white/50 leading-relaxed">{heroExplanation}</p>
+            <div className="flex items-center gap-3 mt-2">
+              <span className="font-mono text-[7px] text-white/20">8 dimensões</span>
+              <span className="font-mono text-[7px] text-white/20">|</span>
+              <span className="font-mono text-[7px] text-white/20">atualizado em tempo real</span>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── 2. RADAR 8D (single, bigger, centered) ── */}
+      <div className="flex flex-col items-center w-full">
+        <div className="flex items-center justify-between w-full mb-1 px-1">
+          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.15em] text-white/25">Radar 8 Dimensões</span>
+          {!manualLock && <span className="font-mono text-[6px] text-white/15 animate-pulse">AUTO</span>}
+        </div>
+        <div className="w-full" style={{ maxWidth: 400, margin: '0 auto' }}>
           <MultidimRadial dimensions={dimensions} activeDim={activeDim} onSelect={handleDimSelect}
             marketScore={marketScore} scoreColor={scoreColor} scoreLabel={scoreLabel} />
-          <div className="flex justify-center gap-1 mt-2">
-            {dimensions.map((dim, i) => (
-              <button key={i} onClick={() => handleDimSelect(i)}
-                className="rounded-full transition-all duration-300 outline-none"
-                style={{ width: activeDim === i ? 14 : 4, height: 4, background: activeDim === i ? dimColor(dim.status) : 'rgba(255,255,255,0.12)' }} />
-            ))}
-          </div>
         </div>
-        {/* Roda Setores */}
-        <div className="flex flex-col items-center w-full">
-          <div className="flex items-center justify-between w-full mb-1 px-1">
-            <span className="font-mono text-[8px] font-bold uppercase tracking-[0.15em] text-white/25">Setores Heat</span>
-            {!secLock && <span className="font-mono text-[6px] text-white/15 animate-pulse">AUTO</span>}
-          </div>
-          <SectorRadial sectors={sectors} activeSec={activeSec} onSelect={handleSecSelect}
-            avgHeat={Math.round(sectors.reduce((a, s) => a + s.heat, 0) / sectors.length)} />
-          <div className="flex justify-center gap-1 mt-2">
-            {sectors.map((s, i) => (
-              <button key={i} onClick={() => handleSecSelect(i)}
-                className="rounded-full transition-all duration-300 outline-none"
-                style={{ width: activeSec === i ? 14 : 4, height: 4, background: activeSec === i ? sectorColor(s.trend) : 'rgba(255,255,255,0.12)' }} />
-            ))}
-          </div>
+        {/* Dot indicators */}
+        <div className="flex justify-center gap-1 mt-2">
+          {dimensions.map((dim, i) => (
+            <button key={i} onClick={() => handleDimSelect(i)}
+              className="rounded-full transition-all duration-300 outline-none"
+              style={{ width: activeDim === i ? 14 : 4, height: 4, background: activeDim === i ? dimColor(dim.status) : 'rgba(255,255,255,0.12)' }} />
+          ))}
         </div>
       </div>
 
-      {/* ── PAINEL 8D — largura total ── */}
+      {/* ── 3. DIMENSION DETAIL PANEL ── */}
       <AnimatePresence mode="wait">
-        <DimDetailPanel key={activeDim} dim={dimensions[activeDim]} scoreColor={scoreColor} extra={dimExtra} />
+        <DimDetailPanel key={activeDim} dim={dimensions[activeDim]} scoreColor={scoreColor}
+          extra={dimExtra} businessImpact={currentBizImpact} />
       </AnimatePresence>
 
-      {/* ── PAINEL SETORES — largura total ── */}
-      <AnimatePresence mode="wait">
-        <SectorDetailPanel key={activeSec} sector={sectors[activeSec]} ctx={sectorContext[sectors[activeSec].id]} />
-      </AnimatePresence>
+      {/* ── 5. 4 MACRO CARDS ── */}
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <motion.div className="h-1.5 w-1.5 rounded-full bg-blue-400/60"
+            animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />
+          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/20">Indicadores Macro</span>
+        </div>
+        <div className="grid grid-cols-4 gap-2">
+          <MacroCard index={0} label="SELIC" value={`${selic.toFixed(1)}%`} delta={selicD} meaning={selicMeaning} />
+          <MacroCard index={1} label="IPCA" value={`${ipca.toFixed(2)}%`} delta={ipcaD} meaning={ipcaMeaning} />
+          <MacroCard index={2} label="PIB" value={`+${pib.toFixed(1)}%`} delta={pibD} meaning={pibMeaning} />
+          <MacroCard index={3} label="USD/BRL" value={`R$${usd.toFixed(2)}`} delta={usdD} meaning={usdMeaning} />
+        </div>
+      </div>
+
+      {/* ── 6. COMMODITIES GRID (2x3) ── */}
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <motion.div className="h-1.5 w-1.5 rounded-full bg-amber-400/60"
+            animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />
+          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/20">Commodities</span>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {Object.entries(commodities).map(([name, c], i) => (
+            <CommodityCard key={name} name={name} index={i} value={c.value} delta={c.delta} unit={c.unit} label={c.label} />
+          ))}
+        </div>
+      </div>
 
     </div>
   )

@@ -59,135 +59,10 @@ const PLATFORM_ANALYSIS: Record<string, { why: string; strategy: string[]; bestF
   },
 }
 
-// ── Card de Plataforma ─────────────────────────────────────────────────────
+// ── Interfaces ────────────────────────────────────────────────────────────
 interface Platform {
   id: string; label: string; cpm?: number; cpmDelta?: number
   cpc?: number; cpcDelta?: number; reach: string; trend: string; note: string
-}
-
-function PlatformCard({ platform, index }: { platform: Platform; index: number }) {
-  const [open, setOpen] = useState(false)
-  const col = trendColor(platform.trend)
-  const trendLabel = platform.trend === 'up' ? 'CPM ▲' : platform.trend === 'down' ? 'CPM ▼' : 'ESTÁVEL'
-  const analysis = PLATFORM_ANALYSIS[platform.id]
-
-  const metric = platform.cpm != null
-    ? { label: 'CPM', val: `US$${platform.cpm.toFixed(2)}`, delta: platform.cpmDelta ?? 0 }
-    : { label: 'CPC', val: `US$${(platform.cpc ?? 0).toFixed(2)}`, delta: platform.cpcDelta ?? 0 }
-
-  const deltaCol = deltaColor(metric.delta)
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.06 }}
-      className="rounded-lg overflow-hidden"
-      style={{ border: `1px solid ${open ? col + '28' : 'rgba(255,255,255,0.06)'}`, background: 'rgba(0,0,0,0.25)' }}>
-
-      <button className="w-full text-left" onClick={() => setOpen(o => !o)}>
-        {/* Top bar */}
-        <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${col}70, transparent)` }} />
-
-        <div className="flex items-center gap-3 px-4 py-3">
-          {/* Ícone */}
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 font-mono text-[11px] font-bold"
-            style={{ background: `${col}15`, border: `1px solid ${col}30`, color: col }}>
-            {PLATFORM_ICON[platform.id] ?? platform.label[0]}
-          </div>
-
-          {/* Nome + nota */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-[13px] font-semibold text-white/75">{platform.label}</span>
-              <span className="font-mono text-[7px] px-1.5 py-0.5 rounded-sm shrink-0"
-                style={{ background: `${col}15`, color: col, border: `1px solid ${col}25` }}>{trendLabel}</span>
-            </div>
-            <p className="text-[9px] text-white/30 truncate">{platform.note}</p>
-          </div>
-
-          {/* Métricas */}
-          <div className="flex flex-col items-end shrink-0 gap-0.5">
-            <div className="flex items-baseline gap-1">
-              <span className="font-mono text-[8px] text-white/25">{metric.label}</span>
-              <span className="font-mono text-[16px] font-bold text-white/80">{metric.val}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="font-mono text-[10px] font-bold" style={{ color: deltaCol }}>
-                {metric.delta > 0 ? '▲' : metric.delta < 0 ? '▼' : '—'}{Math.abs(metric.delta).toFixed(1)}%
-              </span>
-              <span className="font-mono text-[8px] text-white/20">reach {platform.reach}</span>
-            </div>
-          </div>
-
-          <span className="text-white/20 text-[10px] ml-1">{open ? '▲' : '▼'}</span>
-        </div>
-      </button>
-
-      <AnimatePresence>
-        {open && analysis && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
-            className="overflow-hidden">
-            <div className="px-4 pb-4 border-t border-white/[0.05] flex flex-col gap-3 pt-3">
-
-              {/* Por que este CPM/CPC */}
-              <div className="rounded-sm p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">POR QUE ESSE CUSTO</span>
-                <p className="text-[10px] text-white/45 leading-relaxed">{analysis.why}</p>
-              </div>
-
-              {/* Estratégias */}
-              <div>
-                <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">ESTRATÉGIAS RECOMENDADAS</span>
-                <div className="flex flex-col gap-1.5">
-                  {analysis.strategy.map((s, i) => (
-                    <div key={i} className="flex items-start gap-2">
-                      <span className="font-mono text-[9px] shrink-0 mt-0.5" style={{ color: GREEN }}>→</span>
-                      <span className="text-[10px] text-white/40 leading-relaxed">{s}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Best for + Risk */}
-              <div className="grid grid-cols-2 gap-2">
-                <div className="rounded-sm p-2.5" style={{ background: `${GREEN}10`, border: `1px solid ${GREEN}25` }}>
-                  <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: GREEN }}>MELHOR PARA</span>
-                  <p className="text-[9px] text-white/35 leading-relaxed">{analysis.bestFor}</p>
-                </div>
-                <div className="rounded-sm p-2.5" style={{ background: `${AMBER}10`, border: `1px solid ${AMBER}25` }}>
-                  <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: AMBER }}>ATENÇÃO</span>
-                  <p className="text-[9px] text-white/35 leading-relaxed">{analysis.risk}</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  )
-}
-
-// ── Card de Oportunidade ───────────────────────────────────────────────────
-function OppCard({ opp, index }: { opp: { id: string; label: string; urgency: number; type: string }; index: number }) {
-  const col = opp.urgency >= 75 ? RED : opp.urgency >= 60 ? AMBER : GREEN
-  const typeLabel = opp.type === 'canal' ? 'CANAL' : opp.type === 'tech' ? 'TECH' : opp.type === 'macro' ? 'MACRO' : 'SETOR'
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.05 }}
-      className="flex items-center gap-3 rounded-lg px-3 py-2.5"
-      style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${col}18` }}>
-      <div className="flex flex-col items-center shrink-0 w-10">
-        <span className="font-mono text-[20px] font-bold leading-none" style={{ color: col }}>{opp.urgency}</span>
-        <span className="font-mono text-[6px] text-white/20 mt-0.5">URGÊNCIA</span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-[10px] text-white/55 leading-snug">{opp.label}</p>
-      </div>
-      <span className="font-mono text-[7px] px-1.5 py-0.5 rounded-sm shrink-0"
-        style={{ background: `${col}15`, color: col, border: `1px solid ${col}25` }}>{typeLabel}</span>
-    </motion.div>
-  )
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -196,7 +71,7 @@ function OppCard({ opp, index }: { opp: { id: string; label: string; urgency: nu
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function MarketingSection({ data }: { data: any }) {
-  const [filter, setFilter] = useState<'all' | 'up' | 'down' | 'neutral'>('all')
+  const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null)
 
   const platforms = data.platforms as Platform[]
   const mkt = data.marketing as Record<string, { value: number; delta: number; label: string }>
@@ -207,19 +82,95 @@ export default function MarketingSection({ data }: { data: any }) {
   const cacVal = v(mkt?.cacTrend?.value, 48.6)
   const cacD   = v(mkt?.cacTrend?.delta, 12.1)
 
-  // Score geral de marketing (0-100, onde baixo = caro/difícil)
-  const mktScore = useMemo(() => {
-    const cpmScore   = Math.max(0, 100 - (v(mkt?.cpmGlobal?.value, 11.3) - 5) * 5)
-    const cacScore   = Math.max(0, 100 - cacD * 2)
-    const orgScore   = v(mkt?.organicShare?.value, 31)
-    return Math.round((cpmScore * 0.35 + cacScore * 0.35 + orgScore * 0.3))
-  }, [mkt, cacD])
+  const cpmVal = v(mkt?.cpmGlobal?.value, 11.3)
+  const cpmD   = v(mkt?.cpmGlobal?.delta, 8.2)
+  const cpcVal = v(mkt?.cpcGlobal?.value, 1.42)
+  const cpcD   = v(mkt?.cpcGlobal?.delta, 5.7)
+  const orgVal = v(mkt?.organicShare?.value, 31)
+  const orgD   = v(mkt?.organicShare?.delta, -4.2)
 
-  const scoreStatus = mktScore >= 60 ? 'good' : mktScore >= 40 ? 'warning' : 'critical'
-  const scoreColor  = scoreStatus === 'good' ? GREEN : scoreStatus === 'warning' ? AMBER : RED
-  const scoreLabel  = scoreStatus === 'good' ? 'FAVORÁVEL' : scoreStatus === 'warning' ? 'MODERADO' : 'PRESSÃO ALTA'
+  // Build CAC explanation line
+  const cacReasons: string[] = []
+  if (selic > 12) cacReasons.push('Selic alta')
+  if (cpmD > 5) cacReasons.push('CPM subindo')
+  if (orgD < 0) cacReasons.push('orgânico caindo')
+  if (usd > 5.5) cacReasons.push('câmbio pressionado')
+  const cacExplanation = cacReasons.length > 0 ? cacReasons.join(' + ') : 'pressão competitiva'
 
-  const filtered = filter === 'all' ? platforms : platforms.filter(p => p.trend === filter)
+  // Sorted platforms by cost-effectiveness (lowest CPM/CPC first)
+  const sortedPlatforms = useMemo(() => {
+    return [...platforms].sort((a, b) => {
+      const costA = a.cpm ?? a.cpc ?? 999
+      const costB = b.cpm ?? b.cpc ?? 999
+      return costA - costB
+    })
+  }, [platforms])
+
+  // Best platform (cheapest)
+  const bestPlatformId = sortedPlatforms.length > 0 ? sortedPlatforms[0].id : null
+
+  // Generate action items based on current data
+  const actions = useMemo(() => {
+    const items: Array<{ action: string; impact: string; priority: 'URGENTE' | 'IMPORTANTE' | 'CONSIDERAR' }> = []
+
+    // Find cheapest CPM platform
+    const cheapestCPM = sortedPlatforms.find(p => p.cpm != null)
+    const cheapestCPC = sortedPlatforms.find(p => p.cpc != null)
+
+    if (cheapestCPM && cheapestCPM.id === 'tiktok') {
+      items.push({
+        action: `Realocar budget para TikTok — CPM ${cheapestCPM.cpm?.toFixed(2)} é o menor do mercado`,
+        impact: `Redução estimada de 20-35% no custo por impressão vs Meta`,
+        priority: 'URGENTE',
+      })
+    } else if (cheapestCPM) {
+      items.push({
+        action: `Concentrar awareness em ${cheapestCPM.label} — CPM US$${cheapestCPM.cpm?.toFixed(2)} mais barato`,
+        impact: `Redução de custo por mil impressões vs outras plataformas`,
+        priority: 'URGENTE',
+      })
+    }
+
+    if (orgD < -2) {
+      items.push({
+        action: `Investir em SEO e conteúdo orgânico — share caiu ${Math.abs(orgD).toFixed(1)}%`,
+        impact: 'Cada 1% de orgânico recuperado = menos R$ gasto em paid',
+        priority: 'URGENTE',
+      })
+    }
+
+    if (cacD > 8) {
+      items.push({
+        action: 'Melhorar LTV do cliente para compensar CAC alto',
+        impact: `CAC subiu ${cacD.toFixed(1)}% — foco em retenção reduz dependência de aquisição`,
+        priority: 'IMPORTANTE',
+      })
+    }
+
+    if (cpmD > 5) {
+      items.push({
+        action: 'Migrar criativos para vídeo curto (Reels/Shorts/TikTok)',
+        impact: 'Vídeo tem CPM 30-40% menor que estático nas principais plataformas',
+        priority: 'IMPORTANTE',
+      })
+    }
+
+    items.push({
+      action: 'Construir first-party data (email, WhatsApp, CRM)',
+      impact: 'Cookie deprecation tornará retargeting 3rd party inviável — dados próprios serão vantagem competitiva',
+      priority: 'CONSIDERAR',
+    })
+
+    return items
+  }, [sortedPlatforms, orgD, cacD, cpmD])
+
+  // Opportunity explanations
+  const oppExplanations: Record<string, string> = {
+    'canal': 'Janela de custo baixo fecha rápido quando concorrentes entram',
+    'tech': 'Adoção precoce gera vantagem competitiva exponencial',
+    'macro': 'Condições macro mudam trimestralmente — agir agora ou perder',
+    'setor': 'Setores em transformação criam gaps de mercado temporários',
+  }
 
   return (
     <div className="flex flex-col gap-5 px-4 pb-8">
@@ -227,142 +178,274 @@ export default function MarketingSection({ data }: { data: any }) {
       {/* ── Header ── */}
       <div className="flex items-center gap-2">
         <motion.div className="h-1.5 w-1.5 rounded-full"
-          style={{ background: scoreColor }}
+          style={{ background: deltaColor(cacD) }}
           animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />
         <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em] text-white/20">
           Plataformas & Marketing
         </span>
       </div>
 
-      {/* ── Score geral + métricas chave ── */}
-      <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.35)', border: `1px solid ${scoreColor}22` }}>
-        <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${scoreColor}80, transparent)` }} />
-        <div className="p-4">
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <div>
-              <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/25 block mb-1">SCORE DE MERCADO DIGITAL</span>
-              <div className="flex items-baseline gap-2">
-                <span className="font-mono text-[48px] font-bold leading-none" style={{ color: scoreColor }}>{mktScore}</span>
-                <div className="flex flex-col">
-                  <span className="font-mono text-[9px] px-2 py-0.5 rounded-sm mb-1"
-                    style={{ background: `${scoreColor}15`, color: scoreColor, border: `1px solid ${scoreColor}30` }}>{scoreLabel}</span>
-                  <span className="font-mono text-[8px] text-white/20">quanto + baixo = + caro anunciar</span>
-                </div>
-              </div>
+      {/* ══ 1. HERO: CAC COMO PROTAGONISTA ══ */}
+      <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.35)', border: `1px solid ${deltaColor(cacD)}22` }}>
+        <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${deltaColor(cacD)}80, transparent)` }} />
+        <div className="p-5">
+          <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/25 block mb-3">
+            QUANTO CUSTA ADQUIRIR 1 CLIENTE?
+          </span>
+
+          <div className="flex flex-col items-center gap-2 mb-4">
+            <div className="flex items-baseline gap-2">
+              <span className="font-mono text-[14px] text-white/30">R$</span>
+              <span className="font-mono text-[52px] font-bold leading-none text-white/90">{cacVal.toFixed(0)}</span>
             </div>
-            <div className="flex flex-col gap-1.5 text-right">
-              <div>
-                <span className="font-mono text-[7px] text-white/20 block">CAC MÉDIO BR</span>
-                <span className="font-mono text-[18px] font-bold" style={{ color: deltaColor(cacD) }}>R${cacVal.toFixed(0)}</span>
-                <span className="font-mono text-[10px] font-bold ml-1" style={{ color: deltaColor(cacD) }}>▲{cacD.toFixed(1)}%</span>
-              </div>
-              <div>
-                <span className="font-mono text-[7px] text-white/20 block">SELIC IMPACTO</span>
-                <span className="font-mono text-[11px] font-bold" style={{ color: selic > 13 ? RED : AMBER }}>
-                  {selic.toFixed(1)}% a.a. comprime margem
-                </span>
-              </div>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[13px] font-bold" style={{ color: deltaColor(cacD) }}>
+                {cacD > 0 ? '▲' : cacD < 0 ? '▼' : '—'} {Math.abs(cacD).toFixed(1)}%
+              </span>
+              <span className="font-mono text-[9px] text-white/25">vs mês anterior</span>
             </div>
           </div>
 
-          {/* 6 métricas em grid */}
-          <div className="grid grid-cols-3 gap-2">
-            {Object.entries(mkt ?? {}).map(([key, m]) => {
-              const isGood = key === 'organicShare' || key === 'videoShare' || key === 'aiAdoption'
-              const col = isGood ? goodDeltaColor(m.delta) : deltaColor(m.delta)
-              const isPercent = key !== 'cacTrend' && key !== 'cpmGlobal' && key !== 'cpcGlobal'
-              const prefix = key === 'cacTrend' ? 'R$' : key === 'cpmGlobal' || key === 'cpcGlobal' ? 'US$' : ''
-              const suffix = isPercent ? '%' : ''
-              return (
-                <div key={key} className="rounded-lg p-2.5" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <span className="font-mono text-[7px] text-white/20 block mb-1 leading-tight">{m.label}</span>
-                  <div className="flex items-baseline gap-1">
-                    <span className="font-mono text-[15px] font-bold text-white/75">{prefix}{m.value}{suffix}</span>
+          <div className="rounded-sm px-3 py-2 mb-3 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <span className="font-mono text-[10px] text-white/40">
+              {cacD > 0 ? 'Subiu' : 'Caiu'} {Math.abs(cacD).toFixed(1)}% porque <span className="text-white/60 font-bold">[{cacExplanation}]</span>
+            </span>
+          </div>
+
+          <div className="text-center">
+            <span className="font-mono text-[9px]" style={{ color: selic > 13 ? RED : AMBER }}>
+              SELIC {selic.toFixed(1)}% impacta direto no custo de crédito para growth
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ══ 2. 3-COLUMN METRICS ROW ══ */}
+      <div className="grid grid-cols-3 gap-2">
+        {/* CPM Médio */}
+        <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <span className="font-mono text-[7px] text-white/25 block mb-1.5">CPM MÉDIO</span>
+          <span className="font-mono text-[22px] font-bold text-white/80 block leading-none">US${cpmVal.toFixed(1)}</span>
+          <span className="font-mono text-[10px] font-bold block mt-1" style={{ color: deltaColor(cpmD) }}>
+            {cpmD > 0 ? '▲' : '▼'}{Math.abs(cpmD).toFixed(1)}%
+          </span>
+          <p className="font-mono text-[8px] text-white/25 mt-1.5 leading-relaxed">
+            {cpmD > 3 ? 'CPM subindo = mais caro aparecer' : cpmD < -2 ? 'CPM caindo = oportunidade de escala' : 'CPM estável — monitorar'}
+          </p>
+        </div>
+
+        {/* CPC Médio */}
+        <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <span className="font-mono text-[7px] text-white/25 block mb-1.5">CPC MÉDIO</span>
+          <span className="font-mono text-[22px] font-bold text-white/80 block leading-none">US${cpcVal.toFixed(2)}</span>
+          <span className="font-mono text-[10px] font-bold block mt-1" style={{ color: deltaColor(cpcD) }}>
+            {cpcD > 0 ? '▲' : '▼'}{Math.abs(cpcD).toFixed(1)}%
+          </span>
+          <p className="font-mono text-[8px] text-white/25 mt-1.5 leading-relaxed">
+            {cpcD > 3 ? 'CPC alto = cliques caros' : cpcD < -2 ? 'CPC caindo = clicks mais baratos' : 'CPC estável — monitorar'}
+          </p>
+        </div>
+
+        {/* Tráfego Orgânico */}
+        <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <span className="font-mono text-[7px] text-white/25 block mb-1.5">ORGÂNICO</span>
+          <span className="font-mono text-[22px] font-bold text-white/80 block leading-none">{orgVal}%</span>
+          <span className="font-mono text-[10px] font-bold block mt-1" style={{ color: goodDeltaColor(orgD) }}>
+            {orgD > 0 ? '▲' : '▼'}{Math.abs(orgD).toFixed(1)}%
+          </span>
+          <p className="font-mono text-[8px] text-white/25 mt-1.5 leading-relaxed">
+            {orgD < -2 ? 'Orgânico caindo = mais dependência de paid' : orgD > 2 ? 'Orgânico crescendo = menos custo' : 'Orgânico estável'}
+          </p>
+        </div>
+      </div>
+
+      {/* ══ 3. PLATFORM RANKING TABLE ══ */}
+      <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="px-4 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/25">
+            RANKING DE PLATAFORMAS — por custo-benefício
+          </span>
+        </div>
+
+        {/* Table header */}
+        <div className="grid grid-cols-[32px_28px_1fr_72px_56px_64px_1fr] items-center px-3 py-2 gap-2"
+          style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: 'rgba(255,255,255,0.02)' }}>
+          <span className="font-mono text-[7px] text-white/20">#</span>
+          <span className="font-mono text-[7px] text-white/20"></span>
+          <span className="font-mono text-[7px] text-white/20">PLATAFORMA</span>
+          <span className="font-mono text-[7px] text-white/20 text-right">CPM/CPC</span>
+          <span className="font-mono text-[7px] text-white/20 text-right">DELTA</span>
+          <span className="font-mono text-[7px] text-white/20 text-center">TREND</span>
+          <span className="font-mono text-[7px] text-white/20">MELHOR PARA</span>
+        </div>
+
+        {/* Table rows */}
+        {sortedPlatforms.map((p, i) => {
+          const analysis = PLATFORM_ANALYSIS[p.id]
+          const isBest = p.id === bestPlatformId
+          const isExpanded = expandedPlatform === p.id
+          const col = trendColor(p.trend)
+          const metric = p.cpm != null
+            ? { label: 'CPM', val: `US$${p.cpm.toFixed(2)}`, delta: p.cpmDelta ?? 0 }
+            : { label: 'CPC', val: `US$${(p.cpc ?? 0).toFixed(2)}`, delta: p.cpcDelta ?? 0 }
+          const dCol = deltaColor(metric.delta)
+          const trendLabel = p.trend === 'up' ? '▲ SUBINDO' : p.trend === 'down' ? '▼ CAINDO' : '— ESTÁVEL'
+
+          return (
+            <motion.div key={p.id}
+              initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+              style={{ borderLeft: isBest ? `2px solid ${GREEN}` : '2px solid transparent' }}>
+
+              <button className="w-full text-left" onClick={() => setExpandedPlatform(isExpanded ? null : p.id)}>
+                <div className="grid grid-cols-[32px_28px_1fr_72px_56px_64px_1fr] items-center px-3 py-2.5 gap-2 transition-colors"
+                  style={{
+                    borderBottom: '1px solid rgba(255,255,255,0.04)',
+                    background: isExpanded ? 'rgba(255,255,255,0.03)' : 'transparent',
+                  }}>
+                  {/* Rank */}
+                  <span className="font-mono text-[13px] font-bold" style={{ color: isBest ? GREEN : 'rgba(255,255,255,0.25)' }}>
+                    {i + 1}
+                  </span>
+
+                  {/* Icon */}
+                  <div className="w-6 h-6 rounded flex items-center justify-center font-mono text-[9px] font-bold"
+                    style={{ background: `${col}12`, color: col, border: `1px solid ${col}25` }}>
+                    {PLATFORM_ICON[p.id] ?? p.label[0]}
                   </div>
-                  <span className="font-mono text-[9px] font-bold" style={{ color: col }}>
-                    {m.delta > 0 ? '▲' : '▼'}{Math.abs(m.delta).toFixed(1)}{suffix}
+
+                  {/* Name */}
+                  <div className="min-w-0">
+                    <span className="font-mono text-[11px] font-semibold text-white/70">{p.label}</span>
+                  </div>
+
+                  {/* CPM/CPC value */}
+                  <span className="font-mono text-[12px] font-bold text-white/80 text-right">{metric.val}</span>
+
+                  {/* Delta */}
+                  <span className="font-mono text-[10px] font-bold text-right" style={{ color: dCol }}>
+                    {metric.delta > 0 ? '▲' : metric.delta < 0 ? '▼' : '—'}{Math.abs(metric.delta).toFixed(1)}%
+                  </span>
+
+                  {/* Trend badge */}
+                  <span className="font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm text-center"
+                    style={{ background: `${col}12`, color: col, border: `1px solid ${col}20` }}>
+                    {trendLabel}
+                  </span>
+
+                  {/* Best for (short) */}
+                  <div className="flex items-center gap-1 min-w-0">
+                    <span className="font-mono text-[8px] text-white/30 truncate">
+                      {analysis?.bestFor?.split('.')[0] ?? p.note}
+                    </span>
+                    <span className="text-white/15 text-[9px] shrink-0 ml-auto">{isExpanded ? '▲' : '▼'}</span>
+                  </div>
+                </div>
+              </button>
+
+              {/* Expanded detail */}
+              <AnimatePresence>
+                {isExpanded && analysis && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
+                    className="overflow-hidden">
+                    <div className="px-4 pb-4 pt-3 flex flex-col gap-3" style={{ background: 'rgba(0,0,0,0.15)' }}>
+
+                      {/* Por que este custo */}
+                      <div className="rounded-sm p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">POR QUE ESSE CUSTO</span>
+                        <p className="text-[10px] text-white/45 leading-relaxed">{analysis.why}</p>
+                      </div>
+
+                      {/* Estratégias */}
+                      <div>
+                        <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">ESTRATÉGIAS RECOMENDADAS</span>
+                        <div className="flex flex-col gap-1.5">
+                          {analysis.strategy.map((s, si) => (
+                            <div key={si} className="flex items-start gap-2">
+                              <span className="font-mono text-[9px] shrink-0 mt-0.5" style={{ color: GREEN }}>→</span>
+                              <span className="text-[10px] text-white/40 leading-relaxed">{s}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Best for + Risk */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="rounded-sm p-2.5" style={{ background: `${GREEN}10`, border: `1px solid ${GREEN}25` }}>
+                          <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: GREEN }}>MELHOR PARA</span>
+                          <p className="text-[9px] text-white/35 leading-relaxed">{analysis.bestFor}</p>
+                        </div>
+                        <div className="rounded-sm p-2.5" style={{ background: `${AMBER}10`, border: `1px solid ${AMBER}25` }}>
+                          <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: AMBER }}>ATENÇÃO</span>
+                          <p className="text-[9px] text-white/35 leading-relaxed">{analysis.risk}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      {/* ══ 4. AÇÕES RECOMENDADAS ══ */}
+      <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="px-4 py-3" style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <span className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-white/40">
+            AÇÕES RECOMENDADAS
+          </span>
+        </div>
+
+        <div className="flex flex-col">
+          {actions.map((item, i) => {
+            const priorityColor = item.priority === 'URGENTE' ? RED : item.priority === 'IMPORTANTE' ? AMBER : GREEN
+            return (
+              <motion.div key={i}
+                initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
+                className="flex gap-3 px-4 py-3"
+                style={{
+                  borderBottom: '1px solid rgba(255,255,255,0.04)',
+                  borderLeft: `3px solid ${priorityColor}`,
+                  background: item.priority === 'URGENTE' ? 'rgba(255,255,255,0.02)' : 'transparent',
+                }}>
+                <div className="shrink-0 mt-0.5">
+                  <span className="font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm"
+                    style={{ background: `${priorityColor}15`, color: priorityColor, border: `1px solid ${priorityColor}30` }}>
+                    {item.priority}
                   </span>
                 </div>
-              )
-            })}
-          </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-mono text-[10px] text-white/60 leading-snug mb-0.5">{item.action}</p>
+                  <p className="font-mono text-[8px] text-white/25 leading-relaxed">{item.impact}</p>
+                </div>
+              </motion.div>
+            )
+          })}
         </div>
       </div>
 
-      {/* ── Análise de CAC ── */}
-      <div className="rounded-lg p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-        <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 block mb-3">POR QUE O CAC ESTÁ SUBINDO</span>
-        <div className="flex flex-col gap-2">
-          {[
-            { causa: 'Leilão mais competitivo', efeito: 'Mais anunciantes disputando o mesmo inventory → preço sobe automaticamente', col: RED },
-            { causa: `USD R$${usd.toFixed(2)}`, efeito: 'Plataformas cobram em dólar — câmbio alto encarece CPM/CPC em reais diretamente', col: RED },
-            { causa: 'iOS privacy (ATT)', efeito: 'Menos dados de tracking → otimização pior → custo por resultado sobe', col: AMBER },
-            { causa: 'IA nas plataformas', efeito: 'Automação privilegia formatos de maior CPM — exige adaptação de criativo', col: AMBER },
-            { causa: 'Menos tráfego orgânico', efeito: `Share orgânico caiu ${Math.abs(v(mkt?.organicShare?.delta, -4.2)).toFixed(1)}% — mais dependência de paid aumenta pressão no CAC`, col: RED },
-          ].map((r, i) => (
-            <div key={i} className="flex items-start gap-3">
-              <div className="shrink-0 mt-0.5 w-2 h-2 rounded-full" style={{ background: r.col }} />
-              <div>
-                <span className="font-mono text-[9px] font-bold text-white/50">{r.causa}: </span>
-                <span className="text-[9px] text-white/30">{r.efeito}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-3 rounded-sm p-3" style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}20` }}>
-          <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1.5" style={{ color: GREEN }}>COMO REDUZIR O CAC</span>
-          {['Diversificar canais — não depender só de Meta/Google', 'Investir em conteúdo orgânico (SEO, social orgânico, email)', 'Melhorar LTV — mesmo CAC alto vira viável com cliente que compra mais', 'Testar TikTok — CPM menor, janela de entrada curta'].map((a, i) => (
-            <div key={i} className="flex items-start gap-1.5 mt-1">
-              <span className="font-mono text-[9px] shrink-0" style={{ color: GREEN }}>→</span>
-              <span className="text-[9px] text-white/35">{a}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Plataformas ── */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/20">Plataformas</span>
-          <div className="flex gap-1">
-            {([['all', 'Todas'], ['up', 'CPM▲'], ['down', 'CPM▼'], ['neutral', 'Estáveis']] as const).map(([val, label]) => (
-              <button key={val} onClick={() => setFilter(val)}
-                className="font-mono text-[7px] font-bold uppercase tracking-[0.1em] px-2 py-1 rounded-sm transition-all"
-                style={{
-                  background: filter === val ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.2)',
-                  color: filter === val ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)',
-                  border: `1px solid ${filter === val ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)'}`,
-                }}>{label}</button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <AnimatePresence mode="popLayout">
-            {filtered.map((p, i) => <PlatformCard key={p.id} platform={p} index={i} />)}
-          </AnimatePresence>
-        </div>
-      </div>
-
-      {/* ── Sinais de mercado ── */}
+      {/* ══ 5. MARKET SIGNALS (3x2) ══ */}
       <div className="rounded-lg p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
         <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/20 block mb-3">Sinais do Mercado Digital</span>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {[
-            { label: 'Vídeo curto', signal: `+${v(mkt?.videoShare?.delta, 8.6).toFixed(1)}% engajamento`, note: 'Reels, TikTok e Shorts dominam o feed — criativo estático perde alcance', col: GREEN },
-            { label: 'IA no Marketing', signal: `${v(mkt?.aiAdoption?.value, 64)}% adoção`, note: 'Copywriting, imagens, segmentação e lances automatizados com IA', col: GREEN },
-            { label: 'Orgânico caindo', signal: `${v(mkt?.organicShare?.delta, -4.2).toFixed(1)}% reach`, note: 'Algoritmos priorizam anúncios e posts de amigos vs páginas de marca', col: RED },
-            { label: 'Dark Social', signal: 'Invisible sharing', note: 'WhatsApp, Telegram e DMs geram tráfego não rastreável — underreported no GA', col: AMBER },
-            { label: 'Social Commerce', signal: 'Em aceleração', note: 'Compra sem sair do app: TikTok Shop, Instagram Shopping, WhatsApp Pay', col: GREEN },
-            { label: 'Cookie Deprecation', signal: '3rd party out', note: 'Google finalizando cookies de terceiros — first-party data vira ativo crítico', col: AMBER },
+            { label: 'Vídeo curto', signal: `+${v(mkt?.videoShare?.delta, 8.6).toFixed(1)}% engajamento`, note: 'Reels, TikTok e Shorts dominam o feed — criativo estático perde alcance', col: GREEN, severity: GREEN },
+            { label: 'IA no Marketing', signal: `${v(mkt?.aiAdoption?.value, 64)}% adoção`, note: 'Copywriting, imagens, segmentação e lances automatizados com IA', col: GREEN, severity: GREEN },
+            { label: 'Orgânico caindo', signal: `${v(mkt?.organicShare?.delta, -4.2).toFixed(1)}% reach`, note: 'Algoritmos priorizam anúncios e posts de amigos vs páginas de marca', col: RED, severity: RED },
+            { label: 'Dark Social', signal: 'Invisible sharing', note: 'WhatsApp, Telegram e DMs geram tráfego não rastreável — underreported no GA', col: AMBER, severity: AMBER },
+            { label: 'Social Commerce', signal: 'Em aceleração', note: 'Compra sem sair do app: TikTok Shop, Instagram Shopping, WhatsApp Pay', col: GREEN, severity: GREEN },
+            { label: 'Cookie Deprecation', signal: '3rd party out', note: 'Google finalizando cookies de terceiros — first-party data vira ativo crítico', col: AMBER, severity: RED },
           ].map((s, i) => (
             <motion.div key={i}
               initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
               className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${s.col}18` }}>
-              <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-1.5 mb-1">
+                {/* Severity dot */}
+                <div className="w-[5px] h-[5px] rounded-full shrink-0" style={{ background: s.severity }} />
                 <span className="font-mono text-[8px] font-bold text-white/40">{s.label}</span>
-                <span className="font-mono text-[8px] font-bold" style={{ color: s.col }}>{s.signal}</span>
+                <span className="font-mono text-[8px] font-bold ml-auto" style={{ color: s.col }}>{s.signal}</span>
               </div>
               <p className="text-[8px] text-white/25 leading-relaxed">{s.note}</p>
             </motion.div>
@@ -370,13 +453,32 @@ export default function MarketingSection({ data }: { data: any }) {
         </div>
       </div>
 
-      {/* ── Oportunidades ── */}
+      {/* ══ 6. OPORTUNIDADES ══ */}
       <div>
         <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/20 block mb-3">Oportunidades — por Urgência</span>
         <div className="flex flex-col gap-2">
-          {[...opportunities].sort((a, b) => b.urgency - a.urgency).map((o, i) => (
-            <OppCard key={o.id} opp={o} index={i} />
-          ))}
+          {[...opportunities].sort((a, b) => b.urgency - a.urgency).map((o, i) => {
+            const col = o.urgency >= 75 ? RED : o.urgency >= 60 ? AMBER : GREEN
+            const typeLabel = o.type === 'canal' ? 'CANAL' : o.type === 'tech' ? 'TECH' : o.type === 'macro' ? 'MACRO' : 'SETOR'
+            const whyText = oppExplanations[o.type] ?? 'Oportunidade identificada pelo modelo de análise'
+            return (
+              <motion.div key={o.id}
+                initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+                className="flex items-start gap-3 rounded-lg px-3 py-2.5"
+                style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${col}18` }}>
+                <div className="flex flex-col items-center shrink-0 w-10">
+                  <span className="font-mono text-[20px] font-bold leading-none" style={{ color: col }}>{o.urgency}</span>
+                  <span className="font-mono text-[6px] text-white/20 mt-0.5">URGÊNCIA</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] text-white/55 leading-snug">{o.label}</p>
+                  <p className="font-mono text-[8px] text-white/20 mt-1 leading-relaxed">POR QUÊ: {whyText}</p>
+                </div>
+                <span className="font-mono text-[7px] px-1.5 py-0.5 rounded-sm shrink-0"
+                  style={{ background: `${col}15`, color: col, border: `1px solid ${col}25` }}>{typeLabel}</span>
+              </motion.div>
+            )
+          })}
         </div>
       </div>
 

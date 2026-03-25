@@ -325,86 +325,238 @@ function buildCausalChains(data: any): CausalChain[] {
   return chains.sort((a, b) => b.urgency - a.urgency)
 }
 
-function CausalCard({ chain, index }: { chain: CausalChain; index: number }) {
-  const [open, setOpen] = useState(index === 0)
+/* ─── Macro sentiment helper ─── */
+function macroSentiment(selic: number, ipca: number, pib: number, usd: number): string {
+  const negatives = (selic > 12 ? 1 : 0) + (ipca > 5 ? 1 : 0) + (usd > 5.8 ? 1 : 0)
+  const positives = (pib > 2.5 ? 1 : 0) + (ipca < 4 ? 1 : 0) + (selic < 10 ? 1 : 0)
+  if (negatives >= 2) return 'Ambiente restritivo: juro alto + inflação acima da meta comprimem margem'
+  if (positives >= 2) return 'Ambiente favorável: crescimento sólido com inflação controlada'
+  return 'Ambiente misto: crescimento positivo mas custos financeiros elevados'
+}
+
+/* ─── Hero: Top Risk ─── */
+function HeroRisk({ chain }: { chain: CausalChain }) {
   const col = chain.type === 'critical' ? RED : chain.type === 'risk' ? AMBER : GREEN
-  const typeLabel = chain.type === 'critical' ? 'CRÍTICO' : chain.type === 'risk' ? 'RISCO' : 'OPORT.'
+  const typeLabel = chain.type === 'critical' ? 'CRITICO' : chain.type === 'risk' ? 'RISCO' : 'OPORT.'
+  const isCritical = chain.type === 'critical'
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.06 }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
       className="rounded-lg overflow-hidden"
-      style={{ border: `1px solid ${col}${open ? '40' : '1a'}`, background: open ? `${col}05` : 'rgba(0,0,0,0.2)' }}>
-
-      <div className="h-[2px] relative" style={{ background: 'rgba(255,255,255,0.04)' }}>
-        <motion.div className="absolute left-0 top-0 h-full" style={{ background: col }}
-          initial={{ width: 0 }} animate={{ width: `${chain.urgency}%` }}
-          transition={{ duration: 1.4, delay: index * 0.06, ease: 'easeOut' }} />
+      style={{
+        background: `linear-gradient(135deg, ${col}08 0%, rgba(0,0,0,0.4) 100%)`,
+        border: `1px solid ${col}40`,
+        boxShadow: isCritical ? `0 0 24px ${col}15, inset 0 1px 0 ${col}10` : `0 0 12px ${col}08`,
+      }}
+    >
+      {/* Urgency meter */}
+      <div className="h-[3px] relative" style={{ background: 'rgba(255,255,255,0.04)' }}>
+        <motion.div
+          className="absolute left-0 top-0 h-full"
+          style={{ background: `linear-gradient(90deg, ${col}, ${col}cc)` }}
+          initial={{ width: 0 }}
+          animate={{ width: `${chain.urgency}%` }}
+          transition={{ duration: 1.6, ease: 'easeOut' }}
+        />
+        <motion.div
+          className="absolute top-0 h-full w-1 rounded-full"
+          style={{ background: col, boxShadow: `0 0 6px ${col}` }}
+          initial={{ left: 0 }}
+          animate={{ left: `${chain.urgency}%` }}
+          transition={{ duration: 1.6, ease: 'easeOut' }}
+        />
       </div>
 
-      <button className="w-full flex items-center gap-3 px-4 py-3 text-left" onClick={() => setOpen(o => !o)}>
-        <motion.span className="font-mono text-[7px] font-bold tracking-[0.18em] px-2 py-1 rounded-sm shrink-0"
-          style={{ background: `${col}15`, color: col, border: `1px solid ${col}30` }}
-          animate={{ opacity: chain.type === 'critical' ? [1, 0.35, 1] : 1 }}
-          transition={{ duration: 1, repeat: Infinity }}>
-          {typeLabel}
-        </motion.span>
-        <p className="text-[12px] font-semibold text-white/75 flex-1 text-left">{chain.title}</p>
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="font-mono text-[12px] font-bold" style={{ color: col }}>{chain.urgency}%</span>
-          <span className="text-white/20 text-[10px]">{open ? '▲' : '▼'}</span>
+      <div className="px-4 pt-3 pb-4">
+        {/* Top line: badge + urgency % */}
+        <div className="flex items-center justify-between mb-2">
+          <motion.span
+            className="font-mono text-[8px] font-bold tracking-[0.2em] px-2.5 py-1 rounded-sm"
+            style={{
+              background: `${col}20`,
+              color: col,
+              border: `1px solid ${col}40`,
+              boxShadow: isCritical ? `0 0 8px ${col}30` : 'none',
+            }}
+            animate={isCritical ? { opacity: [1, 0.4, 1], scale: [1, 1.02, 1] } : {}}
+            transition={{ duration: 1.2, repeat: Infinity }}
+          >
+            {typeLabel}
+          </motion.span>
+          <span className="font-mono text-[11px] font-bold" style={{ color: col }}>
+            URGENCIA {chain.urgency}%
+          </span>
         </div>
+
+        {/* Title */}
+        <p className="text-[13px] font-bold text-white/90 leading-snug mb-3">
+          {chain.title}
+        </p>
+
+        {/* POR QUE */}
+        <div className="rounded-sm p-3 mb-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/25 block mb-1.5">POR QUE</span>
+          <p className="text-[11px] text-white/55 leading-relaxed line-clamp-3">{chain.why}</p>
+        </div>
+
+        {/* COMO AGIR — green box */}
+        <div className="rounded-sm p-3" style={{ background: `${GREEN}12`, border: `1px solid ${GREEN}30` }}>
+          <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1.5" style={{ color: GREEN }}>COMO AGIR</span>
+          <p className="text-[11px] text-white/55 leading-relaxed">{chain.action}</p>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+/* ─── Dashboard Row (collapsed) ─── */
+function DashboardRow({ chain, index, isExpanded, onToggle }: {
+  chain: CausalChain
+  index: number
+  isExpanded: boolean
+  onToggle: () => void
+}) {
+  const col = chain.type === 'critical' ? RED : chain.type === 'risk' ? AMBER : GREEN
+  const typeLabel = chain.type === 'critical' ? 'CRITICO' : chain.type === 'risk' ? 'RISCO' : 'OPORT.'
+  const isCritical = chain.type === 'critical'
+
+  // Extract affected % from chain data if available
+  const affectedMatch = chain.affected.match(/(\d+)%/)
+  const affectedPct = affectedMatch ? affectedMatch[0] : null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.03 }}
+      className="rounded overflow-hidden"
+      style={{
+        background: isExpanded
+          ? `${col}06`
+          : chain.type === 'opportunity' ? `${GREEN}04` : 'rgba(0,0,0,0.2)',
+        border: `1px solid ${isExpanded ? col + '30' : 'rgba(255,255,255,0.04)'}`,
+      }}
+    >
+      {/* Collapsed row — 44px */}
+      <button
+        className="w-full flex items-center gap-2 pr-3 text-left"
+        style={{ height: '44px' }}
+        onClick={onToggle}
+      >
+        {/* Left urgency bar */}
+        <div className="h-full w-[3px] shrink-0 relative" style={{ background: `${col}15` }}>
+          <motion.div
+            className="absolute bottom-0 left-0 w-full"
+            style={{
+              background: col,
+              boxShadow: isCritical ? `0 0 4px ${col}60` : 'none',
+            }}
+            initial={{ height: 0 }}
+            animate={{ height: `${chain.urgency}%` }}
+            transition={{ duration: 1, delay: index * 0.03 }}
+          />
+          {isCritical && (
+            <motion.div
+              className="absolute bottom-0 left-0 w-full"
+              style={{ background: col }}
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+          )}
+        </div>
+
+        {/* Type badge */}
+        <span
+          className="font-mono text-[7px] font-bold tracking-[0.15em] px-1.5 py-0.5 rounded-sm shrink-0 ml-1"
+          style={{
+            background: `${col}12`,
+            color: col,
+            border: `1px solid ${col}25`,
+            minWidth: '42px',
+            textAlign: 'center',
+          }}
+        >
+          {typeLabel}
+        </span>
+
+        {/* Title */}
+        <p className="text-[11px] text-white/65 flex-1 truncate leading-none">{chain.title}</p>
+
+        {/* Affected badge */}
+        {affectedPct && (
+          <span
+            className="font-mono text-[9px] px-1.5 py-0.5 rounded-sm shrink-0"
+            style={{ background: `${col}10`, color: `${col}cc` }}
+          >
+            {affectedPct}
+          </span>
+        )}
+
+        {/* Urgency + expand */}
+        <span className="font-mono text-[10px] font-bold shrink-0" style={{ color: col }}>{chain.urgency}%</span>
+        <span className="text-white/20 text-[9px] shrink-0">{isExpanded ? '▲' : '▼'}</span>
       </button>
 
+      {/* Expanded detail */}
       <AnimatePresence>
-        {open && (
+        {isExpanded && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }}
-            className="overflow-hidden">
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
             <div className="px-4 pb-4 border-t" style={{ borderColor: `${col}15` }}>
-
+              {/* POR QUE */}
               <div className="mt-3 rounded-sm p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/25 block mb-1.5">POR QUE ESTÁ ACONTECENDO</span>
+                <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/25 block mb-1.5">POR QUE</span>
                 <p className="text-[11px] text-white/55 leading-relaxed">{chain.why}</p>
               </div>
 
+              {/* 2-column layout */}
               <div className="mt-3 grid grid-cols-2 gap-3">
-                <div>
-                  <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 block mb-2">O QUE INFLUENCIA</span>
-                  <div className="flex flex-col gap-1.5">
-                    {chain.influence.map((inf, i) => (
-                      <div key={i} className="flex items-start gap-2">
-                        <span className="shrink-0 mt-1 h-1 w-1 rounded-full" style={{ background: col, opacity: 0.5 }} />
-                        <span className="text-[10px] text-white/40 leading-relaxed">{inf}</span>
-                      </div>
-                    ))}
+                {/* Left column: O QUE CAUSA + EFEITOS */}
+                <div className="flex flex-col gap-3">
+                  <div>
+                    <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 block mb-2">O QUE CAUSA</span>
+                    <div className="flex flex-col gap-1.5">
+                      {chain.influence.map((inf, i) => (
+                        <div key={i} className="flex items-start gap-2">
+                          <span className="shrink-0 mt-1 h-1 w-1 rounded-full" style={{ background: col, opacity: 0.5 }} />
+                          <span className="text-[10px] text-white/40 leading-relaxed">{inf}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 block mb-2">EFEITOS</span>
+                    <div className="flex flex-col gap-1.5">
+                      {chain.effects.map((ef, i) => (
+                        <div key={i} className="flex items-start gap-2">
+                          <span className="font-mono text-[9px] shrink-0 mt-0.5 leading-none" style={{ color: col }}>→</span>
+                          <span className="text-[10px] text-white/45 leading-relaxed">{ef}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 block mb-2">EFEITOS EM CASCATA</span>
-                  <div className="flex flex-col gap-1.5">
-                    {chain.effects.map((ef, i) => (
-                      <div key={i} className="flex items-start gap-2">
-                        <span className="font-mono text-[9px] shrink-0 mt-0.5 leading-none" style={{ color: col }}>→</span>
-                        <span className="text-[10px] text-white/45 leading-relaxed">{ef}</span>
-                      </div>
-                    ))}
+
+                {/* Right column: QUEM E AFETADO + O QUE FAZER */}
+                <div className="flex flex-col gap-3">
+                  <div className="rounded-sm p-2.5" style={{ background: `${RED}08`, border: `1px solid ${RED}15` }}>
+                    <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: RED }}>QUEM E AFETADO</span>
+                    <p className="text-[10px] text-white/40 leading-relaxed">{chain.affected}</p>
+                  </div>
+                  <div className="rounded-sm p-2.5" style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}15` }}>
+                    <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: GREEN }}>O QUE FAZER</span>
+                    <p className="text-[10px] text-white/40 leading-relaxed">{chain.action}</p>
                   </div>
                 </div>
               </div>
-
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <div className="rounded-sm p-2.5" style={{ background: `${RED}08`, border: `1px solid ${RED}15` }}>
-                  <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: RED }}>QUEM É AFETADO</span>
-                  <p className="text-[10px] text-white/40 leading-relaxed">{chain.affected}</p>
-                </div>
-                <div className="rounded-sm p-2.5" style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}15` }}>
-                  <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: GREEN }}>AÇÃO RECOMENDADA</span>
-                  <p className="text-[10px] text-white/40 leading-relaxed">{chain.action}</p>
-                </div>
-              </div>
-
             </div>
           </motion.div>
         )}
@@ -413,78 +565,130 @@ function CausalCard({ chain, index }: { chain: CausalChain; index: number }) {
   )
 }
 
+/* ─── Section Divider ─── */
+function SectionDivider({ label, color, count }: { label: string; color: string; count: number }) {
+  return (
+    <div className="flex items-center gap-2 mt-3 mb-1">
+      <div className="h-[1px] flex-1" style={{ background: `${color}25` }} />
+      <span className="font-mono text-[8px] font-bold tracking-[0.25em]" style={{ color }}>
+        {label}
+      </span>
+      <span className="font-mono text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: `${color}15`, color }}>
+        {count}
+      </span>
+      <div className="h-[1px] flex-1" style={{ background: `${color}25` }} />
+    </div>
+  )
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function RiscosSection({ data }: { data: any }) {
   const chains = useMemo(() => buildCausalChains(data), [data])
-  const [filter, setFilter] = useState<'all' | 'critical' | 'risk' | 'opportunity'>('all')
+  const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  const criticos  = chains.filter(c => c.type === 'critical')
-  const riscos    = chains.filter(c => c.type === 'risk')
-  const oports    = chains.filter(c => c.type === 'opportunity')
+  const topRisk = chains[0] // Already sorted by urgency DESC
+  const remaining = chains.slice(1)
+
+  const criticos = remaining.filter(c => c.type === 'critical')
+  const riscos   = remaining.filter(c => c.type === 'risk')
+  const oports   = remaining.filter(c => c.type === 'opportunity')
 
   const selic = v(data.macro.selic?.value, 10.5)
   const ipca  = v(data.macro.ipca?.value, 4.8)
   const pib   = v(data.macro.pib?.value, 2.9)
   const usd   = v(data.macro.usdBrl?.value, 5.72)
 
-  const filtered = filter === 'all' ? chains
-    : filter === 'critical' ? criticos
-    : filter === 'risk' ? riscos
-    : oports
+  const sentiment = macroSentiment(selic, ipca, pib, usd)
 
   return (
-    <div className="flex flex-col gap-5 px-4 pb-8">
+    <div className="flex flex-col gap-4 px-4 pb-8">
 
+      {/* Header */}
       <div className="flex items-center gap-2">
         <motion.div className="h-1.5 w-1.5 rounded-full" style={{ background: RED }}
           animate={{ opacity: [1, 0.2, 1] }} transition={{ duration: 0.9, repeat: Infinity }} />
         <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em] text-white/20">
-          Análise Causal — O que está acontecendo e por quê
+          Riscos & Oportunidades
         </span>
       </div>
 
-      {/* Snapshot macro */}
-      <div className="rounded-lg p-3 grid grid-cols-4 gap-3" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
-        {[
-          { label: 'SELIC', val: `${selic.toFixed(1)}%`, status: selic > 13 ? 'critical' : selic > 10 ? 'risk' : 'ok' },
-          { label: 'IPCA',  val: `${ipca.toFixed(2)}%`, status: ipca > 6 ? 'critical' : ipca > 4 ? 'risk' : 'ok' },
-          { label: 'PIB',   val: `+${pib.toFixed(1)}%`, status: pib > 2 ? 'ok' : pib > 0 ? 'risk' : 'critical' },
-          { label: 'USD',   val: `R$${usd.toFixed(2)}`, status: usd > 6 ? 'critical' : usd > 5.3 ? 'risk' : 'ok' },
-        ].map(m => {
-          const c = m.status === 'critical' ? RED : m.status === 'risk' ? AMBER : GREEN
-          return (
-            <div key={m.label} className="flex flex-col items-center gap-1">
-              <span className="font-mono text-[8px] text-white/25 tracking-widest">{m.label}</span>
-              <span className="font-mono text-[18px] font-bold" style={{ color: c }}>{m.val}</span>
-              <div className="h-[2px] w-8 rounded-full" style={{ background: c, opacity: 0.5 }} />
-            </div>
-          )
-        })}
+      {/* 3. Macro Impact Summary — one-line contextual bar */}
+      <div
+        className="rounded-md px-3 py-2 flex items-center gap-1 flex-wrap"
+        style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)' }}
+      >
+        <span className="font-mono text-[10px] text-white/35">
+          SELIC <span className="font-bold text-white/55">{selic.toFixed(1)}%</span>
+        </span>
+        <span className="text-white/10 text-[10px]">·</span>
+        <span className="font-mono text-[10px] text-white/35">
+          IPCA <span className="font-bold text-white/55">{ipca.toFixed(2)}%</span>
+        </span>
+        <span className="text-white/10 text-[10px]">·</span>
+        <span className="font-mono text-[10px] text-white/35">
+          USD <span className="font-bold text-white/55">R${usd.toFixed(2)}</span>
+        </span>
+        <span className="text-white/10 text-[10px]">·</span>
+        <span className="font-mono text-[10px] text-white/35">
+          PIB <span className="font-bold text-white/55">{pib.toFixed(1)}%</span>
+        </span>
+        <span className="text-white/08 text-[10px] mx-1">—</span>
+        <span className="text-[10px] text-white/40 italic">{sentiment}</span>
       </div>
 
-      {/* Contadores + filtro */}
-      <div className="flex items-center gap-2 flex-wrap">
-        {([
-          { key: 'all',         label: 'Todos',       count: chains.length,    col: 'rgba(255,255,255,0.3)' },
-          { key: 'critical',    label: 'Críticos',    count: criticos.length,  col: RED },
-          { key: 'risk',        label: 'Riscos',      count: riscos.length,    col: AMBER },
-          { key: 'opportunity', label: 'Oportunidades', count: oports.length,  col: GREEN },
-        ] as const).map(f => (
-          <button key={f.key} onClick={() => setFilter(f.key)}
-            className="flex items-center gap-1.5 rounded-sm px-2.5 py-1.5 transition-all"
-            style={{
-              background: filter === f.key ? `${f.col}15` : 'rgba(0,0,0,0.2)',
-              border: `1px solid ${filter === f.key ? f.col + '50' : 'rgba(255,255,255,0.06)'}`,
-            }}>
-            <span className="font-mono text-[9px] font-bold" style={{ color: filter === f.key ? f.col : 'rgba(255,255,255,0.3)' }}>{f.label}</span>
-            <span className="font-mono text-[8px] rounded-full px-1.5 py-0.5" style={{ background: `${f.col}20`, color: f.col }}>{f.count}</span>
-          </button>
-        ))}
-      </div>
+      {/* 1. Hero: Top Risk */}
+      {topRisk && <HeroRisk chain={topRisk} />}
 
-      {/* Cards */}
-      <div className="flex flex-col gap-2">
-        {filtered.map((c, i) => <CausalCard key={c.id} chain={c} index={i} />)}
+      {/* 2. Risk Dashboard */}
+      <div className="flex flex-col gap-0.5">
+
+        {/* CRITICOS section */}
+        {criticos.length > 0 && (
+          <>
+            <SectionDivider label="RISCOS CRITICOS" color={RED} count={criticos.length} />
+            {criticos.map((c, i) => (
+              <DashboardRow
+                key={c.id}
+                chain={c}
+                index={i}
+                isExpanded={expandedId === c.id}
+                onToggle={() => setExpandedId(prev => prev === c.id ? null : c.id)}
+              />
+            ))}
+          </>
+        )}
+
+        {/* RISCOS section */}
+        {riscos.length > 0 && (
+          <>
+            <SectionDivider label="ALERTAS" color={AMBER} count={riscos.length} />
+            {riscos.map((c, i) => (
+              <DashboardRow
+                key={c.id}
+                chain={c}
+                index={i + criticos.length}
+                isExpanded={expandedId === c.id}
+                onToggle={() => setExpandedId(prev => prev === c.id ? null : c.id)}
+              />
+            ))}
+          </>
+        )}
+
+        {/* OPORTUNIDADES section */}
+        {oports.length > 0 && (
+          <>
+            <SectionDivider label="OPORTUNIDADES" color={GREEN} count={oports.length} />
+            {oports.map((c, i) => (
+              <DashboardRow
+                key={c.id}
+                chain={c}
+                index={i + criticos.length + riscos.length}
+                isExpanded={expandedId === c.id}
+                onToggle={() => setExpandedId(prev => prev === c.id ? null : c.id)}
+              />
+            ))}
+          </>
+        )}
       </div>
 
     </div>
