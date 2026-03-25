@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const RED   = '#c0392b'
@@ -361,102 +361,231 @@ function ModuleBadge({ name }: { name: string }) {
   )
 }
 
-/* ─── Hero: Top Risk ─── */
-function HeroRisk({ chain }: { chain: CausalChain }) {
-  const col = chain.type === 'critical' ? RED : chain.type === 'risk' ? AMBER : GREEN
-  const typeLabel = chain.type === 'critical' ? 'CRITICO' : chain.type === 'risk' ? 'RISCO' : 'OPORT.'
-  const isCritical = chain.type === 'critical'
+/* ─── Circular Severity Meter ─── */
+function SeverityCircle({ urgency, color, animate }: { urgency: number; color: string; animate: boolean }) {
+  const size = 60
+  const strokeWidth = 4
+  const radius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * radius
+  const arcLength = (urgency / 100) * circumference
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    if (animate) {
+      const t = setTimeout(() => setMounted(true), 50)
+      return () => clearTimeout(t)
+    }
+  }, [animate])
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="rounded-lg overflow-hidden"
-      style={{
-        background: `linear-gradient(135deg, ${col}08 0%, rgba(0,0,0,0.4) 100%)`,
-        border: `1px solid ${col}40`,
-        boxShadow: isCritical ? `0 0 24px ${col}15, inset 0 1px 0 ${col}10` : `0 0 12px ${col}08`,
-      }}
-    >
-      {/* Urgency meter */}
-      <div className="h-[3px] relative" style={{ background: 'rgba(255,255,255,0.04)' }}>
-        <motion.div
-          className="absolute left-0 top-0 h-full"
-          style={{ background: `linear-gradient(90deg, ${col}, ${col}cc)` }}
-          initial={{ width: 0 }}
-          animate={{ width: `${chain.urgency}%` }}
-          transition={{ duration: 1.6, ease: 'easeOut' }}
-        />
-        <motion.div
-          className="absolute top-0 h-full w-1 rounded-full"
-          style={{ background: col, boxShadow: `0 0 6px ${col}` }}
-          initial={{ left: 0 }}
-          animate={{ left: `${chain.urgency}%` }}
-          transition={{ duration: 1.6, ease: 'easeOut' }}
-        />
-      </div>
-
-      <div className="px-4 pt-3 pb-4">
-        {/* Top line: badge + urgency % */}
-        <div className="flex items-center justify-between mb-2">
-          <motion.span
-            className="font-mono text-[8px] font-bold tracking-[0.2em] px-2.5 py-1 rounded-sm"
-            style={{
-              background: `${col}20`,
-              color: col,
-              border: `1px solid ${col}40`,
-              boxShadow: isCritical ? `0 0 8px ${col}30` : 'none',
-            }}
-            animate={isCritical ? { opacity: [1, 0.4, 1], scale: [1, 1.02, 1] } : {}}
-            transition={{ duration: 1.2, repeat: Infinity }}
-          >
-            {typeLabel}
-          </motion.span>
-          <span className="font-mono text-[11px] font-bold" style={{ color: col }}>
-            URGENCIA {chain.urgency}%
-          </span>
-        </div>
-
-        {/* Title */}
-        <p className="text-[13px] font-bold text-white/90 leading-snug mb-3">
-          {chain.title}
-        </p>
-
-        {/* POR QUE */}
-        <div className="rounded-sm p-3 mb-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/25 block mb-1.5">POR QUE</span>
-          <p className="text-[11px] text-white/55 leading-relaxed line-clamp-3">{chain.why}</p>
-        </div>
-
-        {/* COMO AGIR — green box */}
-        <div className="rounded-sm p-3 mb-3" style={{ background: `${GREEN}12`, border: `1px solid ${GREEN}30` }}>
-          <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1.5" style={{ color: GREEN }}>COMO AGIR</span>
-          <p className="text-[11px] text-white/55 leading-relaxed">{chain.action}</p>
-        </div>
-
-        {/* RESOLVER EM */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/25">RESOLVER EM</span>
-          {chain.modules.map((mod) => (
-            <ModuleBadge key={mod} name={mod} />
-          ))}
-        </div>
-      </div>
-    </motion.div>
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="shrink-0">
+      {/* Background circle */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="rgba(255,255,255,0.06)"
+        strokeWidth={strokeWidth}
+      />
+      {/* Foreground arc */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeDasharray={`${circumference}`}
+        strokeDashoffset={mounted ? circumference - arcLength : circumference}
+        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        style={{
+          transition: 'stroke-dashoffset 1.2s ease-out',
+          filter: `drop-shadow(0 0 3px ${color}60)`,
+        }}
+      />
+      {/* Center number */}
+      <text
+        x={size / 2}
+        y={size / 2 + 1}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fill={color}
+        fontSize="18"
+        fontWeight="bold"
+        fontFamily="monospace"
+      >
+        {urgency}
+      </text>
+    </svg>
   )
 }
 
-/* ─── Dashboard Row (collapsed/expanded) ─── */
-function DashboardRow({ chain, index, isExpanded, onToggle }: {
+/* ─── Type Badge ─── */
+function TypeBadge({ type, color, small }: { type: string; color: string; small?: boolean }) {
+  const label = type === 'critical' ? 'CRITICO' : type === 'risk' ? 'RISCO' : 'OPORT'
+  const isCritical = type === 'critical'
+
+  return (
+    <motion.span
+      className={`font-mono font-bold tracking-[0.15em] rounded-sm text-center ${
+        small ? 'text-[6px] px-1 py-0.5' : 'text-[7px] px-1.5 py-0.5'
+      }`}
+      style={{
+        background: `${color}18`,
+        color,
+        border: `1px solid ${color}30`,
+        minWidth: small ? '32px' : '42px',
+        display: 'inline-block',
+      }}
+      animate={isCritical ? { opacity: [1, 0.4, 1] } : {}}
+      transition={{ duration: 1.2, repeat: Infinity }}
+    >
+      {label}
+    </motion.span>
+  )
+}
+
+/* ─── Expanded Detail Content ─── */
+function ExpandedDetail({ chain }: { chain: CausalChain }) {
+  const col = chain.type === 'critical' ? RED : chain.type === 'risk' ? AMBER : GREEN
+
+  return (
+    <div className="px-4 pb-4 pt-3 space-y-3">
+      {/* Full WHY */}
+      <div className="rounded-sm p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/25 block mb-1.5">POR QUE</span>
+        <p className="text-[10px] text-white/55 leading-relaxed">{chain.why}</p>
+      </div>
+
+      {/* Influences */}
+      <div>
+        <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">O QUE CAUSA</span>
+        <div className="flex flex-col gap-1.5">
+          {chain.influence.map((inf, i) => (
+            <div key={i} className="flex items-start gap-2">
+              <span className="shrink-0 mt-1 h-1 w-1 rounded-full" style={{ background: col, opacity: 0.5 }} />
+              <span className="text-[9px] text-white/40 leading-relaxed">{inf}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Effects */}
+      <div>
+        <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">IMPACTO</span>
+        <div className="flex flex-col gap-1.5">
+          {chain.effects.map((ef, i) => (
+            <div key={i} className="flex items-start gap-2">
+              <span className="font-mono text-[8px] shrink-0 mt-0.5 leading-none" style={{ color: col }}>{'\u2192'}</span>
+              <span className="text-[9px] text-white/45 leading-relaxed">{ef}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Full COMO AGIR */}
+      <div className="rounded-sm p-2.5" style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}15` }}>
+        <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: GREEN }}>COMO AGIR</span>
+        <p className="text-[9px] text-white/45 leading-relaxed">{chain.action}</p>
+      </div>
+
+      {/* QUEM E AFETADO */}
+      <div className="rounded-sm p-2.5" style={{ background: `${RED}06`, border: `1px solid ${RED}12` }}>
+        <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: RED }}>QUEM E AFETADO</span>
+        <p className="text-[9px] text-white/40 leading-relaxed">{chain.affected}</p>
+      </div>
+
+      {/* RESOLVER EM */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/25">{'\u2192'} RESOLVER EM</span>
+        {chain.modules.map((mod) => (
+          <ModuleBadge key={mod} name={mod} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* ─── Top 3 Big Card ─── */
+function BigRiskCard({ chain, index, isExpanded, onToggle }: {
   chain: CausalChain
   index: number
   isExpanded: boolean
   onToggle: () => void
 }) {
   const col = chain.type === 'critical' ? RED : chain.type === 'risk' ? AMBER : GREEN
-  const typeLabel = chain.type === 'critical' ? 'CRITICO' : chain.type === 'risk' ? 'RISCO' : 'OPORT.'
-  const isCritical = chain.type === 'critical'
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.08 }}
+      className="rounded-lg overflow-hidden cursor-pointer"
+      style={{
+        background: 'rgba(0,0,0,0.35)',
+        border: `1px solid ${col}25`,
+      }}
+      onClick={onToggle}
+    >
+      {/* Main content row */}
+      <div className="flex items-center gap-4 p-4">
+        {/* Left: Severity circle + badge */}
+        <div className="flex flex-col items-center gap-1.5 shrink-0">
+          <SeverityCircle urgency={chain.urgency} color={col} animate={true} />
+          <TypeBadge type={chain.type} color={col} />
+        </div>
+
+        {/* Right: text content */}
+        <div className="flex-1 min-w-0">
+          <p className="text-[12px] font-bold text-white/80 leading-snug mb-1">{chain.title}</p>
+          <p className="text-[9px] text-white/40 leading-relaxed line-clamp-2 mb-1.5">{chain.why}</p>
+          <p className="text-[9px] leading-none mb-1.5" style={{ color: GREEN }}>
+            COMO AGIR: {chain.action.split('.')[0]}.
+          </p>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[8px] text-white/25 font-mono">{'\u2192'} Resolver em:</span>
+            {chain.modules.map((mod) => (
+              <ModuleBadge key={mod} name={mod} />
+            ))}
+          </div>
+        </div>
+
+        {/* Expand indicator */}
+        <span className="text-white/20 text-[10px] shrink-0 self-start mt-1">
+          {isExpanded ? '\u25B2' : '\u25BC'}
+        </span>
+      </div>
+
+      {/* Expanded detail */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden border-t"
+            style={{ borderColor: `${col}15` }}
+          >
+            <ExpandedDetail chain={chain} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+/* ─── Compact Row ─── */
+function CompactRow({ chain, index, isExpanded, onToggle }: {
+  chain: CausalChain
+  index: number
+  isExpanded: boolean
+  onToggle: () => void
+}) {
+  const col = chain.type === 'critical' ? RED : chain.type === 'risk' ? AMBER : GREEN
+  const isOpp = chain.type === 'opportunity'
 
   return (
     <motion.div
@@ -465,59 +594,32 @@ function DashboardRow({ chain, index, isExpanded, onToggle }: {
       transition={{ delay: index * 0.03 }}
       className="rounded overflow-hidden"
       style={{
-        background: isExpanded
-          ? `${col}06`
-          : chain.type === 'opportunity' ? `${GREEN}04` : 'rgba(0,0,0,0.2)',
-        border: `1px solid ${isExpanded ? col + '30' : 'rgba(255,255,255,0.04)'}`,
+        background: isOpp ? `${GREEN}06` : 'rgba(0,0,0,0.2)',
+        borderBottom: '1px solid rgba(255,255,255,0.04)',
       }}
     >
       {/* Collapsed row */}
       <button
-        className="w-full flex items-center gap-2 pr-3 text-left"
-        style={{ height: '44px' }}
+        className="w-full flex items-center gap-2 px-3 text-left"
+        style={{ height: '36px' }}
         onClick={onToggle}
       >
-        {/* Left urgency bar */}
-        <div className="h-full w-[3px] shrink-0 relative" style={{ background: `${col}15` }}>
-          <motion.div
-            className="absolute bottom-0 left-0 w-full"
-            style={{
-              background: col,
-              boxShadow: isCritical ? `0 0 4px ${col}60` : 'none',
-            }}
-            initial={{ height: 0 }}
-            animate={{ height: `${chain.urgency}%` }}
-            transition={{ duration: 1, delay: index * 0.03 }}
-          />
-          {isCritical && (
-            <motion.div
-              className="absolute bottom-0 left-0 w-full"
-              style={{ background: col }}
-              animate={{ opacity: [0.4, 1, 0.4] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            />
-          )}
-        </div>
-
-        {/* Type badge */}
+        {/* Colored dot */}
         <span
-          className="font-mono text-[7px] font-bold tracking-[0.15em] px-1.5 py-0.5 rounded-sm shrink-0 ml-1"
-          style={{
-            background: `${col}12`,
-            color: col,
-            border: `1px solid ${col}25`,
-            minWidth: '42px',
-            textAlign: 'center',
-          }}
-        >
-          {typeLabel}
-        </span>
+          className="shrink-0 rounded-full"
+          style={{ width: '6px', height: '6px', background: col }}
+        />
+
+        {/* Type badge (tiny) */}
+        <TypeBadge type={chain.type} color={col} small />
 
         {/* Title */}
-        <p className="text-[11px] text-white/65 flex-1 truncate leading-none">{chain.title}</p>
+        <p className="text-[10px] text-white/60 flex-1 truncate leading-none">{chain.title}</p>
 
-        {/* Urgency + expand */}
+        {/* Urgency % */}
         <span className="font-mono text-[10px] font-bold shrink-0" style={{ color: col }}>{chain.urgency}%</span>
+
+        {/* Expand button */}
         <span className="text-white/20 text-[9px] shrink-0">{isExpanded ? '\u25B2' : '\u25BC'}</span>
       </button>
 
@@ -529,66 +631,10 @@ function DashboardRow({ chain, index, isExpanded, onToggle }: {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="overflow-hidden"
+            className="overflow-hidden border-t"
+            style={{ borderColor: `${col}10` }}
           >
-            <div className="px-4 pb-4 border-t" style={{ borderColor: `${col}15` }}>
-              {/* POR QUE */}
-              <div className="mt-3 rounded-sm p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/25 block mb-1.5">DIAGNOSTICO</span>
-                <p className="text-[11px] text-white/55 leading-relaxed">{chain.why}</p>
-              </div>
-
-              {/* 2-column layout: Influences + Effects */}
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                {/* Left: O QUE CAUSA + EFEITOS */}
-                <div className="flex flex-col gap-3">
-                  <div>
-                    <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 block mb-2">O QUE CAUSA</span>
-                    <div className="flex flex-col gap-1.5">
-                      {chain.influence.map((inf, i) => (
-                        <div key={i} className="flex items-start gap-2">
-                          <span className="shrink-0 mt-1 h-1 w-1 rounded-full" style={{ background: col, opacity: 0.5 }} />
-                          <span className="text-[10px] text-white/40 leading-relaxed">{inf}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 block mb-2">IMPACTO</span>
-                    <div className="flex flex-col gap-1.5">
-                      {chain.effects.map((ef, i) => (
-                        <div key={i} className="flex items-start gap-2">
-                          <span className="font-mono text-[9px] shrink-0 mt-0.5 leading-none" style={{ color: col }}>{'\u2192'}</span>
-                          <span className="text-[10px] text-white/45 leading-relaxed">{ef}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right: QUEM E AFETADO + COMO AGIR */}
-                <div className="flex flex-col gap-3">
-                  <div className="rounded-sm p-2.5" style={{ background: `${RED}08`, border: `1px solid ${RED}15` }}>
-                    <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: RED }}>QUEM E AFETADO</span>
-                    <p className="text-[10px] text-white/40 leading-relaxed">{chain.affected}</p>
-                  </div>
-                  <div className="rounded-sm p-2.5" style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}15` }}>
-                    <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: GREEN }}>COMO AGIR</span>
-                    <p className="text-[10px] text-white/40 leading-relaxed">{chain.action}</p>
-                  </div>
-
-                  {/* RESOLVER EM */}
-                  <div className="rounded-sm p-2.5" style={{ background: 'rgba(26,82,118,0.06)', border: '1px solid rgba(26,82,118,0.15)' }}>
-                    <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1.5" style={{ color: '#2471a3' }}>RESOLVER EM</span>
-                    <div className="flex flex-wrap gap-1">
-                      {chain.modules.map((mod) => (
-                        <ModuleBadge key={mod} name={mod} />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ExpandedDetail chain={chain} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -597,17 +643,14 @@ function DashboardRow({ chain, index, isExpanded, onToggle }: {
 }
 
 /* ─── Section Divider ─── */
-function SectionDivider({ label, color, count }: { label: string; color: string; count: number }) {
+function SectionDivider({ label, color }: { label: string; color: string }) {
   return (
-    <div className="flex items-center gap-2 mt-3 mb-1">
-      <div className="h-[1px] flex-1" style={{ background: `${color}25` }} />
-      <span className="font-mono text-[8px] font-bold tracking-[0.25em]" style={{ color }}>
+    <div className="flex items-center gap-2 mt-4 mb-1.5">
+      <div className="h-[1px] flex-1" style={{ background: `${color}20` }} />
+      <span className="font-mono text-[7px] font-bold tracking-[0.25em]" style={{ color: `${color}99` }}>
         {label}
       </span>
-      <span className="font-mono text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: `${color}15`, color }}>
-        {count}
-      </span>
-      <div className="h-[1px] flex-1" style={{ background: `${color}25` }} />
+      <div className="h-[1px] flex-1" style={{ background: `${color}20` }} />
     </div>
   )
 }
@@ -617,12 +660,11 @@ export default function RiscosSection({ data }: { data: any }) {
   const chains = useMemo(() => buildCausalChains(data), [data])
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  const topRisk = chains[0]
-  const remaining = chains.slice(1)
+  const top3 = chains.slice(0, 3)
+  const remaining = chains.slice(3)
 
-  const criticos = remaining.filter(c => c.type === 'critical')
-  const riscos   = remaining.filter(c => c.type === 'risk')
-  const oports   = remaining.filter(c => c.type === 'opportunity')
+  const remainingRisks = remaining.filter(c => c.type === 'critical' || c.type === 'risk')
+  const remainingOpps  = remaining.filter(c => c.type === 'opportunity')
 
   const selic = v(data.macro.selic?.value, 10.5)
   const ipca  = v(data.macro.ipca?.value, 4.8)
@@ -630,77 +672,67 @@ export default function RiscosSection({ data }: { data: any }) {
 
   const contextSentence = macroContextSentence(selic, ipca, pib)
 
+  const toggle = (id: string) => setExpandedId(prev => prev === id ? null : id)
+
   return (
-    <div className="flex flex-col gap-4 px-4 pb-8">
+    <div className="flex flex-col gap-3 px-4 pb-8">
 
-      {/* Header */}
-      <div className="flex items-center gap-2">
-        <motion.div className="h-1.5 w-1.5 rounded-full" style={{ background: RED }}
-          animate={{ opacity: [1, 0.2, 1] }} transition={{ duration: 0.9, repeat: Infinity }} />
-        <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em] text-white/20">
-          O Que Pode Me Quebrar?
-        </span>
+      {/* 1. Question Header */}
+      <div className="text-center mb-4">
+        <p className="font-mono text-[8px] font-bold tracking-[0.3em] text-white/20 uppercase">Diagnostico de Riscos</p>
+        <h2 className="text-[15px] font-semibold text-white/60 mt-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          O que pode me <span className="text-white/90">quebrar</span>?
+        </h2>
       </div>
 
-      {/* 1. Macro Context Bar — one sentence, no numbers */}
-      <div
-        className="rounded-md px-3 py-2"
-        style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)' }}
-      >
-        <span className="font-mono text-[10px] text-white/45 italic">{contextSentence}</span>
+      {/* 2. Macro Context Sentence */}
+      <p className="text-center font-mono text-[9px] text-white/30 italic -mt-3 mb-1">
+        {contextSentence}
+      </p>
+
+      {/* 3. Top 3 Risks as BIG Cards */}
+      <div className="flex flex-col gap-2">
+        {top3.map((chain, i) => (
+          <BigRiskCard
+            key={chain.id}
+            chain={chain}
+            index={i}
+            isExpanded={expandedId === chain.id}
+            onToggle={() => toggle(chain.id)}
+          />
+        ))}
       </div>
 
-      {/* 2. Hero: #1 Risk */}
-      {topRisk && <HeroRisk chain={topRisk} />}
+      {/* 4. Remaining risks as compact list */}
+      {remainingRisks.length > 0 && (
+        <div className="flex flex-col gap-0.5">
+          <SectionDivider label="OUTROS RISCOS" color={AMBER} />
+          {remainingRisks.map((c, i) => (
+            <CompactRow
+              key={c.id}
+              chain={c}
+              index={i}
+              isExpanded={expandedId === c.id}
+              onToggle={() => toggle(c.id)}
+            />
+          ))}
+        </div>
+      )}
 
-      {/* 3. Remaining Risks — grouped by type */}
-      <div className="flex flex-col gap-0.5">
-
-        {criticos.length > 0 && (
-          <>
-            <SectionDivider label="RISCOS CRITICOS" color={RED} count={criticos.length} />
-            {criticos.map((c, i) => (
-              <DashboardRow
-                key={c.id}
-                chain={c}
-                index={i}
-                isExpanded={expandedId === c.id}
-                onToggle={() => setExpandedId(prev => prev === c.id ? null : c.id)}
-              />
-            ))}
-          </>
-        )}
-
-        {riscos.length > 0 && (
-          <>
-            <SectionDivider label="ALERTAS" color={AMBER} count={riscos.length} />
-            {riscos.map((c, i) => (
-              <DashboardRow
-                key={c.id}
-                chain={c}
-                index={i + criticos.length}
-                isExpanded={expandedId === c.id}
-                onToggle={() => setExpandedId(prev => prev === c.id ? null : c.id)}
-              />
-            ))}
-          </>
-        )}
-
-        {oports.length > 0 && (
-          <>
-            <SectionDivider label="OPORTUNIDADES" color={GREEN} count={oports.length} />
-            {oports.map((c, i) => (
-              <DashboardRow
-                key={c.id}
-                chain={c}
-                index={i + criticos.length + riscos.length}
-                isExpanded={expandedId === c.id}
-                onToggle={() => setExpandedId(prev => prev === c.id ? null : c.id)}
-              />
-            ))}
-          </>
-        )}
-      </div>
+      {remainingOpps.length > 0 && (
+        <div className="flex flex-col gap-0.5">
+          <SectionDivider label="OPORTUNIDADES" color={GREEN} />
+          {remainingOpps.map((c, i) => (
+            <CompactRow
+              key={c.id}
+              chain={c}
+              index={i + remainingRisks.length}
+              isExpanded={expandedId === c.id}
+              onToggle={() => toggle(c.id)}
+            />
+          ))}
+        </div>
+      )}
 
     </div>
   )

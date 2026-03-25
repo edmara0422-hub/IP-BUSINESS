@@ -109,7 +109,7 @@ export default function MarketingSection({ data }: { data: any }) {
   const orgVal = v(mkt?.organicShare?.value, 31)
   const orgD   = v(mkt?.organicShare?.delta, -4.2)
 
-  // Build CAC explanation line — marketing-only reasons (no macro)
+  // Build CAC explanation line
   const cacReasons: string[] = []
   if (cpmD > 5) cacReasons.push('CPM subindo')
   if (cpcD > 5) cacReasons.push('CPC subindo')
@@ -117,7 +117,7 @@ export default function MarketingSection({ data }: { data: any }) {
   if (cacD > 15) cacReasons.push('competição de leilão intensa')
   const cacExplanation = cacReasons.length > 0 ? cacReasons.join(' + ') : 'pressão competitiva'
 
-  // Sorted platforms by cost-effectiveness (lowest CPM/CPC first)
+  // Sorted platforms by cost (cheapest first)
   const sortedPlatforms = useMemo(() => {
     return [...platforms].sort((a, b) => {
       const costA = a.cpm ?? a.cpc ?? 999
@@ -129,11 +129,20 @@ export default function MarketingSection({ data }: { data: any }) {
   // Best platform (cheapest)
   const bestPlatformId = sortedPlatforms.length > 0 ? sortedPlatforms[0].id : null
 
+  // Max cost for bar width calculation
+  const maxCost = useMemo(() => {
+    let max = 0
+    for (const p of sortedPlatforms) {
+      const c = p.cpm ?? p.cpc ?? 0
+      if (c > max) max = c
+    }
+    return max || 1
+  }, [sortedPlatforms])
+
   // Generate action items based on current data
   const actions = useMemo(() => {
     const items: Array<{ action: string; impact: string; priority: 'URGENTE' | 'IMPORTANTE' | 'CONSIDERAR' }> = []
 
-    // Find cheapest CPM platform
     const cheapestCPM = sortedPlatforms.find(p => p.cpm != null)
 
     if (cheapestCPM && cheapestCPM.id === 'tiktok') {
@@ -180,7 +189,7 @@ export default function MarketingSection({ data }: { data: any }) {
       priority: 'CONSIDERAR',
     })
 
-    return items
+    return items.slice(0, 3)
   }, [sortedPlatforms, orgD, cacD, cpmD])
 
   // Opportunity explanations
@@ -191,20 +200,21 @@ export default function MarketingSection({ data }: { data: any }) {
     'setor': 'Setores em transformação criam gaps de mercado temporários',
   }
 
+  // Bar color gradient: green for cheapest, amber for middle, red for most expensive
+  const barColors = [GREEN, GREEN, AMBER, AMBER, RED, RED]
+
   return (
     <div className="flex flex-col gap-5 px-4 pb-8">
 
-      {/* ── Header ── */}
-      <div className="flex items-center gap-2">
-        <motion.div className="h-1.5 w-1.5 rounded-full"
-          style={{ background: deltaColor(cacD) }}
-          animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />
-        <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em] text-white/20">
-          Plataformas & Marketing
-        </span>
+      {/* ── 1. Question Header ── */}
+      <div className="text-center mb-4">
+        <p className="font-mono text-[8px] font-bold tracking-[0.3em] text-white/20 uppercase">Performance de Aquisição</p>
+        <h2 className="text-[15px] font-semibold text-white/60 mt-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          Quanto custa adquirir <span className="text-white/90">cliente</span>?
+        </h2>
       </div>
 
-      {/* ══ 1. HERO: CAC COMO PROTAGONISTA ══ */}
+      {/* ══ 2. HERO: CAC COMO PROTAGONISTA ══ */}
       <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.35)', border: `1px solid ${deltaColor(cacD)}22` }}>
         <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${deltaColor(cacD)}80, transparent)` }} />
         <div className="p-5">
@@ -250,7 +260,7 @@ export default function MarketingSection({ data }: { data: any }) {
         </div>
       </div>
 
-      {/* ══ 2. 3-COLUMN KEY METRICS ROW ══ */}
+      {/* ══ 3. 3-COLUMN KEY METRICS ROW ══ */}
       <div className="grid grid-cols-3 gap-2">
         {/* CPM Médio */}
         <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -289,226 +299,188 @@ export default function MarketingSection({ data }: { data: any }) {
         </div>
       </div>
 
-      {/* ══ 3. PLATFORM RANKING TABLE ══ */}
+      {/* ══ 4. PLATFORM COMPARISON — HORIZONTAL BARS ══ */}
       <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="px-4 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/25">
-            RANKING DE PLATAFORMAS — por custo-benefício
-          </span>
-        </div>
-
-        {/* Table header */}
-        <div className="grid grid-cols-[32px_28px_1fr_72px_56px_64px_1fr] items-center px-3 py-2 gap-2"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: 'rgba(255,255,255,0.02)' }}>
-          <span className="font-mono text-[7px] text-white/20">#</span>
-          <span className="font-mono text-[7px] text-white/20"></span>
-          <span className="font-mono text-[7px] text-white/20">PLATAFORMA</span>
-          <span className="font-mono text-[7px] text-white/20 text-right">CPM/CPC</span>
-          <span className="font-mono text-[7px] text-white/20 text-right">DELTA</span>
-          <span className="font-mono text-[7px] text-white/20 text-center">TREND</span>
-          <span className="font-mono text-[7px] text-white/20">MELHOR PARA</span>
-        </div>
-
-        {/* Table rows */}
-        {sortedPlatforms.map((p, i) => {
-          const analysis = PLATFORM_ANALYSIS[p.id]
-          const isBest = p.id === bestPlatformId
-          const isExpanded = expandedPlatform === p.id
-          const col = trendColor(p.trend)
-          const metric = p.cpm != null
-            ? { label: 'CPM', val: `US$${p.cpm.toFixed(2)}`, delta: p.cpmDelta ?? 0 }
-            : { label: 'CPC', val: `US$${(p.cpc ?? 0).toFixed(2)}`, delta: p.cpcDelta ?? 0 }
-          const dCol = deltaColor(metric.delta)
-          const trendLabel = p.trend === 'up' ? '▲ SUBINDO' : p.trend === 'down' ? '▼ CAINDO' : '— ESTÁVEL'
-
-          return (
-            <motion.div key={p.id}
-              initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
-              style={{ borderLeft: isBest ? `2px solid ${GREEN}` : '2px solid transparent' }}>
-
-              <button className="w-full text-left" onClick={() => setExpandedPlatform(isExpanded ? null : p.id)}>
-                <div className="grid grid-cols-[32px_28px_1fr_72px_56px_64px_1fr] items-center px-3 py-2.5 gap-2 transition-colors"
-                  style={{
-                    borderBottom: '1px solid rgba(255,255,255,0.04)',
-                    background: isExpanded ? 'rgba(255,255,255,0.03)' : 'transparent',
-                  }}>
-                  {/* Rank */}
-                  <span className="font-mono text-[13px] font-bold" style={{ color: isBest ? GREEN : 'rgba(255,255,255,0.25)' }}>
-                    {i + 1}
-                  </span>
-
-                  {/* Icon */}
-                  <div className="w-6 h-6 rounded flex items-center justify-center font-mono text-[9px] font-bold"
-                    style={{ background: `${col}12`, color: col, border: `1px solid ${col}25` }}>
-                    {PLATFORM_ICON[p.id] ?? p.label[0]}
-                  </div>
-
-                  {/* Name */}
-                  <div className="min-w-0">
-                    <span className="font-mono text-[11px] font-semibold text-white/70">{p.label}</span>
-                  </div>
-
-                  {/* CPM/CPC value */}
-                  <span className="font-mono text-[12px] font-bold text-white/80 text-right">{metric.val}</span>
-
-                  {/* Delta */}
-                  <span className="font-mono text-[10px] font-bold text-right" style={{ color: dCol }}>
-                    {metric.delta > 0 ? '▲' : metric.delta < 0 ? '▼' : '—'}{Math.abs(metric.delta).toFixed(1)}%
-                  </span>
-
-                  {/* Trend badge */}
-                  <span className="font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm text-center"
-                    style={{ background: `${col}12`, color: col, border: `1px solid ${col}20` }}>
-                    {trendLabel}
-                  </span>
-
-                  {/* Best for (short) */}
-                  <div className="flex items-center gap-1 min-w-0">
-                    <span className="font-mono text-[8px] text-white/30 truncate">
-                      {analysis?.bestFor?.split('.')[0] ?? p.note}
-                    </span>
-                    <span className="text-white/15 text-[9px] shrink-0 ml-auto">{isExpanded ? '▲' : '▼'}</span>
-                  </div>
-                </div>
-              </button>
-
-              {/* Expanded detail */}
-              <AnimatePresence>
-                {isExpanded && analysis && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
-                    className="overflow-hidden">
-                    <div className="px-4 pb-4 pt-3 flex flex-col gap-3" style={{ background: 'rgba(0,0,0,0.15)' }}>
-
-                      {/* Por que este custo */}
-                      <div className="rounded-sm p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                        <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">POR QUE ESSE CUSTO</span>
-                        <p className="text-[10px] text-white/45 leading-relaxed">{analysis.why}</p>
-                      </div>
-
-                      {/* Estratégias */}
-                      <div>
-                        <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">ESTRATÉGIAS RECOMENDADAS</span>
-                        <div className="flex flex-col gap-1.5">
-                          {analysis.strategy.map((s, si) => (
-                            <div key={si} className="flex items-start gap-2">
-                              <span className="font-mono text-[9px] shrink-0 mt-0.5" style={{ color: GREEN }}>→</span>
-                              <span className="text-[10px] text-white/40 leading-relaxed">{s}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Best for + Risk */}
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="rounded-sm p-2.5" style={{ background: `${GREEN}10`, border: `1px solid ${GREEN}25` }}>
-                          <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: GREEN }}>MELHOR PARA</span>
-                          <p className="text-[9px] text-white/35 leading-relaxed">{analysis.bestFor}</p>
-                        </div>
-                        <div className="rounded-sm p-2.5" style={{ background: `${AMBER}10`, border: `1px solid ${AMBER}25` }}>
-                          <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: AMBER }}>ATENÇÃO</span>
-                          <p className="text-[9px] text-white/35 leading-relaxed">{analysis.risk}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          )
-        })}
-      </div>
-
-      {/* ══ 4. AÇÕES RECOMENDADAS ══ */}
-      <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.08)' }}>
-        <div className="px-4 py-3" style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <span className="font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-white/40">
-            AÇÕES RECOMENDADAS
+            PLATAFORMAS — custo comparado
           </span>
         </div>
 
         <div className="flex flex-col">
-          {actions.map((item, i) => {
-            const priorityColor = item.priority === 'URGENTE' ? RED : item.priority === 'IMPORTANTE' ? AMBER : GREEN
-            const adminModule = resolveModule(item.action)
+          {sortedPlatforms.map((p, i) => {
+            const analysis = PLATFORM_ANALYSIS[p.id]
+            const isBest = p.id === bestPlatformId
+            const isExpanded = expandedPlatform === p.id
+            const cost = p.cpm ?? p.cpc ?? 0
+            const metric = p.cpm != null
+              ? { label: 'CPM', val: `US$${p.cpm.toFixed(2)}`, delta: p.cpmDelta ?? 0 }
+              : { label: 'CPC', val: `US$${(p.cpc ?? 0).toFixed(2)}`, delta: p.cpcDelta ?? 0 }
+            const dCol = deltaColor(metric.delta)
+
+            // Bar width: cheapest gets longest bar (best value), most expensive gets shortest
+            const barWidth = maxCost > 0 ? ((maxCost - cost) / maxCost) * 85 + 15 : 50
+            const barCol = barColors[Math.min(i, barColors.length - 1)]
+            const bestForShort = analysis?.bestFor?.split('.')[0] ?? p.note
+
             return (
-              <motion.div key={i}
-                initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
-                className="flex gap-3 px-4 py-3"
+              <motion.div key={p.id}
+                initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
                 style={{
                   borderBottom: '1px solid rgba(255,255,255,0.04)',
-                  borderLeft: `3px solid ${priorityColor}`,
-                  background: item.priority === 'URGENTE' ? 'rgba(255,255,255,0.02)' : 'transparent',
+                  ...(isBest ? { boxShadow: `inset 0 0 20px ${GREEN}08`, border: `1px solid ${GREEN}20` } : {}),
                 }}>
-                <div className="shrink-0 mt-0.5">
-                  <span className="font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm"
-                    style={{ background: `${priorityColor}15`, color: priorityColor, border: `1px solid ${priorityColor}30` }}>
-                    {item.priority}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-mono text-[10px] text-white/60 leading-snug mb-1">{item.action}</p>
-                  <p className="font-mono text-[8px] text-white/25 leading-relaxed mb-1.5">{item.impact}</p>
-                  <span className="inline-block font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm"
-                    style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.35)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    → Resolver em: {adminModule}
-                  </span>
-                </div>
+
+                <button className="w-full text-left px-4 py-3 transition-colors hover:bg-white/[0.02]"
+                  onClick={() => setExpandedPlatform(isExpanded ? null : p.id)}>
+
+                  {/* Platform name + value row */}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      {/* Icon */}
+                      <div className="w-5 h-5 rounded flex items-center justify-center font-mono text-[8px] font-bold shrink-0"
+                        style={{ background: `${barCol}15`, color: barCol }}>
+                        {PLATFORM_ICON[p.id] ?? p.label[0]}
+                      </div>
+                      <span className="font-mono text-[11px] font-semibold text-white/70">{p.label}</span>
+                      {isBest && (
+                        <span className="font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm"
+                          style={{ background: `${GREEN}15`, color: GREEN, border: `1px solid ${GREEN}30` }}>
+                          MELHOR CUSTO
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[12px] font-bold text-white/80">{metric.val}</span>
+                      <span className="font-mono text-[10px] font-bold" style={{ color: dCol }}>
+                        {metric.delta > 0 ? '▲' : metric.delta < 0 ? '▼' : '—'}{Math.abs(metric.delta).toFixed(1)}%
+                      </span>
+                      <span className="text-white/15 text-[9px] shrink-0">{isExpanded ? '▲' : '▼'}</span>
+                    </div>
+                  </div>
+
+                  {/* Horizontal bar */}
+                  <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ background: barCol }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${barWidth}%` }}
+                      transition={{ duration: 0.6, delay: i * 0.08, ease: 'easeOut' }}
+                    />
+                  </div>
+
+                  {/* Best for subtitle */}
+                  <p className="font-mono text-[8px] text-white/25 mt-1.5 leading-relaxed">
+                    Melhor para: {bestForShort}
+                  </p>
+                </button>
+
+                {/* Expanded detail */}
+                <AnimatePresence>
+                  {isExpanded && analysis && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
+                      className="overflow-hidden">
+                      <div className="px-4 pb-4 pt-3 flex flex-col gap-3" style={{ background: 'rgba(0,0,0,0.15)' }}>
+
+                        {/* Por que este custo */}
+                        <div className="rounded-sm p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">POR QUE ESSE CUSTO</span>
+                          <p className="text-[10px] text-white/45 leading-relaxed">{analysis.why}</p>
+                        </div>
+
+                        {/* Estratégias */}
+                        <div>
+                          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">ESTRATÉGIAS RECOMENDADAS</span>
+                          <div className="flex flex-col gap-1.5">
+                            {analysis.strategy.map((s, si) => (
+                              <div key={si} className="flex items-start gap-2">
+                                <span className="font-mono text-[9px] shrink-0 mt-0.5" style={{ color: GREEN }}>→</span>
+                                <span className="text-[10px] text-white/40 leading-relaxed">{s}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Best for + Risk */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="rounded-sm p-2.5" style={{ background: `${GREEN}10`, border: `1px solid ${GREEN}25` }}>
+                            <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: GREEN }}>MELHOR PARA</span>
+                            <p className="text-[9px] text-white/35 leading-relaxed">{analysis.bestFor}</p>
+                          </div>
+                          <div className="rounded-sm p-2.5" style={{ background: `${AMBER}10`, border: `1px solid ${AMBER}25` }}>
+                            <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: AMBER }}>ATENÇÃO</span>
+                            <p className="text-[9px] text-white/35 leading-relaxed">{analysis.risk}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             )
           })}
         </div>
       </div>
 
-      {/* ══ 5. MARKET SIGNALS (3x2) ══ */}
-      <div className="rounded-lg p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-        <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/20 block mb-3">Sinais do Mercado Digital</span>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {[
-            { label: 'Vídeo curto', signal: `+${v(mkt?.videoShare?.delta, 8.6).toFixed(1)}% engajamento`, note: 'Reels, TikTok e Shorts dominam o feed — criativo estático perde alcance', col: GREEN, severity: GREEN },
-            { label: 'IA no Marketing', signal: `${v(mkt?.aiAdoption?.value, 64)}% adoção`, note: 'Copywriting, imagens, segmentação e lances automatizados com IA', col: GREEN, severity: GREEN },
-            { label: 'Orgânico caindo', signal: `${v(mkt?.organicShare?.delta, -4.2).toFixed(1)}% reach`, note: 'Algoritmos priorizam anúncios e posts de amigos vs páginas de marca', col: RED, severity: RED },
-            { label: 'Dark Social', signal: 'Invisible sharing', note: 'WhatsApp, Telegram e DMs geram tráfego não rastreável — underreported no GA', col: AMBER, severity: AMBER },
-            { label: 'Social Commerce', signal: 'Em aceleração', note: 'Compra sem sair do app: TikTok Shop, Instagram Shopping, WhatsApp Pay', col: GREEN, severity: GREEN },
-            { label: 'Cookie Deprecation', signal: '3rd party out', note: 'Google finalizando cookies de terceiros — first-party data vira ativo crítico', col: AMBER, severity: RED },
-          ].map((s, i) => (
-            <motion.div key={i}
-              initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
-              className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${s.col}18` }}>
-              <div className="flex items-center gap-1.5 mb-1">
-                {/* Severity dot */}
-                <div className="w-[5px] h-[5px] rounded-full shrink-0" style={{ background: s.severity }} />
-                <span className="font-mono text-[8px] font-bold text-white/40">{s.label}</span>
-                <span className="font-mono text-[8px] font-bold ml-auto" style={{ color: s.col }}>{s.signal}</span>
-              </div>
-              <p className="text-[8px] text-white/25 leading-relaxed">{s.note}</p>
-            </motion.div>
-          ))}
+      {/* ══ 5. AÇÕES RECOMENDADAS — 3 CARDS ══ */}
+      <div>
+        <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/20 block mb-3">
+          Ações Recomendadas
+        </span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+          {actions.map((item, i) => {
+            const priorityColor = item.priority === 'URGENTE' ? RED : item.priority === 'IMPORTANTE' ? AMBER : GREEN
+            const adminModule = resolveModule(item.action)
+            return (
+              <motion.div key={i}
+                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
+                className="rounded-lg p-3 flex flex-col gap-2"
+                style={{
+                  background: 'rgba(0,0,0,0.3)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  borderLeft: `3px solid ${priorityColor}`,
+                }}>
+                {/* Priority badge */}
+                <span className="font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm self-start"
+                  style={{ background: `${priorityColor}15`, color: priorityColor, border: `1px solid ${priorityColor}30` }}>
+                  {item.priority}
+                </span>
+
+                {/* Action text */}
+                <p className="font-mono text-[10px] font-bold text-white/60 leading-snug">{item.action}</p>
+
+                {/* Impact text */}
+                <p className="font-mono text-[9px] text-white/25 leading-relaxed flex-1">{item.impact}</p>
+
+                {/* Module badge */}
+                <span className="inline-block font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm self-start"
+                  style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.35)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  → Resolver em: {adminModule}
+                </span>
+              </motion.div>
+            )
+          })}
         </div>
       </div>
 
-      {/* ══ 6. OPORTUNIDADES ══ */}
+      {/* ══ 6. OPORTUNIDADES (compact) ══ */}
       <div>
-        <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/20 block mb-3">Oportunidades — por Urgência</span>
-        <div className="flex flex-col gap-2">
-          {[...opportunities].sort((a, b) => b.urgency - a.urgency).map((o, i) => {
+        <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/20 block mb-2">Oportunidades</span>
+        <div className="flex flex-col gap-1.5">
+          {[...opportunities].sort((a, b) => b.urgency - a.urgency).slice(0, 3).map((o, i) => {
             const col = o.urgency >= 75 ? RED : o.urgency >= 60 ? AMBER : GREEN
             const typeLabel = o.type === 'canal' ? 'CANAL' : o.type === 'tech' ? 'TECH' : o.type === 'macro' ? 'MACRO' : 'SETOR'
             const whyText = oppExplanations[o.type] ?? 'Oportunidade identificada pelo modelo de análise'
             return (
               <motion.div key={o.id}
-                initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
-                className="flex items-start gap-3 rounded-lg px-3 py-2.5"
-                style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${col}18` }}>
-                <div className="flex flex-col items-center shrink-0 w-10">
-                  <span className="font-mono text-[20px] font-bold leading-none" style={{ color: col }}>{o.urgency}</span>
-                  <span className="font-mono text-[6px] text-white/20 mt-0.5">URGÊNCIA</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] text-white/55 leading-snug">{o.label}</p>
-                  <p className="font-mono text-[8px] text-white/20 mt-1 leading-relaxed">POR QUÊ: {whyText}</p>
-                </div>
+                initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+                className="flex items-center gap-3 rounded-sm px-3 py-2"
+                style={{ background: 'rgba(0,0,0,0.2)', border: `1px solid ${col}12` }}>
+                <div className="w-[5px] h-[5px] rounded-full shrink-0" style={{ background: col }} />
+                <p className="text-[10px] text-white/50 leading-snug flex-1 min-w-0">{o.label}</p>
                 <span className="font-mono text-[7px] px-1.5 py-0.5 rounded-sm shrink-0"
                   style={{ background: `${col}15`, color: col, border: `1px solid ${col}25` }}>{typeLabel}</span>
               </motion.div>
