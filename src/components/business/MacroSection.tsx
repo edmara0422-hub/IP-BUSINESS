@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect, useCallback, memo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const RED   = '#c0392b'
@@ -145,132 +145,112 @@ const ADMIN_MODULES: Record<string, string[]> = {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// ██  MultidimRadial (single, bigger, centered)
+// ██  DimensionCard — interactive card with expand/collapse
 // ══════════════════════════════════════════════════════════════════════════
 
-const CX = 155, CY = 155, R_INNER = 40, R_MAX = 114, SPOKE_LEN = 74, R_LABEL = 132
-
-const MultidimRadial = memo(function MultidimRadial({ dimensions, activeDim, onSelect, marketScore, scoreColor, scoreLabel }: {
-  dimensions: DimScore[]; activeDim: number; onSelect: (i: number) => void
-  marketScore: number; scoreColor: string; scoreLabel: string
-}) {
-  return (
-    <svg viewBox="0 0 310 310" style={{ width: '100%', display: 'block', overflow: 'visible' }}>
-      <circle cx={CX} cy={CY} r={R_MAX} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={1} strokeDasharray="3 5" />
-      <circle cx={CX} cy={CY} r={(R_INNER + R_MAX) / 2} fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth={1} />
-      {dimensions.map((dim, i) => {
-        const angle = (i * 45 - 90) * (Math.PI / 180)
-        const cos = Math.cos(angle), sin = Math.sin(angle)
-        const x1 = CX + R_INNER * cos, y1 = CY + R_INNER * sin
-        const xFull = CX + R_MAX * cos, yFull = CY + R_MAX * sin
-        const scoreR = R_INNER + (dim.score / 100) * SPOKE_LEN
-        const xScore = CX + scoreR * cos, yScore = CY + scoreR * sin
-        const xLabel = CX + R_LABEL * cos, yLabel = CY + R_LABEL * sin
-        const color = dimColor(dim.status)
-        const isActive = activeDim === i
-        return (
-          <g key={dim.short} style={{ cursor: 'pointer' }} onClick={() => onSelect(i)}>
-            <line x1={x1} y1={y1} x2={xFull} y2={yFull} stroke="rgba(255,255,255,0.06)" strokeWidth={1} />
-            <motion.path d={`M ${x1} ${y1} L ${xFull} ${yFull}`}
-              stroke={color} strokeWidth={isActive ? 3 : 1.5} strokeLinecap="round" fill="none"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: dim.score / 100, opacity: isActive ? 1 : 0.3 }}
-              transition={{ duration: 1.5, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
-              style={isActive ? { filter: `drop-shadow(0 0 4px ${color}99)` } : {}} />
-            <motion.circle cx={xScore} cy={yScore} fill={color}
-              animate={{ r: isActive ? [3, 4.5, 3] : 2, opacity: isActive ? 1 : 0.3 }}
-              transition={{ r: { duration: 1.4, repeat: Infinity }, opacity: { duration: 0.3 } }} />
-            <line x1={x1} y1={y1} x2={xFull} y2={yFull} stroke="transparent" strokeWidth={20} />
-            <text x={xLabel} y={yLabel} textAnchor="middle" dominantBaseline="middle"
-              fontSize={isActive ? 8.5 : 7.5} fontFamily="monospace" fontWeight={isActive ? 'bold' : 'normal'}
-              fill={isActive ? color : 'rgba(255,255,255,0.28)'} letterSpacing="0.1em">{dim.short}</text>
-          </g>
-        )
-      })}
-      <circle cx={CX} cy={CY} r={R_INNER} fill="rgba(0,0,0,0.85)" stroke={scoreColor} strokeWidth={1.5}
-        style={{ filter: `drop-shadow(0 0 8px ${scoreColor}33)` }} />
-      <text x={CX} y={CY - 8} textAnchor="middle" dominantBaseline="middle"
-        fontSize={26} fontFamily="monospace" fontWeight="bold" fill={scoreColor}>{marketScore}</text>
-      <text x={CX} y={CY + 13} textAnchor="middle" dominantBaseline="middle"
-        fontSize={6.5} fontFamily="monospace" fill={scoreColor} letterSpacing="0.2em">{scoreLabel}</text>
-    </svg>
-  )
-})
-
-// ══════════════════════════════════════════════════════════════════════════
-// ██  DimDetailPanel (with business impact + onde resolver)
-// ══════════════════════════════════════════════════════════════════════════
-
-function DimDetailPanel({ dim, scoreColor, businessImpact }: {
-  dim: DimScore; scoreColor: string; businessImpact: string
+function DimensionCard({ dim, isExpanded, onToggle, businessImpact }: {
+  dim: DimScore; isExpanded: boolean; onToggle: () => void; businessImpact: string
 }) {
   const color = dimColor(dim.status)
-  const statusLabel = dim.status === 'good' ? 'SAUDAVEL' : dim.status === 'warning' ? 'MODERADO' : 'CRITICO'
-  const contribution = Math.round(dim.score * dim.weight)
+  const statusLabel = dim.status === 'good' ? 'SAUDÁVEL' : dim.status === 'warning' ? 'MODERADO' : 'CRÍTICO'
   const modules = ADMIN_MODULES[dim.short] ?? []
 
   return (
-    <motion.div key={dim.short}
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
-      transition={{ duration: 0.2 }}
-      className="rounded-lg overflow-hidden"
-      style={{ background: 'rgba(0,0,0,0.4)', border: `1px solid ${color}22` }}>
-      <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${color}80, transparent)` }} />
+    <motion.div
+      layout
+      onClick={onToggle}
+      className="rounded-lg overflow-hidden cursor-pointer"
+      style={{
+        background: isExpanded ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.3)',
+        border: `1px solid ${isExpanded ? color + '40' : 'rgba(255,255,255,0.06)'}`,
+        gridColumn: isExpanded ? '1 / -1' : undefined,
+      }}
+      transition={{ layout: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
+    >
+      {/* Colored top border */}
+      <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${color}80, ${color}30)` }} />
 
-      {/* Header: Name + Score + Status */}
-      <div className="px-3 py-2.5 flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-            <span className="font-mono text-[10px] font-bold" style={{ color }}>{dim.short}</span>
-            <span className="font-mono text-[10px] text-white/50">{dim.label}</span>
-            <span className="font-mono text-[8px] px-1.5 py-0.5 rounded-sm" style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}>{statusLabel}</span>
-          </div>
-          <p className="font-mono text-[8px] text-white/30 mb-1">{dim.driver}</p>
-          <p className="text-[10px] text-white/45 leading-relaxed">{dim.detail}</p>
+      {/* Collapsed content */}
+      <div className="px-3 py-2.5">
+        <p className="font-mono text-[8px] font-bold tracking-[0.1em]" style={{ color }}>{dim.short}</p>
+        <p className="text-[10px] text-white/40 mt-0.5 leading-tight">{dim.label}</p>
+
+        <div className="mt-2 flex items-end justify-between">
+          <span className="font-mono text-[24px] font-bold leading-none" style={{ color }}>{dim.score}</span>
+          <span className="font-mono text-[7px] px-1.5 py-0.5 rounded-sm mb-1"
+            style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}>
+            {statusLabel}
+          </span>
         </div>
-        <div className="flex flex-col items-center shrink-0">
-          <span className="font-mono text-[28px] font-bold leading-none" style={{ color }}>{dim.score}</span>
-          <span className="font-mono text-[7px] text-white/20 mt-0.5">peso {Math.round(dim.weight * 100)}%</span>
-          <div className="mt-1 rounded-sm px-1.5 py-0.5" style={{ background: `${scoreColor}15`, border: `1px solid ${scoreColor}25` }}>
-            <span className="font-mono text-[7px]" style={{ color: scoreColor }}>+{contribution}pts</span>
-          </div>
+
+        {/* Progress bar */}
+        <div className="mt-2 w-full h-[4px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: color }}
+            initial={{ width: 0 }}
+            animate={{ width: `${dim.score}%` }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          />
         </div>
+
+        <p className="font-mono text-[8px] text-white/30 mt-1.5 leading-tight truncate">{dim.driver}</p>
       </div>
 
-      {/* COMO AFETA SEU NEGOCIO */}
-      {businessImpact && (
-        <div className="px-3 pb-2">
-          <div className="rounded-sm px-2.5 py-2" style={{ background: `${BLUE}12`, border: `1px solid ${BLUE}25` }}>
-            <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: '#5dade2' }}>COMO AFETA SEU NEGOCIO</span>
-            <p className="text-[10px] text-white/50 leading-relaxed">{businessImpact}</p>
-          </div>
-        </div>
-      )}
+      {/* Expanded content */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-3 pb-3 border-t border-white/5 pt-2.5">
+              {/* Detail paragraph */}
+              <p className="text-[10px] text-white/45 leading-relaxed mb-3">{dim.detail}</p>
 
-      {/* ONDE RESOLVER */}
-      {modules.length > 0 && (
-        <div className="px-3 pb-2.5">
-          <span className="font-mono text-[7px] font-bold tracking-[0.15em] text-white/20 block mb-1.5">ONDE RESOLVER</span>
-          <div className="flex flex-wrap gap-1.5">
-            {modules.map((mod) => (
-              <span key={mod} className="font-mono text-[8px] px-2 py-1 rounded-sm"
-                style={{ background: 'rgba(26,82,118,0.15)', color: '#2471a3', border: '1px solid rgba(26,82,118,0.3)' }}>
-                {'\u2192'} {mod}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+              {/* COMO AFETA SEU NEGÓCIO */}
+              {businessImpact && (
+                <div className="mb-3">
+                  <div className="rounded-sm px-2.5 py-2" style={{ background: `${BLUE}12`, border: `1px solid ${BLUE}25` }}>
+                    <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: '#5dade2' }}>COMO AFETA SEU NEGÓCIO</span>
+                    <p className="text-[10px] text-white/50 leading-relaxed">{businessImpact}</p>
+                  </div>
+                </div>
+              )}
 
-      {/* Breakdown points */}
-      <div className="px-3 pb-2.5 flex flex-wrap gap-1.5">
-        {dim.pts.map((p, i) => (
-          <div key={i} className="flex items-center gap-1 rounded-sm px-1.5 py-0.5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <span className="text-[8px] text-white/25">{p.label}</span>
-            <span className="font-mono text-[9px] font-bold" style={{ color }}>{p.value}</span>
-          </div>
-        ))}
-      </div>
+              {/* ONDE RESOLVER */}
+              {modules.length > 0 && (
+                <div className="mb-3">
+                  <span className="font-mono text-[7px] font-bold tracking-[0.15em] text-white/20 block mb-1.5">ONDE RESOLVER</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {modules.map((mod) => (
+                      <span key={mod} className="font-mono text-[8px] px-2 py-1 rounded-sm"
+                        style={{ background: 'rgba(26,82,118,0.15)', color: '#2471a3', border: '1px solid rgba(26,82,118,0.3)' }}>
+                        {'\u2192'} {mod}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Breakdown points */}
+              <div className="flex flex-wrap gap-1.5">
+                {dim.pts.map((p, i) => (
+                  <div key={i} className="flex items-center gap-1 rounded-sm px-1.5 py-0.5"
+                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <span className="text-[8px] text-white/25">{p.label}</span>
+                    <span className="font-mono text-[9px] font-bold" style={{ color }}>{p.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }
@@ -283,83 +263,75 @@ function DimDetailPanel({ dim, scoreColor, businessImpact }: {
 export default function MacroSection({ data }: { data: any }) {
   const dimensions = useMemo(() => buildDimensions(data), [data])
 
-  // ── Radar state ──
-  const [activeDim, setActiveDim] = useState(0)
-  const [manualLock, setManualLock] = useState(false)
+  // ── Accordion state — only one expanded at a time, -1 = none ──
+  const [expandedIdx, setExpandedIdx] = useState<number>(-1)
 
-  const handleDimSelect = useCallback((i: number) => {
-    if (manualLock && activeDim === i) { setManualLock(false) } else { setActiveDim(i); setManualLock(true) }
-  }, [manualLock, activeDim])
-
-  useEffect(() => {
-    if (manualLock) return
-    const t = setInterval(() => setActiveDim(p => (p + 1) % 8), 2800)
-    return () => clearInterval(t)
-  }, [manualLock])
+  const handleToggle = useCallback((i: number) => {
+    setExpandedIdx(prev => prev === i ? -1 : i)
+  }, [])
 
   const marketScore = useMemo(() => Math.round(dimensions.reduce((a, d) => a + d.score * d.weight, 0)), [dimensions])
   const scoreStatus = marketScore >= 65 ? 'good' : marketScore >= 45 ? 'warning' : 'critical'
   const scoreColor  = scoreStatus === 'good' ? GREEN : scoreStatus === 'warning' ? AMBER : RED
-  const scoreLabel  = scoreStatus === 'good' ? 'SAUDAVEL' : scoreStatus === 'warning' ? 'MODERADO' : 'CRITICO'
-
-  const currentBizImpact = businessImpactSentence(dimensions[activeDim], data)
+  const scoreLabel  = scoreStatus === 'good' ? 'SAUDÁVEL' : scoreStatus === 'warning' ? 'MODERADO' : 'CRÍTICO'
 
   // ── Hero summary sentence ──
   const heroSummary = marketScore >= 65
-    ? `Score ${marketScore} \u2014 ambiente saud\u00e1vel: condi\u00e7\u00f5es favor\u00e1veis para crescer e investir.`
+    ? `Ambiente saudável: condições favoráveis para crescer e investir.`
     : marketScore >= 45
-    ? `Score ${marketScore} \u2014 ambiente moderado: crescimento existe mas juro alto freia expans\u00e3o.`
-    : `Score ${marketScore} \u2014 ambiente cr\u00edtico: foco em resili\u00eancia e efici\u00eancia operacional.`
+    ? `Ambiente moderado: crescimento existe mas juro alto freia expansão.`
+    : `Ambiente crítico: foco em resiliência e eficiência operacional.`
 
   return (
     <div className="flex flex-col gap-4 px-4 pb-8">
 
-      {/* ── 1. HERO SCORE ── */}
+      {/* ── 1. QUESTION HEADER ── */}
+      <div className="text-center mb-4">
+        <p className="font-mono text-[8px] font-bold tracking-[0.3em] text-white/20 uppercase">Análise Macroeconômica</p>
+        <h2 className="text-[15px] font-semibold text-white/60 mt-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          O que está movendo a <span className="text-white/90">economia</span>?
+        </h2>
+      </div>
+
+      {/* ── 2. MARKET SCORE HERO ── */}
       <motion.div
         initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-        className="rounded-lg overflow-hidden"
-        style={{ background: 'rgba(0,0,0,0.45)', border: `1px solid ${scoreColor}25` }}>
-        <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${scoreColor}80, ${scoreColor}20, transparent)` }} />
-        <div className="px-4 py-4 flex items-center gap-4">
-          <div className="flex flex-col items-center shrink-0">
-            <span className="font-mono font-bold leading-none" style={{ color: scoreColor, fontSize: 42 }}>{marketScore}</span>
-            <span className="font-mono text-[9px] font-bold tracking-[0.2em] mt-1 px-2 py-0.5 rounded-sm"
-              style={{ background: `${scoreColor}15`, color: scoreColor, border: `1px solid ${scoreColor}30` }}>
-              {scoreLabel}
-            </span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <span className="font-mono text-[8px] font-bold tracking-[0.15em] text-white/25 block mb-1">MARKET SCORE</span>
-            <p className="text-[11px] text-white/50 leading-relaxed">{heroSummary}</p>
-          </div>
+        className="flex flex-col items-center"
+      >
+        <span className="font-mono font-bold leading-none" style={{ color: scoreColor, fontSize: 36 }}>{marketScore}</span>
+        <span className="font-mono text-[9px] font-bold tracking-[0.2em] mt-1.5 px-2.5 py-0.5 rounded-sm"
+          style={{ background: `${scoreColor}15`, color: scoreColor, border: `1px solid ${scoreColor}30` }}>
+          {scoreLabel}
+        </span>
+        <p className="text-[11px] text-white/50 leading-relaxed text-center mt-2 max-w-[320px]">{heroSummary}</p>
+
+        {/* Thin progress bar */}
+        <div className="mt-3 w-full max-w-[280px] h-[4px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          <motion.div
+            className="h-full rounded-full"
+            style={{ background: scoreColor }}
+            initial={{ width: 0 }}
+            animate={{ width: `${marketScore}%` }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+          />
         </div>
       </motion.div>
 
-      {/* ── 2. RADAR 8D (single, centered, max-width 400px) ── */}
-      <div className="flex flex-col items-center w-full">
-        <div className="flex items-center justify-between w-full mb-1 px-1">
-          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.15em] text-white/25">Radar 8 Dimens\u00f5es</span>
-          {!manualLock && <span className="font-mono text-[6px] text-white/15 animate-pulse">AUTO</span>}
-        </div>
-        <div className="w-full" style={{ maxWidth: 400, margin: '0 auto' }}>
-          <MultidimRadial dimensions={dimensions} activeDim={activeDim} onSelect={handleDimSelect}
-            marketScore={marketScore} scoreColor={scoreColor} scoreLabel={scoreLabel} />
-        </div>
-        {/* Dot indicators */}
-        <div className="flex justify-center gap-1 mt-2">
-          {dimensions.map((dim, i) => (
-            <button key={i} onClick={() => handleDimSelect(i)}
-              className="rounded-full transition-all duration-300 outline-none"
-              style={{ width: activeDim === i ? 14 : 4, height: 4, background: activeDim === i ? dimColor(dim.status) : 'rgba(255,255,255,0.12)' }} />
-          ))}
-        </div>
-      </div>
-
-      {/* ── 3. DIMENSION DETAIL PANEL ── */}
-      <AnimatePresence mode="wait">
-        <DimDetailPanel key={activeDim} dim={dimensions[activeDim]} scoreColor={scoreColor}
-          businessImpact={currentBizImpact} />
-      </AnimatePresence>
+      {/* ── 3. DIMENSION CARDS GRID ── */}
+      <motion.div
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: 0.15 }}
+        className="grid grid-cols-2 md:grid-cols-4 gap-3"
+      >
+        {dimensions.map((dim, i) => (
+          <DimensionCard
+            key={dim.short}
+            dim={dim}
+            isExpanded={expandedIdx === i}
+            onToggle={() => handleToggle(i)}
+            businessImpact={businessImpactSentence(dim, data)}
+          />
+        ))}
+      </motion.div>
 
     </div>
   )

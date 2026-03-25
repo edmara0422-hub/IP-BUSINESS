@@ -43,16 +43,6 @@ function UpdateTimer() {
   )
 }
 
-function SectionLabel({ children }: { children: string }) {
-  return (
-    <div className="flex items-center gap-2 mb-2">
-      <LivePulse />
-      <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/25">{children}</span>
-      <div className="flex-1 h-px bg-gradient-to-r from-white/[0.06] to-transparent" />
-    </div>
-  )
-}
-
 // ══════════════════════════════════════════════════════════════════════════
 // ██  NEWS FEED
 // ══════════════════════════════════════════════════════════════════════════
@@ -77,32 +67,49 @@ const CAT_META: Record<string, { label: string; color: string }> = {
   all:        { label: 'Tudo',      color: 'rgba(255,255,255,0.35)' },
 }
 
-// Ticker horizontal estilo Bloomberg
+const SECTOR_MAP: Record<string, string> = {
+  economia: 'Macro', mercado: 'Setores', tecnologia: 'Tech', startups: 'Inovação', inovacao: 'Inovação',
+}
+
+const NEG_WORDS = /queda|cai|perde|crise|risco|inflação|alta de juros/i
+const POS_WORDS = /sobe|cresce|alta|recorde|oportunidade|investimento/i
+
+function getSentiment(title: string): 'POSITIVO' | 'NEGATIVO' | 'NEUTRO' {
+  if (NEG_WORDS.test(title)) return 'NEGATIVO'
+  if (POS_WORDS.test(title)) return 'POSITIVO'
+  return 'NEUTRO'
+}
+
+const SENTIMENT_COLORS: Record<string, string> = {
+  POSITIVO: '#1e8449',
+  NEGATIVO: '#c0392b',
+  NEUTRO: '#9a7d0a',
+}
+
+// Thin ticker line
 function NewsTicker({ news }: { news: NewsItem[] }) {
   if (news.length === 0) return null
-  const items = [...news, ...news] // duplica para loop contínuo
+  const items = [...news, ...news]
   return (
-    <div className="overflow-hidden relative" style={{ borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-      <div className="flex items-center">
-        {/* Badge LIVE fixo */}
-        <div className="shrink-0 flex items-center gap-1.5 px-2.5 py-1 z-10"
+    <div className="overflow-hidden relative h-6" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      <div className="flex items-center h-full">
+        <div className="shrink-0 flex items-center gap-1 px-2 h-full z-10"
           style={{ background: 'rgba(0,0,0,0.8)', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
           <motion.div className="h-1.5 w-1.5 rounded-full bg-red-500"
             animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 0.8, repeat: Infinity }} />
-          <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-red-400/80">LIVE</span>
+          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-red-400/80">LIVE</span>
         </div>
-        {/* Marquee */}
-        <div className="flex-1 overflow-hidden">
-          <div className="flex whitespace-nowrap" style={{ animation: 'marquee 60s linear infinite' }}>
+        <div className="flex-1 overflow-hidden h-full">
+          <div className="flex items-center h-full whitespace-nowrap" style={{ animation: 'marquee 60s linear infinite' }}>
             {items.map((n, i) => {
               const m = CAT_META[n.category] ?? CAT_META.all
               return (
                 <a key={`${n.id}-${i}`} href={n.link} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-1 hover:bg-white/[0.03] transition-colors">
-                  <span className="font-mono text-[8px] font-bold tracking-widest uppercase" style={{ color: m.color }}>{m.label}</span>
-                  <span className="text-[10px] text-white/50 hover:text-white/80 transition-colors">{n.title}</span>
-                  <span className="font-mono text-[8px] text-white/20">{timeAgo(n.pubDate)}</span>
-                  <span className="text-white/10 text-[10px]">·</span>
+                  className="inline-flex items-center gap-1.5 px-4 hover:bg-white/[0.03] transition-colors h-full">
+                  <span className="font-mono text-[7px] font-bold tracking-widest uppercase" style={{ color: m.color }}>{m.label}</span>
+                  <span className="text-[9px] text-white/45">{n.title}</span>
+                  <span className="font-mono text-[7px] text-white/15">{timeAgo(n.pubDate)}</span>
+                  <span className="text-white/10 text-[8px]">·</span>
                 </a>
               )
             })}
@@ -113,52 +120,83 @@ function NewsTicker({ news }: { news: NewsItem[] }) {
   )
 }
 
-function NewsCard({ item, index, isNew }: { item: NewsItem; index: number; isNew: boolean }) {
+function RichNewsCard({ item, index, isNew }: { item: NewsItem; index: number; isNew: boolean }) {
   const [expanded, setExpanded] = useState(false)
   const meta = CAT_META[item.category] ?? CAT_META.all
   const minsOld = Math.floor((Date.now() - new Date(item.pubDate).getTime()) / 60000)
+  const sentiment = getSentiment(item.title)
+  const sentimentColor = SENTIMENT_COLORS[sentiment]
+  const sector = SECTOR_MAP[item.category] ?? 'Geral'
+
   return (
-    <motion.div className="relative rounded-sm overflow-hidden cursor-pointer"
-      style={{ border: `1px solid ${expanded ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.04)'}` }}
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.035 }}
+    <motion.div className="relative rounded-lg overflow-hidden cursor-pointer"
+      style={{
+        background: 'rgba(0,0,0,0.3)',
+        border: `1px solid ${expanded ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.06)'}`,
+        borderLeft: `3px solid ${meta.color}`,
+      }}
+      initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.06, duration: 0.3 }}
       whileHover={{ y: -2, transition: { type: 'spring', stiffness: 400, damping: 22 } }}
       onClick={() => setExpanded(e => !e)}>
-      {/* Flash glow para notícias novas (< 60min) */}
+      {/* Flash glow for new news */}
       {isNew && (
         <motion.div className="absolute inset-0 pointer-events-none"
           style={{ background: `${meta.color}08` }}
           animate={{ opacity: [0.6, 0, 0.6] }} transition={{ duration: 2, repeat: 3 }} />
       )}
-      {/* Barra lateral colorida */}
-      <div className="absolute left-0 top-0 bottom-0 w-[2px]" style={{ background: meta.color }} />
-      {/* Flash "NOVO" */}
-      {isNew && minsOld < 60 && (
-        <div className="absolute top-2 right-2">
-          <motion.span className="font-mono text-[7px] font-bold tracking-widest px-1.5 py-0.5 rounded-sm"
-            style={{ background: `${meta.color}25`, color: meta.color, border: `1px solid ${meta.color}44` }}
-            animate={{ opacity: [1, 0.5, 1] }} transition={{ duration: 1.2, repeat: Infinity }}>
-            NOVO · {minsOld}min
-          </motion.span>
+
+      <div className="px-3 py-3">
+        {/* Top row: category badge + sector + NOVO badge */}
+        <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+          <span className="font-mono text-[7px] font-bold tracking-[0.15em] uppercase px-1.5 py-0.5 rounded-sm"
+            style={{ background: `${meta.color}20`, color: meta.color, border: `1px solid ${meta.color}33` }}>
+            {meta.label}
+          </span>
+          <span className="font-mono text-[7px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded-sm"
+            style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            {sector}
+          </span>
+          <span className="font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm"
+            style={{ background: `${sentimentColor}18`, color: sentimentColor, border: `1px solid ${sentimentColor}33` }}>
+            {sentiment}
+          </span>
+          {isNew && minsOld < 60 && (
+            <motion.span className="font-mono text-[7px] font-bold tracking-widest px-1.5 py-0.5 rounded-sm ml-auto"
+              style={{ background: `${meta.color}25`, color: meta.color, border: `1px solid ${meta.color}44` }}
+              animate={{ opacity: [1, 0.5, 1] }} transition={{ duration: 1.2, repeat: Infinity }}>
+              NOVO
+            </motion.span>
+          )}
         </div>
-      )}
-      <div className="pl-3 pr-3 py-2.5" style={{ background: expanded ? 'rgba(255,255,255,0.025)' : 'rgba(255,255,255,0.012)' }}>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="font-mono text-[8px] font-bold tracking-[0.18em] uppercase" style={{ color: meta.color }}>{meta.label}</span>
-          <span className="font-mono text-[8px] text-white/18">{item.source}</span>
-          <span className="font-mono text-[8px] text-white/15 ml-auto">{timeAgo(item.pubDate)}</span>
-          <span className="font-mono text-[9px] text-white/20">{expanded ? '▲' : '▼'}</span>
+
+        {/* Source + time */}
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="font-mono text-[8px] text-white/25">{item.source}</span>
+          <span className="font-mono text-[8px] text-white/15">·</span>
+          <span className="font-mono text-[8px] text-white/15">{timeAgo(item.pubDate)}</span>
         </div>
+
+        {/* Title */}
         <p className="text-[11px] font-medium leading-snug"
-          style={{ color: expanded ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.55)', WebkitLineClamp: expanded ? undefined : 2, display: expanded ? 'block' : '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          style={{
+            color: expanded ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.55)',
+            WebkitLineClamp: expanded ? undefined : 2,
+            display: expanded ? 'block' : '-webkit-box',
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}>
           {item.title}
         </p>
+
+        {/* Expanded content */}
         <AnimatePresence>
           {expanded && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
               <a href={item.link} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 mt-2 font-mono text-[9px] hover:underline"
+                className="inline-flex items-center gap-1 mt-2.5 font-mono text-[9px] hover:underline"
                 style={{ color: meta.color }} onClick={e => e.stopPropagation()}>
-                Abrir notícia completa ↗
+                Ver notícia completa ↗
               </a>
             </motion.div>
           )}
@@ -233,7 +271,7 @@ function NewsFeed() {
       {/* Ticker */}
       <NewsTicker news={news} />
 
-      {/* Filtros */}
+      {/* Filters */}
       <div className="flex items-center gap-1 mt-3 mb-3 flex-wrap">
         {cats.slice(0, 6).map(cat => {
           const m = CAT_META[cat] ?? CAT_META.all
@@ -253,7 +291,7 @@ function NewsFeed() {
         })}
       </div>
 
-      {/* Cards — 3 columns on desktop, max 6 */}
+      {/* Rich news cards grid */}
       {loading ? (
         <div className="flex items-center justify-center py-8">
           <div className="h-4 w-4 animate-spin rounded-full border border-white/10 border-t-white/40" />
@@ -261,10 +299,10 @@ function NewsFeed() {
         </div>
       ) : (
         <AnimatePresence mode="wait">
-          <motion.div key={filter} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2"
+          <motion.div key={filter} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
             {filtered.slice(0, 6).map((n, i) => (
-              <NewsCard key={n.id} item={n} index={i} isNew={isNew(n.id)} />
+              <RichNewsCard key={n.id} item={n} index={i} isNew={isNew(n.id)} />
             ))}
           </motion.div>
         </AnimatePresence>
@@ -300,9 +338,16 @@ export default function PanoramaSection({ data }: { data: any }) {
 
       {/* ══ BLOCO 1: GLOBO 3D CENTRAL + DADOS FLUTUANTES ══ */}
       <div>
-        <SectionLabel>Panorama Global</SectionLabel>
         <div className="relative rounded-lg border border-white/[0.06] overflow-hidden"
           style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.01) 0%, rgba(0,0,0,0.5) 80%)' }}>
+          {/* Question overlay */}
+          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 text-center">
+            <p className="font-mono text-[8px] font-bold tracking-[0.3em] text-white/20 uppercase">Intelligence Platform Business</p>
+            <h2 className="text-[15px] font-semibold text-white/60 mt-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              Como está o mercado <span className="text-white/90">AGORA</span>?
+            </h2>
+          </div>
+
           {/* Globo grande centralizado */}
           <div className="h-[480px] lg:h-[540px]">
             <Globe3D data={{ agents }} />
