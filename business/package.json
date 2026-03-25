@@ -4,7 +4,7 @@
   "description": "EGE Business — Intelligence Platform",
   "scripts": {
     "dev": "next dev -p 3005",
-    "build": "next build",
+    "build": "next build && cp .next/routes-manifest.json .next/routes-manifest-deterministic.json 2>/dev/null; true",
     "build:cap": "npm run build && node -e \"const http=require('http');const fs=require('fs');['api/market','api/news'].forEach(p=>{const r=http.get('http://localhost:3005/'+p,res=>{let d='';res.on('data',c=>d+=c);res.on('end',()=>{fs.mkdirSync('out/'+require('path').dirname(p),{recursive:true});fs.writeFileSync('out/'+p+'.json',d);console.log(p+'.json OK')})});r.on('error',()=>console.log(p+' skip'))})\" && npx cap sync ios",
     "start": "next start -H 0.0.0.0 -p ${PORT:-3005}",
     "lint": "next lint",
