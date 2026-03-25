@@ -1,3 +1,4 @@
 {
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "buildCommand": "next build && (cp .next/routes-manifest.json .next/routes-manifest-deterministic.json 2>/dev/null || echo '{\"version\":3,\"pages404\":true,\"basePath\":\"\",\"redirects\":[],\"rewrites\":[],\"headers\":[],\"dynamicRoutes\":[],\"staticRoutes\":[],\"dataRoutes\":[],\"rsc\":{\"header\":\"RSC\",\"varyHeader\":\"RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Url\"}}' > .next/routes-manifest-deterministic.json)"
 }
