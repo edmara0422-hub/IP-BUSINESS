@@ -1,4 +1,0 @@
-{
-  "framework": "nextjs",
-  "buildCommand": "next build && ln -sf $(pwd)/.next ../.next"
-}
