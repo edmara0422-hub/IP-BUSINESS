@@ -1,7 +1,10 @@
 'use client'
 
 import { useState, useMemo, useEffect, useCallback, memo } from 'react'
+import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
+
+const SimulacaoSection = dynamic(() => import('./SimulacaoSection'), { ssr: false, loading: () => <div className="flex min-h-[20rem] items-center justify-center"><span className="text-[10px] text-white/20">Carregando simulação...</span></div> })
 
 const RED   = '#c0392b'
 const GREEN = '#1e8449'
@@ -862,6 +865,9 @@ export default function MacroSection({ data }: { data: any }) {
       <AnimatePresence mode="wait">
         <SectorDetailPanel key={activeSec} sector={sectors[activeSec]} ctx={sectorContext[sectors[activeSec].id]} />
       </AnimatePresence>
+
+      {/* ── SIMULAÇÃO 6D ── */}
+      <SimulacaoSection data={data} />
 
     </div>
   )
