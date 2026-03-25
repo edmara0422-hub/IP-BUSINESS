@@ -1,4 +1,4 @@
 {
   "framework": "nextjs",
-  "buildCommand": "next build && cp .next/routes-manifest.json .next/routes-manifest-deterministic.json"
+  "buildCommand": "next build && cp .next/routes-manifest.json .next/routes-manifest-deterministic.json && mkdir -p ../.next && cp .next/routes-manifest.json ../.next/routes-manifest-deterministic.json"
 }
