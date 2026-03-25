@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import BusinessClock from '@/components/business/BusinessClock'
 import BusinessSectionNav from '@/components/business/BusinessSectionNav'
 import PanoramaSection from '@/components/business/PanoramaSection'
@@ -10,6 +11,9 @@ import MacroSection from '@/components/business/MacroSection'
 import MarketingSection from '@/components/business/MarketingSection'
 import { useBusinessStore } from '@/store/business-store'
 import { apiFetch } from '@/lib/api'
+
+const SimulacaoSection = dynamic(() => import('@/components/business/SimulacaoSection'), { ssr: false, loading: () => <div className="flex min-h-[32rem] items-center justify-center"><span className="text-[10px] text-white/20">Carregando simulação...</span></div> })
+const SignalFeedSection = dynamic(() => import('@/components/business/SignalFeedSection'), { ssr: false, loading: () => <div className="flex min-h-[32rem] items-center justify-center"><span className="text-[10px] text-white/20">Carregando signals...</span></div> })
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -99,24 +103,6 @@ function applySimulation(data: MarketData, sim: SimOffsets): MarketData {
   }
 }
 
-// ── Placeholder sections ──────────────────────────────────────────────────
-
-function ComingSoonSection({ title }: { title: string }) {
-  return (
-    <motion.div
-      className="flex flex-col items-center justify-center gap-3 px-4 py-20"
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="rounded-lg border border-white/[0.08] px-6 py-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/30">{title}</p>
-        <p className="mt-1 text-[10px] text-white/20">Em construção — Fase 2</p>
-      </div>
-    </motion.div>
-  )
-}
-
 // ════════════════════════════════════════════════════════════════════════════
 // ██  MAIN
 // ════════════════════════════════════════════════════════════════════════════
@@ -168,7 +154,8 @@ export default function AbaBusiness() {
         {activeSection === 'macro' && <MacroSection data={data} />}
         {activeSection === 'plataformas' && <MarketingSection data={data} />}
         {activeSection === 'problemas' && <RiscosSection data={data} />}
-        {activeSection === 'simulacao' && <ComingSoonSection title="Simulação 6D" />}
+        {activeSection === 'signals' && <SignalFeedSection data={data} />}
+        {activeSection === 'simulacao' && <SimulacaoSection data={data} />}
       </div>
     </motion.div>
   )

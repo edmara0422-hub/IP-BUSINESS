@@ -86,7 +86,7 @@ export interface BusinessWorkspace {
   uploadSummary: UploadSummary | null
 }
 
-export type BusinessSection = 'panorama' | 'macro' | 'setores' | 'plataformas' | 'problemas' | 'simulacao'
+export type BusinessSection = 'panorama' | 'macro' | 'setores' | 'plataformas' | 'problemas' | 'simulacao' | 'signals'
 
 interface BusinessState {
   activeModule: BusinessModuleKey

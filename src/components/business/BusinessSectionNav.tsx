@@ -8,6 +8,8 @@ const SECTIONS: { id: BusinessSection; label: string }[] = [
   { id: 'macro',       label: 'Macro' },
   { id: 'plataformas', label: 'Marketing' },
   { id: 'problemas',   label: 'Riscos' },
+  { id: 'signals',     label: 'Signals' },
+  { id: 'simulacao',   label: 'Simulação' },
 ]
 
 export default function BusinessSectionNav() {
@@ -15,7 +17,7 @@ export default function BusinessSectionNav() {
   const setSection = useBusinessStore((s) => s.setBusinessSection)
 
   return (
-    <div className="flex items-center justify-center gap-5 py-1">
+    <div className="flex items-center justify-start md:justify-center gap-4 md:gap-5 py-1 overflow-x-auto scrollbar-hide px-4 md:px-0">
       {SECTIONS.map((s) => {
         const isActive = active === s.id
         return (

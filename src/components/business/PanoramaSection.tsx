@@ -4,6 +4,7 @@ import { useMemo, useEffect, useState, useCallback, memo } from 'react'
 import { motion, useSpring, useTransform, AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { apiFetch } from '@/lib/api'
+import { SectorTreemap, CorrelationHeatmap, SectorBubbleChart } from './BusinessCharts'
 
 const Globe3D = dynamic(() => import('./Globe3D'), { ssr: false, loading: () => <div className="flex h-full items-center justify-center"><span className="text-[10px] text-white/20">Carregando globo...</span></div> })
 
@@ -828,6 +829,29 @@ export default function PanoramaSection({ data }: { data: any }) {
         <NewsFeed />
       </div>
 
+      {/* ══ BLOCO 3: VISUALIZAÇÕES AVANÇADAS ══ */}
+      <div>
+        <SectionLabel>Análise Visual</SectionLabel>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Treemap de Setores */}
+          <div className="rounded-lg p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 block mb-3">TREEMAP — PESO DOS SETORES</span>
+            <SectorTreemap sectors={data.sectors} />
+          </div>
+
+          {/* Bubble Chart */}
+          <div className="rounded-lg p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 block mb-3">SCATTER — VARIAÇÃO vs HEAT</span>
+            <SectorBubbleChart sectors={data.sectors} agents={data.globalAgents} />
+          </div>
+        </div>
+
+        {/* Heatmap de Correlação */}
+        <div className="mt-4 rounded-lg p-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 block mb-3">HEATMAP — CORRELAÇÃO MACRO</span>
+          <CorrelationHeatmap data={data} />
+        </div>
+      </div>
 
     </div>
   )
