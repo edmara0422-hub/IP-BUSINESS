@@ -12,7 +12,7 @@ const config: CapacitorConfig = {
   },
   server: {
     iosScheme: 'https',
-    url: 'https://ip-business.onrender.com',
+    url: 'https://ip-business-ten.vercel.app',
   },
 }
 
