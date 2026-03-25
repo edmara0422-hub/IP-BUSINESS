@@ -4,7 +4,6 @@ import { useMemo, useEffect, useState, useCallback, memo } from 'react'
 import { motion, useSpring, useTransform, AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { apiFetch } from '@/lib/api'
-import AnaliseVisual from './BusinessCharts'
 import SignalFeedSection from './SignalFeedSection'
 
 const Globe3D = dynamic(() => import('./Globe3D'), { ssr: false, loading: () => <div className="flex h-full items-center justify-center"><span className="text-[10px] text-white/20">Carregando globo...</span></div> })
@@ -832,9 +831,6 @@ export default function PanoramaSection({ data }: { data: any }) {
 
       {/* ══ BLOCO 3: SIGNAL FEED — evento → impacto → oportunidade → ação ══ */}
       <SignalFeedSection data={data} />
-
-      {/* ══ BLOCO 4: ANÁLISE VISUAL COM INTELIGÊNCIA ══ */}
-      <AnaliseVisual data={data} />
 
     </div>
   )
