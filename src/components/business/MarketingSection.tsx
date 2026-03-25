@@ -59,6 +59,28 @@ const PLATFORM_ANALYSIS: Record<string, { why: string; strategy: string[]; bestF
   },
 }
 
+// ── Admin module mapping for actions ────────────────────────────────────────
+const ACTION_MODULE_MAP: Record<string, string> = {
+  realocar: 'Mercado & Concorrência',
+  concentrar: 'Mercado & Concorrência',
+  seo: 'SEO & Conteúdo',
+  orgânico: 'SEO & Conteúdo',
+  ltv: 'Smart Pricing',
+  cac: 'Smart Pricing',
+  criativos: 'Criativo & Mídia',
+  vídeo: 'Criativo & Mídia',
+  'first-party': 'CRM & Dados',
+  data: 'CRM & Dados',
+}
+
+function resolveModule(actionText: string): string {
+  const lower = actionText.toLowerCase()
+  for (const [key, mod] of Object.entries(ACTION_MODULE_MAP)) {
+    if (lower.includes(key)) return mod
+  }
+  return 'Mercado & Concorrência'
+}
+
 // ── Interfaces ────────────────────────────────────────────────────────────
 interface Platform {
   id: string; label: string; cpm?: number; cpmDelta?: number
@@ -77,8 +99,6 @@ export default function MarketingSection({ data }: { data: any }) {
   const mkt = data.marketing as Record<string, { value: number; delta: number; label: string }>
   const opportunities = data.opportunities as Array<{ id: string; label: string; urgency: number; type: string }>
 
-  const selic  = v(data.macro.selic?.value, 10.5)
-  const usd    = v(data.macro.usdBrl?.value, 5.72)
   const cacVal = v(mkt?.cacTrend?.value, 48.6)
   const cacD   = v(mkt?.cacTrend?.delta, 12.1)
 
@@ -89,12 +109,12 @@ export default function MarketingSection({ data }: { data: any }) {
   const orgVal = v(mkt?.organicShare?.value, 31)
   const orgD   = v(mkt?.organicShare?.delta, -4.2)
 
-  // Build CAC explanation line
+  // Build CAC explanation line — marketing-only reasons (no macro)
   const cacReasons: string[] = []
-  if (selic > 12) cacReasons.push('Selic alta')
   if (cpmD > 5) cacReasons.push('CPM subindo')
+  if (cpcD > 5) cacReasons.push('CPC subindo')
   if (orgD < 0) cacReasons.push('orgânico caindo')
-  if (usd > 5.5) cacReasons.push('câmbio pressionado')
+  if (cacD > 15) cacReasons.push('competição de leilão intensa')
   const cacExplanation = cacReasons.length > 0 ? cacReasons.join(' + ') : 'pressão competitiva'
 
   // Sorted platforms by cost-effectiveness (lowest CPM/CPC first)
@@ -115,7 +135,6 @@ export default function MarketingSection({ data }: { data: any }) {
 
     // Find cheapest CPM platform
     const cheapestCPM = sortedPlatforms.find(p => p.cpm != null)
-    const cheapestCPC = sortedPlatforms.find(p => p.cpc != null)
 
     if (cheapestCPM && cheapestCPM.id === 'tiktok') {
       items.push({
@@ -196,7 +215,7 @@ export default function MarketingSection({ data }: { data: any }) {
           <div className="flex flex-col items-center gap-2 mb-4">
             <div className="flex items-baseline gap-2">
               <span className="font-mono text-[14px] text-white/30">R$</span>
-              <span className="font-mono text-[52px] font-bold leading-none text-white/90">{cacVal.toFixed(0)}</span>
+              <span className="font-mono text-[48px] font-bold leading-none text-white/90">{cacVal.toFixed(0)}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-mono text-[13px] font-bold" style={{ color: deltaColor(cacD) }}>
@@ -206,21 +225,32 @@ export default function MarketingSection({ data }: { data: any }) {
             </div>
           </div>
 
+          {/* One-line cause */}
           <div className="rounded-sm px-3 py-2 mb-3 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
             <span className="font-mono text-[10px] text-white/40">
               {cacD > 0 ? 'Subiu' : 'Caiu'} {Math.abs(cacD).toFixed(1)}% porque <span className="text-white/60 font-bold">[{cacExplanation}]</span>
             </span>
           </div>
 
-          <div className="text-center">
-            <span className="font-mono text-[9px]" style={{ color: selic > 13 ? RED : AMBER }}>
-              SELIC {selic.toFixed(1)}% impacta direto no custo de crédito para growth
+          {/* Admin module badges */}
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
+            <span className="font-mono text-[8px] text-white/25">Isso afeta</span>
+            <span className="font-mono text-[8px] font-bold px-2 py-1 rounded-sm"
+              style={{ background: `${AMBER}15`, color: AMBER, border: `1px solid ${AMBER}30` }}>
+              → Smart Pricing
+            </span>
+            <span className="font-mono text-[8px] font-bold px-2 py-1 rounded-sm"
+              style={{ background: `${AMBER}15`, color: AMBER, border: `1px solid ${AMBER}30` }}>
+              → Mercado & Concorrência
             </span>
           </div>
+          <p className="font-mono text-[8px] text-white/20 text-center mt-1.5">
+            Reprecie para manter margem · Mude de canal se custo subir
+          </p>
         </div>
       </div>
 
-      {/* ══ 2. 3-COLUMN METRICS ROW ══ */}
+      {/* ══ 2. 3-COLUMN KEY METRICS ROW ══ */}
       <div className="grid grid-cols-3 gap-2">
         {/* CPM Médio */}
         <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -401,6 +431,7 @@ export default function MarketingSection({ data }: { data: any }) {
         <div className="flex flex-col">
           {actions.map((item, i) => {
             const priorityColor = item.priority === 'URGENTE' ? RED : item.priority === 'IMPORTANTE' ? AMBER : GREEN
+            const adminModule = resolveModule(item.action)
             return (
               <motion.div key={i}
                 initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.06 }}
@@ -417,8 +448,12 @@ export default function MarketingSection({ data }: { data: any }) {
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-mono text-[10px] text-white/60 leading-snug mb-0.5">{item.action}</p>
-                  <p className="font-mono text-[8px] text-white/25 leading-relaxed">{item.impact}</p>
+                  <p className="font-mono text-[10px] text-white/60 leading-snug mb-1">{item.action}</p>
+                  <p className="font-mono text-[8px] text-white/25 leading-relaxed mb-1.5">{item.impact}</p>
+                  <span className="inline-block font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm"
+                    style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.35)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    → Resolver em: {adminModule}
+                  </span>
                 </div>
               </motion.div>
             )

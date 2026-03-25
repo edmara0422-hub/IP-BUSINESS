@@ -16,8 +16,6 @@ function dimColor(s: 'good' | 'warning' | 'critical') {
   return s === 'good' ? GREEN : s === 'warning' ? AMBER : RED
 }
 
-function v(n: number | undefined, fb: number) { return (n != null && Number.isFinite(n)) ? n : fb }
-
 interface DimScore {
   label: string; short: string; score: number; weight: number
   status: 'good' | 'warning' | 'critical'
@@ -94,12 +92,13 @@ function buildDimensions(data: any): DimScore[] {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// ██  "COMO ISSO AFETA SEU NEGÓCIO" — dynamic sentence per dimension
+// ██  "COMO AFETA SEU NEGÓCIO" — dynamic sentence per dimension
 // ══════════════════════════════════════════════════════════════════════════
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function businessImpactSentence(dim: DimScore, data: any): string {
   const vv = (n: number | undefined, fb: number) => (n != null && Number.isFinite(n)) ? n : fb
+  const selic = vv(data.macro.selic?.value, 10.5)
   const pib   = vv(data.macro.pib?.value, 2.9)
   const ipca  = vv(data.macro.ipca?.value, 4.8)
   const cacDelta = data.marketing?.cacTrend?.delta ?? 12
@@ -110,24 +109,39 @@ function businessImpactSentence(dim: DimScore, data: any): string {
 
   switch (dim.short) {
     case 'ECON':
-      return `PIB ${pib > 0 ? '+' : ''}${pib.toFixed(1)}% significa ${pib > 1 ? 'mais' : 'menos'} demanda para seus produtos`
+      return `PIB ${pib > 0 ? '+' : ''}${pib.toFixed(1)}% = ${pib > 1 ? 'mais' : 'menos'} demanda. SELIC ${selic.toFixed(1)}% = crédito ${selic > 12 ? 'caro' : 'acessível'}.`
     case 'IPCA':
-      return `Inflação ${ipca.toFixed(2)}% ${ipca > 4.75 ? 'corrói' : 'mantém'} o poder de compra do seu cliente`
+      return `Inflação ${ipca.toFixed(2)}% ${ipca > 4.75 ? 'corrói' : 'mantém'} poder de compra do cliente.`
     case 'COMM':
-      return `Commodities ${commAvgDelta > 2 ? 'em alta' : commAvgDelta > -2 ? 'estáveis' : 'em queda'} ${commAvgDelta > 2 ? 'encarecem' : 'barateiam'} seus insumos`
+      return `Commodities ${commAvgDelta > 2 ? 'subindo' : commAvgDelta > -2 ? 'estáveis' : 'caindo'} = insumos ${commAvgDelta > 2 ? 'mais caros' : 'mais baratos'}.`
     case 'TECH':
-      return `Setor tech ${dim.score >= 65 ? 'aquecido' : 'frio'} ${dim.score >= 65 ? 'facilita' : 'dificulta'} adoção de ferramentas digitais`
+      return `Setor tech heat ${dim.score} = ${dim.score >= 65 ? 'fácil' : 'difícil'} adotar ferramentas digitais.`
     case 'MKTD':
-      return `Mercado ${mktAvg >= 55 ? 'expandindo' : 'contraindo'} — ${mktAvg >= 55 ? 'bom' : 'ruim'} momento para escalar`
+      return `Mercado ${mktAvg >= 55 ? 'expandindo' : 'contraindo'} = ${mktAvg >= 55 ? 'bom' : 'mau'} momento para escalar.`
     case 'INOV':
-      return `Ambiente ${dim.score >= 60 ? 'favorável' : 'desfavorável'} para inovação e novos produtos`
+      return `Ambiente ${dim.score >= 60 ? 'favorável' : 'hostil'} para inovação e lançamentos.`
     case 'ESG':
-      return `Pressão ESG ${dim.score >= 60 ? 'alta' : 'moderada'} — compliance ${dim.score >= 60 ? 'urgente' : 'pode esperar'}`
+      return `Pressão ESG ${dim.score >= 60 ? 'alta' : 'baixa'} = compliance ${dim.score >= 60 ? 'urgente' : 'pode esperar'}.`
     case 'MRKT':
-      return `CAC ${cacDelta > 0 ? 'subindo' : 'caindo'} — custo de aquisição ${cacDelta > 0 ? 'comprime' : 'libera'} margem`
+      return `CAC ${cacDelta > 0 ? 'subindo' : 'caindo'} = aquisição de cliente ${cacDelta > 0 ? 'comprime' : 'libera'} margem.`
     default:
       return ''
   }
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ██  "ONDE RESOLVER" — admin module badges per dimension
+// ══════════════════════════════════════════════════════════════════════════
+
+const ADMIN_MODULES: Record<string, string[]> = {
+  ECON: ['Cenários & Forecast', 'Cockpit Financeiro'],
+  IPCA: ['Smart Pricing', 'Cockpit Financeiro'],
+  COMM: ['Smart Pricing', 'Cenários & Forecast'],
+  TECH: ['Inovação & Tendências'],
+  MKTD: ['Mercado & Concorrência'],
+  INOV: ['Inovação & Tendências', 'Canvas & Pitch'],
+  ESG:  ['ESG & Ética'],
+  MRKT: ['Mercado & Concorrência', 'Smart Pricing'],
 }
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -184,15 +198,17 @@ const MultidimRadial = memo(function MultidimRadial({ dimensions, activeDim, onS
 })
 
 // ══════════════════════════════════════════════════════════════════════════
-// ██  DimDetailPanel (with business impact line)
+// ██  DimDetailPanel (with business impact + onde resolver)
 // ══════════════════════════════════════════════════════════════════════════
 
-function DimDetailPanel({ dim, scoreColor, extra, businessImpact }: {
-  dim: DimScore; scoreColor: string; extra?: React.ReactNode; businessImpact: string
+function DimDetailPanel({ dim, scoreColor, businessImpact }: {
+  dim: DimScore; scoreColor: string; businessImpact: string
 }) {
   const color = dimColor(dim.status)
-  const statusLabel = dim.status === 'good' ? 'SAUDÁVEL' : dim.status === 'warning' ? 'MODERADO' : 'CRÍTICO'
+  const statusLabel = dim.status === 'good' ? 'SAUDAVEL' : dim.status === 'warning' ? 'MODERADO' : 'CRITICO'
   const contribution = Math.round(dim.score * dim.weight)
+  const modules = ADMIN_MODULES[dim.short] ?? []
+
   return (
     <motion.div key={dim.short}
       initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
@@ -200,10 +216,13 @@ function DimDetailPanel({ dim, scoreColor, extra, businessImpact }: {
       className="rounded-lg overflow-hidden"
       style={{ background: 'rgba(0,0,0,0.4)', border: `1px solid ${color}22` }}>
       <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${color}80, transparent)` }} />
+
+      {/* Header: Name + Score + Status */}
       <div className="px-3 py-2.5 flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-1 flex-wrap">
             <span className="font-mono text-[10px] font-bold" style={{ color }}>{dim.short}</span>
+            <span className="font-mono text-[10px] text-white/50">{dim.label}</span>
             <span className="font-mono text-[8px] px-1.5 py-0.5 rounded-sm" style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}>{statusLabel}</span>
           </div>
           <p className="font-mono text-[8px] text-white/30 mb-1">{dim.driver}</p>
@@ -217,309 +236,40 @@ function DimDetailPanel({ dim, scoreColor, extra, businessImpact }: {
           </div>
         </div>
       </div>
-      {/* COMO ISSO AFETA SEU NEGÓCIO */}
+
+      {/* COMO AFETA SEU NEGOCIO */}
       {businessImpact && (
         <div className="px-3 pb-2">
           <div className="rounded-sm px-2.5 py-2" style={{ background: `${BLUE}12`, border: `1px solid ${BLUE}25` }}>
-            <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: '#5dade2' }}>COMO ISSO AFETA SEU NEGÓCIO</span>
+            <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: '#5dade2' }}>COMO AFETA SEU NEGOCIO</span>
             <p className="text-[10px] text-white/50 leading-relaxed">{businessImpact}</p>
           </div>
         </div>
       )}
-      {extra && <div className="px-3 pb-3">{extra}</div>}
-      {!extra && (
-        <div className="px-3 pb-2.5 flex flex-wrap gap-1.5">
-          {dim.pts.map((p, i) => (
-            <div key={i} className="flex items-center gap-1 rounded-sm px-1.5 py-0.5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <span className="text-[8px] text-white/25">{p.label}</span>
-              <span className="font-mono text-[9px] font-bold" style={{ color }}>{p.value}</span>
-            </div>
-          ))}
+
+      {/* ONDE RESOLVER */}
+      {modules.length > 0 && (
+        <div className="px-3 pb-2.5">
+          <span className="font-mono text-[7px] font-bold tracking-[0.15em] text-white/20 block mb-1.5">ONDE RESOLVER</span>
+          <div className="flex flex-wrap gap-1.5">
+            {modules.map((mod) => (
+              <span key={mod} className="font-mono text-[8px] px-2 py-1 rounded-sm"
+                style={{ background: 'rgba(26,82,118,0.15)', color: '#2471a3', border: '1px solid rgba(26,82,118,0.3)' }}>
+                {'\u2192'} {mod}
+              </span>
+            ))}
+          </div>
         </div>
       )}
-    </motion.div>
-  )
-}
 
-// ══════════════════════════════════════════════════════════════════════════
-// ██  Agente global detalhado
-// ══════════════════════════════════════════════════════════════════════════
-
-interface AgentDetail {
-  id: string; label: string; delta: number; impact: string
-  sector: string; mktCap: string
-  whyMatters: string
-  cascades: string[]
-  brazilEffect: string
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function buildAgents(data: any): AgentDetail[] {
-  const agents = data.globalAgents as Array<{ id: string; label: string; delta: number; impact: string }>
-  const usd = v(data.macro.usdBrl?.value, 5.72)
-  const selic = v(data.macro.selic?.value, 10.5)
-
-  const details: Record<string, Omit<AgentDetail, 'id' | 'label' | 'delta' | 'impact'>> = {
-    aapl: {
-      sector: 'Consumer Tech',
-      mktCap: 'US$ 3.3T',
-      whyMatters: `Apple define o comportamento do consumidor premium global. Quando Apple cresce, indica demanda por produto de alto valor — o que impacta diretamente categorias de ticket alto no Brasil.`,
-      cascades: [
-        `iPhone mais caro com dólar R$${usd.toFixed(2)} → consumidor brasileiro paga mais → pressão inflacionária em eletrônicos`,
-        `Ecossistema App Store: desenvolvedores brasileiros recebem em dólar — benefício para tech local`,
-        `Tendência de hardware premium influencia posicionamento de Samsung, Motorola e LG no Brasil`,
-        `Comportamento de consumo: se Apple sobe, consumidor premium está confiante — positivo para luxo e serviços premium BR`,
-      ],
-      brazilEffect: `Impacto direto em distribuidores de eletrônicos (Magazine Luiza, Americanas). Indireto em toda cadeia de consumo premium.`,
-    },
-    googl: {
-      sector: 'AdTech / Cloud',
-      mktCap: 'US$ 2.1T',
-      whyMatters: `Google controla o maior inventário de anúncios do mundo e a principal fonte de tráfego orgânico. Mudanças no algoritmo ou no CPC afetam diretamente o custo de aquisição de clientes de qualquer empresa digital no Brasil.`,
-      cascades: [
-        `CPC sobe → CAC de todas as empresas que usam Google Ads sobe junto`,
-        `Mudanças de algoritmo (core updates) podem derrubar tráfego orgânico de sites inteiros em horas`,
-        `Google Cloud concorre com AWS/Azure — preços afetam stack de tech de startups BR`,
-        `YouTube: maior plataforma de vídeo no Brasil — mudanças em monetização afetam criadores e anunciantes`,
-      ],
-      brazilEffect: `Qualquer empresa com presença digital no Brasil é afetada. Google Ads é o principal canal de aquisição pago para PMEs brasileiras.`,
-    },
-    meta: {
-      sector: 'Social / AdTech',
-      mktCap: 'US$ 1.5T',
-      whyMatters: `Meta (Facebook + Instagram + WhatsApp) é o maior canal de social commerce do Brasil. CPM subindo significa que aquisição de clientes via social fica mais cara para TODOS que anunciam — independente do segmento.`,
-      cascades: [
-        `CPM subindo → CAC médio sobe para todas as empresas que dependem de Meta Ads`,
-        `WhatsApp Business: canal de vendas primário para PMEs brasileiras — mudanças de API afetam fluxo de vendas`,
-        `Instagram Shopping: influencia diretamente o e-commerce de moda e beleza no Brasil`,
-        `Threads e Reels: novos formatos redistribuem atenção e orçamento de conteúdo`,
-      ],
-      brazilEffect: `Brasil é um dos maiores mercados da Meta globalmente. Decisões de produto da Meta impactam DIRETO o e-commerce e varejo digital brasileiro.`,
-    },
-    amzn: {
-      sector: 'E-commerce / Cloud',
-      mktCap: 'US$ 2.2T',
-      whyMatters: `Amazon BR pressiona preços de todo o e-commerce nacional com logística rápida e preços competitivos. AWS é a principal infraestrutura de cloud no Brasil — preços e disponibilidade afetam toda a stack de tech.`,
-      cascades: [
-        `Fulfillment rápido eleva expectativa do consumidor → varejo tradicional perde na experiência`,
-        `Amazon Ads crescendo → mais um leilão de anúncios subindo em custo`,
-        `AWS pricing afeta diretamente o custo de infraestrutura de startups e fintechs brasileiras`,
-        `Seller central: marketplace atrai vendedores que antes estavam só no Mercado Livre`,
-      ],
-      brazilEffect: `Pressão direta no varejo eletrônico. Magazine Luiza, Americanas e Mercado Livre ajustam estratégias em resposta à Amazon BR.`,
-    },
-    vale: {
-      sector: 'Mineração / Commodities',
-      mktCap: 'R$ 280B',
-      whyMatters: `Vale é a maior mineradora do mundo em ferro. O preço do minério de ferro determina a receita da Vale, que impacta o câmbio (entrada de dólares), a Bolsa e o PIB industrial brasileiro.`,
-      cascades: [
-        `Minério de ferro cai → receita da Vale cai → menos dólares entrando no Brasil → real se desvaloriza`,
-        `Vale é o maior peso do Ibovespa → seu desempenho move a bolsa toda`,
-        `Siderúrgicas nacionais dependem do minério Vale → setor industrial impactado`,
-        `China é o maior comprador — desaceleração chinesa afeta Vale mais que qualquer fator interno`,
-      ],
-      brazilEffect: `Câmbio, Ibovespa, geração de empregos no interior de MG e PA, arrecadação federal via dividendos e impostos.`,
-    },
-    petr: {
-      sector: 'Energia / Petróleo',
-      mktCap: 'R$ 480B',
-      whyMatters: `Petrobras controla o preço do combustível no Brasil. Diesel e gasolina afetam o custo logístico de TODA a cadeia produtiva — do produtor rural ao delivery urbano. Além disso, é a maior empresa da Bolsa brasileira.`,
-      cascades: [
-        `Petróleo sobe (US$${v(data.commodities?.oil?.value, 74.2).toFixed(0)}/bbl) → pressão para Petrobras repassar → combustível mais caro → frete sobe → inflação sobe`,
-        `Preço de gasolina afeta poder de compra direto das famílias com carro`,
-        `Diesel caro: frete rodoviário sobe → mercadoria em prateleira fica mais cara`,
-        `Política de dividendos da Petrobras movimenta bilhões no mercado — influencia Ibovespa`,
-        `SELIC alta (${selic.toFixed(1)}%) + Petrobras estável = investidor compara dividend yield com CDI`,
-      ],
-      brazilEffect: `Inflação, custo logístico, Ibovespa e arrecadação federal. Petrobras paga bilhões em impostos e dividendos ao governo.`,
-    },
-  }
-
-  return agents.map(ag => ({
-    ...ag,
-    ...(details[ag.id] ?? {
-      sector: 'Global',
-      mktCap: '—',
-      whyMatters: `Agente econômico global com impacto encadeado no mercado brasileiro.`,
-      cascades: [ag.impact],
-      brazilEffect: ag.impact,
-    }),
-  }))
-}
-
-// ══════════════════════════════════════════════════════════════════════════
-// ██  AgentCard
-// ══════════════════════════════════════════════════════════════════════════
-
-function AgentCard({ agent, index }: { agent: AgentDetail; index: number }) {
-  const [open, setOpen] = useState(false)
-  const col = agent.delta > 0 ? GREEN : agent.delta < 0 ? RED : AMBER
-  const sign = agent.delta > 0 ? '+' : ''
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.06 }}
-      className="rounded-lg overflow-hidden"
-      style={{ border: `1px solid rgba(255,255,255,${open ? '0.1' : '0.05'})`, background: 'rgba(0,0,0,0.25)' }}>
-
-      <button className="w-full flex items-center gap-3 px-4 py-3 text-left" onClick={() => setOpen(o => !o)}>
-        <div className="shrink-0 flex flex-col items-center gap-0.5 w-14">
-          <span className="font-mono text-[18px] font-bold leading-none" style={{ color: col }}>{sign}{agent.delta.toFixed(1)}%</span>
-          <div className="h-[2px] w-10 rounded-full" style={{ background: col, opacity: 0.5 }} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-[13px] font-semibold text-white/75">{agent.label}</span>
-            <span className="font-mono text-[8px] text-white/20 tracking-wider">{agent.sector}</span>
+      {/* Breakdown points */}
+      <div className="px-3 pb-2.5 flex flex-wrap gap-1.5">
+        {dim.pts.map((p, i) => (
+          <div key={i} className="flex items-center gap-1 rounded-sm px-1.5 py-0.5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <span className="text-[8px] text-white/25">{p.label}</span>
+            <span className="font-mono text-[9px] font-bold" style={{ color }}>{p.value}</span>
           </div>
-          <p className="text-[10px] text-white/35 truncate">{agent.impact}</p>
-        </div>
-        <div className="shrink-0 flex flex-col items-end gap-1">
-          <span className="font-mono text-[9px] text-white/20">{agent.mktCap}</span>
-          <span className="text-white/20 text-[10px]">{open ? '▲' : '▼'}</span>
-        </div>
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22 }}
-            className="overflow-hidden">
-            <div className="px-4 pb-4 border-t border-white/[0.05]">
-              <div className="mt-3 rounded-sm p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">POR QUE ESSE AGENTE IMPORTA</span>
-                <p className="text-[10px] text-white/50 leading-relaxed">{agent.whyMatters}</p>
-              </div>
-              <div className="mt-3">
-                <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">EFEITOS EM CASCATA</span>
-                <div className="flex flex-col gap-1.5">
-                  {agent.cascades.map((c, i) => (
-                    <div key={i} className="flex items-start gap-2">
-                      <span className="font-mono text-[9px] shrink-0 mt-0.5" style={{ color: col }}>→</span>
-                      <span className="text-[10px] text-white/40 leading-relaxed">{c}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="mt-3 rounded-sm p-2.5" style={{ background: `${BLUE}15`, border: `1px solid ${BLUE}30` }}>
-                <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: '#5dade2' }}>IMPACTO DIRETO NO BRASIL</span>
-                <p className="text-[10px] text-white/40 leading-relaxed">{agent.brazilEffect}</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  )
-}
-
-// ══════════════════════════════════════════════════════════════════════════
-// ██  CommodityCard (compact for 2x3 grid)
-// ══════════════════════════════════════════════════════════════════════════
-
-function CommodityCard({ name, value, delta, unit, label, index }: {
-  name: string; value: number; delta: number; unit: string; label: string; index: number
-}) {
-  const col = delta > 0 ? GREEN : delta < 0 ? RED : AMBER
-  const context: Record<string, string> = {
-    gold:    'Risco global: ouro sobe = incerteza',
-    oil:     'Define custo de frete e combustível',
-    silver:  'Demanda industrial aquecida',
-    grains:  'Preço de alimentos no Brasil',
-    copper:  'Termômetro de expansão industrial',
-    lithium: 'Insumo de baterias EV e tech',
-  }
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: index * 0.05 }}
-      className="rounded-lg p-2.5 flex flex-col gap-1.5"
-      style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-
-      <div className="flex items-start justify-between">
-        <span className="font-mono text-[8px] font-bold tracking-widest text-white/30">{label.toUpperCase()}</span>
-        <span className="font-mono text-[10px] font-bold" style={{ color: col }}>{delta > 0 ? '+' : ''}{delta.toFixed(1)}%</span>
-      </div>
-
-      <div>
-        <span className="font-mono text-[18px] font-bold text-white/80">
-          {value > 1000 ? value.toLocaleString('pt-BR', { maximumFractionDigits: 0 }) : value.toFixed(2)}
-        </span>
-        <span className="font-mono text-[9px] text-white/25 ml-1">{unit}</span>
-      </div>
-
-      <p className="text-[8px] text-white/25 leading-snug">{context[name] ?? ''}</p>
-    </motion.div>
-  )
-}
-
-// ══════════════════════════════════════════════════════════════════════════
-// ██  MacroCard (SELIC, IPCA, PIB, USD/BRL)
-// ══════════════════════════════════════════════════════════════════════════
-
-function MacroCard({ label, value, delta, meaning, index }: {
-  label: string; value: string; delta: number; meaning: string; index: number
-}) {
-  const deltaCol = delta > 0 ? RED : delta < 0 ? GREEN : AMBER
-  const arrow = delta > 0 ? '▲' : delta < 0 ? '▼' : '—'
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.06 }}
-      className="rounded-lg overflow-hidden flex flex-col"
-      style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${deltaCol}60, transparent)` }} />
-      <div className="px-2.5 py-2 flex flex-col gap-1">
-        <span className="font-mono text-[8px] font-bold tracking-[0.15em] text-white/30">{label}</span>
-        <div className="flex items-baseline gap-1.5">
-          <span className="font-mono text-[22px] font-bold leading-none text-white/85">{value}</span>
-          <span className="font-mono text-[10px] font-bold" style={{ color: deltaCol }}>
-            {arrow}{Math.abs(delta).toFixed(2)}
-          </span>
-        </div>
-        <p className="text-[8px] text-white/30 leading-snug mt-0.5">{meaning}</p>
-      </div>
-    </motion.div>
-  )
-}
-
-// ══════════════════════════════════════════════════════════════════════════
-// ██  MacroIndicator (used inside dim extra panels)
-// ══════════════════════════════════════════════════════════════════════════
-
-function MacroIndicator({ label, value, unit, delta, status, description, context, index }: {
-  label: string; value: string; unit: string; delta: number; status: 'critical' | 'risk' | 'ok'
-  description: string; context: string; index: number
-}) {
-  const col = status === 'critical' ? RED : status === 'risk' ? AMBER : GREEN
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.07 }}
-      className="rounded-lg p-3 flex flex-col gap-2"
-      style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${col}25` }}>
-
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[8px] font-bold tracking-[0.2em]" style={{ color: col }}>{label}</span>
-        <span className="font-mono text-[8px] px-1.5 py-0.5 rounded-sm"
-          style={{ background: `${col}15`, color: col, border: `1px solid ${col}30` }}>
-          {status === 'critical' ? 'CRÍTICO' : status === 'risk' ? 'ATENÇÃO' : 'NORMAL'}
-        </span>
-      </div>
-
-      <div className="flex items-baseline gap-1.5">
-        <span className="font-mono text-[28px] font-bold leading-none text-white/85">{value}</span>
-        <span className="font-mono text-[12px] text-white/40">{unit}</span>
-        <span className="font-mono text-[11px] font-bold ml-1" style={{ color: delta > 0 ? RED : delta < 0 ? GREEN : AMBER }}>
-          {delta > 0 ? '▲' : delta < 0 ? '▼' : '—'}{Math.abs(delta).toFixed(2)}
-        </span>
-      </div>
-
-      <p className="text-[10px] text-white/35 leading-relaxed">{description}</p>
-
-      <div className="rounded-sm px-2 py-1.5 mt-1" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-        <p className="text-[9px] text-white/25 leading-relaxed italic">{context}</p>
+        ))}
       </div>
     </motion.div>
   )
@@ -531,10 +281,9 @@ function MacroIndicator({ label, value, unit, delta, status, description, contex
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function MacroSection({ data }: { data: any }) {
-  const agents = useMemo(() => buildAgents(data), [data])
   const dimensions = useMemo(() => buildDimensions(data), [data])
 
-  // ── Estado da roda ──
+  // ── Radar state ──
   const [activeDim, setActiveDim] = useState(0)
   const [manualLock, setManualLock] = useState(false)
 
@@ -551,227 +300,21 @@ export default function MacroSection({ data }: { data: any }) {
   const marketScore = useMemo(() => Math.round(dimensions.reduce((a, d) => a + d.score * d.weight, 0)), [dimensions])
   const scoreStatus = marketScore >= 65 ? 'good' : marketScore >= 45 ? 'warning' : 'critical'
   const scoreColor  = scoreStatus === 'good' ? GREEN : scoreStatus === 'warning' ? AMBER : RED
-  const scoreLabel  = scoreStatus === 'good' ? 'SAUDÁVEL' : scoreStatus === 'warning' ? 'MODERADO' : 'CRÍTICO'
+  const scoreLabel  = scoreStatus === 'good' ? 'SAUDAVEL' : scoreStatus === 'warning' ? 'MODERADO' : 'CRITICO'
 
-  const selic = v(data.macro.selic?.value, 10.5)
-  const ipca  = v(data.macro.ipca?.value, 4.8)
-  const pib   = v(data.macro.pib?.value, 2.9)
-  const usd   = v(data.macro.usdBrl?.value, 5.72)
-  const selicD = v(data.macro.selic?.delta, 0)
-  const ipcaD  = v(data.macro.ipca?.delta, 0)
-  const pibD   = v(data.macro.pib?.delta, 0)
-  const usdD   = v(data.macro.usdBrl?.delta, 0)
-
-  const commodities = data.commodities as Record<string, { value: number; delta: number; unit: string; label: string }>
-  const sectors = data.sectors as Array<{ id: string; label: string; change: number; trend: string; heat: number }>
-
-  const dimShort = dimensions[activeDim]?.short
   const currentBizImpact = businessImpactSentence(dimensions[activeDim], data)
 
-  // ── Hero explanation ──
-  const heroExplanation = marketScore >= 65
-    ? 'O ambiente macro-econômico está favorável para crescimento. Aproveite para investir e escalar.'
+  // ── Hero summary sentence ──
+  const heroSummary = marketScore >= 65
+    ? `Score ${marketScore} \u2014 ambiente saud\u00e1vel: condi\u00e7\u00f5es favor\u00e1veis para crescer e investir.`
     : marketScore >= 45
-    ? 'Cenário misto — oportunidades existem, mas exigem cautela e seletividade.'
-    : 'Ambiente hostil para negócios. Foco em resiliência, caixa e eficiência operacional.'
-
-  // ── Macro card meanings ──
-  const selicMeaning = selic > 13 ? 'Crédito caro — financiamentos pesam' : selic > 10 ? 'Crédito moderado — juros elevados' : 'Crédito barato — bom para investir'
-  const ipcaMeaning  = ipca > 4.75 ? 'Inflação acima da meta — poder de compra cai' : ipca > 3.25 ? 'Inflação dentro da banda — controlada' : 'Inflação abaixo da meta — ambiente deflacionário'
-  const pibMeaning   = pib > 2 ? 'Economia aquecida — demanda forte' : pib > 0 ? 'Crescimento fraco — demanda tímida' : 'Recessão — demanda em queda'
-  const usdMeaning   = usd > 6 ? 'Real desvalorizado — importações caras' : usd > 5.3 ? 'Câmbio pressionado — atenção ao custo importado' : 'Câmbio controlado — importações viáveis'
-
-  // ── Extra content por dimensão ──
-  const dimExtra: React.ReactNode = (() => {
-    if (dimShort === 'ECON') return (
-      <div className="flex flex-col gap-3 border-t border-white/[0.05] pt-3">
-        <div className="grid grid-cols-2 gap-2">
-          <MacroIndicator index={0} label="SELIC" value={selic.toFixed(1)} unit="% a.a."
-            delta={selicD} status={selic > 13 ? 'critical' : selic > 10 ? 'risk' : 'ok'}
-            description="Taxa básica de juros. Referência para todo o crédito no país."
-            context={`Meta Copom: conter IPCA (${ipca.toFixed(2)}%) próximo a 3.25%. SELIC ${selic.toFixed(1)}% = mais alta desde 2016.`} />
-          <MacroIndicator index={1} label="PIB" value={`+${pib.toFixed(1)}`} unit="% a.a."
-            delta={pibD} status={pib > 2 ? 'ok' : pib > 0 ? 'risk' : 'critical'}
-            description="Produto Interno Bruto. Soma de tudo que o Brasil produz."
-            context={`Puxado por Agro (+28%), Serviços (+${(pib * 0.8).toFixed(1)}%). PIB forte dificulta queda do IPCA.`} />
-        </div>
-        <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">COMO SE INFLUENCIAM</span>
-          <div className="flex flex-col gap-1.5">
-            {[
-              { from: 'USD ▲', to: 'IPCA ▲', why: 'importados ficam mais caros', col: RED },
-              { from: 'IPCA ▲', to: 'SELIC ▲', why: 'BC aumenta juros (regra de Taylor)', col: AMBER },
-              { from: 'SELIC ▲', to: 'PIB ▼', why: 'crédito encarece, consumo recua', col: RED },
-              { from: 'PIB ▲', to: 'IPCA ▲', why: 'demanda aquecida pressiona preços', col: AMBER },
-            ].map((r, i) => (
-              <div key={i} className="flex items-center gap-1.5 text-[9px]">
-                <span className="font-mono font-bold text-white/55 w-14 shrink-0">{r.from}</span>
-                <span className="font-mono" style={{ color: r.col }}>→</span>
-                <span className="font-mono font-bold text-white/55 w-14 shrink-0">{r.to}</span>
-                <span className="text-white/25 flex-1">{r.why}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-    if (dimShort === 'IPCA') return (
-      <div className="flex flex-col gap-3 border-t border-white/[0.05] pt-3">
-        <div className="grid grid-cols-2 gap-2">
-          <MacroIndicator index={0} label="IPCA" value={ipca.toFixed(2)} unit="% 12m"
-            delta={ipcaD} status={ipca > 6 ? 'critical' : ipca > 4 ? 'risk' : 'ok'}
-            description="Inflação oficial. Meta BC: 3.25% (±1.5pp)."
-            context={`Desvio da meta: +${Math.max(0, ipca - 3.25).toFixed(2)}pp. Pressão: câmbio, combustível, serviços.`} />
-          <MacroIndicator index={1} label="USD/BRL" value={`R$${usd.toFixed(2)}`} unit=""
-            delta={usdD} status={usd > 6 ? 'critical' : usd > 5.3 ? 'risk' : 'ok'}
-            description="Câmbio. Cada R$0.10 de alta adiciona ~0.1pp ao IPCA."
-            context={`Fed alto + risco fiscal BR pressionam. Exportadores agro/minério beneficiados.`} />
-        </div>
-      </div>
-    )
-    if (dimShort === 'COMM') return (
-      <div className="flex flex-col gap-3 border-t border-white/[0.05] pt-3">
-        <div className="grid grid-cols-2 gap-2">
-          {Object.entries(commodities).map(([name, c], i) => (
-            <CommodityCard key={name} name={name} index={i} value={c.value} delta={c.delta} unit={c.unit} label={c.label} />
-          ))}
-        </div>
-        <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">IMPACTO NO BRASIL</span>
-          <div className="flex flex-col gap-1.5">
-            {[
-              { item: 'Petróleo sobe', effect: 'Frete sobe → inflação em toda a cadeia', col: RED },
-              { item: 'Grãos sobem', effect: 'Exportação maior → mais dólares → real aprecia', col: GREEN },
-              { item: 'Minério sobe', effect: 'Vale ganha → Ibovespa sobe → câmbio melhora', col: GREEN },
-              { item: 'Ouro sobe', effect: 'Incerteza global → capital foge de emergentes', col: AMBER },
-            ].map((r, i) => (
-              <div key={i} className="flex items-start gap-1.5">
-                <span className="font-mono text-[9px] shrink-0 mt-0.5" style={{ color: r.col }}>→</span>
-                <span className="text-[9px] text-white/25"><span className="font-bold text-white/40">{r.item}:</span> {r.effect}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-    if (dimShort === 'TECH') return (
-      <div className="flex flex-col gap-2 border-t border-white/[0.05] pt-3">
-        <p className="text-[9px] text-white/25 mb-1">Movimentos dessas empresas propagam em cadeia pelo mercado digital BR.</p>
-        {agents.map((ag, i) => <AgentCard key={ag.id} agent={ag} index={i} />)}
-      </div>
-    )
-    if (dimShort === 'MKTD') return (
-      <div className="flex flex-col gap-2 border-t border-white/[0.05] pt-3">
-        {[...sectors].sort((a, b) => b.heat - a.heat).map((s, i) => {
-          const col = s.trend === 'up' ? GREEN : s.trend === 'down' ? RED : AMBER
-          return (
-            <div key={s.id} className="flex items-center gap-2">
-              <span className="font-mono text-[9px] text-white/20 w-4 shrink-0">{i + 1}</span>
-              <span className="text-[10px] text-white/55 flex-1">{s.label}</span>
-              <div className="w-20 h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                <motion.div className="h-full rounded-full" style={{ background: col }}
-                  initial={{ width: 0 }} animate={{ width: `${s.heat}%` }} transition={{ duration: 0.8, delay: i * 0.04 }} />
-              </div>
-              <span className="font-mono text-[10px] font-bold w-12 text-right" style={{ color: col }}>
-                {s.change > 0 ? '+' : ''}{s.change.toFixed(1)}%
-              </span>
-            </div>
-          )
-        })}
-      </div>
-    )
-    if (dimShort === 'MRKT') return (
-      <div className="flex flex-col gap-2 border-t border-white/[0.05] pt-3">
-        <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-mono text-[8px] text-white/30">CAC TREND</span>
-            <span className="font-mono text-[16px] font-bold" style={{ color: RED }}>+{(data.marketing?.cacTrend?.delta ?? 12).toFixed(0)}% YoY</span>
-          </div>
-          <p className="text-[9px] text-white/30 leading-relaxed">CAC subindo = cada R$ investido em mídia retorna menos. Canais orgânicos e CRM ganham relevância estratégica. Empresas que não diversificam aquisição perdem margem.</p>
-        </div>
-        <div className="flex flex-col gap-1.5">
-          {[
-            { plat: 'Meta Ads', note: 'CPM crescendo com iOS tracking limit + concorrência', col: AMBER },
-            { plat: 'Google Ads', note: 'CPC estável mas audience intent muda com IA', col: GREEN },
-            { plat: 'TikTok Ads', note: 'CPM mais baixo — oportunidade de CAC reduzido', col: GREEN },
-          ].map((r, i) => (
-            <div key={i} className="flex items-start gap-2">
-              <span className="font-mono text-[8px] font-bold w-20 shrink-0" style={{ color: r.col }}>{r.plat}</span>
-              <span className="text-[8px] text-white/25 flex-1">{r.note}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-    if (dimShort === 'INOV') return (
-      <div className="flex flex-col gap-3 border-t border-white/[0.05] pt-3">
-        <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">ECOSSISTEMA DE INOVAÇÃO</span>
-          <div className="flex flex-col gap-1.5">
-            {[
-              { label: 'Startups', note: `SELIC ${selic.toFixed(1)}% encarece captação — VCs mais seletivos. Valuations em compressão.`, col: selic > 13 ? RED : AMBER },
-              { label: 'M&A', note: `PIB +${pib.toFixed(1)}% aquece consolidações. Empresas grandes compram inovação ao invés de desenvolver.`, col: GREEN },
-              { label: 'R&D', note: `Dólar alto encarece tecnologia importada (servidores, licenças). Incentivo para soluções nacionais.`, col: AMBER },
-              { label: 'IA Adoção', note: `Independente do ciclo — pressão competitiva força adoção. Quem não adota perde eficiência vs concorrência.`, col: GREEN },
-            ].map((r, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <span className="font-mono text-[8px] font-bold w-16 shrink-0 mt-0.5" style={{ color: r.col }}>{r.label}</span>
-                <span className="text-[9px] text-white/30 flex-1 leading-relaxed">{r.note}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.05)' }}>
-          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">OPORTUNIDADES ATUAIS</span>
-          <div className="flex flex-col gap-1">
-            {['IA generativa: redução de custo operacional 30-50%', 'Open Finance: novos modelos de distribuição financeira', 'Agritech: Brasil como laboratório global de agro digital', 'HealthTech: digitalização forçada pós-pandemia irreversível'].map((o, i) => (
-              <div key={i} className="flex items-start gap-1.5">
-                <span className="font-mono text-[9px] shrink-0" style={{ color: GREEN }}>→</span>
-                <span className="text-[9px] text-white/30">{o}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-    if (dimShort === 'ESG') return (
-      <div className="flex flex-col gap-3 border-t border-white/[0.05] pt-3">
-        <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">IMPACTO MACRO NO ESG</span>
-          <div className="flex flex-col gap-1.5">
-            {[
-              { fator: `PIB +${pib.toFixed(1)}%`, efeito: 'Crescimento gera arrecadação → mais recursos para social e infraestrutura', col: pib > 2 ? GREEN : AMBER },
-              { fator: `IPCA ${ipca.toFixed(2)}%`, efeito: 'Inflação alta corrói salário real e aprofunda desigualdade → ESG Social negativo', col: ipca > 5 ? RED : AMBER },
-              { fator: `USD R$${usd.toFixed(2)}`, efeito: 'Câmbio alto encarece equipamentos de energia limpa (painéis, turbinas importadas)', col: usd > 5.5 ? RED : AMBER },
-              { fator: `SELIC ${selic.toFixed(1)}%`, efeito: 'Juros altos encarecem green bonds e projetos de longo prazo de sustentabilidade', col: selic > 12 ? RED : AMBER },
-            ].map((r, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <span className="font-mono text-[8px] font-bold w-20 shrink-0 mt-0.5" style={{ color: r.col }}>{r.fator}</span>
-                <span className="text-[9px] text-white/30 flex-1 leading-relaxed">{r.efeito}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.05)' }}>
-          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">AGENDA ESG NO BRASIL</span>
-          <div className="flex flex-col gap-1">
-            {['Desmatamento zero: compromisso 2030 pressionando agro a se adaptar', 'B3 ESG Index: empresas listadas com critérios sustentáveis atraem mais capital externo', 'LGPD + ANPD: compliance de dados virou requisito ESG de Governança', 'Diversidade: pressão de investidores institucionais por metas mensuráveis'].map((o, i) => (
-              <div key={i} className="flex items-start gap-1.5">
-                <span className="font-mono text-[9px] shrink-0" style={{ color: GREEN }}>→</span>
-                <span className="text-[9px] text-white/30">{o}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-    return null
-  })()
+    ? `Score ${marketScore} \u2014 ambiente moderado: crescimento existe mas juro alto freia expans\u00e3o.`
+    : `Score ${marketScore} \u2014 ambiente cr\u00edtico: foco em resili\u00eancia e efici\u00eancia operacional.`
 
   return (
     <div className="flex flex-col gap-4 px-4 pb-8">
 
-      {/* ── 1. HERO: Market Score + Status ── */}
+      {/* ── 1. HERO SCORE ── */}
       <motion.div
         initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
         className="rounded-lg overflow-hidden"
@@ -779,28 +322,23 @@ export default function MacroSection({ data }: { data: any }) {
         <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${scoreColor}80, ${scoreColor}20, transparent)` }} />
         <div className="px-4 py-4 flex items-center gap-4">
           <div className="flex flex-col items-center shrink-0">
-            <span className="font-mono text-[48px] font-bold leading-none" style={{ color: scoreColor }}>{marketScore}</span>
+            <span className="font-mono font-bold leading-none" style={{ color: scoreColor, fontSize: 42 }}>{marketScore}</span>
             <span className="font-mono text-[9px] font-bold tracking-[0.2em] mt-1 px-2 py-0.5 rounded-sm"
               style={{ background: `${scoreColor}15`, color: scoreColor, border: `1px solid ${scoreColor}30` }}>
               {scoreLabel}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <span className="font-mono text-[8px] font-bold tracking-[0.15em] text-white/25 block mb-1">MARKET SCORE PONDERADO</span>
-            <p className="text-[11px] text-white/50 leading-relaxed">{heroExplanation}</p>
-            <div className="flex items-center gap-3 mt-2">
-              <span className="font-mono text-[7px] text-white/20">8 dimensões</span>
-              <span className="font-mono text-[7px] text-white/20">|</span>
-              <span className="font-mono text-[7px] text-white/20">atualizado em tempo real</span>
-            </div>
+            <span className="font-mono text-[8px] font-bold tracking-[0.15em] text-white/25 block mb-1">MARKET SCORE</span>
+            <p className="text-[11px] text-white/50 leading-relaxed">{heroSummary}</p>
           </div>
         </div>
       </motion.div>
 
-      {/* ── 2. RADAR 8D (single, bigger, centered) ── */}
+      {/* ── 2. RADAR 8D (single, centered, max-width 400px) ── */}
       <div className="flex flex-col items-center w-full">
         <div className="flex items-center justify-between w-full mb-1 px-1">
-          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.15em] text-white/25">Radar 8 Dimensões</span>
+          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.15em] text-white/25">Radar 8 Dimens\u00f5es</span>
           {!manualLock && <span className="font-mono text-[6px] text-white/15 animate-pulse">AUTO</span>}
         </div>
         <div className="w-full" style={{ maxWidth: 400, margin: '0 auto' }}>
@@ -820,37 +358,8 @@ export default function MacroSection({ data }: { data: any }) {
       {/* ── 3. DIMENSION DETAIL PANEL ── */}
       <AnimatePresence mode="wait">
         <DimDetailPanel key={activeDim} dim={dimensions[activeDim]} scoreColor={scoreColor}
-          extra={dimExtra} businessImpact={currentBizImpact} />
+          businessImpact={currentBizImpact} />
       </AnimatePresence>
-
-      {/* ── 5. 4 MACRO CARDS ── */}
-      <div>
-        <div className="flex items-center gap-2 mb-2">
-          <motion.div className="h-1.5 w-1.5 rounded-full bg-blue-400/60"
-            animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />
-          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/20">Indicadores Macro</span>
-        </div>
-        <div className="grid grid-cols-4 gap-2">
-          <MacroCard index={0} label="SELIC" value={`${selic.toFixed(1)}%`} delta={selicD} meaning={selicMeaning} />
-          <MacroCard index={1} label="IPCA" value={`${ipca.toFixed(2)}%`} delta={ipcaD} meaning={ipcaMeaning} />
-          <MacroCard index={2} label="PIB" value={`+${pib.toFixed(1)}%`} delta={pibD} meaning={pibMeaning} />
-          <MacroCard index={3} label="USD/BRL" value={`R$${usd.toFixed(2)}`} delta={usdD} meaning={usdMeaning} />
-        </div>
-      </div>
-
-      {/* ── 6. COMMODITIES GRID (2x3) ── */}
-      <div>
-        <div className="flex items-center gap-2 mb-2">
-          <motion.div className="h-1.5 w-1.5 rounded-full bg-amber-400/60"
-            animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />
-          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/20">Commodities</span>
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          {Object.entries(commodities).map(([name, c], i) => (
-            <CommodityCard key={name} name={name} index={i} value={c.value} delta={c.delta} unit={c.unit} label={c.label} />
-          ))}
-        </div>
-      </div>
 
     </div>
   )

@@ -19,6 +19,7 @@ interface CausalChain {
   effects: string[]
   affected: string
   action: string
+  modules: string[]
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,72 +64,75 @@ function buildCausalChains(data: any): CausalChain[] {
   // ── SELIC ──
   if (selic > 10) chains.push({
     id: 'selic', type: selic > 13 ? 'critical' : 'risk',
-    title: `SELIC ${selic.toFixed(1)}% — crédito travado, caixa pressionado`,
+    title: `SELIC ${selic.toFixed(1)}% — credito travado, caixa pressionado`,
     urgency: Math.min(95, Math.round(selic * 6)),
-    why: `O Banco Central mantém a SELIC em ${selic.toFixed(1)}% para conter o IPCA (${ipca.toFixed(2)}% vs meta de 3.25%). A lógica: juros altos encarecem o crédito, reduzem consumo e derrubam a inflação. O problema é que o remédio dói na economia real antes de curar a inflação.`,
+    why: `O Banco Central mantem a SELIC em ${selic.toFixed(1)}% para conter o IPCA (${ipca.toFixed(2)}% vs meta de 3.25%). A logica: juros altos encarecem o credito, reduzem consumo e derrubam a inflacao. O problema e que o remedio doi na economia real antes de curar a inflacao.`,
     influence: [
-      `IPCA acima da meta (${ipca.toFixed(2)}%) obriga o BC a agir — sem isso, a inflação desancoraria as expectativas`,
-      `Dólar R$${usd.toFixed(2)} importa inflação via combustíveis, insumos e eletrônicos`,
-      `Incerteza fiscal brasileira mantém prêmio de risco elevado — investidor exige taxa maior para financiar o governo`,
-      `Fed americano ainda restritivo — capital estrangeiro prefere dólar a mercados emergentes`,
+      `IPCA acima da meta (${ipca.toFixed(2)}%) obriga o BC a agir — sem isso, a inflacao desancoraria as expectativas`,
+      `Dolar R$${usd.toFixed(2)} importa inflacao via combustiveis, insumos e eletronicos`,
+      `Incerteza fiscal brasileira mantem premio de risco elevado — investidor exige taxa maior para financiar o governo`,
+      `Fed americano ainda restritivo — capital estrangeiro prefere dolar a mercados emergentes`,
     ],
     effects: [
-      `${creditAff}% das PMEs sem acesso a crédito viável — financiamento bancário pode custar 30-50% a.a.`,
-      `Custo financeiro da empresa sobe direto: dívida existente fica mais cara ao renovar`,
-      `Consumidor com dívida (cartão, financiamento) paga mais → reduz gastos discricionários`,
-      `Varejo físico e construtoras sofrem primeiro — produto depende de financiamento do cliente`,
-      `Capital sai de risco (startups, bolsa) para renda fixa (CDI+): funding para inovação encarece`,
-      `${marginAff}% das empresas com margem comprimida — impossível repassar custo sem perder cliente`,
+      `${creditAff}% das PMEs sem acesso a credito viavel — financiamento bancario pode custar 30-50% a.a.`,
+      `Custo financeiro da empresa sobe direto: divida existente fica mais cara ao renovar`,
+      `Consumidor com divida (cartao, financiamento) paga mais → reduz gastos discricionarios`,
+      `Varejo fisico e construtoras sofrem primeiro — produto depende de financiamento do cliente`,
+      `Capital sai de risco (startups, bolsa) para renda fixa (CDI+): funding para inovacao encarece`,
+      `${marginAff}% das empresas com margem comprimida — impossivel repassar custo sem perder cliente`,
     ],
-    affected: `Varejo, construtoras, fintechs de crédito, PMEs endividadas, startups dependentes de funding e consumidores com financiamentos ativos.`,
-    action: `Liquidar dívida de curto prazo agora (antes de renovar com taxa maior). Negociar prazos mais longos com fornecedores. Alocar caixa ocioso em CDI/Tesouro SELIC. Cortar gastos não-essenciais para preservar liquidez. Evitar expansão alavancada.`,
+    affected: `Varejo, construtoras, fintechs de credito, PMEs endividadas, startups dependentes de funding e consumidores com financiamentos ativos.`,
+    action: `Liquidar divida de curto prazo agora (antes de renovar com taxa maior). Negociar prazos mais longos com fornecedores. Alocar caixa ocioso em CDI/Tesouro SELIC. Cortar gastos nao-essenciais para preservar liquidez. Evitar expansao alavancada.`,
+    modules: ['Cenarios & Forecast', 'Cockpit Financeiro'],
   })
 
   // ── IPCA ──
   if (ipca > 4) chains.push({
     id: 'ipca', type: ipca > 6 ? 'critical' : 'risk',
-    title: `Inflação IPCA ${ipca.toFixed(2)}% — poder de compra erodindo`,
+    title: `Inflacao IPCA ${ipca.toFixed(2)}% — poder de compra erodindo`,
     urgency: Math.min(88, Math.round(ipca * 14)),
-    why: `O IPCA em ${ipca.toFixed(2)}% supera a meta do BC. A pressão vem de três frentes simultâneas: câmbio alto que encarece importados (combustível, eletrônicos, matéria-prima), frete caro que contamina toda a cadeia, e demanda ainda aquecida pelo PIB de ${pib.toFixed(1)}% que impede preços de cair.`,
+    why: `O IPCA em ${ipca.toFixed(2)}% supera a meta do BC. A pressao vem de tres frentes simultaneas: cambio alto que encarece importados (combustivel, eletronicos, materia-prima), frete caro que contamina toda a cadeia, e demanda ainda aquecida pelo PIB de ${pib.toFixed(1)}% que impede precos de cair.`,
     influence: [
-      `Dólar R$${usd.toFixed(2)}: cada 10% de alta no câmbio adiciona ~0.5pp no IPCA via importados`,
-      `Petróleo US$${oil.toFixed(1)}/bbl (${oilD >= 0 ? '+' : ''}${oilD.toFixed(1)}%): combustível afeta frete, que afeta quase tudo`,
-      `PIB crescendo ${pib.toFixed(1)}% mantém demanda aquecida — difícil derrubar preços sem recessão`,
-      `Energia elétrica: bandeiras tarifárias e custo hídrico pressionam conta de luz de empresas e famílias`,
+      `Dolar R$${usd.toFixed(2)}: cada 10% de alta no cambio adiciona ~0.5pp no IPCA via importados`,
+      `Petroleo US$${oil.toFixed(1)}/bbl (${oilD >= 0 ? '+' : ''}${oilD.toFixed(1)}%): combustivel afeta frete, que afeta quase tudo`,
+      `PIB crescendo ${pib.toFixed(1)}% mantem demanda aquecida — dificil derrubar precos sem recessao`,
+      `Energia eletrica: bandeiras tarifarias e custo hidrico pressionam conta de luz de empresas e familias`,
     ],
     effects: [
-      `Ticket médio real cai mesmo com preço nominal subindo — cliente compra menos unidades`,
-      `Classe C e D reduzem consumo discricionário: roupas, lazer, alimentação fora de casa`,
-      `${marginAff}% das empresas não conseguem repassar custos sem perder cliente — margem comprime`,
+      `Ticket medio real cai mesmo com preco nominal subindo — cliente compra menos unidades`,
+      `Classe C e D reduzem consumo discricionario: roupas, lazer, alimentacao fora de casa`,
+      `${marginAff}% das empresas nao conseguem repassar custos sem perder cliente — margem comprime`,
       `Contratos indexados ao IPCA encarecem: aluguel, contratos de fornecimento, SLAs anuais`,
-      `Expectativas de inflação desancorando → BC pode subir SELIC ainda mais → ciclo vicioso`,
+      `Expectativas de inflacao desancorando → BC pode subir SELIC ainda mais → ciclo vicioso`,
     ],
-    affected: `Todo o varejo de bens não-essenciais, serviços premium, restaurantes, empresas com cadeia importada e contratos reajustados por índices de inflação.`,
-    action: `Renegociar contratos anuais com fornecedores antes do reajuste. Revisar mix de produtos priorizando margens maiores. Comunicar valor, não só preço. Considerar precificação dinâmica. Reavaliar contratos indexados ao IPCA na renovação.`,
+    affected: `Todo o varejo de bens nao-essenciais, servicos premium, restaurantes, empresas com cadeia importada e contratos reajustados por indices de inflacao.`,
+    action: `Renegociar contratos anuais com fornecedores antes do reajuste. Revisar mix de produtos priorizando margens maiores. Comunicar valor, nao so preco. Considerar precificacao dinamica. Reavaliar contratos indexados ao IPCA na renovacao.`,
+    modules: ['Smart Pricing', 'Cockpit Financeiro'],
   })
 
   // ── CÂMBIO ──
   if (usd > 5.3) chains.push({
     id: 'cambio', type: usd > 6 ? 'critical' : 'risk',
-    title: `Dólar R$${usd.toFixed(2)} — insumos e tecnologia mais caros`,
+    title: `Dolar R$${usd.toFixed(2)} — insumos e tecnologia mais caros`,
     urgency: Math.min(80, Math.round(usd * 11)),
-    why: `O real está desvalorizado estruturalmente. O Federal Reserve americano mantém juros altos, atraindo capital global para o dólar. Somado ao risco fiscal brasileiro e déficit em conta corrente, o câmbio permanece pressionado. Não é evento passageiro — é tendência enquanto o cenário externo não mudar.`,
+    why: `O real esta desvalorizado estruturalmente. O Federal Reserve americano mantem juros altos, atraindo capital global para o dolar. Somado ao risco fiscal brasileiro e deficit em conta corrente, o cambio permanece pressionado. Nao e evento passageiro — e tendencia enquanto o cenario externo nao mudar.`,
     influence: [
-      `Fed com juros altos atrai dólares para os EUA — emerging markets perdem capital`,
-      `Risco fiscal doméstico eleva CDS do Brasil → investidor estrangeiro exige mais para emprestar`,
-      `Commodities em dólar: ${goldD >= 0 ? 'ouro subindo' : 'ouro caindo'} US$${gold.toFixed(0)}/oz — exportadores brasileiros se beneficiam`,
-      `Balança comercial: agro exportador compensa parcialmente o déficit — limita a desvalorização`,
+      `Fed com juros altos atrai dolares para os EUA — emerging markets perdem capital`,
+      `Risco fiscal domestico eleva CDS do Brasil → investidor estrangeiro exige mais para emprestar`,
+      `Commodities em dolar: ${goldD >= 0 ? 'ouro subindo' : 'ouro caindo'} US$${gold.toFixed(0)}/oz — exportadores brasileiros se beneficiam`,
+      `Balanca comercial: agro exportador compensa parcialmente o deficit — limita a desvalorizacao`,
     ],
     effects: [
-      `Tecnologia (SaaS em dólar, hardware, servidores AWS/GCP/Azure) encarece diretamente`,
-      `Insumos importados: químicos, eletrônicos, matéria-prima industrial — cadeia toda afetada`,
-      `Combustível importado contamina frete → custo logístico de toda a operação sobe`,
-      `IPCA permanece elevado por inflação importada → BC mantém SELIC alta → ciclo retroalimenta`,
-      `Empresas com dívida em dólar ou contratos em moeda estrangeira têm passivo crescendo`,
-      `Exportadores (agro, mineração, tech) ganham competitividade — efeito positivo para eles`,
+      `Tecnologia (SaaS em dolar, hardware, servidores AWS/GCP/Azure) encarece diretamente`,
+      `Insumos importados: quimicos, eletronicos, materia-prima industrial — cadeia toda afetada`,
+      `Combustivel importado contamina frete → custo logistico de toda a operacao sobe`,
+      `IPCA permanece elevado por inflacao importada → BC mantem SELIC alta → ciclo retroalimenta`,
+      `Empresas com divida em dolar ou contratos em moeda estrangeira tem passivo crescendo`,
+      `Exportadores (agro, mineracao, tech) ganham competitividade — efeito positivo para eles`,
     ],
-    affected: `Empresas de tecnologia com custos em dólar, e-commerce com estoque importado, indústria com insumos internacionais, empresas com dívida em moeda estrangeira.`,
-    action: `Mapear toda a exposição cambial (custo + receita). Contratar hedge (NDF ou opção) para contratos futuros em dólar. Priorizar fornecedores nacionais. Negociar prazo maior de pagamento no exterior. Considerar precificação atrelada ao dólar se produto/serviço tem concorrência importada.`,
+    affected: `Empresas de tecnologia com custos em dolar, e-commerce com estoque importado, industria com insumos internacionais, empresas com divida em moeda estrangeira.`,
+    action: `Mapear toda a exposicao cambial (custo + receita). Contratar hedge (NDF ou opcao) para contratos futuros em dolar. Priorizar fornecedores nacionais. Negociar prazo maior de pagamento no exterior. Considerar precificacao atrelada ao dolar se produto/servico tem concorrencia importada.`,
+    modules: ['Cenarios & Forecast', 'Smart Pricing'],
   })
 
   // ── CAC / Plataformas ──
@@ -136,23 +140,24 @@ function buildCausalChains(data: any): CausalChain[] {
     id: 'cac', type: 'risk',
     title: `CAC subindo — Meta +R$${metaCPMD.toFixed(1)} CPM, Google CPC R$${googleCPC.toFixed(2)}`,
     urgency: cacAff,
-    why: `O CAC médio brasileiro está em R$${cacTrend.toFixed(0)} e subindo. Meta (CPM R$${metaCPM.toFixed(1)}) e Google (CPC R$${googleCPC.toFixed(2)}) aumentaram preços de leilão com mais anunciantes competindo pelo mesmo inventário. A degradação do iOS 14.5 (rastreamento limitado) reduziu a eficiência da segmentação — mais verba desperdiçada para o mesmo resultado.`,
+    why: `O CAC medio brasileiro esta em R$${cacTrend.toFixed(0)} e subindo. Meta (CPM R$${metaCPM.toFixed(1)}) e Google (CPC R$${googleCPC.toFixed(2)}) aumentaram precos de leilao com mais anunciantes competindo pelo mesmo inventario. A degradacao do iOS 14.5 (rastreamento limitado) reduziu a eficiencia da segmentacao — mais verba desperdicada para o mesmo resultado.`,
     influence: [
-      `Meta CPM subiu ${metaCPMD.toFixed(1)}% — mais anunciantes, mesmo inventário de atenção`,
-      `Google CPC em keywords competitivas cresceu 15-30% por conta de leilão mais acirrado`,
-      `iOS 14.5+ limitou rastreamento → segmentação menos precisa → desperdício de verba maior`,
-      `${videoShr.toFixed(0)}% do engajamento em vídeo → anúncios estáticos perdem eficiência`,
+      `Meta CPM subiu ${metaCPMD.toFixed(1)}% — mais anunciantes, mesmo inventario de atencao`,
+      `Google CPC em keywords competitivas cresceu 15-30% por conta de leilao mais acirrado`,
+      `iOS 14.5+ limitou rastreamento → segmentacao menos precisa → desperdicio de verba maior`,
+      `${videoShr.toFixed(0)}% do engajamento em video → anuncios estaticos perdem eficiencia`,
       `TikTok CPM em R$${tiktokCPM.toFixed(1)} (${tiktokCPMD.toFixed(1)}%) — janela de arbitragem aberta`,
     ],
     effects: [
-      `${cacAff}% das empresas com CAC 20-40% mais alto que 2 anos atrás`,
+      `${cacAff}% das empresas com CAC 20-40% mais alto que 2 anos atras`,
       `Ratio LTV/CAC deteriora → rentabilidade por cliente cai → unit economics piora`,
       `Startups dependentes de paid traffic com runway encurtado`,
-      `${organicShr.toFixed(0)}% de tráfego orgânico — cada ponto a menos aumenta dependência de paid`,
-      `Budget de marketing para o mesmo número de clientes aumenta proportionally`,
+      `${organicShr.toFixed(0)}% de trafego organico — cada ponto a menos aumenta dependencia de paid`,
+      `Budget de marketing para o mesmo numero de clientes aumenta proportionally`,
     ],
-    affected: `E-commerce, SaaS B2C, apps de consumo, marketplaces e qualquer negócio dependente de mídia paga para aquisição de clientes.`,
-    action: `Testar TikTok Ads agora (CPM baixo = janela de 3-6 meses). Investir em SEO e conteúdo orgânico para reduzir dependência. Ativar programa de indicação para aquisição por referral (CAC quase zero). Focar em retenção para aumentar LTV. Revisar segmentação de campanhas com mais dados first-party.`,
+    affected: `E-commerce, SaaS B2C, apps de consumo, marketplaces e qualquer negocio dependente de midia paga para aquisicao de clientes.`,
+    action: `Testar TikTok Ads agora (CPM baixo = janela de 3-6 meses). Investir em SEO e conteudo organico para reduzir dependencia. Ativar programa de indicacao para aquisicao por referral (CAC quase zero). Focar em retencao para aumentar LTV. Revisar segmentacao de campanhas com mais dados first-party.`,
+    modules: ['Mercado & Concorrencia', 'Smart Pricing'],
   })
 
   // ── Talento ──
@@ -160,146 +165,153 @@ function buildCausalChains(data: any): CausalChain[] {
     id: 'talent', type: 'risk',
     title: `Talento escasso e caro — ${talentAff}% das empresas impactadas`,
     urgency: talentAff,
-    why: `O mercado de tecnologia e gestão está aquecido. Programadores, analistas de dados, gestores de produto e profissionais de marketing digital estão em demanda maior que a oferta. Com trabalho remoto global, talentos brasileiros competem por vagas em dólar/euro — o salário médio do mercado local sobe para reter.`,
+    why: `O mercado de tecnologia e gestao esta aquecido. Programadores, analistas de dados, gestores de produto e profissionais de marketing digital estao em demanda maior que a oferta. Com trabalho remoto global, talentos brasileiros competem por vagas em dolar/euro — o salario medio do mercado local sobe para reter.`,
     influence: [
-      `Mercado global de tech recruta no Brasil em dólar — eleva piso salarial local`,
-      `IA ainda não substitui completamente posições estratégicas — aumenta valor de quem domina`,
+      `Mercado global de tech recruta no Brasil em dolar — eleva piso salarial local`,
+      `IA ainda nao substitui completamente posicoes estrategicas — aumenta valor de quem domina`,
       `${aiAdoption.toFixed(0)}% das empresas adotando IA → demanda por profissionais de IA exploode`,
-      `Inflação corrói poder de compra → colaborador exige mais para manter padrão de vida`,
+      `Inflacao corroi poder de compra → colaborador exige mais para manter padrao de vida`,
     ],
     effects: [
-      `Folha de pagamento sobe mesmo sem contratar — revisão salarial para reter quem já tem`,
-      `Turnover alto = custo de substituição (recrutamento, onboarding, ramp-up) → 1-3 salários por saída`,
-      `Produtividade cai durante transição → projetos atrasam → receita impactada indiretamente`,
-      `Startups perdem para grandes empresas na guerra por talento por não ter benefícios equivalentes`,
+      `Folha de pagamento sobe mesmo sem contratar — revisao salarial para reter quem ja tem`,
+      `Turnover alto = custo de substituicao (recrutamento, onboarding, ramp-up) → 1-3 salarios por saida`,
+      `Produtividade cai durante transicao → projetos atrasam → receita impactada indiretamente`,
+      `Startups perdem para grandes empresas na guerra por talento por nao ter beneficios equivalentes`,
     ],
-    affected: `Empresas de tecnologia, agências digitais, fintechs, consultorias e qualquer empresa com times de produto, dados ou engenharia.`,
-    action: `Investir em cultura e ambiente antes de salário. Criar plano de carreira claro. Oferecer flexibilidade real (não só no papel). Usar IA para aumentar produtividade do time atual. Contratar sêniores que multiplicam juniors em vez de só contratar juniors.`,
+    affected: `Empresas de tecnologia, agencias digitais, fintechs, consultorias e qualquer empresa com times de produto, dados ou engenharia.`,
+    action: `Investir em cultura e ambiente antes de salario. Criar plano de carreira claro. Oferecer flexibilidade real (nao so no papel). Usar IA para aumentar produtividade do time atual. Contratar seniores que multiplicam juniors em vez de so contratar juniors.`,
+    modules: ['Pessoas & Lideranca'],
   })
 
   // ── IA Disrupting ──
   if (aiAff > 30) chains.push({
     id: 'ai_risk', type: 'risk',
-    title: `IA disruptando setores — ${aiAff}% das empresas não preparadas`,
+    title: `IA disruptando setores — ${aiAff}% das empresas nao preparadas`,
     urgency: aiAff,
-    why: `Modelos de IA generativa (GPT-4, Claude, Gemini) já executam tarefas que antes exigiam times inteiros: criação de conteúdo, análise de dados, atendimento ao cliente, código. Empresas que não se adaptarem perdem para concorrentes com estrutura de custo 30-60% menor.`,
+    why: `Modelos de IA generativa (GPT-4, Claude, Gemini) ja executam tarefas que antes exigiam times inteiros: criacao de conteudo, analise de dados, atendimento ao cliente, codigo. Empresas que nao se adaptarem perdem para concorrentes com estrutura de custo 30-60% menor.`,
     influence: [
-      `${aiAdoption.toFixed(0)}% das empresas já usam IA no marketing — quem não usa perde competitividade`,
-      `Custo de infraestrutura de IA caiu 10x em 2 anos — acessível para PMEs agora`,
-      `Regulação ainda incipiente — janela aberta antes de compliance obrigatório`,
-      `Concorrentes internacionais já operam com IA — mercado se ajusta rapidamente`,
+      `${aiAdoption.toFixed(0)}% das empresas ja usam IA no marketing — quem nao usa perde competitividade`,
+      `Custo de infraestrutura de IA caiu 10x em 2 anos — acessivel para PMEs agora`,
+      `Regulacao ainda incipiente — janela aberta antes de compliance obrigatorio`,
+      `Concorrentes internacionais ja operam com IA — mercado se ajusta rapidamente`,
     ],
     effects: [
-      `Conteúdo de marketing gerado por IA custa 60% menos — agências tradicionais sem posicionamento perdem clientes`,
+      `Conteudo de marketing gerado por IA custa 60% menos — agencias tradicionais sem posicionamento perdem clientes`,
       `Atendimento automatizado com qualidade humana → custo de CS cai drasticamente`,
-      `Análise de dados e BI que antes custava time de data engineers → automatizável`,
-      `Novas competências viram obrigatórias: prompt engineering, IA ops, data literacy`,
+      `Analise de dados e BI que antes custava time de data engineers → automatizavel`,
+      `Novas competencias viram obrigatorias: prompt engineering, IA ops, data literacy`,
     ],
-    affected: `Agências de conteúdo, call centers, analistas de dados júnior, redatores sem especialização, e qualquer papel baseado em tarefas repetitivas de conhecimento.`,
-    action: `Adotar IA imediatamente em conteúdo e atendimento (ROI rápido). Treinar time em ferramentas (Claude, ChatGPT, Midjourney). Reposicionar profissionais afetados para funções de supervisão de IA. Criar vantagem competitiva baseada em dados proprietários que a IA não tem acesso.`,
+    affected: `Agencias de conteudo, call centers, analistas de dados junior, redatores sem especializacao, e qualquer papel baseado em tarefas repetitivas de conhecimento.`,
+    action: `Adotar IA imediatamente em conteudo e atendimento (ROI rapido). Treinar time em ferramentas (Claude, ChatGPT, Midjourney). Reposicionar profissionais afetados para funcoes de supervisao de IA. Criar vantagem competitiva baseada em dados proprietarios que a IA nao tem acesso.`,
+    modules: ['Inovacao & Tendencias'],
   })
 
   // ── Setores em queda ──
   if (sectorRetail && sectorRetail.change < 0) chains.push({
     id: 'retail_decline', type: sectorRetail.change < -20 ? 'critical' : 'risk',
-    title: `Varejo tradicional em queda (${sectorRetail.change.toFixed(1)}% YTD) — modelo sob pressão`,
+    title: `Varejo tradicional em queda (${sectorRetail.change.toFixed(1)}% YTD) — modelo sob pressao`,
     urgency: Math.min(75, Math.abs(Math.round(sectorRetail.change * 1.5))),
-    why: `O varejo físico tradicional enfrenta tripla pressão: e-commerce roubando participação, custo fixo alto (aluguel, folha) que não cai com a demanda, e consumidor mais exigente por experiência e preço. O modelo de "loja como estoque" está obsoleto.`,
+    why: `O varejo fisico tradicional enfrenta tripla pressao: e-commerce roubando participacao, custo fixo alto (aluguel, folha) que nao cai com a demanda, e consumidor mais exigente por experiencia e preco. O modelo de "loja como estoque" esta obsoleto.`,
     influence: [
-      `E-commerce cresceu — consumidor compara preço em segundos e compra online com entrega no dia seguinte`,
-      `SELIC alta reduziu crédito ao consumo — parcelamento fica mais caro para o cliente`,
-      `Plataformas como Shopee e Shein competem com preço que o varejo nacional não consegue bater`,
-      `Aluguel de ponto comercial sobe por IGPM — custo fixo corrói margem mesmo sem vender menos`,
+      `E-commerce cresceu — consumidor compara preco em segundos e compra online com entrega no dia seguinte`,
+      `SELIC alta reduziu credito ao consumo — parcelamento fica mais caro para o cliente`,
+      `Plataformas como Shopee e Shein competem com preco que o varejo nacional nao consegue bater`,
+      `Aluguel de ponto comercial sobe por IGPM — custo fixo corroi margem mesmo sem vender menos`,
     ],
     effects: [
-      `Margens comprimem: não consegue baixar preço (vs. e-commerce) nem subir (vs. concorrência)`,
-      `Lojas físicas viram showroom não remunerado — cliente vê ao vivo e compra online`,
-      `Devolução e troca aumentam com omnichannel mal executado`,
-      `Redução de tamanho de lojas ou fechamento de unidades não rentáveis`,
+      `Margens comprimem: nao consegue baixar preco (vs. e-commerce) nem subir (vs. concorrencia)`,
+      `Lojas fisicas viram showroom nao remunerado — cliente ve ao vivo e compra online`,
+      `Devolucao e troca aumentam com omnichannel mal executado`,
+      `Reducao de tamanho de lojas ou fechamento de unidades nao rentaveis`,
     ],
-    affected: `Redes de varejo físico, shopping centers, franquias de moda e eletrônicos, distribuidores que dependem do varejo como canal.`,
-    action: `Transformar loja em experiência (o que e-commerce não pode oferecer). Integrar estoque online com físico. Usar dados de CRM para personalizar atendimento. Renegociar aluguéis agressivamente. Avaliar formato de loja menor com maior giro.`,
+    affected: `Redes de varejo fisico, shopping centers, franquias de moda e eletronicos, distribuidores que dependem do varejo como canal.`,
+    action: `Transformar loja em experiencia (o que e-commerce nao pode oferecer). Integrar estoque online com fisico. Usar dados de CRM para personalizar atendimento. Renegociar alugueis agressivamente. Avaliar formato de loja menor com maior giro.`,
+    modules: ['Mercado & Concorrencia'],
   })
 
   if (sectorMedia && sectorMedia.change < -20) chains.push({
     id: 'media_decline', type: 'risk',
-    title: `Mídia impressa −${Math.abs(sectorMedia.change).toFixed(1)}% — setor em colapso estrutural`,
+    title: `Midia impressa −${Math.abs(sectorMedia.change).toFixed(1)}% — setor em colapso estrutural`,
     urgency: Math.min(65, Math.abs(Math.round(sectorMedia.change))),
-    why: `A mídia impressa enfrenta colapso estrutural irreversível. Anunciantes migraram para digital (mensurável, segmentado, mais barato). Leitores migraram para redes sociais e agregadores. Não é crise de demanda — é obsolescência de modelo de negócio.`,
+    why: `A midia impressa enfrenta colapso estrutural irreversivel. Anunciantes migraram para digital (mensuravel, segmentado, mais barato). Leitores migraram para redes sociais e agregadores. Nao e crise de demanda — e obsolescencia de modelo de negocio.`,
     influence: [
       `Meta e Google capturam 70%+ do budget de publicidade digital`,
-      `Newsletter e podcasts substituem jornalismo impresso com custo de produção 90% menor`,
-      `Geração Z não consome mídia impressa — base leitora envelhece sem reposição`,
+      `Newsletter e podcasts substituem jornalismo impresso com custo de producao 90% menor`,
+      `Geracao Z nao consome midia impressa — base leitora envelhece sem reposicao`,
     ],
     effects: [
-      `Redação profissional encolhe → qualidade do jornalismo de referência cai`,
-      `Espaço deixado por jornalismo local abre para desinformação`,
-      `Profissionais de comunicação migram para conteúdo digital e marketing de conteúdo`,
+      `Redacao profissional encolhe → qualidade do jornalismo de referencia cai`,
+      `Espaco deixado por jornalismo local abre para desinformacao`,
+      `Profissionais de comunicacao migram para conteudo digital e marketing de conteudo`,
     ],
-    affected: `Jornais, revistas, distribuidores de mídia impressa e anunciantes que ainda dependem de mídia offline como principal canal.`,
-    action: `Não anunciar em mídia impressa como canal principal. Redirecionar budget para digital. Avaliar parcerias com veículos digitais de nicho com audiência qualificada.`,
+    affected: `Jornais, revistas, distribuidores de midia impressa e anunciantes que ainda dependem de midia offline como principal canal.`,
+    action: `Nao anunciar em midia impressa como canal principal. Redirecionar budget para digital. Avaliar parcerias com veiculos digitais de nicho com audiencia qualificada.`,
+    modules: ['Mercado & Concorrencia'],
   })
 
   // ── PIB (oportunidade) ──
   if (pib > 2) chains.push({
     id: 'pib', type: 'opportunity',
-    title: `PIB ${pib.toFixed(1)}% — janela de expansão ativa`,
+    title: `PIB ${pib.toFixed(1)}% — janela de expansao ativa`,
     urgency: Math.min(85, Math.round(pib * 20)),
-    why: `A economia brasileira cresce ${pib.toFixed(1)}%, acima da média histórica. Agro em expansão, serviços aquecidos e mercado de trabalho formal criando vagas sustentam o crescimento. O consumo das famílias está positivo apesar dos juros altos.`,
+    why: `A economia brasileira cresce ${pib.toFixed(1)}%, acima da media historica. Agro em expansao, servicos aquecidos e mercado de trabalho formal criando vagas sustentam o crescimento. O consumo das familias esta positivo apesar dos juros altos.`,
     influence: [
       `Agro ${sectorAgro ? sectorAgro.change.toFixed(1) : '+28'}% gera renda para o interior e aquece mercados regionais`,
       `Mercado formal empregando mais → massa salarial sobe → consumo segue`,
-      `Crédito consignado e FGTS ativo sustentam consumo mesmo com SELIC alta`,
-      `Tech & IA ${sectorTech ? sectorTech.change.toFixed(1) : '+34'}% puxando inovação e produtividade`,
+      `Credito consignado e FGTS ativo sustentam consumo mesmo com SELIC alta`,
+      `Tech & IA ${sectorTech ? sectorTech.change.toFixed(1) : '+34'}% puxando inovacao e produtividade`,
     ],
     effects: [
       `Mais renda circulando → CAC tende a cair em setores essenciais`,
-      `Confiança empresarial sobe → M&A, franquias e expansões se viabilizam`,
+      `Confianca empresarial sobe → M&A, franquias e expansoes se viabilizam`,
       `Risco: crescimento pode pressionar IPCA se demanda superar oferta`,
     ],
-    affected: `Varejo essencial, serviços, agritech, logística, construção civil e educação corporativa.`,
-    action: `Janela para expansão geográfica antes de ciclo de alta de juros encerrar crescimento. Investir em brand building. Construir reserva para a próxima desaceleração. Aproveitar para renegociar contratos de fornecimento com volumes maiores.`,
+    affected: `Varejo essencial, servicos, agritech, logistica, construcao civil e educacao corporativa.`,
+    action: `Janela para expansao geografica antes de ciclo de alta de juros encerrar crescimento. Investir em brand building. Construir reserva para a proxima desaceleracao. Aproveitar para renegociar contratos de fornecimento com volumes maiores.`,
+    modules: ['Canvas & Pitch', 'Mercado & Concorrencia'],
   })
 
   // ── TikTok CPM ──
   chains.push({
     id: 'tiktok_opp', type: 'opportunity',
-    title: `TikTok CPM R$${tiktokCPM.toFixed(1)} (${tiktokCPMD.toFixed(1)}%) — janela de aquisição barata`,
+    title: `TikTok CPM R$${tiktokCPM.toFixed(1)} (${tiktokCPMD.toFixed(1)}%) — janela de aquisicao barata`,
     urgency: 82,
-    why: `TikTok tem CPM significativamente menor que Meta (R$${metaCPM.toFixed(1)}) e Google. Enquanto outras plataformas encarecem, TikTok ainda está em fase de crescimento de inventário de anúncios — mais espaço do que anunciantes. Essa janela fecha quando mais empresas perceberem a oportunidade.`,
+    why: `TikTok tem CPM significativamente menor que Meta (R$${metaCPM.toFixed(1)}) e Google. Enquanto outras plataformas encarecem, TikTok ainda esta em fase de crescimento de inventario de anuncios — mais espaco do que anunciantes. Essa janela fecha quando mais empresas perceberem a oportunidade.`,
     influence: [
-      `TikTok ainda conquistando anunciantes brasileiros — leilão menos acirrado`,
-      `Formato de vídeo curto alinhado com ${videoShr.toFixed(0)}% do engajamento digital`,
-      `Algoritmo distribui conteúdo orgânico melhor que outras plataformas — amplifica anúncio com orgânico`,
-      `Base de usuários crescendo, especialmente 18-35 anos com poder de compra`,
+      `TikTok ainda conquistando anunciantes brasileiros — leilao menos acirrado`,
+      `Formato de video curto alinhado com ${videoShr.toFixed(0)}% do engajamento digital`,
+      `Algoritmo distribui conteudo organico melhor que outras plataformas — amplifica anuncio com organico`,
+      `Base de usuarios crescendo, especialmente 18-35 anos com poder de compra`,
     ],
     effects: [
-      `CPM 50-60% menor que Meta na mesma audiência → ROAS potencialmente maior`,
-      `Marca que entrar agora constrói audiência orgânica antes da plataforma saturar`,
+      `CPM 50-60% menor que Meta na mesma audiencia → ROAS potencialmente maior`,
+      `Marca que entrar agora constroi audiencia organica antes da plataforma saturar`,
       `Primeiros a testar formatos novos aprendem curva antes dos concorrentes`,
     ],
-    affected: `Qualquer empresa com produto visual, massa, ou voltado para público jovem — moda, alimentos, tecnologia, serviços de consumo.`,
-    action: `Alocar 10-20% do budget de paid para TikTok agora. Produzir conteúdo nativo (não reutilizar criativos de outras plataformas). Testar por 30 dias com meta de ROAS > 2x. Se funcionar, escalar antes de competição aumentar.`,
+    affected: `Qualquer empresa com produto visual, massa, ou voltado para publico jovem — moda, alimentos, tecnologia, servicos de consumo.`,
+    action: `Alocar 10-20% do budget de paid para TikTok agora. Produzir conteudo nativo (nao reutilizar criativos de outras plataformas). Testar por 30 dias com meta de ROAS > 2x. Se funcionar, escalar antes de competicao aumentar.`,
+    modules: ['Mercado & Concorrencia'],
   })
 
   // ── IA em conteúdo ──
   chains.push({
     id: 'ai_content', type: 'opportunity',
-    title: `IA cortando custo de conteúdo em 60% — vantagem competitiva real`,
+    title: `IA cortando custo de conteudo em 60% — vantagem competitiva real`,
     urgency: 76,
-    why: `Ferramentas como Claude, ChatGPT, Midjourney e Sora permitem produzir conteúdo de qualidade com fração do custo e tempo anterior. Empresa que adotar agora opera com estrutura 30-60% mais eficiente que concorrente tradicional.`,
+    why: `Ferramentas como Claude, ChatGPT, Midjourney e Sora permitem produzir conteudo de qualidade com fracao do custo e tempo anterior. Empresa que adotar agora opera com estrutura 30-60% mais eficiente que concorrente tradicional.`,
     influence: [
-      `${aiAdoption.toFixed(0)}% das empresas já usam IA — quem não usa perde velocidade de produção`,
-      `Custo de tokens de IA caiu 100x nos últimos 2 anos — escalar conteúdo ficou acessível`,
-      `Regulação ainda não exige declaração de conteúdo gerado por IA — janela legal aberta`,
+      `${aiAdoption.toFixed(0)}% das empresas ja usam IA — quem nao usa perde velocidade de producao`,
+      `Custo de tokens de IA caiu 100x nos ultimos 2 anos — escalar conteudo ficou acessivel`,
+      `Regulacao ainda nao exige declaracao de conteudo gerado por IA — janela legal aberta`,
     ],
     effects: [
-      `Time de marketing produz 5-10x mais conteúdo sem contratar mais gente`,
-      `Testes A/B mais rápidos → otimização de campanha mais ágil → melhor ROI`,
-      `SEO: mais conteúdo indexado → mais tráfego orgânico → redução de dependência de paid`,
+      `Time de marketing produz 5-10x mais conteudo sem contratar mais gente`,
+      `Testes A/B mais rapidos → otimizacao de campanha mais agil → melhor ROI`,
+      `SEO: mais conteudo indexado → mais trafego organico → reducao de dependencia de paid`,
     ],
-    affected: `Agências, equipes de marketing interno, e-commerce com catálogo grande e qualquer empresa que produz conteúdo regularmente.`,
-    action: `Adotar Claude/ChatGPT para rascunho de conteúdo imediatamente. Treinar time em prompts. Criar processo de revisão humana para qualidade. Liberar time para estratégia ao invés de execução repetitiva.`,
+    affected: `Agencias, equipes de marketing interno, e-commerce com catalogo grande e qualquer empresa que produz conteudo regularmente.`,
+    action: `Adotar Claude/ChatGPT para rascunho de conteudo imediatamente. Treinar time em prompts. Criar processo de revisao humana para qualidade. Liberar time para estrategia ao inves de execucao repetitiva.`,
+    modules: ['Inovacao & Tendencias'],
   })
 
   // ── Agro B2B ──
@@ -307,31 +319,46 @@ function buildCausalChains(data: any): CausalChain[] {
     id: 'agro_b2b', type: 'opportunity',
     title: `Agro ${sectorAgro.change.toFixed(1)}% — oportunidade B2B em agritech`,
     urgency: 58,
-    why: `O agronegócio brasileiro cresce consistentemente e está em processo de digitalização. Produtores rurais modernos adotam tecnologia para gestão, monitoramento, logística e financiamento. Mercado B2B com ticket alto e baixo churn.`,
+    why: `O agronegocio brasileiro cresce consistentemente e esta em processo de digitalizacao. Produtores rurais modernos adotam tecnologia para gestao, monitoramento, logistica e financiamento. Mercado B2B com ticket alto e baixo churn.`,
     influence: [
-      `Brasil é maior exportador de várias commodities — agro tem dólares para investir em tech`,
-      `Digitalização do campo ainda incipiente — espaço enorme para primeiros entrantes`,
-      `Governo com linhas de crédito subsidiadas para agritech via BNDES e fundos setoriais`,
+      `Brasil e maior exportador de varias commodities — agro tem dolares para investir em tech`,
+      `Digitalizacao do campo ainda incipiente — espaco enorme para primeiros entrantes`,
+      `Governo com linhas de credito subsidiadas para agritech via BNDES e fundos setoriais`,
     ],
     effects: [
-      `Empresas que entram agora constroem base instalada com baixo custo de aquisição`,
+      `Empresas que entram agora constroem base instalada com baixo custo de aquisicao`,
       `Contrato B2B com fazendeiro: ticket alto, relacionamento longo, baixa rotatividade`,
       `Oportunidade de cross-sell ampla: de insumos a financiamento, de drone a ERP rural`,
     ],
-    affected: `Startups de agritech, SaaS de gestão rural, fintechs de crédito rural, logística agrícola e marketplaces de insumos.`,
-    action: `Mapear dor específica do produtor (não genérica). Parceria com cooperativas como canal de distribuição. Produto simples que funciona offline — conectividade ainda é barreira no campo.`,
+    affected: `Startups de agritech, SaaS de gestao rural, fintechs de credito rural, logistica agricola e marketplaces de insumos.`,
+    action: `Mapear dor especifica do produtor (nao generica). Parceria com cooperativas como canal de distribuicao. Produto simples que funciona offline — conectividade ainda e barreira no campo.`,
+    modules: ['Canvas & Pitch', 'Mercado & Concorrencia'],
   })
 
   return chains.sort((a, b) => b.urgency - a.urgency)
 }
 
-/* ─── Macro sentiment helper ─── */
-function macroSentiment(selic: number, ipca: number, pib: number, usd: number): string {
-  const negatives = (selic > 12 ? 1 : 0) + (ipca > 5 ? 1 : 0) + (usd > 5.8 ? 1 : 0)
-  const positives = (pib > 2.5 ? 1 : 0) + (ipca < 4 ? 1 : 0) + (selic < 10 ? 1 : 0)
-  if (negatives >= 2) return 'Ambiente restritivo: juro alto + inflação acima da meta comprimem margem'
-  if (positives >= 2) return 'Ambiente favorável: crescimento sólido com inflação controlada'
-  return 'Ambiente misto: crescimento positivo mas custos financeiros elevados'
+/* ─── Macro Context Bar ─── */
+function macroContextSentence(selic: number, ipca: number, pib: number): string {
+  if (selic > 13 && ipca > 4.75) return 'Ambiente restritivo: juro alto + inflacao acima da meta'
+  if (pib > 2.5 && selic < 11) return 'Ambiente favoravel: crescimento + credito acessivel'
+  return 'Ambiente misto: indicadores divergentes'
+}
+
+/* ─── Module Badge ─── */
+function ModuleBadge({ name }: { name: string }) {
+  return (
+    <span
+      className="font-mono text-[8px] px-2 py-1 rounded-sm inline-block"
+      style={{
+        background: 'rgba(26,82,118,0.15)',
+        color: '#2471a3',
+        border: '1px solid rgba(26,82,118,0.3)',
+      }}
+    >
+      {'\u2192'} {name}
+    </span>
+  )
 }
 
 /* ─── Hero: Top Risk ─── */
@@ -403,16 +430,24 @@ function HeroRisk({ chain }: { chain: CausalChain }) {
         </div>
 
         {/* COMO AGIR — green box */}
-        <div className="rounded-sm p-3" style={{ background: `${GREEN}12`, border: `1px solid ${GREEN}30` }}>
+        <div className="rounded-sm p-3 mb-3" style={{ background: `${GREEN}12`, border: `1px solid ${GREEN}30` }}>
           <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1.5" style={{ color: GREEN }}>COMO AGIR</span>
           <p className="text-[11px] text-white/55 leading-relaxed">{chain.action}</p>
+        </div>
+
+        {/* RESOLVER EM */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/25">RESOLVER EM</span>
+          {chain.modules.map((mod) => (
+            <ModuleBadge key={mod} name={mod} />
+          ))}
         </div>
       </div>
     </motion.div>
   )
 }
 
-/* ─── Dashboard Row (collapsed) ─── */
+/* ─── Dashboard Row (collapsed/expanded) ─── */
 function DashboardRow({ chain, index, isExpanded, onToggle }: {
   chain: CausalChain
   index: number
@@ -422,10 +457,6 @@ function DashboardRow({ chain, index, isExpanded, onToggle }: {
   const col = chain.type === 'critical' ? RED : chain.type === 'risk' ? AMBER : GREEN
   const typeLabel = chain.type === 'critical' ? 'CRITICO' : chain.type === 'risk' ? 'RISCO' : 'OPORT.'
   const isCritical = chain.type === 'critical'
-
-  // Extract affected % from chain data if available
-  const affectedMatch = chain.affected.match(/(\d+)%/)
-  const affectedPct = affectedMatch ? affectedMatch[0] : null
 
   return (
     <motion.div
@@ -440,7 +471,7 @@ function DashboardRow({ chain, index, isExpanded, onToggle }: {
         border: `1px solid ${isExpanded ? col + '30' : 'rgba(255,255,255,0.04)'}`,
       }}
     >
-      {/* Collapsed row — 44px */}
+      {/* Collapsed row */}
       <button
         className="w-full flex items-center gap-2 pr-3 text-left"
         style={{ height: '44px' }}
@@ -485,19 +516,9 @@ function DashboardRow({ chain, index, isExpanded, onToggle }: {
         {/* Title */}
         <p className="text-[11px] text-white/65 flex-1 truncate leading-none">{chain.title}</p>
 
-        {/* Affected badge */}
-        {affectedPct && (
-          <span
-            className="font-mono text-[9px] px-1.5 py-0.5 rounded-sm shrink-0"
-            style={{ background: `${col}10`, color: `${col}cc` }}
-          >
-            {affectedPct}
-          </span>
-        )}
-
         {/* Urgency + expand */}
         <span className="font-mono text-[10px] font-bold shrink-0" style={{ color: col }}>{chain.urgency}%</span>
-        <span className="text-white/20 text-[9px] shrink-0">{isExpanded ? '▲' : '▼'}</span>
+        <span className="text-white/20 text-[9px] shrink-0">{isExpanded ? '\u25B2' : '\u25BC'}</span>
       </button>
 
       {/* Expanded detail */}
@@ -513,13 +534,13 @@ function DashboardRow({ chain, index, isExpanded, onToggle }: {
             <div className="px-4 pb-4 border-t" style={{ borderColor: `${col}15` }}>
               {/* POR QUE */}
               <div className="mt-3 rounded-sm p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/25 block mb-1.5">POR QUE</span>
+                <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/25 block mb-1.5">DIAGNOSTICO</span>
                 <p className="text-[11px] text-white/55 leading-relaxed">{chain.why}</p>
               </div>
 
-              {/* 2-column layout */}
+              {/* 2-column layout: Influences + Effects */}
               <div className="mt-3 grid grid-cols-2 gap-3">
-                {/* Left column: O QUE CAUSA + EFEITOS */}
+                {/* Left: O QUE CAUSA + EFEITOS */}
                 <div className="flex flex-col gap-3">
                   <div>
                     <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 block mb-2">O QUE CAUSA</span>
@@ -533,11 +554,11 @@ function DashboardRow({ chain, index, isExpanded, onToggle }: {
                     </div>
                   </div>
                   <div>
-                    <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 block mb-2">EFEITOS</span>
+                    <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 block mb-2">IMPACTO</span>
                     <div className="flex flex-col gap-1.5">
                       {chain.effects.map((ef, i) => (
                         <div key={i} className="flex items-start gap-2">
-                          <span className="font-mono text-[9px] shrink-0 mt-0.5 leading-none" style={{ color: col }}>→</span>
+                          <span className="font-mono text-[9px] shrink-0 mt-0.5 leading-none" style={{ color: col }}>{'\u2192'}</span>
                           <span className="text-[10px] text-white/45 leading-relaxed">{ef}</span>
                         </div>
                       ))}
@@ -545,15 +566,25 @@ function DashboardRow({ chain, index, isExpanded, onToggle }: {
                   </div>
                 </div>
 
-                {/* Right column: QUEM E AFETADO + O QUE FAZER */}
+                {/* Right: QUEM E AFETADO + COMO AGIR */}
                 <div className="flex flex-col gap-3">
                   <div className="rounded-sm p-2.5" style={{ background: `${RED}08`, border: `1px solid ${RED}15` }}>
                     <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: RED }}>QUEM E AFETADO</span>
                     <p className="text-[10px] text-white/40 leading-relaxed">{chain.affected}</p>
                   </div>
                   <div className="rounded-sm p-2.5" style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}15` }}>
-                    <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: GREEN }}>O QUE FAZER</span>
+                    <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: GREEN }}>COMO AGIR</span>
                     <p className="text-[10px] text-white/40 leading-relaxed">{chain.action}</p>
+                  </div>
+
+                  {/* RESOLVER EM */}
+                  <div className="rounded-sm p-2.5" style={{ background: 'rgba(26,82,118,0.06)', border: '1px solid rgba(26,82,118,0.15)' }}>
+                    <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1.5" style={{ color: '#2471a3' }}>RESOLVER EM</span>
+                    <div className="flex flex-wrap gap-1">
+                      {chain.modules.map((mod) => (
+                        <ModuleBadge key={mod} name={mod} />
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -586,7 +617,7 @@ export default function RiscosSection({ data }: { data: any }) {
   const chains = useMemo(() => buildCausalChains(data), [data])
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  const topRisk = chains[0] // Already sorted by urgency DESC
+  const topRisk = chains[0]
   const remaining = chains.slice(1)
 
   const criticos = remaining.filter(c => c.type === 'critical')
@@ -596,9 +627,8 @@ export default function RiscosSection({ data }: { data: any }) {
   const selic = v(data.macro.selic?.value, 10.5)
   const ipca  = v(data.macro.ipca?.value, 4.8)
   const pib   = v(data.macro.pib?.value, 2.9)
-  const usd   = v(data.macro.usdBrl?.value, 5.72)
 
-  const sentiment = macroSentiment(selic, ipca, pib, usd)
+  const contextSentence = macroContextSentence(selic, ipca, pib)
 
   return (
     <div className="flex flex-col gap-4 px-4 pb-8">
@@ -608,41 +638,24 @@ export default function RiscosSection({ data }: { data: any }) {
         <motion.div className="h-1.5 w-1.5 rounded-full" style={{ background: RED }}
           animate={{ opacity: [1, 0.2, 1] }} transition={{ duration: 0.9, repeat: Infinity }} />
         <span className="font-mono text-[9px] font-bold uppercase tracking-[0.25em] text-white/20">
-          Riscos & Oportunidades
+          O Que Pode Me Quebrar?
         </span>
       </div>
 
-      {/* 3. Macro Impact Summary — one-line contextual bar */}
+      {/* 1. Macro Context Bar — one sentence, no numbers */}
       <div
-        className="rounded-md px-3 py-2 flex items-center gap-1 flex-wrap"
+        className="rounded-md px-3 py-2"
         style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)' }}
       >
-        <span className="font-mono text-[10px] text-white/35">
-          SELIC <span className="font-bold text-white/55">{selic.toFixed(1)}%</span>
-        </span>
-        <span className="text-white/10 text-[10px]">·</span>
-        <span className="font-mono text-[10px] text-white/35">
-          IPCA <span className="font-bold text-white/55">{ipca.toFixed(2)}%</span>
-        </span>
-        <span className="text-white/10 text-[10px]">·</span>
-        <span className="font-mono text-[10px] text-white/35">
-          USD <span className="font-bold text-white/55">R${usd.toFixed(2)}</span>
-        </span>
-        <span className="text-white/10 text-[10px]">·</span>
-        <span className="font-mono text-[10px] text-white/35">
-          PIB <span className="font-bold text-white/55">{pib.toFixed(1)}%</span>
-        </span>
-        <span className="text-white/08 text-[10px] mx-1">—</span>
-        <span className="text-[10px] text-white/40 italic">{sentiment}</span>
+        <span className="font-mono text-[10px] text-white/45 italic">{contextSentence}</span>
       </div>
 
-      {/* 1. Hero: Top Risk */}
+      {/* 2. Hero: #1 Risk */}
       {topRisk && <HeroRisk chain={topRisk} />}
 
-      {/* 2. Risk Dashboard */}
+      {/* 3. Remaining Risks — grouped by type */}
       <div className="flex flex-col gap-0.5">
 
-        {/* CRITICOS section */}
         {criticos.length > 0 && (
           <>
             <SectionDivider label="RISCOS CRITICOS" color={RED} count={criticos.length} />
@@ -658,7 +671,6 @@ export default function RiscosSection({ data }: { data: any }) {
           </>
         )}
 
-        {/* RISCOS section */}
         {riscos.length > 0 && (
           <>
             <SectionDivider label="ALERTAS" color={AMBER} count={riscos.length} />
@@ -674,7 +686,6 @@ export default function RiscosSection({ data }: { data: any }) {
           </>
         )}
 
-        {/* OPORTUNIDADES section */}
         {oports.length > 0 && (
           <>
             <SectionDivider label="OPORTUNIDADES" color={GREEN} count={oports.length} />
