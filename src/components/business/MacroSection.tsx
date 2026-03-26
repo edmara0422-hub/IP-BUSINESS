@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const RED   = '#c0392b'
@@ -8,424 +8,251 @@ const GREEN = '#1e8449'
 const AMBER = '#9a7d0a'
 const BLUE  = '#1a5276'
 
-// ══════════════════════════════════════════════════════════════════════════
-// ██  HELPERS
-// ══════════════════════════════════════════════════════════════════════════
-
-function dimColor(s: 'good' | 'warning' | 'critical') {
-  return s === 'good' ? GREEN : s === 'warning' ? AMBER : RED
-}
-
-interface DimScore {
-  label: string; short: string; score: number; weight: number
-  status: 'good' | 'warning' | 'critical'
-  driver: string; detail: string
-  pts: { label: string; value: number }[]
+const ADMIN_MODULES: Record<string, string[]> = {
+  CREDITO:  ['Cenários & Forecast'],
+  INFLACAO: ['Smart Pricing'],
+  CAMBIO:   ['Cenários & Forecast'],
+  DEMANDA:  ['Cockpit Financeiro'],
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function buildDimensions(data: any): DimScore[] {
-  const clamp = (n: number) => Math.round(Math.max(5, Math.min(95, n)))
+function getValues(data: any) {
   const vv = (n: number | undefined, fb: number) => (n != null && Number.isFinite(n)) ? n : fb
-  const selic = vv(data.macro.selic?.value, 10.5)
-  const ipca  = vv(data.macro.ipca?.value, 4.8)
-  const pib   = vv(data.macro.pib?.value, 2.9)
-  const usd   = vv(data.macro.usdBrl?.value, 5.72)
-  const sectors = data.sectors as Array<{ id: string; heat: number; change: number }>
-  const comms = Object.values(data.commodities as Record<string, { delta: number }>)
-  const agents = data.globalAgents as Array<{ delta: number }>
-  const cacDelta = data.marketing?.cacTrend?.delta ?? 12
+  const selic = vv(data.macro?.selic?.value, 10.5)
+  const ipca  = vv(data.macro?.ipca?.value, 4.8)
+  const pib   = vv(data.macro?.pib?.value, 2.9)
+  const usd   = vv(data.macro?.usdBrl?.value, 5.72)
+  return { selic, ipca, pib, usd }
+}
 
-  const pibPts   = Math.min(60, Math.max(0, (pib + 3) / 11 * 60))
-  const selicPts = Math.max(0, 40 - Math.max(0, selic - 5) * 3.6)
-  const econ     = clamp(pibPts + selicPts)
-  const metaBC   = 3.25
-  const ipcaOvr  = Math.max(0, ipca - metaBC)
-  const infla    = clamp(100 - ipcaOvr * 13)
-  const commAvgDelta = comms.reduce((s, c) => s + c.delta, 0) / Math.max(1, comms.length)
-  const comm     = clamp(50 + commAvgDelta * 4)
-  const techHeat = sectors.find(s => s.id === 'tech')?.heat ?? 60
-  const agentAvg = agents.slice(0, 3).reduce((s, a) => s + a.delta, 0) / 3
-  const tech     = clamp(techHeat * 0.72 + Math.min(95, 50 + agentAvg * 10) * 0.28)
-  const mktAvg   = sectors.reduce((s, sec) => s + sec.heat, 0) / Math.max(1, sectors.length)
-  const mktBroad = clamp(mktAvg)
-  const inovScore = clamp(tech * 0.75 + mktBroad * 0.25)
-  const esgBase  = 55 + (pib > 2 ? 6 : pib < 0 ? -8 : 0) - Math.max(0, ipca - 4) * 2.5 - Math.max(0, usd - 5.5) * 3
-  const esg      = clamp(esgBase)
-  const mkt      = clamp(72 - cacDelta * 1.7)
-  const status   = (s: number): 'good' | 'warning' | 'critical' => s >= 65 ? 'good' : s >= 42 ? 'warning' : 'critical'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildHeadline(data: any): { before: string; highlight: string; after: string } {
+  const { selic, ipca, pib } = getValues(data)
+  if (selic > 13) return { before: 'Juro alto domina: SELIC ', highlight: `${selic.toFixed(1)}%`, after: ' trava crédito e comprime margens' }
+  if (ipca > 5) return { before: 'Inflação acima da meta: ', highlight: `IPCA ${ipca.toFixed(2)}%`, after: ' — poder de compra do consumidor cai' }
+  if (pib > 3) return { before: 'Economia aquecida: PIB ', highlight: `${pib.toFixed(1)}%`, after: ' abre janela de crescimento' }
+  return { before: 'Mercado misto: ', highlight: 'crescimento lento', after: ' com custo alto' }
+}
+
+interface InsightCard {
+  id: string
+  value: string
+  title: string
+  body: string
+  color: string
+  module: string
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildInsights(data: any): InsightCard[] {
+  const { selic, ipca, pib, usd } = getValues(data)
+  const bankRate = (selic * 2.5).toFixed(1)
+  const metaBC = 3.25
+
+  const creditColor = selic > 12 ? RED : selic > 9 ? AMBER : GREEN
+  const creditTitle = selic > 9 ? 'Crédito caro' : 'Crédito acessível'
+  const creditBody = `SELIC ${selic.toFixed(1)}% = empresas pagam ~${bankRate}% a.a. em financiamento bancário. ${selic > 12 ? 'Capital de giro fica inviável para PMEs. Priorize caixa próprio.' : 'Janela para financiar expansão.'}`
+
+  const inflaColor = ipca > 6 ? RED : ipca > 4 ? AMBER : GREEN
+  const inflaTitle = ipca > 4.75 ? 'Poder de compra caindo' : 'Poder de compra estável'
+  const lossPerThousand = ((ipca - metaBC) / 100 * 1000).toFixed(0)
+  const inflaBody = `IPCA ${ipca.toFixed(2)}% vs meta BC ${metaBC}%. ${ipca > 4.75 ? `Seu cliente perdeu ~R$${lossPerThousand} em cada mil de renda. Reajuste de preço inevitável.` : 'Dentro da banda — sem pressão imediata.'}`
+
+  const cambioColor = usd > 6 ? RED : usd > 5.3 ? AMBER : GREEN
+  const cambioTitle = usd > 5.5 ? 'Importação cara' : 'Importação acessível'
+  const pctMore = ((usd / 4.5 - 1) * 100).toFixed(0)
+  const cambioBody = `Dólar R$${usd.toFixed(2)}. ${usd > 5.5 ? `Insumos importados, SaaS em dólar e equipamentos custam ${pctMore}% mais que há 2 anos. Fornecedor nacional ganha competitividade.` : 'Câmbio favorável para importação e tech.'}`
+
+  const demandaColor = pib > 2.5 ? GREEN : pib > 0 ? AMBER : RED
+  const demandaTitle = pib > 2.5 ? 'Economia crescendo' : pib > 0 ? 'Economia estagnada' : 'Economia contraindo'
+  const demandaBody = `PIB ${pib > 0 ? '+' : ''}${pib.toFixed(1)}%. ${pib > 2.5 ? 'Consumo em expansão — bom momento para investir em aquisição e contratar.' : pib > 0 ? 'Crescimento fraco — foque em eficiência antes de expandir.' : 'Contração — modo sobrevivência: corte custos, proteja caixa.'}`
 
   return [
-    { label: 'Econômico', short: 'ECON', score: econ, weight: 0.20, status: status(econ),
-      driver: `PIB +${pib.toFixed(1)}% · SELIC ${selic.toFixed(1)}%`,
-      detail: `PIB cresce ${pib.toFixed(1)}%. SELIC em ${selic.toFixed(1)}% ${selic > 13 ? 'impõe custo de capital elevado, frenando investimentos' : 'em patamar controlado'}.`,
-      pts: [{ label: `PIB ${pib.toFixed(1)}%`, value: Math.round(pibPts) }, { label: `SELIC ${selic.toFixed(1)}%`, value: Math.round(selicPts) }] },
-    { label: 'Inflação / Social', short: 'IPCA', score: infla, weight: 0.15, status: status(infla),
-      driver: `IPCA ${ipca.toFixed(2)}% · Meta BC ${metaBC}%`,
-      detail: `IPCA em ${ipca.toFixed(2)}%: ${ipca <= metaBC ? 'abaixo da meta' : ipca <= 4.75 ? 'acima da meta mas dentro da banda' : 'fora da banda — BC sob pressão'}.`,
-      pts: [{ label: `Desvio meta`, value: Math.round(100 - ipcaOvr * 13) }] },
-    { label: 'Commodities', short: 'COMM', score: comm, weight: 0.15, status: status(comm),
-      driver: `Média ${comms.length} commod.: ${commAvgDelta > 0 ? '+' : ''}${commAvgDelta.toFixed(1)}%`,
-      detail: `${commAvgDelta > 2 ? 'Alta pressiona inflação de insumos.' : commAvgDelta > -2 ? 'Commodities estáveis.' : 'Queda alivia inflação de insumos.'}`,
-      pts: comms.slice(0, 3).map((c, i) => ({ label: `Commodity ${i + 1}`, value: Math.round(50 + c.delta * 4) })) },
-    { label: 'Tech & Digital', short: 'TECH', score: tech, weight: 0.15, status: status(tech),
-      driver: `Tech heat: ${techHeat}/100 · Big techs: ${agentAvg > 0 ? '+' : ''}${agentAvg.toFixed(1)}%`,
-      detail: `Setor tech ${tech >= 70 ? 'aquecido' : tech >= 50 ? 'moderado' : 'desacelerando'}. Big techs globais: ${agentAvg.toFixed(1)}%.`,
-      pts: [{ label: `Heat tech`, value: Math.round(techHeat * 0.72) }, { label: `Big techs`, value: Math.round(Math.min(95, 50 + agentAvg * 10) * 0.28) }] },
-    { label: 'Mercado Amplo', short: 'MKTD', score: mktBroad, weight: 0.15, status: status(mktBroad),
-      driver: `Média ${sectors.length} setores: ${mktAvg.toFixed(0)}/100`,
-      detail: `${mktAvg >= 65 ? 'Expansão generalizada.' : mktAvg >= 50 ? 'Crescimento heterogêneo — setores divergem.' : 'Mercado contraindo na maioria dos setores.'}`,
-      pts: sectors.slice(0, 3).map(s => ({ label: s.id, value: s.heat })) },
-    { label: 'Inovação', short: 'INOV', score: inovScore, weight: 0.10, status: status(inovScore),
-      driver: `Tech (75%) + Mercado (25%)`,
-      detail: `${inovScore >= 70 ? 'Startups conseguem funding, M&A aquece.' : 'Custo de capital alto inibe R&D.'}`,
-      pts: [{ label: 'Tech', value: Math.round(tech * 0.75) }, { label: 'Market', value: Math.round(mktBroad * 0.25) }] },
-    { label: 'ESG / Sustent.', short: 'ESG', score: esg, weight: 0.10, status: status(esg),
-      driver: `Proxy via macro (PIB, IPCA, câmbio)`,
-      detail: `PIB positivo (+${pib > 2 ? 6 : 0}pts). IPCA pressiona desigualdade (-${(Math.max(0, ipca - 4) * 2.5).toFixed(0)}pts). Câmbio alto encarece energia limpa (-${(Math.max(0, usd - 5.5) * 3).toFixed(0)}pts).`,
-      pts: [{ label: `PIB proxy`, value: esg }] },
-    { label: 'Marketing', short: 'MRKT', score: mkt, weight: 0.10, status: status(mkt),
-      driver: `CAC trend: +${cacDelta.toFixed(0)}% YoY`,
-      detail: `CAC ${cacDelta > 0 ? `subindo +${cacDelta.toFixed(0)}%` : `caindo ${cacDelta.toFixed(0)}%`} YoY — ${cacDelta > 20 ? 'eficiência caindo drasticamente.' : cacDelta > 10 ? 'pressão gerenciável.' : 'eficiência mantida.'}`,
-      pts: [{ label: `CAC trend`, value: mkt }] },
+    { id: 'CREDITO', value: `${selic.toFixed(1)}%`, title: creditTitle, body: creditBody, color: creditColor, module: 'Cenários & Forecast' },
+    { id: 'INFLACAO', value: `${ipca.toFixed(2)}%`, title: inflaTitle, body: inflaBody, color: inflaColor, module: 'Smart Pricing' },
+    { id: 'CAMBIO', value: `R$${usd.toFixed(2)}`, title: cambioTitle, body: cambioBody, color: cambioColor, module: 'Cenários & Forecast' },
+    { id: 'DEMANDA', value: `${pib > 0 ? '+' : ''}${pib.toFixed(1)}%`, title: demandaTitle, body: demandaBody, color: demandaColor, module: 'Cockpit Financeiro' },
   ]
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// ██  "COMO AFETA SEU NEGÓCIO" — dynamic sentence per dimension
+// ██  INSIGHT CARD
 // ══════════════════════════════════════════════════════════════════════════
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function businessImpactSentence(dim: DimScore, data: any): string {
-  const vv = (n: number | undefined, fb: number) => (n != null && Number.isFinite(n)) ? n : fb
-  const selic = vv(data.macro.selic?.value, 10.5)
-  const pib   = vv(data.macro.pib?.value, 2.9)
-  const ipca  = vv(data.macro.ipca?.value, 4.8)
-  const cacDelta = data.marketing?.cacTrend?.delta ?? 12
-  const comms = Object.values(data.commodities as Record<string, { delta: number }>)
-  const commAvgDelta = comms.reduce((s, c) => s + c.delta, 0) / Math.max(1, comms.length)
-  const sectors = data.sectors as Array<{ heat: number }>
-  const mktAvg = sectors.reduce((s, sec) => s + sec.heat, 0) / Math.max(1, sectors.length)
-
-  switch (dim.short) {
-    case 'ECON':
-      return `PIB ${pib > 0 ? '+' : ''}${pib.toFixed(1)}% = ${pib > 1 ? 'mais' : 'menos'} demanda. SELIC ${selic.toFixed(1)}% = crédito ${selic > 12 ? 'caro' : 'acessível'}.`
-    case 'IPCA':
-      return `Inflação ${ipca.toFixed(2)}% ${ipca > 4.75 ? 'corrói' : 'mantém'} poder de compra do cliente.`
-    case 'COMM':
-      return `Commodities ${commAvgDelta > 2 ? 'subindo' : commAvgDelta > -2 ? 'estáveis' : 'caindo'} = insumos ${commAvgDelta > 2 ? 'mais caros' : 'mais baratos'}.`
-    case 'TECH':
-      return `Setor tech heat ${dim.score} = ${dim.score >= 65 ? 'fácil' : 'difícil'} adotar ferramentas digitais.`
-    case 'MKTD':
-      return `Mercado ${mktAvg >= 55 ? 'expandindo' : 'contraindo'} = ${mktAvg >= 55 ? 'bom' : 'mau'} momento para escalar.`
-    case 'INOV':
-      return `Ambiente ${dim.score >= 60 ? 'favorável' : 'hostil'} para inovação e lançamentos.`
-    case 'ESG':
-      return `Pressão ESG ${dim.score >= 60 ? 'alta' : 'baixa'} = compliance ${dim.score >= 60 ? 'urgente' : 'pode esperar'}.`
-    case 'MRKT':
-      return `CAC ${cacDelta > 0 ? 'subindo' : 'caindo'} = aquisição de cliente ${cacDelta > 0 ? 'comprime' : 'libera'} margem.`
-    default:
-      return ''
-  }
-}
-
-// ══════════════════════════════════════════════════════════════════════════
-// ██  "ONDE RESOLVER" — admin module badges per dimension
-// ══════════════════════════════════════════════════════════════════════════
-
-const ADMIN_MODULES: Record<string, string[]> = {
-  ECON: ['Cenários & Forecast', 'Cockpit Financeiro'],
-  IPCA: ['Smart Pricing', 'Cockpit Financeiro'],
-  COMM: ['Smart Pricing', 'Cenários & Forecast'],
-  TECH: ['Inovação & Tendências'],
-  MKTD: ['Mercado & Concorrência'],
-  INOV: ['Inovação & Tendências', 'Canvas & Pitch'],
-  ESG:  ['ESG & Ética'],
-  MRKT: ['Mercado & Concorrência', 'Smart Pricing'],
-}
-
-// ══════════════════════════════════════════════════════════════════════════
-// ██  DYNAMIC QUESTION HEADER LOGIC
-// ══════════════════════════════════════════════════════════════════════════
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function dynamicQuestionHeader(dims: DimScore[], data: any): string {
-  const vv = (n: number | undefined, fb: number) => (n != null && Number.isFinite(n)) ? n : fb
-  const selic = vv(data.macro.selic?.value, 10.5)
-  const ipca  = vv(data.macro.ipca?.value, 4.8)
-  const pib   = vv(data.macro.pib?.value, 2.9)
-  const cacDelta = data.marketing?.cacTrend?.delta ?? 12
-  const sectors = data.sectors as Array<{ heat: number }>
-  const avgHeat = Math.round(sectors.reduce((s, sec) => s + sec.heat, 0) / Math.max(1, sectors.length))
-
-  // Find most impactful dimension (highest weight * deviation from 50)
-  let maxImpact = 0
-  let dominantShort = ''
-  for (const d of dims) {
-    const impact = d.weight * Math.abs(d.score - 50)
-    if (impact > maxImpact) { maxImpact = impact; dominantShort = d.short }
-  }
-
-  // Find lowest and highest scoring dimensions
-  const sorted = [...dims].sort((a, b) => a.score - b.score)
-  const lowest = sorted[0]
-  const highest = sorted[sorted.length - 1]
-
-  if (lowest.short === 'ECON' && selic > 13) return `SELIC ${selic.toFixed(1)}% está frenando o mercado`
-  if (lowest.short === 'IPCA' && ipca > 5) return `Inflação ${ipca.toFixed(2)}% está corroendo margens`
-  if (lowest.short === 'MRKT' && cacDelta > 15) return `CAC subindo ${cacDelta.toFixed(0)}% — aquisição cara`
-  if (highest.short === 'MKTD') return `Mercado aquecido — ${avgHeat}/100 de calor`
-  if (highest.short === 'ECON' && pib > 2.5) return `PIB ${pib.toFixed(1)}% impulsiona demanda`
-
-  // Also check dominant factor for extra context
-  if (dominantShort === 'ECON' && selic > 13) return `SELIC ${selic.toFixed(1)}% está frenando o mercado`
-  if (dominantShort === 'IPCA' && ipca > 5) return `Inflação ${ipca.toFixed(2)}% está corroendo margens`
-
-  return 'O que está movendo a economia?'
-}
-
-// ══════════════════════════════════════════════════════════════════════════
-// ██  DimensionCard — interactive card with expand/collapse
-// ══════════════════════════════════════════════════════════════════════════
-
-function DimensionCard({ dim, isExpanded, onToggle, businessImpact, glowType }: {
-  dim: DimScore; isExpanded: boolean; onToggle: () => void; businessImpact: string
-  glowType: 'critical' | 'best' | 'none'
-}) {
-  const color = dimColor(dim.status)
-  const statusLabel = dim.status === 'good' ? 'SAUDÁVEL' : dim.status === 'warning' ? 'MODERADO' : 'CRÍTICO'
-  const modules = ADMIN_MODULES[dim.short] ?? []
-
-  // Improvement 1: glow styles
-  const glowStyle: React.CSSProperties = glowType === 'critical'
-    ? { boxShadow: `0 0 12px ${RED}25`, animation: 'pulse-glow 2s ease-in-out infinite' }
-    : glowType === 'best'
-    ? { boxShadow: `0 0 12px ${GREEN}25` }
-    : {}
-
-  const borderColor = glowType === 'critical'
-    ? `${RED}50`
-    : glowType === 'best'
-    ? `${GREEN}50`
-    : isExpanded ? `${color}40` : 'rgba(255,255,255,0.06)'
-
+function InsightCardComponent({ card, index }: { card: InsightCard; index: number }) {
+  const labels: Record<string, string> = { CREDITO: 'CRÉDITO', INFLACAO: 'INFLAÇÃO', CAMBIO: 'CÂMBIO', DEMANDA: 'DEMANDA' }
   return (
     <motion.div
-      layout
-      onClick={onToggle}
-      className="rounded-lg overflow-hidden cursor-pointer"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.1 + index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+      className="rounded-lg overflow-hidden flex"
       style={{
-        background: isExpanded ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.3)',
-        border: `1px solid ${borderColor}`,
-        gridColumn: isExpanded ? '1 / -1' : undefined,
-        ...glowStyle,
+        background: 'rgba(0,0,0,0.35)',
+        borderLeft: `4px solid ${card.color}`,
       }}
-      transition={{ layout: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
     >
-      {/* Colored top border */}
-      <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${color}80, ${color}30)` }} />
-
-      {/* Collapsed content */}
-      <div className="px-3 py-2.5">
-        <p className="font-mono text-[12px] font-bold tracking-[0.1em]" style={{ color }}>{dim.short}</p>
-        <p className="text-[12px] text-white/40 mt-0.5 leading-tight">{dim.label}</p>
-
-        <div className="mt-2 flex items-end justify-between">
-          <span className="font-mono text-[24px] font-bold leading-none" style={{ color }}>{dim.score}</span>
-          <span className="font-mono text-[13px] px-1.5 py-0.5 rounded-sm mb-1"
-            style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}>
-            {statusLabel}
-          </span>
-        </div>
-
-        {/* Progress bar */}
-        <div className="mt-2 w-full h-[4px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
-          <motion.div
-            className="h-full rounded-full"
-            style={{ background: color }}
-            initial={{ width: 0 }}
-            animate={{ width: `${dim.score}%` }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-          />
-        </div>
-
-        <p className="font-mono text-[12px] text-white/30 mt-1.5 leading-tight truncate">{dim.driver}</p>
-
-        {/* Improvement 4: Show impact sentence on collapsed cards */}
-        {!isExpanded && businessImpact && (
-          <p className="font-mono text-[11px] mt-1 leading-tight truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>
-            {businessImpact}
-          </p>
-        )}
+      {/* Left: big number */}
+      <div className="flex flex-col items-center justify-center px-4 py-4 min-w-[90px]"
+        style={{ background: `${card.color}08` }}>
+        <span className="font-mono text-[10px] font-bold tracking-[0.15em] mb-1" style={{ color: `${card.color}90` }}>
+          {labels[card.id] ?? card.id}
+        </span>
+        <span className="font-mono text-[24px] font-bold leading-none" style={{ color: card.color }}>
+          {card.value}
+        </span>
       </div>
 
-      {/* Expanded content */}
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="px-3 pb-3 border-t border-white/5 pt-2.5">
-              {/* Detail paragraph */}
-              <p className="text-[12px] text-white/45 leading-relaxed mb-3">{dim.detail}</p>
-
-              {/* COMO AFETA SEU NEGÓCIO */}
-              {businessImpact && (
-                <div className="mb-3">
-                  <div className="rounded-sm px-2.5 py-2" style={{ background: `${BLUE}12`, border: `1px solid ${BLUE}25` }}>
-                    <span className="font-mono text-[13px] font-bold tracking-[0.15em] block mb-1" style={{ color: '#5dade2' }}>COMO AFETA SEU NEGÓCIO</span>
-                    <p className="text-[12px] text-white/50 leading-relaxed">{businessImpact}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* ONDE RESOLVER */}
-              {modules.length > 0 && (
-                <div className="mb-3">
-                  <span className="font-mono text-[13px] font-bold tracking-[0.15em] text-white/20 block mb-1.5">ONDE RESOLVER</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {modules.map((mod) => (
-                      <span key={mod} className="font-mono text-[12px] px-2 py-1 rounded-sm"
-                        style={{ background: 'rgba(26,82,118,0.15)', color: '#2471a3', border: '1px solid rgba(26,82,118,0.3)' }}>
-                        {'\u2192'} {mod}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Breakdown points */}
-              <div className="flex flex-wrap gap-1.5">
-                {dim.pts.map((p, i) => (
-                  <div key={i} className="flex items-center gap-1 rounded-sm px-1.5 py-0.5"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                    <span className="text-[12px] text-white/25">{p.label}</span>
-                    <span className="font-mono text-[13px] font-bold" style={{ color }}>{p.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Right: content */}
+      <div className="flex flex-col justify-center px-3 py-3 flex-1 min-w-0">
+        <p className="text-[14px] font-semibold text-white/85 leading-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          {card.title}
+        </p>
+        <p className="text-[12px] text-white/50 leading-relaxed mt-1.5">
+          {card.body}
+        </p>
+        <span className="font-mono text-[11px] px-2 py-0.5 rounded-sm mt-2 self-start inline-flex items-center gap-1"
+          style={{ background: 'rgba(26,82,118,0.15)', color: '#2471a3', border: '1px solid rgba(26,82,118,0.3)' }}>
+          &rarr; {card.module}
+        </span>
+      </div>
     </motion.div>
   )
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// ██  STACKED CONTRIBUTION BAR
+// ██  BOTTOM PANEL: Setores / Commodities / Agentes (tabbed)
 // ══════════════════════════════════════════════════════════════════════════
 
-function StackedContributionBar({ dimensions }: { dimensions: DimScore[] }) {
-  const totalWeighted = dimensions.reduce((a, d) => a + d.score * d.weight, 0)
-  if (totalWeighted === 0) return null
-
-  const segments = dimensions.map(d => ({
-    short: d.short,
-    pct: (d.score * d.weight / totalWeighted) * 100,
-    color: dimColor(d.status),
-  }))
-
-  return (
-    <div className="mt-3 w-full max-w-[320px]">
-      {/* Stacked bar */}
-      <div className="flex w-full h-[8px] rounded-full overflow-hidden" style={{ gap: '1px' }}>
-        {segments.map((seg) => (
-          <motion.div
-            key={seg.short}
-            className="h-full first:rounded-l-full last:rounded-r-full"
-            style={{ background: seg.color }}
-            initial={{ width: 0 }}
-            animate={{ width: `${seg.pct}%` }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-          />
-        ))}
-      </div>
-      {/* Tiny labels */}
-      <div className="flex w-full mt-1" style={{ gap: '1px' }}>
-        {segments.map((seg) => (
-          <div key={seg.short} className="text-center" style={{ width: `${seg.pct}%` }}>
-            <span className="font-mono text-[9px] text-white/25 leading-none">{seg.short}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ══════════════════════════════════════════════════════════════════════════
-// ██  DESTAQUES SECTION
-// ══════════════════════════════════════════════════════════════════════════
+type BottomTab = 'setores' | 'commodities' | 'agentes'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function DestaquesSection({ data }: { data: any }) {
-  const sectors = (data.sectors as Array<{ id: string; label?: string; heat: number; change: number }>)
-    .slice()
-    .sort((a, b) => b.heat - a.heat)
-    .slice(0, 3)
+function BottomPanel({ data }: { data: any }) {
+  const [tab, setTab] = useState<BottomTab>('setores')
 
-  const commodities = Object.entries(data.commodities as Record<string, { label?: string; delta: number }>)
-    .filter(([, c]) => Math.abs(c.delta) > 1)
-    .map(([key, c]) => ({ key, label: c.label ?? key, delta: c.delta }))
+  const sectors = useMemo(() => {
+    const raw = data.sectors as Array<{ id: string; label?: string; heat: number; change: number; trend?: string }>
+    return [...raw].sort((a, b) => b.heat - a.heat)
+  }, [data.sectors])
 
-  if (sectors.length === 0 && commodities.length === 0) return null
+  const commodities = useMemo(() => {
+    const raw = data.commodities as Record<string, { label?: string; value?: number; delta: number }>
+    return Object.entries(raw).map(([key, c]) => ({
+      key,
+      label: c.label ?? key,
+      value: c.value,
+      delta: c.delta,
+    }))
+  }, [data.commodities])
+
+  const agents = useMemo(() => {
+    const raw = data.globalAgents as Array<{ id: string; label?: string; delta: number }>
+    return raw
+  }, [data.globalAgents])
 
   const trendColor = (val: number) => val > 0 ? GREEN : val < 0 ? RED : AMBER
+  const tabs: { key: BottomTab; label: string }[] = [
+    { key: 'setores', label: 'SETORES' },
+    { key: 'commodities', label: 'COMMODITIES' },
+    { key: 'agentes', label: 'AGENTES GLOBAIS' },
+  ]
+
+  const maxHeat = Math.max(...sectors.map(s => s.heat), 1)
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}
-      className="rounded-lg px-3 py-3"
-      style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.06)' }}
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.5 }}
+      className="rounded-lg overflow-hidden"
+      style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}
     >
-      {/* Row 1: Setores */}
-      {sectors.length > 0 && (
-        <div className="mb-2.5">
-          <span className="font-mono text-[11px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">SETORES EM DESTAQUE</span>
-          <div className="flex flex-wrap gap-1.5">
-            {sectors.map((s) => (
-              <span
-                key={s.id}
-                className="font-mono text-[11px] px-2 py-0.5 rounded-sm inline-flex items-center gap-1"
-                style={{
-                  background: `${trendColor(s.change)}10`,
-                  color: trendColor(s.change),
-                  border: `1px solid ${trendColor(s.change)}25`,
-                }}
-              >
-                {s.label ?? s.id} {s.heat}/100 {s.change > 0 ? '\u25B2' : '\u25BC'}{Math.abs(s.change).toFixed(1)}%
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Tab buttons */}
+      <div className="flex border-b border-white/5">
+        {tabs.map(t => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className="flex-1 py-2 font-mono text-[11px] font-bold tracking-[0.15em] transition-colors"
+            style={{
+              color: tab === t.key ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)',
+              background: tab === t.key ? 'rgba(255,255,255,0.04)' : 'transparent',
+              borderBottom: tab === t.key ? `2px solid ${BLUE}` : '2px solid transparent',
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
 
-      {/* Row 2: Commodities */}
-      {commodities.length > 0 && (
-        <div>
-          <span className="font-mono text-[11px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">COMMODITIES EM MOVIMENTO</span>
-          <div className="flex flex-wrap gap-1.5">
-            {commodities.map((c) => (
-              <span
-                key={c.key}
-                className="font-mono text-[11px] px-2 py-0.5 rounded-sm inline-flex items-center gap-1"
-                style={{
-                  background: `${trendColor(c.delta)}10`,
-                  color: trendColor(c.delta),
-                  border: `1px solid ${trendColor(c.delta)}25`,
-                }}
-              >
-                {c.label} {c.delta > 0 ? '\u25B2' : '\u25BC'}{Math.abs(c.delta).toFixed(1)}%
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Tab content */}
+      <div className="px-3 py-2.5">
+        <AnimatePresence mode="wait">
+          {tab === 'setores' && (
+            <motion.div key="setores" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+              <div className="flex flex-col gap-0.5 overflow-x-auto">
+                {sectors.map(s => {
+                  const color = (s.trend === 'up' || s.change > 0) ? GREEN : (s.trend === 'down' || s.change < 0) ? RED : AMBER
+                  const barW = Math.max(4, (s.heat / maxHeat) * 100)
+                  return (
+                    <div key={s.id} className="flex items-center gap-2" style={{ height: 28 }}>
+                      <span className="font-mono text-[11px] text-white/50 w-[80px] shrink-0 truncate">{s.label ?? s.id}</span>
+                      <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                        <motion.div
+                          className="h-full rounded-full"
+                          style={{ background: color }}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${barW}%` }}
+                          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                        />
+                      </div>
+                      <span className="font-mono text-[11px] w-[32px] text-right" style={{ color: 'rgba(255,255,255,0.4)' }}>{s.heat}</span>
+                      <span className="font-mono text-[11px] w-[52px] text-right" style={{ color }}>
+                        {s.change > 0 ? '\u25B2' : s.change < 0 ? '\u25BC' : '\u25CF'}{Math.abs(s.change).toFixed(1)}%
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </motion.div>
+          )}
+
+          {tab === 'commodities' && (
+            <motion.div key="commodities" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+              <div className="flex flex-wrap gap-2 py-1">
+                {commodities.map(c => {
+                  const color = trendColor(c.delta)
+                  return (
+                    <span key={c.key} className="font-mono text-[12px] px-2.5 py-1.5 rounded-md inline-flex items-center gap-1.5"
+                      style={{ background: `${color}10`, color, border: `1px solid ${color}25` }}>
+                      <span className="text-white/60">{c.label}</span>
+                      {c.value != null && <span className="font-bold">${c.value.toFixed(2)}</span>}
+                      <span>{c.delta > 0 ? '\u25B2' : '\u25BC'}{Math.abs(c.delta).toFixed(1)}%</span>
+                    </span>
+                  )
+                })}
+              </div>
+            </motion.div>
+          )}
+
+          {tab === 'agentes' && (
+            <motion.div key="agentes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+              <div className="flex flex-wrap gap-2 py-1">
+                {agents.map(a => {
+                  const color = trendColor(a.delta)
+                  return (
+                    <span key={a.id} className="font-mono text-[12px] px-2.5 py-1.5 rounded-md inline-flex items-center gap-1.5"
+                      style={{ background: `${color}10`, color, border: `1px solid ${color}25` }}>
+                      <span className="text-white/60">{a.label ?? a.id}</span>
+                      <span className="font-bold">{a.delta > 0 ? '\u25B2' : '\u25BC'}{Math.abs(a.delta).toFixed(1)}%</span>
+                    </span>
+                  )
+                })}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.div>
   )
 }
@@ -436,113 +263,36 @@ function DestaquesSection({ data }: { data: any }) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function MacroSection({ data }: { data: any }) {
-  const dimensions = useMemo(() => buildDimensions(data), [data])
-
-  // ── Accordion state — only one expanded at a time, -1 = none ──
-  const [expandedIdx, setExpandedIdx] = useState<number>(-1)
-
-  const handleToggle = useCallback((i: number) => {
-    setExpandedIdx(prev => prev === i ? -1 : i)
-  }, [])
-
-  const marketScore = useMemo(() => Math.round(dimensions.reduce((a, d) => a + d.score * d.weight, 0)), [dimensions])
-  const scoreStatus = marketScore >= 65 ? 'good' : marketScore >= 45 ? 'warning' : 'critical'
-  const scoreColor  = scoreStatus === 'good' ? GREEN : scoreStatus === 'warning' ? AMBER : RED
-  const scoreLabel  = scoreStatus === 'good' ? 'SAUDÁVEL' : scoreStatus === 'warning' ? 'MODERADO' : 'CRÍTICO'
-
-  // ── Hero summary sentence ──
-  const heroSummary = marketScore >= 65
-    ? `Ambiente saudável: condições favoráveis para crescer e investir.`
-    : marketScore >= 45
-    ? `Ambiente moderado: crescimento existe mas juro alto freia expansão.`
-    : `Ambiente crítico: foco em resiliência e eficiência operacional.`
-
-  // ── Improvement 2: Dynamic question header ──
-  const questionHeader = useMemo(() => dynamicQuestionHeader(dimensions, data), [dimensions, data])
-
-  // ── Improvement 1: Find lowest/highest score indices ──
-  const { lowestIdx, highestIdx } = useMemo(() => {
-    let lo = 0, hi = 0
-    for (let i = 1; i < dimensions.length; i++) {
-      if (dimensions[i].score < dimensions[lo].score) lo = i
-      if (dimensions[i].score > dimensions[hi].score) hi = i
-    }
-    return { lowestIdx: lo, highestIdx: hi }
-  }, [dimensions])
+  const headline = useMemo(() => buildHeadline(data), [data])
+  const insights = useMemo(() => buildInsights(data), [data])
 
   return (
     <div className="flex flex-col gap-4 px-4 pb-8">
 
-      {/* Pulse animation keyframes */}
-      <style>{`
-        @keyframes pulse-glow {
-          0%, 100% { box-shadow: 0 0 12px ${RED}25; }
-          50% { box-shadow: 0 0 20px ${RED}40; }
-        }
-      `}</style>
-
-      {/* ── 1. QUESTION HEADER ── */}
-      <div className="text-center mb-4">
-        <p className="font-mono text-[12px] font-bold tracking-[0.3em] text-white/20 uppercase">Análise Macroeconômica</p>
-        <h2 className="text-[15px] font-semibold text-white/60 mt-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          {questionHeader === 'O que está movendo a economia?'
-            ? <>O que está movendo a <span className="text-white/90">economia</span>?</>
-            : <span className="text-white/90">{questionHeader}</span>
-          }
+      {/* ── 1. DYNAMIC HEADLINE ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="text-center mb-2"
+      >
+        <p className="font-mono text-[11px] font-bold tracking-[0.3em] text-white/20 uppercase mb-2">Briefing Econômico</p>
+        <h2 className="text-[17px] font-semibold text-white/70 leading-snug" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          {headline.before}
+          <span className="text-white/95">{headline.highlight}</span>
+          {headline.after}
         </h2>
+      </motion.div>
+
+      {/* ── 2. FOUR INSIGHT CARDS ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {insights.map((card, i) => (
+          <InsightCardComponent key={card.id} card={card} index={i} />
+        ))}
       </div>
 
-      {/* ── 2. MARKET SCORE HERO ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-        className="flex flex-col items-center"
-      >
-        <span className="font-mono font-bold leading-none" style={{ color: scoreColor, fontSize: 36 }}>{marketScore}</span>
-        <span className="font-mono text-[13px] font-bold tracking-[0.2em] mt-1.5 px-2.5 py-0.5 rounded-sm"
-          style={{ background: `${scoreColor}15`, color: scoreColor, border: `1px solid ${scoreColor}30` }}>
-          {scoreLabel}
-        </span>
-        <p className="text-[13px] text-white/50 leading-relaxed text-center mt-2 max-w-[320px]">{heroSummary}</p>
-
-        {/* Thin progress bar */}
-        <div className="mt-3 w-full max-w-[280px] h-[4px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
-          <motion.div
-            className="h-full rounded-full"
-            style={{ background: scoreColor }}
-            initial={{ width: 0 }}
-            animate={{ width: `${marketScore}%` }}
-            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          />
-        </div>
-
-        {/* Improvement 3: Stacked contribution bar */}
-        <StackedContributionBar dimensions={dimensions} />
-      </motion.div>
-
-      {/* ── 3. DIMENSION CARDS GRID ── */}
-      <motion.div
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: 0.15 }}
-        className="grid grid-cols-2 md:grid-cols-4 gap-3"
-      >
-        {dimensions.map((dim, i) => (
-          <DimensionCard
-            key={dim.short}
-            dim={dim}
-            isExpanded={expandedIdx === i}
-            onToggle={() => handleToggle(i)}
-            businessImpact={businessImpactSentence(dim, data)}
-            glowType={
-              lowestIdx === highestIdx ? 'none'
-                : i === lowestIdx ? 'critical'
-                : i === highestIdx ? 'best'
-                : 'none'
-            }
-          />
-        ))}
-      </motion.div>
-
-      {/* ── 4. DESTAQUES SECTION ── */}
-      <DestaquesSection data={data} />
+      {/* ── 3-5. BOTTOM PANEL: Setores / Commodities / Agentes ── */}
+      <BottomPanel data={data} />
 
     </div>
   )
