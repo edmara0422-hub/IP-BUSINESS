@@ -14,7 +14,7 @@ const STEP = 2
 function ProgressRail({ progress }: { progress: number }) {
   return (
     <motion.div
-      className="mx-auto mt-32 w-[min(28rem,80vw)] overflow-hidden rounded-[1.4rem] border border-white/14 px-4 py-3"
+      className="mx-auto w-[min(28rem,80vw)] overflow-hidden rounded-[1.4rem] border border-white/14 px-4 py-3"
       style={{
         background:
           'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(157,165,174,0.08) 12%, rgba(12,12,14,0.82) 48%, rgba(6,6,7,0.96) 100%)',
@@ -97,8 +97,9 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.12),transparent_18%),radial-gradient(circle_at_50%_78%,rgba(173,181,192,0.06),transparent_24%),linear-gradient(180deg,rgba(3,3,3,0.12)_0%,rgba(3,3,3,0.62)_56%,rgba(3,3,3,0.92)_100%)]" />
 
-      <div className="relative flex min-h-screen flex-col items-center justify-center px-5 text-center" style={{ paddingBottom: '12vh' }}>
-        <div className="w-full max-w-4xl" style={{ marginTop: '8vh' }}>
+      {/* Logo central */}
+      <div className="relative flex min-h-screen flex-col items-center justify-center px-5 text-center">
+        <div className="w-full max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -127,12 +128,13 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           >
             Intelligence Platform BUSINESS
           </motion.p>
-
-          <div className="mx-auto max-w-2xl">
-            <ProgressRail progress={progress} />
-          </div>
           </motion.div>
         </div>
+      </div>
+
+      {/* Barra de progresso — fixada no fundo, separada do logo */}
+      <div className="absolute bottom-[8vh] left-1/2 -translate-x-1/2 w-full max-w-2xl px-5">
+        <ProgressRail progress={progress} />
       </div>
     </motion.div>
   )
