@@ -126,6 +126,39 @@ function InsightCardComponent({ card, index }: { card: InsightCard; index: numbe
 
 type BottomTab = 'setores' | 'commodities' | 'agentes'
 
+// ── Contexto inteligente por setor ──
+const SECTOR_CONTEXT: Record<string, string> = {
+  tech:      'IA e cloud computing puxam crescimento. Empresas que adotam tech escalam mais rápido e reduzem custo operacional.',
+  agro:      'Brasil é líder global em exportação agrícola. Dólar alto favorece exportador mas encarece insumos importados.',
+  health:    'MedTech e telemedicina crescem pós-pandemia. Regulação pesada mas mercado resiliente a ciclos econômicos.',
+  energy:    'Transição energética acelera. Solar e eólica crescem 20%+ a.a. Petróleo ainda domina mas perde espaço.',
+  fintech:   'Pix, open banking e crédito digital transformam o setor. Nubank e Inter lideram. Regulação do BC aumenta.',
+  logistics: 'E-commerce impulsiona logística last-mile. Automação de armazéns e frota elétrica são tendências fortes.',
+  services:  'Setor sensível a PIB — cresce quando economia expande, contrai rápido em recessão.',
+  retail:    'Varejo físico perde espaço para e-commerce. Juro alto mata crédito ao consumidor e comprime vendas.',
+  media:     'Mídia tradicional em declínio estrutural. Audiência migrou para digital. Modelo de negócio quebrado.',
+}
+
+// ── Contexto por commodity ──
+const COMMODITY_CONTEXT: Record<string, (delta: number) => string> = {
+  gold:    (d) => d > 0 ? 'Ouro subindo = investidores buscam proteção. Sinal de incerteza global.' : 'Ouro caindo = confiança no mercado aumenta. Dinheiro sai de porto seguro para risco.',
+  oil:     (d) => d > 0 ? 'Petróleo subindo = frete e energia ficam mais caros. Pressiona inflação e custo logístico.' : 'Petróleo caindo = alívio nos custos de transporte e energia. Bom para margens.',
+  silver:  (d) => d > 0 ? 'Prata sobe com demanda industrial (eletrônicos, solar) e como reserva de valor.' : 'Prata cai — menor demanda industrial ou dólar fortalecendo.',
+  grains:  (d) => d > 0 ? 'Grãos subindo = custo de alimentação sobe. Pressiona inflação de alimentos no Brasil.' : 'Grãos caindo = alívio na cesta básica. Bom para poder de compra do consumidor.',
+  copper:  (d) => d > 0 ? 'Cobre subindo = sinal de atividade industrial global. Usado em construção, eletrônicos e energia.' : 'Cobre caindo = desaceleração industrial. Indicador antecedente de recessão.',
+  lithium: (d) => d > 0 ? 'Lítio subindo = demanda por baterias e veículos elétricos aquecida.' : 'Lítio caindo = excesso de oferta ou desaceleração do mercado de EVs.',
+}
+
+// ── Contexto por agente global ──
+const AGENT_CONTEXT: Record<string, (delta: number) => string> = {
+  aapl:  (d) => d > 0 ? 'Apple subindo = consumo premium aquecido. Bom sinal para produtos de alto valor agregado.' : 'Apple caindo = consumidor premium recua. Pode indicar desaceleração de gastos discricionários.',
+  googl: (d) => d > 0 ? 'Google subindo = mercado de ads aquecido. CPC pode subir, encarecendo aquisição de clientes.' : 'Google caindo = investidores preocupados com IA concorrente. CPC pode cair — oportunidade.',
+  meta:  (d) => d > 0 ? 'Meta subindo = mais anunciantes competindo. CPM sobe, seu custo de ads no Instagram/Facebook aumenta.' : 'Meta caindo = anunciantes reduzindo budget. CPM pode cair — janela para escalar ads.',
+  amzn:  (d) => d > 0 ? 'Amazon subindo = e-commerce e cloud crescem. Pressão competitiva no varejo online aumenta.' : 'Amazon caindo = desaceleração do e-commerce global. Menos competição mas também menos demanda.',
+  vale:  (d) => d > 0 ? 'Vale subindo = minério de ferro valorizado. Dólar real e Ibovespa se beneficiam. Bom para PIB.' : 'Vale caindo = China desacelerando compra de minério. Impacto negativo no PIB e câmbio.',
+  petr:  (d) => d > 0 ? 'Petrobras subindo = petróleo valorizado + dividendos atraentes. Combustível pode subir.' : 'Petrobras caindo = petróleo desvaloriza ou risco político. Combustível pode cair — bom para frete.',
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function BottomPanel({ data }: { data: any }) {
   const [tab, setTab] = useState<BottomTab>('setores')
@@ -190,26 +223,30 @@ function BottomPanel({ data }: { data: any }) {
         <AnimatePresence mode="wait">
           {tab === 'setores' && (
             <motion.div key="setores" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-              <div className="flex flex-col gap-0.5 overflow-x-auto">
+              <div className="flex flex-col gap-2">
                 {sectors.map(s => {
                   const color = (s.trend === 'up' || s.change > 0) ? GREEN : (s.trend === 'down' || s.change < 0) ? RED : AMBER
                   const barW = Math.max(4, (s.heat / maxHeat) * 100)
+                  const ctx = SECTOR_CONTEXT[s.id]
                   return (
-                    <div key={s.id} className="flex items-center gap-2" style={{ height: 28 }}>
-                      <span className="font-mono text-[11px] text-white/50 w-[80px] shrink-0 truncate">{s.label ?? s.id}</span>
-                      <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                        <motion.div
-                          className="h-full rounded-full"
-                          style={{ background: color }}
-                          initial={{ width: 0 }}
-                          animate={{ width: `${barW}%` }}
-                          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                        />
+                    <div key={s.id} className="rounded-md overflow-hidden" style={{ background: 'rgba(0,0,0,0.2)', borderLeft: `3px solid ${color}` }}>
+                      <div className="px-3 py-2">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[13px] font-semibold text-white/60">{s.label ?? s.id}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-[11px] text-white/30">heat {s.heat}/100</span>
+                            <span className="font-mono text-[12px] font-bold" style={{ color }}>
+                              {s.change > 0 ? '\u25B2' : s.change < 0 ? '\u25BC' : '\u25CF'}{Math.abs(s.change).toFixed(1)}%
+                            </span>
+                          </div>
+                        </div>
+                        <div className="h-[4px] rounded-full overflow-hidden mb-1.5" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                          <motion.div className="h-full rounded-full" style={{ background: color }}
+                            initial={{ width: 0 }} animate={{ width: `${barW}%` }}
+                            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }} />
+                        </div>
+                        {ctx && <p className="text-[11px] text-white/35 leading-snug">{ctx}</p>}
                       </div>
-                      <span className="font-mono text-[11px] w-[32px] text-right" style={{ color: 'rgba(255,255,255,0.4)' }}>{s.heat}</span>
-                      <span className="font-mono text-[11px] w-[52px] text-right" style={{ color }}>
-                        {s.change > 0 ? '\u25B2' : s.change < 0 ? '\u25BC' : '\u25CF'}{Math.abs(s.change).toFixed(1)}%
-                      </span>
                     </div>
                   )
                 })}
@@ -219,16 +256,23 @@ function BottomPanel({ data }: { data: any }) {
 
           {tab === 'commodities' && (
             <motion.div key="commodities" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-              <div className="flex flex-wrap gap-2 py-1">
+              <div className="flex flex-col gap-2">
                 {commodities.map(c => {
                   const color = trendColor(c.delta)
+                  const ctx = COMMODITY_CONTEXT[c.key]
                   return (
-                    <span key={c.key} className="font-mono text-[12px] px-2.5 py-1.5 rounded-md inline-flex items-center gap-1.5"
-                      style={{ background: `${color}10`, color, border: `1px solid ${color}25` }}>
-                      <span className="text-white/60">{c.label}</span>
-                      {c.value != null && <span className="font-bold">${c.value.toFixed(2)}</span>}
-                      <span>{c.delta > 0 ? '\u25B2' : '\u25BC'}{Math.abs(c.delta).toFixed(1)}%</span>
-                    </span>
+                    <div key={c.key} className="rounded-md px-3 py-2" style={{ background: 'rgba(0,0,0,0.2)', borderLeft: `3px solid ${color}` }}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[13px] font-semibold text-white/60">{c.label}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-[13px] font-bold text-white/70">${c.value != null ? (c.value > 1000 ? c.value.toFixed(0) : c.value.toFixed(2)) : '—'}</span>
+                          <span className="font-mono text-[12px] font-bold" style={{ color }}>
+                            {c.delta > 0 ? '\u25B2' : '\u25BC'}{Math.abs(c.delta).toFixed(1)}%
+                          </span>
+                        </div>
+                      </div>
+                      {ctx && <p className="text-[11px] text-white/35 leading-snug">{ctx(c.delta)}</p>}
+                    </div>
                   )
                 })}
               </div>
@@ -237,15 +281,20 @@ function BottomPanel({ data }: { data: any }) {
 
           {tab === 'agentes' && (
             <motion.div key="agentes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-              <div className="flex flex-wrap gap-2 py-1">
+              <div className="flex flex-col gap-2">
                 {agents.map(a => {
                   const color = trendColor(a.delta)
+                  const ctx = AGENT_CONTEXT[a.id]
                   return (
-                    <span key={a.id} className="font-mono text-[12px] px-2.5 py-1.5 rounded-md inline-flex items-center gap-1.5"
-                      style={{ background: `${color}10`, color, border: `1px solid ${color}25` }}>
-                      <span className="text-white/60">{a.label ?? a.id}</span>
-                      <span className="font-bold">{a.delta > 0 ? '\u25B2' : '\u25BC'}{Math.abs(a.delta).toFixed(1)}%</span>
-                    </span>
+                    <div key={a.id} className="rounded-md px-3 py-2" style={{ background: 'rgba(0,0,0,0.2)', borderLeft: `3px solid ${color}` }}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[13px] font-semibold text-white/60">{a.label ?? a.id}</span>
+                        <span className="font-mono text-[13px] font-bold" style={{ color }}>
+                          {a.delta > 0 ? '\u25B2+' : '\u25BC'}{Math.abs(a.delta).toFixed(1)}%
+                        </span>
+                      </div>
+                      {ctx && <p className="text-[11px] text-white/35 leading-snug">{ctx(a.delta)}</p>}
+                    </div>
                   )
                 })}
               </div>
