@@ -12,6 +12,7 @@ type Tab = 'business' | 'estudo' | 'admin'
 const AbaBusiness = dynamic(() => import('@/components/AbaBusiness'), { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
 const AbaEstudo = dynamic(() => import('@/components/AbaEstudo'), { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
 const AbaWorkspace = dynamic(() => import('@/components/AbaTrabalhar'), { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
+const WorkspaceOnboarding = dynamic(() => import('@/components/WorkspaceOnboarding'), { ssr: false, loading: () => null })
 
 function ShellBackdrop() {
   return (
@@ -207,6 +208,7 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
 
 export default function MainApp() {
   const [activeTab, setActiveTab] = useState<Tab>('business')
+  const [workspaceReady, setWorkspaceReady] = useState(false)
   const { profile } = useAuth()
 
   return (
@@ -228,7 +230,7 @@ export default function MainApp() {
           <AnimatePresence mode="wait">
             {activeTab === 'business' && <AbaBusiness key="business" />}
             {activeTab === 'estudo'   && <AbaEstudo key="estudo" />}
-            {activeTab === 'admin'    && <AbaWorkspace key="workspace" />}
+            {activeTab === 'admin' && (workspaceReady ? <AbaWorkspace key="workspace" /> : <WorkspaceOnboarding key="onboarding" onComplete={() => setWorkspaceReady(true)} />)}
           </AnimatePresence>
         </div>
       </div>
