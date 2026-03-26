@@ -51,7 +51,7 @@ export default function CockpitFinanceiro({ marketData }: { marketData: any }) {
 
   const selicRate = marketData?.macro?.selic?.value ?? 13.75
   const ipcaRate = marketData?.macro?.ipca?.value ?? 4.5
-  const usdRate = marketData?.currencies?.USD ?? 5.20
+  const usdRate = marketData?.macro?.usdBrl?.value ?? 5.72
 
   const metricCards = [
     { label: 'Margem', value: `${fmtDec(metrics.margem)}%`, color: colorByRange(metrics.margem, 20, 10), desc: '(receita - despesas) / receita' },
@@ -93,7 +93,7 @@ export default function CockpitFinanceiro({ marketData }: { marketData: any }) {
           value={value}
           onChange={e => setter(Number(e.target.value) || 0)}
           className="bg-transparent outline-none w-full"
-          style={{ fontSize: 16, fontFamily: 'monospace', color: '#fff', border: 'none' }}
+          style={{ fontSize: 14, fontFamily: 'monospace', color: '#fff', border: 'none' }}
         />
       </div>
     </div>
@@ -143,8 +143,8 @@ export default function CockpitFinanceiro({ marketData }: { marketData: any }) {
               style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${m.color}` }}
             >
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>{m.label}</div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: m.color, fontFamily: 'monospace' }}>{m.value}</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 4 }}>{m.desc}</div>
+              <div className="truncate" style={{ fontSize: 16, fontWeight: 700, color: m.color, fontFamily: 'monospace', lineHeight: 1.2 }}>{m.value}</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 4, lineHeight: 1.3 }}>{m.desc}</div>
             </motion.div>
           ))}
         </div>
