@@ -71,8 +71,8 @@ const SECTOR_MAP: Record<string, string> = {
   economia: 'Macro', mercado: 'Setores', tecnologia: 'Tech', startups: 'Inovação', inovacao: 'Inovação',
 }
 
-const NEG_WORDS = /queda|cai|perde|crise|risco|inflação|alta de juros/i
-const POS_WORDS = /sobe|cresce|alta|recorde|oportunidade|investimento/i
+const NEG_WORDS = /queda|cai|perde|crise|risco|inflação|alta de juros|desacelera|retrai|recua|déficit|inadimplência|demissão|falência|prejuízo/i
+const POS_WORDS = /sobe|cresce|alta|recorde|oportunidade|investimento|expansão|lucro|avança|acelera|contrata|supera|otimismo/i
 
 function getSentiment(title: string): 'POSITIVO' | 'NEGATIVO' | 'NEUTRO' {
   if (NEG_WORDS.test(title)) return 'NEGATIVO'
@@ -84,6 +84,102 @@ const SENTIMENT_COLORS: Record<string, string> = {
   POSITIVO: '#1e8449',
   NEGATIVO: '#c0392b',
   NEUTRO: '#9a7d0a',
+}
+
+// ── Conecta notícia aos dados de mercado ──
+const INDICATOR_KEYWORDS: Array<{ pattern: RegExp; indicator: string; getImpact: (data: any) => string }> = [
+  {
+    pattern: /selic|juros|copom|banco central|taxa básica/i,
+    indicator: 'SELIC',
+    getImpact: (d) => {
+      const s = d?.macro?.selic?.value ?? 14.75
+      return `SELIC em ${s.toFixed(1)}% → financiamento bancário a ~${(s * 2.5).toFixed(0)}% a.a. para empresas`
+    },
+  },
+  {
+    pattern: /inflação|ipca|preços ao consumidor|cesta básica|carestia/i,
+    indicator: 'IPCA',
+    getImpact: (d) => {
+      const i = d?.macro?.ipca?.value ?? 4.83
+      return `IPCA em ${i.toFixed(2)}% → poder de compra do consumidor ${i > 4.75 ? 'caindo' : 'estável'}`
+    },
+  },
+  {
+    pattern: /dólar|câmbio|real|moeda|forex|usd/i,
+    indicator: 'USD/BRL',
+    getImpact: (d) => {
+      const u = d?.macro?.usdBrl?.value ?? 5.72
+      return `Dólar R$${u.toFixed(2)} → insumos importados ${u > 5.5 ? 'mais caros' : 'controlados'}`
+    },
+  },
+  {
+    pattern: /pib|crescimento|economia brasileira|atividade econômica|recessão/i,
+    indicator: 'PIB',
+    getImpact: (d) => {
+      const p = d?.macro?.pib?.value ?? 2.9
+      return `PIB ${p > 0 ? '+' : ''}${p.toFixed(1)}% → demanda ${p > 2 ? 'em expansão' : p > 0 ? 'fraca' : 'contraindo'}`
+    },
+  },
+  {
+    pattern: /petróleo|petrobras|combustível|gasolina|diesel|brent|wti/i,
+    indicator: 'PETRÓLEO',
+    getImpact: (d) => {
+      const o = d?.commodities?.oil
+      return o ? `Petróleo US$${o.value?.toFixed(0)} (${o.delta > 0 ? '▲' : '▼'}${Math.abs(o.delta).toFixed(1)}%) → frete e energia ${o.delta > 0 ? 'mais caros' : 'aliviando'}` : 'Impacta custo de frete e energia'
+    },
+  },
+  {
+    pattern: /ouro|gold|reserva de valor|porto seguro/i,
+    indicator: 'OURO',
+    getImpact: (d) => {
+      const g = d?.commodities?.gold
+      return g ? `Ouro US$${g.value?.toFixed(0)} (${g.delta > 0 ? '▲' : '▼'}${Math.abs(g.delta).toFixed(1)}%) → ${g.delta > 0 ? 'investidores buscam proteção' : 'confiança no mercado'}` : 'Sinal de sentimento global'
+    },
+  },
+  {
+    pattern: /tech|tecnologia|ia|inteligência artificial|startup|inovação|apple|google|meta|microsoft|nvidia/i,
+    indicator: 'TECH',
+    getImpact: (d) => {
+      const t = d?.sectors?.find((s: any) => s.id === 'tech')
+      return t ? `Setor tech heat ${t.heat}/100 (${t.change > 0 ? '▲' : '▼'}${Math.abs(t.change).toFixed(1)}%) → ${t.heat > 70 ? 'aquecido, bom para adoção digital' : 'desacelerando'}` : 'Impacta setor de tecnologia'
+    },
+  },
+  {
+    pattern: /varejo|consumo|shopping|loja|e-commerce|marketplace|compras/i,
+    indicator: 'VAREJO',
+    getImpact: (d) => {
+      const r = d?.sectors?.find((s: any) => s.id === 'retail')
+      const s = d?.macro?.selic?.value ?? 14.75
+      return r ? `Varejo heat ${r.heat}/100 — SELIC ${s.toFixed(1)}% ${s > 12 ? 'trava crédito ao consumidor' : 'permite financiamento'}` : 'Impacta setor de varejo'
+    },
+  },
+  {
+    pattern: /agro|agrícola|soja|milho|commodit|safra|exportação/i,
+    indicator: 'AGRO',
+    getImpact: (d) => {
+      const a = d?.sectors?.find((s: any) => s.id === 'agro')
+      const u = d?.macro?.usdBrl?.value ?? 5.72
+      return a ? `Agro heat ${a.heat}/100 — dólar R$${u.toFixed(2)} ${u > 5.3 ? 'favorece exportador' : 'comprime margem'}` : 'Impacta agronegócio'
+    },
+  },
+  {
+    pattern: /bolsa|ibovespa|b3|ações|mercado financeiro|investidor|fundos/i,
+    indicator: 'MERCADO',
+    getImpact: (d) => {
+      const s = d?.macro?.selic?.value ?? 14.75
+      return `SELIC ${s.toFixed(1)}% → ${s > 12 ? 'renda fixa atrai mais que bolsa — pressão vendedora' : 'capital volta pra risco'}`
+    },
+  },
+]
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getNewsImpact(title: string, data: any): { indicator: string; impact: string } | null {
+  for (const kw of INDICATOR_KEYWORDS) {
+    if (kw.pattern.test(title)) {
+      return { indicator: kw.indicator, impact: kw.getImpact(data) }
+    }
+  }
+  return null
 }
 
 // Thin ticker line
@@ -120,13 +216,15 @@ function NewsTicker({ news }: { news: NewsItem[] }) {
   )
 }
 
-function RichNewsCard({ item, index, isNew }: { item: NewsItem; index: number; isNew: boolean }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function RichNewsCard({ item, index, isNew, marketData }: { item: NewsItem; index: number; isNew: boolean; marketData?: any }) {
   const [expanded, setExpanded] = useState(false)
   const meta = CAT_META[item.category] ?? CAT_META.all
   const minsOld = Math.floor((Date.now() - new Date(item.pubDate).getTime()) / 60000)
   const sentiment = getSentiment(item.title)
   const sentimentColor = SENTIMENT_COLORS[sentiment]
   const sector = SECTOR_MAP[item.category] ?? 'Geral'
+  const newsImpact = marketData ? getNewsImpact(item.title, marketData) : null
 
   return (
     <motion.div className="relative rounded-lg overflow-hidden cursor-pointer"
@@ -189,6 +287,19 @@ function RichNewsCard({ item, index, isNew }: { item: NewsItem; index: number; i
           {item.title}
         </p>
 
+        {/* Impacto no mercado */}
+        {newsImpact && (
+          <div className="mt-2 rounded-sm px-2.5 py-1.5" style={{ background: `${sentimentColor}08`, border: `1px solid ${sentimentColor}15` }}>
+            <div className="flex items-center gap-1.5">
+              <span className="font-mono text-[8px] font-bold px-1.5 py-0.5 rounded-sm shrink-0"
+                style={{ background: `${sentimentColor}20`, color: sentimentColor }}>
+                {newsImpact.indicator}
+              </span>
+              <span className="text-[11px] text-white/45 leading-snug">{newsImpact.impact}</span>
+            </div>
+          </div>
+        )}
+
         {/* Expanded content */}
         <AnimatePresence>
           {expanded && (
@@ -206,7 +317,8 @@ function RichNewsCard({ item, index, isNew }: { item: NewsItem; index: number; i
   )
 }
 
-function NewsFeed() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function NewsFeed({ marketData }: { marketData?: any }) {
   const [news, setNews] = useState<NewsItem[]>([])
   const [filter, setFilter] = useState<string>('all')
   const [loading, setLoading] = useState(true)
@@ -302,7 +414,7 @@ function NewsFeed() {
           <motion.div key={filter} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
             {filtered.slice(0, 6).map((n, i) => (
-              <RichNewsCard key={n.id} item={n} index={i} isNew={isNew(n.id)} />
+              <RichNewsCard key={n.id} item={n} index={i} isNew={isNew(n.id)} marketData={marketData} />
             ))}
           </motion.div>
         </AnimatePresence>
@@ -503,7 +615,7 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
 
       {/* ══ BLOCO 2: FEED DE NOTÍCIAS ══ */}
       <div className="rounded-sm px-4 py-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
-        <NewsFeed />
+        <NewsFeed marketData={data} />
       </div>
 
       {/* ══ AI INSIGHT ══ */}
