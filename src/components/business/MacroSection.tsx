@@ -297,4 +297,3 @@ export default function MacroSection({ data }: { data: any }) {
     </div>
   )
 }
-// deploy trigger 1774486186
