@@ -14,7 +14,7 @@ const STEP = 2
 function ProgressRail({ progress }: { progress: number }) {
   return (
     <motion.div
-      className="mx-auto mt-16 w-[min(28rem,80vw)] overflow-hidden rounded-[1.4rem] border border-white/14 px-4 py-3"
+      className="mx-auto mt-32 w-[min(28rem,80vw)] overflow-hidden rounded-[1.4rem] border border-white/14 px-4 py-3"
       style={{
         background:
           'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(157,165,174,0.08) 12%, rgba(12,12,14,0.82) 48%, rgba(6,6,7,0.96) 100%)',
