@@ -21,12 +21,12 @@ const ORBIT_BADGES = [
 
 // ── Diferenciais que rotacionam no centro ──
 const DIFERENCIAIS = [
-  { title: 'Dados macro reais', desc: 'BCB, IBGE, Yahoo Finance — não é mock' },
-  { title: 'IA que cruza tudo', desc: 'Groq/Llama analisa seus dados + mercado em tempo real' },
-  { title: 'De PF a LTDA', desc: 'O app cresce com você — iniciante ou empresa' },
-  { title: 'Consultoria automatizada', desc: 'O que custa R$50-200k, o IPB faz com IA grátis' },
-  { title: 'Motor acadêmico', desc: 'Base do BI em Negócios da PUCPR — não é achismo' },
-  { title: 'Workspace completo', desc: 'Cockpit, pricing, cenários, ESG — tudo conectado ao mercado' },
+  { title: 'Mercado em tempo real', desc: 'SELIC, câmbio, inflação, setores — dados reais atualizados a cada minuto' },
+  { title: 'IA que cruza seus dados', desc: 'Inteligência artificial analisa o mercado e mostra como afeta SEU negócio' },
+  { title: 'De PF a LTDA', desc: 'O app cresce com você — de iniciante a empresa estabelecida' },
+  { title: 'Decisão, não diagnóstico', desc: 'Não mostra só números — entrega a ação que você precisa tomar agora' },
+  { title: 'Base acadêmica real', desc: 'Motor lógico construído sobre o BI em Negócios da PUCPR' },
+  { title: 'Workspace inteligente', desc: 'Cockpit financeiro, pricing, cenários e ESG conectados ao mercado ao vivo' },
 ]
 
 export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
