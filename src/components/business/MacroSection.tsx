@@ -41,6 +41,7 @@ interface InsightCard {
   body: string
   color: string
   module: string
+  affects: string
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,10 +69,10 @@ function buildInsights(data: any): InsightCard[] {
   const demandaBody = `PIB ${pib > 0 ? '+' : ''}${pib.toFixed(1)}%. ${pib > 2.5 ? 'Consumo em expansão — bom momento para investir em aquisição e contratar.' : pib > 0 ? 'Crescimento fraco — foque em eficiência antes de expandir.' : 'Contração — modo sobrevivência: corte custos, proteja caixa.'}`
 
   return [
-    { id: 'CREDITO', value: `${selic.toFixed(1)}%`, title: creditTitle, body: creditBody, color: creditColor, module: 'Cenários & Forecast' },
-    { id: 'INFLACAO', value: `${ipca.toFixed(2)}%`, title: inflaTitle, body: inflaBody, color: inflaColor, module: 'Smart Pricing' },
-    { id: 'CAMBIO', value: `R$${usd.toFixed(2)}`, title: cambioTitle, body: cambioBody, color: cambioColor, module: 'Cenários & Forecast' },
-    { id: 'DEMANDA', value: `${pib > 0 ? '+' : ''}${pib.toFixed(1)}%`, title: demandaTitle, body: demandaBody, color: demandaColor, module: 'Cockpit Financeiro' },
+    { id: 'CREDITO', value: `${selic.toFixed(1)}%`, title: creditTitle, body: creditBody, color: creditColor, module: 'Cenários & Forecast', affects: selic > 12 ? 'PME, varejo, startups em growth' : 'Funding, expansão, contratação' },
+    { id: 'INFLACAO', value: `${ipca.toFixed(2)}%`, title: inflaTitle, body: inflaBody, color: inflaColor, module: 'Smart Pricing', affects: ipca > 4.75 ? 'Preço, demanda, cesta básica' : 'Poder de compra estável' },
+    { id: 'CAMBIO', value: `R$${usd.toFixed(2)}`, title: cambioTitle, body: cambioBody, color: cambioColor, module: 'Cenários & Forecast', affects: usd > 5.5 ? 'Custo, insumos, SaaS em dólar' : 'Importação acessível' },
+    { id: 'DEMANDA', value: `${pib > 0 ? '+' : ''}${pib.toFixed(1)}%`, title: demandaTitle, body: demandaBody, color: demandaColor, module: 'Cockpit Financeiro', affects: pib > 2.5 ? 'Aquisição, escala, contratação' : pib > 0 ? 'Eficiência operacional' : 'Corte de custos, caixa' },
   ]
 }
 
@@ -110,6 +111,9 @@ function InsightCardComponent({ card, index }: { card: InsightCard; index: numbe
         </p>
         <p className="text-[12px] text-white/50 leading-relaxed mt-1.5">
           {card.body}
+        </p>
+        <p className="font-mono text-[10px] text-white/30 mt-1.5">
+          Afeta: <span className="text-white/45">{card.affects}</span>
         </p>
         <span className="font-mono text-[11px] px-2 py-0.5 rounded-sm mt-2 self-start inline-flex items-center gap-1"
           style={{ background: 'rgba(26,82,118,0.15)', color: '#2471a3', border: '1px solid rgba(26,82,118,0.3)' }}>
@@ -339,6 +343,85 @@ export default function MacroSection({ data, ai }: { data: any; ai?: any }) {
           <InsightCardComponent key={card.id} card={card} index={i} />
         ))}
       </div>
+
+      {/* ── CASCATAS: cruzamento de indicadores ── */}
+      {(() => {
+        const { selic, ipca, pib, usd } = getValues(data)
+        const taxaReal = (selic - ipca).toFixed(2)
+        const meta = data?.globalAgents?.find((a: any) => a.id === 'meta')
+        const cacD = data?.marketing?.cacTrend?.delta ?? 12
+        const retailHeat = data?.sectors?.find((s: any) => s.id === 'retail')?.heat ?? 20
+        const agroHeat = data?.sectors?.find((s: any) => s.id === 'agro')?.heat ?? 80
+        const techHeat = data?.sectors?.find((s: any) => s.id === 'tech')?.heat ?? 70
+
+        const cascades: Array<{ cross: string; insight: string; color: string }> = []
+
+        // SELIC + IPCA = taxa real
+        cascades.push({
+          cross: `SELIC ${selic.toFixed(1)}% + IPCA ${ipca.toFixed(2)}%`,
+          insight: `Taxa real de ${taxaReal}% — ${parseFloat(taxaReal) > 8 ? 'um dos maiores juros reais do mundo. Renda fixa paga mais que bolsa, capital foge de risco.' : parseFloat(taxaReal) > 5 ? 'juro real elevado. Investimento produtivo perde pra renda fixa.' : 'juro real moderado. Capital começa a voltar pra risco.'}`,
+          color: parseFloat(taxaReal) > 8 ? RED : parseFloat(taxaReal) > 5 ? AMBER : GREEN,
+        })
+
+        // Câmbio + Meta = CPM
+        if (meta) {
+          const cpmImpact = ((usd / 4.5 - 1) * 100).toFixed(0)
+          cascades.push({
+            cross: `Dólar R$${usd.toFixed(2)} + Meta ${meta.delta > 0 ? '▲' : '▼'}${Math.abs(meta.delta).toFixed(1)}%`,
+            insight: `CPM em reais sobe ${cpmImpact}% pelo câmbio${meta.delta > 0 ? ' + leilão mais competitivo' : ''}. ${cacD > 10 ? `CAC subindo ${cacD.toFixed(0)}% — custo de aquisição vai piorar.` : 'CAC ainda gerenciável.'}`,
+            color: cacD > 15 ? RED : cacD > 8 ? AMBER : GREEN,
+          })
+        }
+
+        // SELIC + Varejo
+        if (selic > 12 && retailHeat < 40) {
+          cascades.push({
+            cross: `SELIC ${selic.toFixed(1)}% + Varejo heat ${retailHeat}/100`,
+            insight: `Juro alto mata crédito ao consumidor → varejo contrai. Cada ponto de SELIC acima de 10% retira ~3% da demanda discricionária.`,
+            color: RED,
+          })
+        }
+
+        // PIB + Agro + Câmbio
+        if (pib > 2 && agroHeat > 70) {
+          cascades.push({
+            cross: `PIB +${pib.toFixed(1)}% + Agro ${agroHeat}/100 + Dólar R$${usd.toFixed(2)}`,
+            insight: `Economia crescendo + agro aquecido + dólar alto = exportadores com margem recorde. B2B agritech é oportunidade.`,
+            color: GREEN,
+          })
+        }
+
+        // Tech + PIB
+        if (techHeat > 75) {
+          cascades.push({
+            cross: `Tech ${techHeat}/100 + PIB +${pib.toFixed(1)}%`,
+            insight: `Setor tech aquecido com economia crescendo = janela para lançar produtos digitais e captar funding.`,
+            color: GREEN,
+          })
+        }
+
+        return cascades.length > 0 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="rounded-lg overflow-hidden"
+            style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}
+          >
+            <div className="px-4 py-3">
+              <span className="font-mono text-[11px] font-bold tracking-[0.15em] text-white/25 block mb-3">CASCATAS — CRUZAMENTO DE INDICADORES</span>
+              <div className="flex flex-col gap-2.5">
+                {cascades.map((c, i) => (
+                  <div key={i} className="rounded-md px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.2)', borderLeft: `3px solid ${c.color}` }}>
+                    <span className="font-mono text-[11px] font-bold text-white/50 block mb-1">{c.cross}</span>
+                    <p className="text-[12px] text-white/40 leading-snug">{c.insight}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        ) : null
+      })()}
 
       {/* ══ AI INSIGHTS ══ */}
       {ai?.macro_insights?.length > 0 && (
