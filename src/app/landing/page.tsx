@@ -19,7 +19,18 @@ function Divider() {
   return <div className="mx-auto h-px w-full max-w-5xl silver-divider opacity-40" />
 }
 
-function CTAButton() {
+function CTAButton({ onClick }: { onClick?: () => void }) {
+  if (onClick) {
+    return (
+      <button
+        onClick={onClick}
+        className="group inline-flex items-center justify-center gap-2 rounded-[1rem] border border-white/12 bg-white/[0.06] px-10 py-3.5 text-[11px] uppercase tracking-[0.24em] text-white/72 backdrop-blur transition hover:bg-white/[0.1] hover:text-white/90"
+      >
+        Entrar no IPB
+        <span className="inline-block transition group-hover:translate-x-0.5">&#8594;</span>
+      </button>
+    )
+  }
   return (
     <Link
       href="/login"
@@ -50,7 +61,7 @@ function Card({ children, className = '' }: { children: React.ReactNode; classNa
   )
 }
 
-export default function LandingPage() {
+export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
   return (
     <main className="relative min-h-screen bg-[#050507] text-white selection:bg-white/20 overflow-x-hidden">
       {/* ── HERO ── */}
@@ -87,7 +98,7 @@ export default function LandingPage() {
             Dados reais. IA que cruza. Acao que transforma.
           </p>
           <div className="mt-10">
-            <CTAButton />
+            <CTAButton onClick={onEnter} />
           </div>
         </motion.div>
 
@@ -311,7 +322,7 @@ export default function LandingPage() {
             Decisao mais rapida. Mais precisa. Com menos custo.
           </p>
           <div className="mt-10">
-            <CTAButton />
+            <CTAButton onClick={onEnter} />
           </div>
         </motion.div>
 

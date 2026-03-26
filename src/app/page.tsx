@@ -16,12 +16,16 @@ const LoginForm = dynamic(() => import('@/app/login/LoginForm'), {
   loading: () => null,
 })
 
-
+const LandingPage = dynamic(() => import('@/app/landing/page'), {
+  ssr: false,
+  loading: () => null,
+})
 
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true)
+  const [showLanding, setShowLanding] = useState(true)
   const [justLoggedIn, setJustLoggedIn] = useState(false)
-  const { user, profile, loading } = useAuth()
+  const { user, loading } = useAuth()
 
   const handleLogin = useCallback(() => {
     setJustLoggedIn(true)
@@ -43,10 +47,10 @@ export default function Home() {
     return <LoginForm onLogin={handleLogin} />
   }
 
-  // 3. Logado → Splash depois MainApp
+  // 3. Logado → Splash
   if (showSplash) {
     return (
-      <main className="min-h-screen bg-ocean-900">
+      <main className="min-h-screen bg-[#030303]">
         <AnimatePresence mode="wait">
           <SplashScreen key="splash" onComplete={() => setShowSplash(false)} />
         </AnimatePresence>
@@ -54,6 +58,12 @@ export default function Home() {
     )
   }
 
+  // 4. Logado → Landing (introdução ao app)
+  if (showLanding) {
+    return <LandingPage onEnter={() => setShowLanding(false)} />
+  }
+
+  // 5. App
   return (
     <main className="min-h-screen bg-ocean-900">
       <MainApp />
