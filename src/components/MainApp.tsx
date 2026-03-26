@@ -230,7 +230,7 @@ export default function MainApp() {
           <AnimatePresence mode="wait">
             {activeTab === 'business' && <AbaBusiness key="business" />}
             {activeTab === 'estudo'   && <AbaEstudo key="estudo" />}
-            {activeTab === 'admin' && (workspaceReady ? <AbaWorkspace key="workspace" /> : <WorkspaceOnboarding key="onboarding" onComplete={() => setWorkspaceReady(true)} />)}
+            {activeTab === 'admin' && (workspaceReady ? <AbaWorkspace key="workspace" /> : <WorkspaceOnboarding key="onboarding" onComplete={(_p) => setWorkspaceReady(true)} />)}
           </AnimatePresence>
         </div>
       </div>
