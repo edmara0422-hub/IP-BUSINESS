@@ -175,21 +175,7 @@ export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
           </AnimatePresence>
         </motion.div>
 
-        {/* Dots indicadores */}
-        <div className="flex gap-1.5 mt-3 mb-8">
-          {DIFERENCIAIS.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveIdx(i)}
-              className="rounded-full transition-all duration-300"
-              style={{
-                width: activeIdx === i ? 16 : 4,
-                height: 4,
-                background: activeIdx === i ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.12)',
-              }}
-            />
-          ))}
-        </div>
+        <div className="mb-8" />
 
         {/* CTA */}
         <motion.button
@@ -206,15 +192,6 @@ export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
         </motion.button>
       </div>
 
-      {/* ── Footer ── */}
-      <motion.p
-        className="absolute bottom-6 text-[8px] uppercase tracking-[0.3em] text-white/12"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
-      >
-        Intelligence Platform BUSINESS &copy; 2026
-      </motion.p>
     </div>
   )
 }

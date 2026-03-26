@@ -42,8 +42,11 @@ export default function Home() {
     )
   }
 
-  // 2. Não logado → Login
+  // 2. Não logado → Landing → Login
   if (!isLoggedIn) {
+    if (showLanding) {
+      return <LandingPage onEnter={() => setShowLanding(false)} />
+    }
     return <LoginForm onLogin={handleLogin} />
   }
 
@@ -58,12 +61,7 @@ export default function Home() {
     )
   }
 
-  // 4. Logado → Landing (introdução ao app)
-  if (showLanding) {
-    return <LandingPage onEnter={() => setShowLanding(false)} />
-  }
-
-  // 5. App
+  // 4. App
   return (
     <main className="min-h-screen bg-ocean-900">
       <MainApp />
