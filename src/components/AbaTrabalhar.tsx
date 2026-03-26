@@ -15,6 +15,9 @@ import {
   Lightbulb,
   ChevronDown,
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+
+const IAAdvisor = dynamic(() => import('@/components/workspace/IAAdvisor'), { ssr: false })
 
 interface ModuleConfig {
   id: number
@@ -299,51 +302,58 @@ export default function AbaTrabalhar() {
                       className="px-4 pb-4 pt-1 space-y-3"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {/* Descriptions */}
-                      <div className="space-y-1.5">
-                        {mod.descriptions.map((desc, i) => (
-                          <p key={i} className="text-[13px] text-white/60 leading-relaxed">
-                            {desc}
-                          </p>
-                        ))}
-                      </div>
+                      {/* IA Advisor: show chat instead of text */}
+                      {mod.id === 1 ? (
+                        <IAAdvisor marketData={marketData} />
+                      ) : (
+                        <>
+                          {/* Descriptions */}
+                          <div className="space-y-1.5">
+                            {mod.descriptions.map((desc, i) => (
+                              <p key={i} className="text-[13px] text-white/60 leading-relaxed">
+                                {desc}
+                              </p>
+                            ))}
+                          </div>
 
-                      {/* Connection Badges */}
-                      <div className="flex flex-wrap gap-2">
-                        {mod.connectsTo.map((conn, i) => (
-                          <span
-                            key={i}
-                            className="text-[11px] px-2.5 py-1 rounded-md"
+                          {/* Connection Badges */}
+                          <div className="flex flex-wrap gap-2">
+                            {mod.connectsTo.map((conn, i) => (
+                              <span
+                                key={i}
+                                className="text-[11px] px-2.5 py-1 rounded-md"
+                                style={{
+                                  background: 'rgba(26,82,118,0.15)',
+                                  color: '#2471a3',
+                                }}
+                              >
+                                → Conecta com: {conn}
+                              </span>
+                            ))}
+                          </div>
+
+                          {/* Live Data or Building Message */}
+                          <div
+                            className="rounded-md px-3 py-2.5 text-[12px] leading-relaxed"
                             style={{
-                              background: 'rgba(26,82,118,0.15)',
-                              color: '#2471a3',
+                              background: isConnected
+                                ? 'rgba(39,174,96,0.08)'
+                                : 'rgba(243,156,18,0.08)',
+                              borderLeft: `3px solid ${isConnected ? '#27ae6050' : '#f39c1250'}`,
                             }}
                           >
-                            → Conecta com: {conn}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* Live Data or Building Message */}
-                      <div
-                        className="rounded-md px-3 py-2.5 text-[12px] leading-relaxed"
-                        style={{
-                          background: isConnected
-                            ? 'rgba(39,174,96,0.08)'
-                            : 'rgba(243,156,18,0.08)',
-                          borderLeft: `3px solid ${isConnected ? '#27ae6050' : '#f39c1250'}`,
-                        }}
-                      >
-                        {isConnected && mod.liveData ? (
-                          <span className="text-white/60">
-                            {mod.liveData(marketData)}
-                          </span>
-                        ) : (
-                          <span className="text-white/40 italic">
-                            Este módulo será ativado em breve com IA e dados reais
-                          </span>
-                        )}
-                      </div>
+                            {isConnected && mod.liveData ? (
+                              <span className="text-white/60">
+                                {mod.liveData(marketData)}
+                              </span>
+                            ) : (
+                              <span className="text-white/40 italic">
+                                Este módulo será ativado em breve com IA e dados reais
+                              </span>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </div>
                   </motion.div>
                 )}
