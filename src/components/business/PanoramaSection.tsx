@@ -149,15 +149,15 @@ function RichNewsCard({ item, index, isNew }: { item: NewsItem; index: number; i
       <div className="px-3 py-3">
         {/* Top row: category badge + sector + NOVO badge */}
         <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
-          <span className="font-mono text-[7px] font-bold tracking-[0.15em] uppercase px-1.5 py-0.5 rounded-sm"
+          <span className="font-mono text-[9px] font-bold tracking-[0.12em] uppercase px-2 py-0.5 rounded-sm"
             style={{ background: `${meta.color}20`, color: meta.color, border: `1px solid ${meta.color}33` }}>
             {meta.label}
           </span>
-          <span className="font-mono text-[7px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded-sm"
+          <span className="font-mono text-[8px] tracking-[0.1em] uppercase px-1.5 py-0.5 rounded-sm"
             style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
             {sector}
           </span>
-          <span className="font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm"
+          <span className="font-mono text-[8px] font-bold px-1.5 py-0.5 rounded-sm"
             style={{ background: `${sentimentColor}18`, color: sentimentColor, border: `1px solid ${sentimentColor}33` }}>
             {sentiment}
           </span>
@@ -172,13 +172,13 @@ function RichNewsCard({ item, index, isNew }: { item: NewsItem; index: number; i
 
         {/* Source + time */}
         <div className="flex items-center gap-1.5 mb-1">
-          <span className="font-mono text-[8px] text-white/25">{item.source}</span>
-          <span className="font-mono text-[8px] text-white/15">·</span>
-          <span className="font-mono text-[8px] text-white/15">{timeAgo(item.pubDate)}</span>
+          <span className="font-mono text-[9px] text-white/30">{item.source}</span>
+          <span className="font-mono text-[9px] text-white/15">·</span>
+          <span className="font-mono text-[9px] text-white/20">{timeAgo(item.pubDate)}</span>
         </div>
 
         {/* Title */}
-        <p className="text-[11px] font-medium leading-snug"
+        <p className="text-[13px] font-medium leading-snug"
           style={{
             color: expanded ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.55)',
             WebkitLineClamp: expanded ? undefined : 2,
@@ -194,7 +194,7 @@ function RichNewsCard({ item, index, isNew }: { item: NewsItem; index: number; i
           {expanded && (
             <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
               <a href={item.link} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 mt-2.5 font-mono text-[9px] hover:underline"
+                className="inline-flex items-center gap-1 mt-2.5 font-mono text-[11px] hover:underline"
                 style={{ color: meta.color }} onClick={e => e.stopPropagation()}>
                 Ver notícia completa ↗
               </a>

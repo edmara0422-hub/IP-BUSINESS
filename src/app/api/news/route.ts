@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server'
 
-async function safeFetch(url: string, ms = 4000): Promise<Response | null> {
+async function safeFetch(url: string, ms = 5000): Promise<Response | null> {
   try {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), ms)
-    const res = await fetch(url, { signal: controller.signal, cache: 'no-store' })
+    const res = await fetch(url, {
+      signal: controller.signal,
+      cache: 'no-store',
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; IPB/1.0)' },
+    })
     clearTimeout(timer)
     return res.ok ? res : null
   } catch { return null }
@@ -58,24 +62,25 @@ function parseItems(xml: string, category: string, defaultSource = 'RSS'): NewsI
 const SOURCES = [
   // Economia BR
   { url: 'https://www.infomoney.com.br/feed/', category: 'economia', source: 'InfoMoney' },
-  { url: 'https://valor.globo.com/rss/valor', category: 'economia', source: 'Valor Econômico' },
   { url: 'https://agenciabrasil.ebc.com.br/rss/economia/feed.xml', category: 'economia', source: 'Agência Brasil' },
+  { url: 'https://rss.uol.com.br/feed/economia.xml', category: 'economia', source: 'UOL Economia' },
+  { url: 'https://news.google.com/rss/search?q=economia+Brasil+SELIC+inflação&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'economia', source: 'Google News' },
 
   // Mercado financeiro
-  { url: 'https://www.infomoney.com.br/mercados/feed/', category: 'mercado', source: 'InfoMoney' },
-  { url: 'https://br.investing.com/rss/news.rss', category: 'mercado', source: 'Investing.com' },
+  { url: 'https://feeds.folha.uol.com.br/mercado/rss091.xml', category: 'mercado', source: 'Folha Mercado' },
+  { url: 'https://g1.globo.com/rss/g1/economia/', category: 'mercado', source: 'G1 Economia' },
+  { url: 'https://news.google.com/rss/search?q=bolsa+ibovespa+dólar+mercado+financeiro&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'mercado', source: 'Google News' },
 
-  // Inovação e Tecnologia
-  { url: 'https://www.tecmundo.com.br/rss', category: 'tecnologia', source: 'TecMundo' },
+  // Tecnologia
   { url: 'https://canaltech.com.br/rss/', category: 'tecnologia', source: 'Canaltech' },
   { url: 'https://techcrunch.com/feed/', category: 'tecnologia', source: 'TechCrunch' },
 
   // Startups e Negócios
-  { url: 'https://startups.com.br/feed/', category: 'startups', source: 'Startups.com.br' },
-  { url: 'https://www.infomoney.com.br/negocios/feed/', category: 'startups', source: 'InfoMoney' },
+  { url: 'https://news.google.com/rss/search?q=startups+Brasil+venture+capital&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'startups', source: 'Google News' },
+  { url: 'https://feeds.folha.uol.com.br/empreendedorismo/rss091.xml', category: 'startups', source: 'Folha Empreendedorismo' },
 
   // Inovação
-  { url: 'https://epocanegocios.globo.com/rss/epocanegocios', category: 'inovacao', source: 'Época Negócios' },
+  { url: 'https://news.google.com/rss/search?q=inovação+inteligência+artificial+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'inovacao', source: 'Google News' },
 ]
 
 let cache: { data: { news: NewsItem[]; updatedAt: string } | null; ts: number } = { data: null, ts: 0 }
