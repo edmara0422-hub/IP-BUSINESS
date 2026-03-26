@@ -33,7 +33,12 @@ export default function Home() {
 
   const isLoggedIn = !!user || justLoggedIn
 
-  // 1. Loading auth
+  // 1. Landing — sempre primeira tela
+  if (showLanding) {
+    return <LandingPage onEnter={() => setShowLanding(false)} />
+  }
+
+  // 2. Loading auth
   if (loading && !justLoggedIn) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#050507]">
@@ -42,15 +47,12 @@ export default function Home() {
     )
   }
 
-  // 2. Não logado → Landing → Login
+  // 3. Não logado → Login
   if (!isLoggedIn) {
-    if (showLanding) {
-      return <LandingPage onEnter={() => setShowLanding(false)} />
-    }
     return <LoginForm onLogin={handleLogin} />
   }
 
-  // 3. Logado → Splash
+  // 4. Logado → Splash
   if (showSplash) {
     return (
       <main className="min-h-screen bg-[#030303]">
@@ -61,7 +63,7 @@ export default function Home() {
     )
   }
 
-  // 4. App
+  // 5. App
   return (
     <main className="min-h-screen bg-ocean-900">
       <MainApp />
