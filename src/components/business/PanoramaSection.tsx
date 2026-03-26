@@ -340,18 +340,27 @@ export default function PanoramaSection({ data }: { data: any }) {
       <div>
         <div className="relative rounded-lg border border-white/[0.06] overflow-hidden"
           style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.01) 0%, rgba(0,0,0,0.5) 80%)' }}>
-          {/* Pergunta central — estilo HUD integrado ao globo */}
-          <div className="absolute top-5 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+          {/* Pergunta central — perspectiva 3D dentro do globo */}
+          <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center" style={{ perspective: '800px' }}>
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.5 }}
-              className="text-center px-4 py-1.5 rounded-lg"
-              style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.06)' }}
+              initial={{ opacity: 0, rotateX: 40, scale: 0.7 }}
+              animate={{ opacity: 1, rotateX: 12, scale: 1 }}
+              transition={{ duration: 1.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="text-center"
+              style={{ transformStyle: 'preserve-3d' }}
             >
-              <span className="font-mono text-[13px] font-semibold tracking-wide text-white/50" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                Como está o mercado <span className="text-white/90">agora</span>?
-              </span>
+              <motion.p
+                className="text-[18px] md:text-[22px] font-semibold tracking-wide"
+                style={{
+                  fontFamily: 'Poppins, sans-serif',
+                  color: 'rgba(255,255,255,0.15)',
+                  textShadow: '0 0 40px rgba(255,255,255,0.08), 0 0 80px rgba(255,255,255,0.04)',
+                }}
+                animate={{ opacity: [0.12, 0.2, 0.12] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                Como está o mercado <span style={{ color: 'rgba(255,255,255,0.3)' }}>agora</span>?
+              </motion.p>
             </motion.div>
           </div>
 
