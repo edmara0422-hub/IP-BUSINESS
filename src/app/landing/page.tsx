@@ -22,7 +22,7 @@ function Divider() {
 function CTAButton() {
   return (
     <Link
-      href="/"
+      href="/login"
       className="group inline-flex items-center justify-center gap-2 rounded-[1rem] border border-white/12 bg-white/[0.06] px-10 py-3.5 text-[11px] uppercase tracking-[0.24em] text-white/72 backdrop-blur transition hover:bg-white/[0.1] hover:text-white/90"
     >
       Entrar no IPB
