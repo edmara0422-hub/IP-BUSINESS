@@ -208,7 +208,7 @@ export default function MarketingSection({ data }: { data: any }) {
 
       {/* ── 1. Question Header ── */}
       <div className="text-center mb-4">
-        <p className="font-mono text-[8px] font-bold tracking-[0.3em] text-white/20 uppercase">Performance de Aquisição</p>
+        <p className="font-mono text-[12px] font-bold tracking-[0.3em] text-white/20 uppercase">Performance de Aquisição</p>
         <h2 className="text-[15px] font-semibold text-white/60 mt-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Quanto custa adquirir <span className="text-white/90">cliente</span>?
         </h2>
@@ -218,7 +218,7 @@ export default function MarketingSection({ data }: { data: any }) {
       <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.35)', border: `1px solid ${deltaColor(cacD)}22` }}>
         <div className="h-[2px]" style={{ background: `linear-gradient(90deg, ${deltaColor(cacD)}80, transparent)` }} />
         <div className="p-5">
-          <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/25 block mb-3">
+          <span className="font-mono text-[12px] font-bold tracking-[0.2em] text-white/25 block mb-3">
             QUANTO CUSTA ADQUIRIR 1 CLIENTE?
           </span>
 
@@ -231,30 +231,30 @@ export default function MarketingSection({ data }: { data: any }) {
               <span className="font-mono text-[13px] font-bold" style={{ color: deltaColor(cacD) }}>
                 {cacD > 0 ? '▲' : cacD < 0 ? '▼' : '—'} {Math.abs(cacD).toFixed(1)}%
               </span>
-              <span className="font-mono text-[9px] text-white/25">vs mês anterior</span>
+              <span className="font-mono text-[13px] text-white/25">vs mês anterior</span>
             </div>
           </div>
 
           {/* One-line cause */}
           <div className="rounded-sm px-3 py-2 mb-3 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <span className="font-mono text-[10px] text-white/40">
+            <span className="font-mono text-[12px] text-white/40">
               {cacD > 0 ? 'Subiu' : 'Caiu'} {Math.abs(cacD).toFixed(1)}% porque <span className="text-white/60 font-bold">[{cacExplanation}]</span>
             </span>
           </div>
 
           {/* Admin module badges */}
           <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
-            <span className="font-mono text-[8px] text-white/25">Isso afeta</span>
-            <span className="font-mono text-[8px] font-bold px-2 py-1 rounded-sm"
+            <span className="font-mono text-[12px] text-white/25">Isso afeta</span>
+            <span className="font-mono text-[12px] font-bold px-2 py-1 rounded-sm"
               style={{ background: `${AMBER}15`, color: AMBER, border: `1px solid ${AMBER}30` }}>
               → Smart Pricing
             </span>
-            <span className="font-mono text-[8px] font-bold px-2 py-1 rounded-sm"
+            <span className="font-mono text-[12px] font-bold px-2 py-1 rounded-sm"
               style={{ background: `${AMBER}15`, color: AMBER, border: `1px solid ${AMBER}30` }}>
               → Mercado & Concorrência
             </span>
           </div>
-          <p className="font-mono text-[8px] text-white/20 text-center mt-1.5">
+          <p className="font-mono text-[12px] text-white/20 text-center mt-1.5">
             Reprecie para manter margem · Mude de canal se custo subir
           </p>
         </div>
@@ -264,36 +264,36 @@ export default function MarketingSection({ data }: { data: any }) {
       <div className="grid grid-cols-3 gap-2">
         {/* CPM Médio */}
         <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <span className="font-mono text-[7px] text-white/25 block mb-1.5">CPM MÉDIO</span>
+          <span className="font-mono text-[13px] text-white/25 block mb-1.5">CPM MÉDIO</span>
           <span className="font-mono text-[22px] font-bold text-white/80 block leading-none">US${cpmVal.toFixed(1)}</span>
-          <span className="font-mono text-[10px] font-bold block mt-1" style={{ color: deltaColor(cpmD) }}>
+          <span className="font-mono text-[12px] font-bold block mt-1" style={{ color: deltaColor(cpmD) }}>
             {cpmD > 0 ? '▲' : '▼'}{Math.abs(cpmD).toFixed(1)}%
           </span>
-          <p className="font-mono text-[8px] text-white/25 mt-1.5 leading-relaxed">
+          <p className="font-mono text-[12px] text-white/25 mt-1.5 leading-relaxed">
             {cpmD > 3 ? 'CPM subindo = mais caro aparecer' : cpmD < -2 ? 'CPM caindo = oportunidade de escala' : 'CPM estável — monitorar'}
           </p>
         </div>
 
         {/* CPC Médio */}
         <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <span className="font-mono text-[7px] text-white/25 block mb-1.5">CPC MÉDIO</span>
+          <span className="font-mono text-[13px] text-white/25 block mb-1.5">CPC MÉDIO</span>
           <span className="font-mono text-[22px] font-bold text-white/80 block leading-none">US${cpcVal.toFixed(2)}</span>
-          <span className="font-mono text-[10px] font-bold block mt-1" style={{ color: deltaColor(cpcD) }}>
+          <span className="font-mono text-[12px] font-bold block mt-1" style={{ color: deltaColor(cpcD) }}>
             {cpcD > 0 ? '▲' : '▼'}{Math.abs(cpcD).toFixed(1)}%
           </span>
-          <p className="font-mono text-[8px] text-white/25 mt-1.5 leading-relaxed">
+          <p className="font-mono text-[12px] text-white/25 mt-1.5 leading-relaxed">
             {cpcD > 3 ? 'CPC alto = cliques caros' : cpcD < -2 ? 'CPC caindo = clicks mais baratos' : 'CPC estável — monitorar'}
           </p>
         </div>
 
         {/* Tráfego Orgânico */}
         <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <span className="font-mono text-[7px] text-white/25 block mb-1.5">ORGÂNICO</span>
+          <span className="font-mono text-[13px] text-white/25 block mb-1.5">ORGÂNICO</span>
           <span className="font-mono text-[22px] font-bold text-white/80 block leading-none">{orgVal}%</span>
-          <span className="font-mono text-[10px] font-bold block mt-1" style={{ color: goodDeltaColor(orgD) }}>
+          <span className="font-mono text-[12px] font-bold block mt-1" style={{ color: goodDeltaColor(orgD) }}>
             {orgD > 0 ? '▲' : '▼'}{Math.abs(orgD).toFixed(1)}%
           </span>
-          <p className="font-mono text-[8px] text-white/25 mt-1.5 leading-relaxed">
+          <p className="font-mono text-[12px] text-white/25 mt-1.5 leading-relaxed">
             {orgD < -2 ? 'Orgânico caindo = mais dependência de paid' : orgD > 2 ? 'Orgânico crescendo = menos custo' : 'Orgânico estável'}
           </p>
         </div>
@@ -302,7 +302,7 @@ export default function MarketingSection({ data }: { data: any }) {
       {/* ══ 4. PLATFORM COMPARISON — HORIZONTAL BARS ══ */}
       <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/25">
+          <span className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-white/25">
             PLATAFORMAS — custo comparado
           </span>
         </div>
@@ -338,13 +338,13 @@ export default function MarketingSection({ data }: { data: any }) {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       {/* Icon */}
-                      <div className="w-5 h-5 rounded flex items-center justify-center font-mono text-[8px] font-bold shrink-0"
+                      <div className="w-5 h-5 rounded flex items-center justify-center font-mono text-[12px] font-bold shrink-0"
                         style={{ background: `${barCol}15`, color: barCol }}>
                         {PLATFORM_ICON[p.id] ?? p.label[0]}
                       </div>
-                      <span className="font-mono text-[11px] font-semibold text-white/70">{p.label}</span>
+                      <span className="font-mono text-[13px] font-semibold text-white/70">{p.label}</span>
                       {isBest && (
-                        <span className="font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm"
+                        <span className="font-mono text-[13px] font-bold px-1.5 py-0.5 rounded-sm"
                           style={{ background: `${GREEN}15`, color: GREEN, border: `1px solid ${GREEN}30` }}>
                           MELHOR CUSTO
                         </span>
@@ -352,10 +352,10 @@ export default function MarketingSection({ data }: { data: any }) {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-[12px] font-bold text-white/80">{metric.val}</span>
-                      <span className="font-mono text-[10px] font-bold" style={{ color: dCol }}>
+                      <span className="font-mono text-[12px] font-bold" style={{ color: dCol }}>
                         {metric.delta > 0 ? '▲' : metric.delta < 0 ? '▼' : '—'}{Math.abs(metric.delta).toFixed(1)}%
                       </span>
-                      <span className="text-white/15 text-[9px] shrink-0">{isExpanded ? '▲' : '▼'}</span>
+                      <span className="text-white/15 text-[13px] shrink-0">{isExpanded ? '▲' : '▼'}</span>
                     </div>
                   </div>
 
@@ -371,7 +371,7 @@ export default function MarketingSection({ data }: { data: any }) {
                   </div>
 
                   {/* Best for subtitle */}
-                  <p className="font-mono text-[8px] text-white/25 mt-1.5 leading-relaxed">
+                  <p className="font-mono text-[12px] text-white/25 mt-1.5 leading-relaxed">
                     Melhor para: {bestForShort}
                   </p>
                 </button>
@@ -387,18 +387,18 @@ export default function MarketingSection({ data }: { data: any }) {
 
                         {/* Por que este custo */}
                         <div className="rounded-sm p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">POR QUE ESSE CUSTO</span>
-                          <p className="text-[10px] text-white/45 leading-relaxed">{analysis.why}</p>
+                          <span className="font-mono text-[13px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">POR QUE ESSE CUSTO</span>
+                          <p className="text-[12px] text-white/45 leading-relaxed">{analysis.why}</p>
                         </div>
 
                         {/* Estratégias */}
                         <div>
-                          <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">ESTRATÉGIAS RECOMENDADAS</span>
+                          <span className="font-mono text-[13px] font-bold tracking-[0.2em] text-white/20 block mb-2">ESTRATÉGIAS RECOMENDADAS</span>
                           <div className="flex flex-col gap-1.5">
                             {analysis.strategy.map((s, si) => (
                               <div key={si} className="flex items-start gap-2">
-                                <span className="font-mono text-[9px] shrink-0 mt-0.5" style={{ color: GREEN }}>→</span>
-                                <span className="text-[10px] text-white/40 leading-relaxed">{s}</span>
+                                <span className="font-mono text-[13px] shrink-0 mt-0.5" style={{ color: GREEN }}>→</span>
+                                <span className="text-[12px] text-white/40 leading-relaxed">{s}</span>
                               </div>
                             ))}
                           </div>
@@ -407,12 +407,12 @@ export default function MarketingSection({ data }: { data: any }) {
                         {/* Best for + Risk */}
                         <div className="grid grid-cols-2 gap-2">
                           <div className="rounded-sm p-2.5" style={{ background: `${GREEN}10`, border: `1px solid ${GREEN}25` }}>
-                            <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: GREEN }}>MELHOR PARA</span>
-                            <p className="text-[9px] text-white/35 leading-relaxed">{analysis.bestFor}</p>
+                            <span className="font-mono text-[13px] font-bold tracking-[0.15em] block mb-1" style={{ color: GREEN }}>MELHOR PARA</span>
+                            <p className="text-[13px] text-white/35 leading-relaxed">{analysis.bestFor}</p>
                           </div>
                           <div className="rounded-sm p-2.5" style={{ background: `${AMBER}10`, border: `1px solid ${AMBER}25` }}>
-                            <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: AMBER }}>ATENÇÃO</span>
-                            <p className="text-[9px] text-white/35 leading-relaxed">{analysis.risk}</p>
+                            <span className="font-mono text-[13px] font-bold tracking-[0.15em] block mb-1" style={{ color: AMBER }}>ATENÇÃO</span>
+                            <p className="text-[13px] text-white/35 leading-relaxed">{analysis.risk}</p>
                           </div>
                         </div>
                       </div>
@@ -427,7 +427,7 @@ export default function MarketingSection({ data }: { data: any }) {
 
       {/* ══ 5. AÇÕES RECOMENDADAS — 3 CARDS ══ */}
       <div>
-        <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/20 block mb-3">
+        <span className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-white/20 block mb-3">
           Ações Recomendadas
         </span>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
@@ -444,19 +444,19 @@ export default function MarketingSection({ data }: { data: any }) {
                   borderLeft: `3px solid ${priorityColor}`,
                 }}>
                 {/* Priority badge */}
-                <span className="font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm self-start"
+                <span className="font-mono text-[13px] font-bold px-1.5 py-0.5 rounded-sm self-start"
                   style={{ background: `${priorityColor}15`, color: priorityColor, border: `1px solid ${priorityColor}30` }}>
                   {item.priority}
                 </span>
 
                 {/* Action text */}
-                <p className="font-mono text-[10px] font-bold text-white/60 leading-snug">{item.action}</p>
+                <p className="font-mono text-[12px] font-bold text-white/60 leading-snug">{item.action}</p>
 
                 {/* Impact text */}
-                <p className="font-mono text-[9px] text-white/25 leading-relaxed flex-1">{item.impact}</p>
+                <p className="font-mono text-[13px] text-white/25 leading-relaxed flex-1">{item.impact}</p>
 
                 {/* Module badge */}
-                <span className="inline-block font-mono text-[7px] font-bold px-1.5 py-0.5 rounded-sm self-start"
+                <span className="inline-block font-mono text-[13px] font-bold px-1.5 py-0.5 rounded-sm self-start"
                   style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.35)', border: '1px solid rgba(255,255,255,0.08)' }}>
                   → Resolver em: {adminModule}
                 </span>
@@ -468,7 +468,7 @@ export default function MarketingSection({ data }: { data: any }) {
 
       {/* ══ 6. OPORTUNIDADES (compact) ══ */}
       <div>
-        <span className="font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-white/20 block mb-2">Oportunidades</span>
+        <span className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-white/20 block mb-2">Oportunidades</span>
         <div className="flex flex-col gap-1.5">
           {[...opportunities].sort((a, b) => b.urgency - a.urgency).slice(0, 3).map((o, i) => {
             const col = o.urgency >= 75 ? RED : o.urgency >= 60 ? AMBER : GREEN
@@ -480,8 +480,8 @@ export default function MarketingSection({ data }: { data: any }) {
                 className="flex items-center gap-3 rounded-sm px-3 py-2"
                 style={{ background: 'rgba(0,0,0,0.2)', border: `1px solid ${col}12` }}>
                 <div className="w-[5px] h-[5px] rounded-full shrink-0" style={{ background: col }} />
-                <p className="text-[10px] text-white/50 leading-snug flex-1 min-w-0">{o.label}</p>
-                <span className="font-mono text-[7px] px-1.5 py-0.5 rounded-sm shrink-0"
+                <p className="text-[12px] text-white/50 leading-snug flex-1 min-w-0">{o.label}</p>
+                <span className="font-mono text-[13px] px-1.5 py-0.5 rounded-sm shrink-0"
                   style={{ background: `${col}15`, color: col, border: `1px solid ${col}25` }}>{typeLabel}</span>
               </motion.div>
             )

@@ -172,12 +172,12 @@ function DimensionCard({ dim, isExpanded, onToggle, businessImpact }: {
 
       {/* Collapsed content */}
       <div className="px-3 py-2.5">
-        <p className="font-mono text-[8px] font-bold tracking-[0.1em]" style={{ color }}>{dim.short}</p>
-        <p className="text-[10px] text-white/40 mt-0.5 leading-tight">{dim.label}</p>
+        <p className="font-mono text-[12px] font-bold tracking-[0.1em]" style={{ color }}>{dim.short}</p>
+        <p className="text-[12px] text-white/40 mt-0.5 leading-tight">{dim.label}</p>
 
         <div className="mt-2 flex items-end justify-between">
           <span className="font-mono text-[24px] font-bold leading-none" style={{ color }}>{dim.score}</span>
-          <span className="font-mono text-[7px] px-1.5 py-0.5 rounded-sm mb-1"
+          <span className="font-mono text-[13px] px-1.5 py-0.5 rounded-sm mb-1"
             style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}>
             {statusLabel}
           </span>
@@ -194,7 +194,7 @@ function DimensionCard({ dim, isExpanded, onToggle, businessImpact }: {
           />
         </div>
 
-        <p className="font-mono text-[8px] text-white/30 mt-1.5 leading-tight truncate">{dim.driver}</p>
+        <p className="font-mono text-[12px] text-white/30 mt-1.5 leading-tight truncate">{dim.driver}</p>
       </div>
 
       {/* Expanded content */}
@@ -210,14 +210,14 @@ function DimensionCard({ dim, isExpanded, onToggle, businessImpact }: {
           >
             <div className="px-3 pb-3 border-t border-white/5 pt-2.5">
               {/* Detail paragraph */}
-              <p className="text-[10px] text-white/45 leading-relaxed mb-3">{dim.detail}</p>
+              <p className="text-[12px] text-white/45 leading-relaxed mb-3">{dim.detail}</p>
 
               {/* COMO AFETA SEU NEGÓCIO */}
               {businessImpact && (
                 <div className="mb-3">
                   <div className="rounded-sm px-2.5 py-2" style={{ background: `${BLUE}12`, border: `1px solid ${BLUE}25` }}>
-                    <span className="font-mono text-[7px] font-bold tracking-[0.15em] block mb-1" style={{ color: '#5dade2' }}>COMO AFETA SEU NEGÓCIO</span>
-                    <p className="text-[10px] text-white/50 leading-relaxed">{businessImpact}</p>
+                    <span className="font-mono text-[13px] font-bold tracking-[0.15em] block mb-1" style={{ color: '#5dade2' }}>COMO AFETA SEU NEGÓCIO</span>
+                    <p className="text-[12px] text-white/50 leading-relaxed">{businessImpact}</p>
                   </div>
                 </div>
               )}
@@ -225,10 +225,10 @@ function DimensionCard({ dim, isExpanded, onToggle, businessImpact }: {
               {/* ONDE RESOLVER */}
               {modules.length > 0 && (
                 <div className="mb-3">
-                  <span className="font-mono text-[7px] font-bold tracking-[0.15em] text-white/20 block mb-1.5">ONDE RESOLVER</span>
+                  <span className="font-mono text-[13px] font-bold tracking-[0.15em] text-white/20 block mb-1.5">ONDE RESOLVER</span>
                   <div className="flex flex-wrap gap-1.5">
                     {modules.map((mod) => (
-                      <span key={mod} className="font-mono text-[8px] px-2 py-1 rounded-sm"
+                      <span key={mod} className="font-mono text-[12px] px-2 py-1 rounded-sm"
                         style={{ background: 'rgba(26,82,118,0.15)', color: '#2471a3', border: '1px solid rgba(26,82,118,0.3)' }}>
                         {'\u2192'} {mod}
                       </span>
@@ -242,8 +242,8 @@ function DimensionCard({ dim, isExpanded, onToggle, businessImpact }: {
                 {dim.pts.map((p, i) => (
                   <div key={i} className="flex items-center gap-1 rounded-sm px-1.5 py-0.5"
                     style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                    <span className="text-[8px] text-white/25">{p.label}</span>
-                    <span className="font-mono text-[9px] font-bold" style={{ color }}>{p.value}</span>
+                    <span className="text-[12px] text-white/25">{p.label}</span>
+                    <span className="font-mono text-[13px] font-bold" style={{ color }}>{p.value}</span>
                   </div>
                 ))}
               </div>
@@ -287,7 +287,7 @@ export default function MacroSection({ data }: { data: any }) {
 
       {/* ── 1. QUESTION HEADER ── */}
       <div className="text-center mb-4">
-        <p className="font-mono text-[8px] font-bold tracking-[0.3em] text-white/20 uppercase">Análise Macroeconômica</p>
+        <p className="font-mono text-[12px] font-bold tracking-[0.3em] text-white/20 uppercase">Análise Macroeconômica</p>
         <h2 className="text-[15px] font-semibold text-white/60 mt-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
           O que está movendo a <span className="text-white/90">economia</span>?
         </h2>
@@ -299,11 +299,11 @@ export default function MacroSection({ data }: { data: any }) {
         className="flex flex-col items-center"
       >
         <span className="font-mono font-bold leading-none" style={{ color: scoreColor, fontSize: 36 }}>{marketScore}</span>
-        <span className="font-mono text-[9px] font-bold tracking-[0.2em] mt-1.5 px-2.5 py-0.5 rounded-sm"
+        <span className="font-mono text-[13px] font-bold tracking-[0.2em] mt-1.5 px-2.5 py-0.5 rounded-sm"
           style={{ background: `${scoreColor}15`, color: scoreColor, border: `1px solid ${scoreColor}30` }}>
           {scoreLabel}
         </span>
-        <p className="text-[11px] text-white/50 leading-relaxed text-center mt-2 max-w-[320px]">{heroSummary}</p>
+        <p className="text-[13px] text-white/50 leading-relaxed text-center mt-2 max-w-[320px]">{heroSummary}</p>
 
         {/* Thin progress bar */}
         <div className="mt-3 w-full max-w-[280px] h-[4px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>

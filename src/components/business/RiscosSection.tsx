@@ -349,7 +349,7 @@ function macroContextSentence(selic: number, ipca: number, pib: number): string 
 function ModuleBadge({ name }: { name: string }) {
   return (
     <span
-      className="font-mono text-[8px] px-2 py-1 rounded-sm inline-block"
+      className="font-mono text-[12px] px-2 py-1 rounded-sm inline-block"
       style={{
         background: 'rgba(26,82,118,0.15)',
         color: '#2471a3',
@@ -430,7 +430,7 @@ function TypeBadge({ type, color, small }: { type: string; color: string; small?
   return (
     <motion.span
       className={`font-mono font-bold tracking-[0.15em] rounded-sm text-center ${
-        small ? 'text-[6px] px-1 py-0.5' : 'text-[7px] px-1.5 py-0.5'
+        small ? 'text-[6px] px-1 py-0.5' : 'text-[13px] px-1.5 py-0.5'
       }`}
       style={{
         background: `${color}18`,
@@ -455,18 +455,18 @@ function ExpandedDetail({ chain }: { chain: CausalChain }) {
     <div className="px-4 pb-4 pt-3 space-y-3">
       {/* Full WHY */}
       <div className="rounded-sm p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-        <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/25 block mb-1.5">POR QUE</span>
-        <p className="text-[10px] text-white/55 leading-relaxed">{chain.why}</p>
+        <span className="font-mono text-[13px] font-bold tracking-[0.2em] text-white/25 block mb-1.5">POR QUE</span>
+        <p className="text-[12px] text-white/55 leading-relaxed">{chain.why}</p>
       </div>
 
       {/* Influences */}
       <div>
-        <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">O QUE CAUSA</span>
+        <span className="font-mono text-[13px] font-bold tracking-[0.2em] text-white/20 block mb-2">O QUE CAUSA</span>
         <div className="flex flex-col gap-1.5">
           {chain.influence.map((inf, i) => (
             <div key={i} className="flex items-start gap-2">
               <span className="shrink-0 mt-1 h-1 w-1 rounded-full" style={{ background: col, opacity: 0.5 }} />
-              <span className="text-[9px] text-white/40 leading-relaxed">{inf}</span>
+              <span className="text-[13px] text-white/40 leading-relaxed">{inf}</span>
             </div>
           ))}
         </div>
@@ -474,12 +474,12 @@ function ExpandedDetail({ chain }: { chain: CausalChain }) {
 
       {/* Effects */}
       <div>
-        <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/20 block mb-2">IMPACTO</span>
+        <span className="font-mono text-[13px] font-bold tracking-[0.2em] text-white/20 block mb-2">IMPACTO</span>
         <div className="flex flex-col gap-1.5">
           {chain.effects.map((ef, i) => (
             <div key={i} className="flex items-start gap-2">
-              <span className="font-mono text-[8px] shrink-0 mt-0.5 leading-none" style={{ color: col }}>{'\u2192'}</span>
-              <span className="text-[9px] text-white/45 leading-relaxed">{ef}</span>
+              <span className="font-mono text-[12px] shrink-0 mt-0.5 leading-none" style={{ color: col }}>{'\u2192'}</span>
+              <span className="text-[13px] text-white/45 leading-relaxed">{ef}</span>
             </div>
           ))}
         </div>
@@ -487,19 +487,19 @@ function ExpandedDetail({ chain }: { chain: CausalChain }) {
 
       {/* Full COMO AGIR */}
       <div className="rounded-sm p-2.5" style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}15` }}>
-        <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: GREEN }}>COMO AGIR</span>
-        <p className="text-[9px] text-white/45 leading-relaxed">{chain.action}</p>
+        <span className="font-mono text-[13px] font-bold tracking-[0.2em] block mb-1" style={{ color: GREEN }}>COMO AGIR</span>
+        <p className="text-[13px] text-white/45 leading-relaxed">{chain.action}</p>
       </div>
 
       {/* QUEM E AFETADO */}
       <div className="rounded-sm p-2.5" style={{ background: `${RED}06`, border: `1px solid ${RED}12` }}>
-        <span className="font-mono text-[7px] font-bold tracking-[0.2em] block mb-1" style={{ color: RED }}>QUEM E AFETADO</span>
-        <p className="text-[9px] text-white/40 leading-relaxed">{chain.affected}</p>
+        <span className="font-mono text-[13px] font-bold tracking-[0.2em] block mb-1" style={{ color: RED }}>QUEM E AFETADO</span>
+        <p className="text-[13px] text-white/40 leading-relaxed">{chain.affected}</p>
       </div>
 
       {/* RESOLVER EM */}
       <div className="flex items-center gap-1.5 flex-wrap">
-        <span className="font-mono text-[7px] font-bold tracking-[0.2em] text-white/25">{'\u2192'} RESOLVER EM</span>
+        <span className="font-mono text-[13px] font-bold tracking-[0.2em] text-white/25">{'\u2192'} RESOLVER EM</span>
         {chain.modules.map((mod) => (
           <ModuleBadge key={mod} name={mod} />
         ))}
@@ -540,12 +540,12 @@ function BigRiskCard({ chain, index, isExpanded, onToggle }: {
         {/* Right: text content */}
         <div className="flex-1 min-w-0">
           <p className="text-[12px] font-bold text-white/80 leading-snug mb-1">{chain.title}</p>
-          <p className="text-[9px] text-white/40 leading-relaxed line-clamp-2 mb-1.5">{chain.why}</p>
-          <p className="text-[9px] leading-none mb-1.5" style={{ color: GREEN }}>
+          <p className="text-[13px] text-white/40 leading-relaxed line-clamp-2 mb-1.5">{chain.why}</p>
+          <p className="text-[13px] leading-none mb-1.5" style={{ color: GREEN }}>
             COMO AGIR: {chain.action.split('.')[0]}.
           </p>
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[8px] text-white/25 font-mono">{'\u2192'} Resolver em:</span>
+            <span className="text-[12px] text-white/25 font-mono">{'\u2192'} Resolver em:</span>
             {chain.modules.map((mod) => (
               <ModuleBadge key={mod} name={mod} />
             ))}
@@ -553,7 +553,7 @@ function BigRiskCard({ chain, index, isExpanded, onToggle }: {
         </div>
 
         {/* Expand indicator */}
-        <span className="text-white/20 text-[10px] shrink-0 self-start mt-1">
+        <span className="text-white/20 text-[12px] shrink-0 self-start mt-1">
           {isExpanded ? '\u25B2' : '\u25BC'}
         </span>
       </div>
@@ -614,13 +614,13 @@ function CompactRow({ chain, index, isExpanded, onToggle }: {
         <TypeBadge type={chain.type} color={col} small />
 
         {/* Title */}
-        <p className="text-[10px] text-white/60 flex-1 truncate leading-none">{chain.title}</p>
+        <p className="text-[12px] text-white/60 flex-1 truncate leading-none">{chain.title}</p>
 
         {/* Urgency % */}
-        <span className="font-mono text-[10px] font-bold shrink-0" style={{ color: col }}>{chain.urgency}%</span>
+        <span className="font-mono text-[12px] font-bold shrink-0" style={{ color: col }}>{chain.urgency}%</span>
 
         {/* Expand button */}
-        <span className="text-white/20 text-[9px] shrink-0">{isExpanded ? '\u25B2' : '\u25BC'}</span>
+        <span className="text-white/20 text-[13px] shrink-0">{isExpanded ? '\u25B2' : '\u25BC'}</span>
       </button>
 
       {/* Expanded detail */}
@@ -647,7 +647,7 @@ function SectionDivider({ label, color }: { label: string; color: string }) {
   return (
     <div className="flex items-center gap-2 mt-4 mb-1.5">
       <div className="h-[1px] flex-1" style={{ background: `${color}20` }} />
-      <span className="font-mono text-[7px] font-bold tracking-[0.25em]" style={{ color: `${color}99` }}>
+      <span className="font-mono text-[13px] font-bold tracking-[0.25em]" style={{ color: `${color}99` }}>
         {label}
       </span>
       <div className="h-[1px] flex-1" style={{ background: `${color}20` }} />
@@ -679,14 +679,14 @@ export default function RiscosSection({ data }: { data: any }) {
 
       {/* 1. Question Header */}
       <div className="text-center mb-4">
-        <p className="font-mono text-[8px] font-bold tracking-[0.3em] text-white/20 uppercase">Diagnostico de Riscos</p>
+        <p className="font-mono text-[12px] font-bold tracking-[0.3em] text-white/20 uppercase">Diagnostico de Riscos</p>
         <h2 className="text-[15px] font-semibold text-white/60 mt-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
           O que pode me <span className="text-white/90">quebrar</span>?
         </h2>
       </div>
 
       {/* 2. Macro Context Sentence */}
-      <p className="text-center font-mono text-[9px] text-white/30 italic -mt-3 mb-1">
+      <p className="text-center font-mono text-[13px] text-white/30 italic -mt-3 mb-1">
         {contextSentence}
       </p>
 
