@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bell, BookOpen, Globe, Search, LogOut, Shield, Settings } from 'lucide-react'
+import { Bell, BookOpen, Briefcase, Globe, Search, LogOut, Shield, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -11,7 +11,7 @@ type Tab = 'business' | 'estudo' | 'admin'
 
 const AbaBusiness = dynamic(() => import('@/components/AbaBusiness'), { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
 const AbaEstudo = dynamic(() => import('@/components/AbaEstudo'), { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
-const AbaAdmin = dynamic(() => import('@/components/AbaAdmin'), { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
+const AbaWorkspace = dynamic(() => import('@/components/AbaTrabalhar'), { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
 
 function ShellBackdrop() {
   return (
@@ -197,8 +197,8 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
           onClick={() => onSwitch('admin')}
           className={`flex items-center justify-center gap-1 rounded-[0.9rem] px-2 py-2 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'admin' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
         >
-          <Shield className="h-3 w-3" />
-          <span>ADMIN</span>
+          <Briefcase className="h-3 w-3" />
+          <span>WORKSPACE</span>
         </button>
       </div>
     </motion.div>
@@ -219,7 +219,7 @@ export default function MainApp() {
       <ShellBackdrop />
       <TopBar />
 
-      <div className={`relative z-10 mx-auto flex min-h-screen max-w-7xl px-2 pb-24 md:px-8 md:pb-32 md:pt-28 ${activeTab === 'admin' ? 'items-center justify-center pt-20' : 'items-start pt-[9rem] md:pt-28'}`}>
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-start px-2 pb-24 pt-[9rem] md:px-8 md:pb-32 md:pt-28">
         <div className="command-stage w-full overflow-hidden rounded-[2.2rem]">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.06)_18%,rgba(255,255,255,0.36)_50%,rgba(255,255,255,0.06)_82%,transparent_100%)] opacity-60" />
           <div className="pointer-events-none absolute bottom-0 left-[7%] right-[7%] h-px bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.03)_20%,rgba(255,255,255,0.14)_50%,rgba(255,255,255,0.03)_80%,transparent_100%)] opacity-45" />
@@ -228,7 +228,7 @@ export default function MainApp() {
           <AnimatePresence mode="wait">
             {activeTab === 'business' && <AbaBusiness key="business" />}
             {activeTab === 'estudo'   && <AbaEstudo key="estudo" />}
-            {activeTab === 'admin'    && <AbaAdmin key="admin" />}
+            {activeTab === 'admin'    && <AbaWorkspace key="workspace" />}
           </AnimatePresence>
         </div>
       </div>
