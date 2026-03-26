@@ -261,7 +261,7 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
           <p className="mb-2 text-[12px] uppercase tracking-widest text-white/30">Setor</p>
           <div className="flex flex-wrap gap-2">
             {SECTORS.map((s) => (
-              <Chip key={s} label={s} selected={profile.sectors.join(', ') === s} onClick={() => patch({ sector: s })} />
+              <Chip key={s} label={s} selected={profile.sectors.includes(s)} onClick={() => toggleSector(s)} />
             ))}
           </div>
         </div>
@@ -284,7 +284,7 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
           </div>
         </div>
 
-        {profile.subtype && profile.sectors.join(', ') && profile.revenue && profile.product && (
+        {profile.subtype && profile.sectors.length > 0 && profile.revenue && profile.product && (
           <motion.button
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -364,7 +364,7 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
   }
 
   const renderStep3 = () => {
-    const insights = profile.sectors.join(', ')s.map(s => SECTOR_INSIGHTS[s]).filter(Boolean)
+    const insights = profile.sectors.map(s => SECTOR_INSIGHTS[s]).filter(Boolean)
 
     return (
       <div className="flex flex-col gap-5">
@@ -373,7 +373,7 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
 
         <div className="flex flex-wrap justify-center gap-2">
           {SECTORS.map((s) => (
-            <Chip key={s} label={s} selected={profile.sectors.join(', ')s.includes(s)} onClick={() => toggleSector(s)} />
+            <Chip key={s} label={s} selected={profile.sectors.includes(s)} onClick={() => toggleSector(s)} />
           ))}
         </div>
 
@@ -390,7 +390,7 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
           </motion.div>
         )}
 
-        {profile.sectors.join(', ')s.length > 0 && (
+        {profile.sectors.length > 0 && (
           <motion.button
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
