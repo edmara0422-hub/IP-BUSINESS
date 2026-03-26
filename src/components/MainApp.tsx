@@ -208,7 +208,15 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
 
 export default function MainApp() {
   const [activeTab, setActiveTab] = useState<Tab>('business')
-  const [workspaceReady, setWorkspaceReady] = useState(false)
+  const [workspaceReady, setWorkspaceReady] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('ipb-workspace-ready') === 'true'
+    return false
+  })
+
+  const handleWorkspaceComplete = (_p: unknown) => {
+    setWorkspaceReady(true)
+    localStorage.setItem('ipb-workspace-ready', 'true')
+  }
   const { profile } = useAuth()
 
   return (
@@ -230,7 +238,7 @@ export default function MainApp() {
           <AnimatePresence mode="wait">
             {activeTab === 'business' && <AbaBusiness key="business" />}
             {activeTab === 'estudo'   && <AbaEstudo key="estudo" />}
-            {activeTab === 'admin' && (workspaceReady ? <AbaWorkspace key="workspace" /> : <WorkspaceOnboarding key="onboarding" onComplete={(_p) => setWorkspaceReady(true)} />)}
+            {activeTab === 'admin' && (workspaceReady ? <AbaWorkspace key="workspace" /> : <WorkspaceOnboarding key="onboarding" onComplete={handleWorkspaceComplete} />)}
           </AnimatePresence>
         </div>
       </div>

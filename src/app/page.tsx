@@ -23,7 +23,10 @@ const LandingPage = dynamic(() => import('@/app/landing/page'), {
 
 export default function Home() {
   const [showSplash, setShowSplash] = useState(true)
-  const [showLanding, setShowLanding] = useState(true)
+  const [showLanding, setShowLanding] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('ipb-landing-seen') !== 'true'
+    return true
+  })
   const [justLoggedIn, setJustLoggedIn] = useState(false)
   const { user, loading } = useAuth()
 
@@ -35,7 +38,7 @@ export default function Home() {
 
   // 1. Landing — sempre primeira tela
   if (showLanding) {
-    return <LandingPage onEnter={() => setShowLanding(false)} />
+    return <LandingPage onEnter={() => { setShowLanding(false); localStorage.setItem('ipb-landing-seen', 'true') }} />
   }
 
   // 2. Loading auth
