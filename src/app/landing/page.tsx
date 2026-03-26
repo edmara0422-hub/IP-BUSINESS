@@ -69,36 +69,6 @@ export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
         </motion.svg>
 
         {/* Badges orbitando */}
-        {ORBIT_BADGES.map((badge, i) => {
-          const angle = (i / ORBIT_BADGES.length) * 360
-          return (
-            <motion.div
-              key={badge}
-              className="absolute hidden md:block"
-              style={{
-                left: '50%', top: '50%',
-                width: 0, height: 0,
-              }}
-              animate={{ rotate: [angle, angle + 360] }}
-              transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-            >
-              <motion.span
-                className="absolute font-mono text-[9px] font-bold tracking-[0.12em] uppercase whitespace-nowrap px-2.5 py-1 rounded-full"
-                style={{
-                  transform: `translateX(340px) rotate(-${angle}deg)`,
-                  transformOrigin: '0 0',
-                  background: 'rgba(255,255,255,0.03)',
-                  color: 'rgba(255,255,255,0.20)',
-                  border: '1px solid rgba(255,255,255,0.05)',
-                }}
-                animate={{ rotate: [-angle, -(angle + 360)] }}
-                transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-              >
-                {badge}
-              </motion.span>
-            </motion.div>
-          )
-        })}
       </div>
 
       {/* ── Centro: Logo + Conteúdo ── */}
