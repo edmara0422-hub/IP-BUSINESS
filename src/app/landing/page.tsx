@@ -48,7 +48,7 @@ export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
       </div>
 
       {/* ── Arco orbital com badges ── */}
-      <div className="absolute" style={{ width: 'min(80vw, 520px)', height: 'min(80vw, 520px)' }}>
+      <div className="absolute" style={{ width: 'min(95vw, 700px)', height: 'min(95vw, 700px)' }}>
         {/* Arco SVG girando */}
         <motion.svg
           viewBox="0 0 440 440"
@@ -56,9 +56,9 @@ export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
           animate={{ rotate: 360 }}
           transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
         >
-          <circle cx="220" cy="220" r="200" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-          <circle cx="220" cy="220" r="200" fill="none" stroke="url(#orbit-grad)" strokeWidth="1.5"
-            strokeDasharray="300 960" strokeLinecap="round" />
+          <circle cx="220" cy="220" r="210" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+          <circle cx="220" cy="220" r="210" fill="none" stroke="url(#orbit-grad)" strokeWidth="1.5"
+            strokeDasharray="300 1020" strokeLinecap="round" />
           <defs>
             <linearGradient id="orbit-grad" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="rgba(255,255,255,0)" />
@@ -85,7 +85,7 @@ export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
               <motion.span
                 className="absolute font-mono text-[8px] md:text-[9px] font-bold tracking-[0.12em] uppercase whitespace-nowrap px-2 py-0.5 rounded-full"
                 style={{
-                  transform: `translateX(min(40vw, 210px)) rotate(-${angle}deg)`,
+                  transform: `translateX(min(47vw, 340px)) rotate(-${angle}deg)`,
                   transformOrigin: '0 0',
                   background: 'rgba(255,255,255,0.04)',
                   color: 'rgba(255,255,255,0.25)',
@@ -102,7 +102,7 @@ export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
       </div>
 
       {/* ── Centro: Logo + Conteúdo ── */}
-      <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-lg">
+      <div className="relative z-10 flex flex-col items-center text-center px-8 max-w-md">
 
         {/* IPB */}
         <motion.h1
