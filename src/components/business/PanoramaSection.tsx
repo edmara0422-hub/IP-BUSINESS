@@ -350,17 +350,16 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
               style={{ transformStyle: 'preserve-3d' }}
             >
               <motion.p
-                className="text-[16px] md:text-[20px] font-light tracking-[0.08em]"
+                className="text-[18px] md:text-[24px] font-normal tracking-[0.06em]"
                 style={{
                   fontFamily: 'Poppins, sans-serif',
-                  color: 'rgba(255,255,255,0.35)',
-                  textShadow: '0 0 20px rgba(255,255,255,0.12), 0 0 50px rgba(255,255,255,0.06)',
-                  letterSpacing: '0.12em',
+                  color: 'rgba(255,255,255,0.50)',
+                  textShadow: '0 0 24px rgba(255,255,255,0.2), 0 0 60px rgba(255,255,255,0.08), 0 2px 6px rgba(0,0,0,0.6)',
                 }}
-                animate={{ opacity: [0.3, 0.45, 0.3] }}
+                animate={{ opacity: [0.45, 0.65, 0.45] }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
               >
-                como está o mercado <span style={{ color: 'rgba(255,255,255,0.55)' }}>agora</span>
+                como está o mercado <span style={{ color: 'rgba(255,255,255,0.85)' }}>agora</span>
               </motion.p>
             </motion.div>
           </div>
