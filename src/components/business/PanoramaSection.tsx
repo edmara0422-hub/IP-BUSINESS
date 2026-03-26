@@ -340,6 +340,21 @@ export default function PanoramaSection({ data }: { data: any }) {
       <div>
         <div className="relative rounded-lg border border-white/[0.06] overflow-hidden"
           style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.01) 0%, rgba(0,0,0,0.5) 80%)' }}>
+          {/* Pergunta central — estilo HUD integrado ao globo */}
+          <div className="absolute top-5 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.5 }}
+              className="text-center px-4 py-1.5 rounded-lg"
+              style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.06)' }}
+            >
+              <span className="font-mono text-[13px] font-semibold tracking-wide text-white/50" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                Como está o mercado <span className="text-white/90">agora</span>?
+              </span>
+            </motion.div>
+          </div>
+
           {/* Globo grande centralizado */}
           <div className="h-[480px] lg:h-[540px]">
             <Globe3D data={{ agents }} />

@@ -703,15 +703,15 @@ export default function RiscosSection({ data }: { data: any }) {
         ))}
       </div>
 
-      {/* 4. Remaining risks as compact list */}
+      {/* 4. Remaining risks */}
       {remainingRisks.length > 0 && (
-        <div className="flex flex-col gap-0.5">
+        <div className="flex flex-col gap-2">
           <SectionDivider label="OUTROS RISCOS" color={AMBER} />
           {remainingRisks.map((c, i) => (
-            <CompactRow
+            <BigRiskCard
               key={c.id}
               chain={c}
-              index={i}
+              index={i + 3}
               isExpanded={expandedId === c.id}
               onToggle={() => toggle(c.id)}
             />
@@ -719,14 +719,15 @@ export default function RiscosSection({ data }: { data: any }) {
         </div>
       )}
 
+      {/* 5. Oportunidades */}
       {remainingOpps.length > 0 && (
-        <div className="flex flex-col gap-0.5">
+        <div className="flex flex-col gap-2">
           <SectionDivider label="OPORTUNIDADES" color={GREEN} />
           {remainingOpps.map((c, i) => (
-            <CompactRow
+            <BigRiskCard
               key={c.id}
               chain={c}
-              index={i + remainingRisks.length}
+              index={i + 3 + remainingRisks.length}
               isExpanded={expandedId === c.id}
               onToggle={() => toggle(c.id)}
             />
