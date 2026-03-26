@@ -1,5 +1,5 @@
 'use client'
-
+// v2 — setores com contexto inteligente
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
