@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 export interface WorkspaceProfile {
   type: 'pf' | 'pj' | 'unknown'
   subtype: string
-  sector: string
+  sectors: string[]
   revenue: string
   product: string
 }
@@ -19,7 +19,12 @@ interface Props {
 
 /* ── constants ─────────────────────────────────────────── */
 
-const SECTORS = ['Tecnologia', 'Varejo', 'Agro', 'Saúde', 'Educação', 'Alimentação', 'Serviços', 'Outro']
+const SECTORS = [
+  'Tecnologia', 'Varejo', 'Agro', 'Saúde', 'Educação', 'Alimentação',
+  'Serviços', 'Indústria', 'Construção', 'Logística', 'Energia',
+  'Financeiro', 'Imobiliário', 'Entretenimento', 'Moda', 'Beleza',
+  'Turismo', 'Jurídico', 'Consultoria', 'Marketing', 'Outro',
+]
 const SECTOR_INSIGHTS: Record<string, string> = {
   Tecnologia: 'Setor de tecnologia está aquecido — heat 98/100. Bom momento para entrar.',
   Varejo: 'Varejo em transformação digital — heat 74/100. Oportunidades em e-commerce.',
@@ -28,6 +33,19 @@ const SECTOR_INSIGHTS: Record<string, string> = {
   Educação: 'EdTech acelerando — heat 82/100. Mercado receptivo a novas soluções.',
   Alimentação: 'FoodTech em expansão — heat 77/100. Delivery e dark kitchens em alta.',
   Serviços: 'Serviços profissionais estáveis — heat 69/100. Diferenciação é chave.',
+  Indústria: 'Indústria em modernização — automação e IoT transformam o setor.',
+  Construção: 'Construção civil sensível a juros — SELIC alta freia lançamentos.',
+  Logística: 'Logística impulsionada por e-commerce — last-mile é o gargalo.',
+  Energia: 'Transição energética acelera — solar e eólica crescem 20%+ a.a.',
+  Financeiro: 'Fintechs disruptam bancos tradicionais — Pix e open banking são o futuro.',
+  Imobiliário: 'Mercado imobiliário travado por juro alto — fundos imobiliários como alternativa.',
+  Entretenimento: 'Economia criativa em ascensão — streaming e games dominam.',
+  Moda: 'Fast fashion pressionado por sustentabilidade — marcas conscientes ganham.',
+  Beleza: 'Mercado de beleza resiliente — Brasil é 4º maior do mundo.',
+  Turismo: 'Turismo em recuperação — câmbio alto atrai turista estrangeiro.',
+  Jurídico: 'LawTechs automatizam processos — compliance digital cresce.',
+  Consultoria: 'Consultoria se digitaliza — IA substitui análises manuais.',
+  Marketing: 'MarTech em explosão — IA, automação e dados dominam aquisição.',
   Outro: 'Mercado diversificado — explore nichos com baixa concorrência.',
 }
 
@@ -133,7 +151,7 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
   const [profile, setProfile] = useState<WorkspaceProfile>({
     type: 'pf',
     subtype: '',
-    sector: '',
+    sectors: [],
     revenue: '',
     product: '',
   })
@@ -243,7 +261,7 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
           <p className="mb-2 text-[12px] uppercase tracking-widest text-white/30">Setor</p>
           <div className="flex flex-wrap gap-2">
             {SECTORS.map((s) => (
-              <Chip key={s} label={s} selected={profile.sector === s} onClick={() => patch({ sector: s })} />
+              <Chip key={s} label={s} selected={profile.sectors.join(', ') === s} onClick={() => patch({ sector: s })} />
             ))}
           </div>
         </div>
@@ -266,7 +284,7 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
           </div>
         </div>
 
-        {profile.subtype && profile.sector && profile.revenue && profile.product && (
+        {profile.subtype && profile.sectors.join(', ') && profile.revenue && profile.product && (
           <motion.button
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -338,34 +356,41 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
     )
   }
 
+  const toggleSector = (s: string) => {
+    setProfile(p => ({
+      ...p,
+      sectors: p.sectors.includes(s) ? p.sectors.filter(x => x !== s) : [...p.sectors, s],
+    }))
+  }
+
   const renderStep3 = () => {
-    const needsSector = !profile.sector
-    const insight = SECTOR_INSIGHTS[profile.sector] || ''
+    const insights = profile.sectors.join(', ')s.map(s => SECTOR_INSIGHTS[s]).filter(Boolean)
 
     return (
       <div className="flex flex-col gap-5">
         <Title>Seu setor</Title>
+        <p className="text-center text-[13px] text-white/35 -mt-2">Selecione um ou mais</p>
 
-        {needsSector && (
-          <div className="flex flex-wrap justify-center gap-2">
-            {SECTORS.map((s) => (
-              <Chip key={s} label={s} selected={profile.sector === s} onClick={() => patch({ sector: s })} />
-            ))}
-          </div>
-        )}
+        <div className="flex flex-wrap justify-center gap-2">
+          {SECTORS.map((s) => (
+            <Chip key={s} label={s} selected={profile.sectors.join(', ')s.includes(s)} onClick={() => toggleSector(s)} />
+          ))}
+        </div>
 
-        {profile.sector && (
+        {insights.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="rounded-[1.4rem] border border-white/[0.08] bg-white/[0.03] px-5 py-4"
           >
-            <p className="text-[12px] uppercase tracking-widest text-white/30">Market Insight</p>
-            <p className="mt-2 font-mono text-[13px] leading-relaxed text-white/60">{insight}</p>
+            <p className="text-[12px] uppercase tracking-widest text-white/30 mb-2">Market Insight</p>
+            {insights.map((ins, i) => (
+              <p key={i} className="font-mono text-[12px] leading-relaxed text-white/55 mb-1">{ins}</p>
+            ))}
           </motion.div>
         )}
 
-        {profile.sector && (
+        {profile.sectors.join(', ')s.length > 0 && (
           <motion.button
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -396,7 +421,7 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
             <div className="h-px bg-white/[0.06]" />
             <div className="flex items-center justify-between">
               <span className="text-[12px] uppercase tracking-widest text-white/30">Setor</span>
-              <span className="font-mono text-[13px] text-white/70">{profile.sector}</span>
+              <span className="font-mono text-[13px] text-white/70">{profile.sectors.join(', ')}</span>
             </div>
             {profile.revenue && (
               <>
