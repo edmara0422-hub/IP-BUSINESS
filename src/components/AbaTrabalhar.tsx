@@ -18,6 +18,7 @@ import {
 import dynamic from 'next/dynamic'
 
 const IAAdvisor = dynamic(() => import('@/components/workspace/IAAdvisor'), { ssr: false })
+const CockpitFinanceiro = dynamic(() => import('@/components/workspace/CockpitFinanceiro'), { ssr: false })
 
 interface ModuleConfig {
   id: number
@@ -308,9 +309,11 @@ export default function AbaTrabalhar() {
                       className="px-4 pb-4 pt-1 space-y-3"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {/* IA Advisor: show chat instead of text */}
+                      {/* Functional modules */}
                       {mod.id === 1 ? (
                         <IAAdvisor marketData={marketData} />
+                      ) : mod.id === 2 ? (
+                        <CockpitFinanceiro marketData={marketData} />
                       ) : (
                         <>
                           {/* Descriptions */}
