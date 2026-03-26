@@ -26,7 +26,7 @@ function extractTag(xml: string, tag: string): string {
 
 interface NewsItem { id: string; title: string; source: string; category: string; pubDate: string; link: string }
 
-function parseItems(xml: string, category: string, defaultSource = 'Google News'): NewsItem[] {
+function parseItems(xml: string, category: string, defaultSource = 'RSS'): NewsItem[] {
   const items: NewsItem[] = []
   const re = /<item>([\s\S]*?)<\/item>/g
   let m: RegExpExecArray | null
@@ -40,34 +40,46 @@ function parseItems(xml: string, category: string, defaultSource = 'Google News'
     const source = srcMatch?.[1]?.trim() ?? defaultSource
     items.push({ id: simpleHash(title), title, source, category, pubDate: pubDateRaw ? new Date(pubDateRaw).toISOString() : new Date().toISOString(), link })
   }
+  // Atom feed fallback (entry instead of item)
+  const atomRe = /<entry>([\s\S]*?)<\/entry>/g
+  while ((m = atomRe.exec(xml)) !== null) {
+    const block = m[1]
+    const title = extractTag(block, 'title')
+    if (!title) continue
+    const linkMatch = block.match(/<link[^>]*href="([^"]*)"/)
+    const link = linkMatch?.[1] ?? extractTag(block, 'link')
+    const pubDateRaw = extractTag(block, 'published') || extractTag(block, 'updated')
+    items.push({ id: simpleHash(title), title, source: defaultSource, category, pubDate: pubDateRaw ? new Date(pubDateRaw).toISOString() : new Date().toISOString(), link })
+  }
   return items
 }
 
-// ── Fontes RSS reais por categoria ──────────────────────────────────────
+// ── Fontes RSS diversificadas ──────────────────────────────────────
 const SOURCES = [
   // Economia BR
-  { url: 'https://news.google.com/rss/search?q=economia+Brasil+SELIC+PIB+inflação&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'economia', source: 'Google News' },
-  { url: 'https://exame.com/economia/feed/', category: 'economia', source: 'Exame' },
+  { url: 'https://www.infomoney.com.br/feed/', category: 'economia', source: 'InfoMoney' },
+  { url: 'https://valor.globo.com/rss/valor', category: 'economia', source: 'Valor Econômico' },
+  { url: 'https://agenciabrasil.ebc.com.br/rss/economia/feed.xml', category: 'economia', source: 'Agência Brasil' },
 
   // Mercado financeiro
-  { url: 'https://news.google.com/rss/search?q=bolsa+ibovespa+B3+ações+dólar+mercado&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'mercado', source: 'Google News' },
-  { url: 'https://exame.com/invest/feed/', category: 'mercado', source: 'Exame Invest' },
+  { url: 'https://www.infomoney.com.br/mercados/feed/', category: 'mercado', source: 'InfoMoney' },
+  { url: 'https://br.investing.com/rss/news.rss', category: 'mercado', source: 'Investing.com' },
 
-  // Inovação / IA
-  { url: 'https://news.google.com/rss/search?q=inteligência+artificial+inovação+tecnologia+2025&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'inovacao', source: 'Google News' },
-  { url: 'https://exame.com/tecnologia/feed/', category: 'inovacao', source: 'Exame Tech' },
+  // Inovação e Tecnologia
+  { url: 'https://www.tecmundo.com.br/rss', category: 'tecnologia', source: 'TecMundo' },
+  { url: 'https://canaltech.com.br/rss/', category: 'tecnologia', source: 'Canaltech' },
   { url: 'https://techcrunch.com/feed/', category: 'tecnologia', source: 'TechCrunch' },
 
-  // Startups
-  { url: 'https://news.google.com/rss/search?q=startups+venture+capital+unicórnio+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', category: 'startups', source: 'Google News' },
-  { url: 'https://exame.com/negocios/feed/', category: 'startups', source: 'Exame Negócios' },
+  // Startups e Negócios
+  { url: 'https://startups.com.br/feed/', category: 'startups', source: 'Startups.com.br' },
+  { url: 'https://www.infomoney.com.br/negocios/feed/', category: 'startups', source: 'InfoMoney' },
 
-  // Global
-  { url: 'https://news.google.com/rss/search?q=federal+reserve+nasdaq+sp500+wall+street&hl=en-US&gl=US&ceid=US:en', category: 'mercado', source: 'Global Markets' },
+  // Inovação
+  { url: 'https://epocanegocios.globo.com/rss/epocanegocios', category: 'inovacao', source: 'Época Negócios' },
 ]
 
 let cache: { data: { news: NewsItem[]; updatedAt: string } | null; ts: number } = { data: null, ts: 0 }
-const CACHE_TTL = 60_000 // 60s — mesmo ritmo dos dados de mercado
+const CACHE_TTL = 60_000
 
 export const dynamic = 'force-dynamic'
 
@@ -100,7 +112,19 @@ export async function GET() {
     const cutoff = Date.now() - 48 * 3600 * 1000
     const fresh = unique.filter(n => new Date(n.pubDate).getTime() > cutoff)
 
-    const data = { news: (fresh.length > 5 ? fresh : unique).slice(0, 20), updatedAt: new Date().toISOString() }
+    // Balancear categorias: max 5 por categoria
+    const balanced: NewsItem[] = []
+    const catCount: Record<string, number> = {}
+    for (const item of (fresh.length > 5 ? fresh : unique)) {
+      const c = catCount[item.category] ?? 0
+      if (c < 5) {
+        balanced.push(item)
+        catCount[item.category] = c + 1
+      }
+      if (balanced.length >= 20) break
+    }
+
+    const data = { news: balanced, updatedAt: new Date().toISOString() }
     cache = { data, ts: Date.now() }
     return NextResponse.json(data, { headers: { 'Access-Control-Allow-Origin': '*' } })
   } catch {
