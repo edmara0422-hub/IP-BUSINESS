@@ -223,6 +223,12 @@ export default function AbaTrabalhar() {
         >
           Seu espaço de <span className="text-white/95">trabalho</span>
         </h2>
+        <button
+          onClick={() => { localStorage.removeItem('ipb-workspace-ready'); window.location.reload() }}
+          className="mt-3 font-mono text-[10px] text-white/20 hover:text-white/40 transition-colors"
+        >
+          Refazer configuração
+        </button>
       </div>
 
       {/* Module Grid */}
