@@ -320,7 +320,7 @@ function NewsFeed() {
 // ══════════════════════════════════════════════════════════════════════════
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function PanoramaSection({ data }: { data: any }) {
+export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
   const agents = data.globalAgents as Array<{ id: string; label: string; delta: number; impact: string }>
   const commodities = data.commodities as Record<string, { value: number; delta: number; label: string }>
 
@@ -350,16 +350,17 @@ export default function PanoramaSection({ data }: { data: any }) {
               style={{ transformStyle: 'preserve-3d' }}
             >
               <motion.p
-                className="text-[20px] md:text-[26px] font-bold tracking-wide"
+                className="text-[16px] md:text-[20px] font-light tracking-[0.08em]"
                 style={{
                   fontFamily: 'Poppins, sans-serif',
-                  color: 'rgba(255,255,255,0.55)',
-                  textShadow: '0 0 30px rgba(255,255,255,0.25), 0 0 60px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.8)',
+                  color: 'rgba(255,255,255,0.35)',
+                  textShadow: '0 0 20px rgba(255,255,255,0.12), 0 0 50px rgba(255,255,255,0.06)',
+                  letterSpacing: '0.12em',
                 }}
-                animate={{ opacity: [0.5, 0.7, 0.5] }}
+                animate={{ opacity: [0.3, 0.45, 0.3] }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
               >
-                Como está o mercado <span style={{ color: 'rgba(255,255,255,0.85)' }}>agora</span>?
+                como está o mercado <span style={{ color: 'rgba(255,255,255,0.55)' }}>agora</span>
               </motion.p>
             </motion.div>
           </div>
@@ -505,6 +506,23 @@ export default function PanoramaSection({ data }: { data: any }) {
       <div className="rounded-sm px-4 py-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
         <NewsFeed />
       </div>
+
+      {/* ══ AI INSIGHT ══ */}
+      {ai?.panorama && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="rounded-lg px-4 py-3"
+          style={{ background: 'linear-gradient(135deg, rgba(26,82,118,0.12) 0%, rgba(0,0,0,0.3) 100%)', border: '1px solid rgba(26,82,118,0.2)' }}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#5dade2', boxShadow: '0 0 6px #5dade2' }} />
+            <span className="font-mono text-[10px] font-bold tracking-[0.2em]" style={{ color: '#5dade2' }}>ANÁLISE IA</span>
+          </div>
+          <p className="text-[13px] text-white/60 leading-relaxed">{ai.panorama}</p>
+        </motion.div>
+      )}
 
     </div>
   )

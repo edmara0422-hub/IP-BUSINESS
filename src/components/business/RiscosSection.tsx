@@ -656,7 +656,7 @@ function SectionDivider({ label, color }: { label: string; color: string }) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function RiscosSection({ data }: { data: any }) {
+export default function RiscosSection({ data, ai }: { data: any; ai?: any }) {
   const chains = useMemo(() => buildCausalChains(data), [data])
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
@@ -689,6 +689,58 @@ export default function RiscosSection({ data }: { data: any }) {
       <p className="text-center font-mono text-[13px] text-white/30 italic -mt-3 mb-1">
         {contextSentence}
       </p>
+
+      {/* ══ AI INSIGHTS — RISCOS ══ */}
+      {ai?.riscos?.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="rounded-lg overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, rgba(192,57,43,0.08) 0%, rgba(0,0,0,0.3) 100%)', border: '1px solid rgba(192,57,43,0.15)' }}
+        >
+          <div className="px-4 py-3">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: RED, boxShadow: `0 0 6px ${RED}` }} />
+              <span className="font-mono text-[10px] font-bold tracking-[0.2em]" style={{ color: RED }}>ANÁLISE IA — RISCOS IDENTIFICADOS</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              {ai.riscos.map((insight: string, i: number) => (
+                <div key={i} className="flex items-start gap-2">
+                  <span className="font-mono text-[11px] shrink-0 mt-0.5" style={{ color: RED }}>{'\u2192'}</span>
+                  <p className="text-[12px] text-white/55 leading-relaxed">{insight}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* ══ AI INSIGHTS — OPORTUNIDADES ══ */}
+      {ai?.oportunidades?.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="rounded-lg overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, rgba(30,132,73,0.08) 0%, rgba(0,0,0,0.3) 100%)', border: '1px solid rgba(30,132,73,0.15)' }}
+        >
+          <div className="px-4 py-3">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: GREEN, boxShadow: `0 0 6px ${GREEN}` }} />
+              <span className="font-mono text-[10px] font-bold tracking-[0.2em]" style={{ color: GREEN }}>ANÁLISE IA — OPORTUNIDADES</span>
+            </div>
+            <div className="flex flex-col gap-2">
+              {ai.oportunidades.map((insight: string, i: number) => (
+                <div key={i} className="flex items-start gap-2">
+                  <span className="font-mono text-[11px] shrink-0 mt-0.5" style={{ color: GREEN }}>{'\u2192'}</span>
+                  <p className="text-[12px] text-white/55 leading-relaxed">{insight}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* 3. Top 3 Risks as BIG Cards */}
       <div className="flex flex-col gap-2">

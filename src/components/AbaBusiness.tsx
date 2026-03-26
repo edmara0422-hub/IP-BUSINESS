@@ -10,6 +10,7 @@ import MacroSection from '@/components/business/MacroSection'
 import MarketingSection from '@/components/business/MarketingSection'
 import { useBusinessStore } from '@/store/business-store'
 import { apiFetch } from '@/lib/api'
+import { useIntelligence } from '@/hooks/useIntelligence'
 
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -124,6 +125,7 @@ export default function AbaBusiness() {
 
   const hasSim = sim.selic !== 0 || sim.cambio !== 0 || sim.ipca !== 0 || sim.pib !== 0
   const data = useMemo(() => rawData ? (hasSim ? applySimulation(rawData, sim) : rawData) : null, [rawData, sim, hasSim])
+  const { intelligence } = useIntelligence(rawData)
 
   if (!data) return (
     <div className="flex min-h-[60vh] items-center justify-center">
@@ -147,10 +149,10 @@ export default function AbaBusiness() {
 
       {/* ── Conteúdo da seção ativa ── */}
       <div className="flex-1 overflow-y-auto pt-1">
-        {activeSection === 'panorama' && <PanoramaSection data={data} />}
-        {activeSection === 'macro' && <MacroSection data={data} />}
-        {activeSection === 'plataformas' && <MarketingSection data={data} />}
-        {activeSection === 'problemas' && <RiscosSection data={data} />}
+        {activeSection === 'panorama' && <PanoramaSection data={data} ai={intelligence} />}
+        {activeSection === 'macro' && <MacroSection data={data} ai={intelligence} />}
+        {activeSection === 'plataformas' && <MarketingSection data={data} ai={intelligence} />}
+        {activeSection === 'problemas' && <RiscosSection data={data} ai={intelligence} />}
       </div>
     </motion.div>
   )
