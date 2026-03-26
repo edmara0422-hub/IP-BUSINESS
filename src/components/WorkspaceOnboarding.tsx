@@ -459,8 +459,8 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
   /* ── render ────────────────────────────────────────── */
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0a0a0c]">
-      <div className="w-full max-w-lg px-6">
+    <div className="flex min-h-[70vh] items-center justify-center px-4 py-8">
+      <div className="w-full max-w-lg">
         <StepDots current={step} total={4} />
 
         <AnimatePresence mode="wait" custom={dir}>
