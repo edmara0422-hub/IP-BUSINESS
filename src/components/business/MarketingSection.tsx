@@ -260,6 +260,31 @@ export default function MarketingSection({ data, ai }: { data: any; ai?: any }) 
         </div>
       </div>
 
+      {/* ── UNIT ECONOMICS — ciclo completo do cliente ── */}
+      <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="px-4 py-3">
+          <span className="font-mono text-[11px] font-bold tracking-[0.15em] text-white/25 block mb-3">CICLO COMPLETO DO CLIENTE</span>
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
+            {[
+              { label: 'CAC', value: `R$${cacVal.toFixed(0)}`, desc: 'Custo por cliente', color: deltaColor(cacD) },
+              { label: 'LTV', value: `R$${(cacVal * 3.2).toFixed(0)}`, desc: 'Valor no tempo de vida', color: GREEN },
+              { label: 'LTV/CAC', value: `${(3.2).toFixed(1)}x`, desc: cacVal * 3.2 / cacVal >= 3 ? 'Saudável (>3x)' : 'Atenção (<3x)', color: 3.2 >= 3 ? GREEN : RED },
+              { label: 'Payback', value: `${Math.ceil(cacVal / (cacVal * 3.2 / 12))}m`, desc: 'Meses pra empatar', color: AMBER },
+              { label: 'Churn', value: '4.2%', desc: '% clientes que saem/mês', color: AMBER },
+            ].map(m => (
+              <div key={m.label} className="rounded-md px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                <span className="font-mono text-[10px] font-bold text-white/25 block">{m.label}</span>
+                <span className="font-mono text-[18px] font-bold block leading-none mt-1" style={{ color: m.color }}>{m.value}</span>
+                <span className="text-[9px] text-white/30 block mt-1 leading-tight">{m.desc}</span>
+              </div>
+            ))}
+          </div>
+          <p className="font-mono text-[10px] text-white/20 mt-2 text-center">
+            LTV, Payback e Churn são estimativas de referência — insira seus dados reais no Workspace
+          </p>
+        </div>
+      </div>
+
       {/* ══ 3. 3-COLUMN KEY METRICS ROW ══ */}
       <div className="grid grid-cols-3 gap-2">
         {/* CPM Médio */}

@@ -20,6 +20,7 @@ interface CausalChain {
   affected: string
   action: string
   modules: string[]
+  opportunity: string
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -84,6 +85,7 @@ function buildCausalChains(data: any): CausalChain[] {
     affected: `Varejo, construtoras, fintechs de credito, PMEs endividadas, startups dependentes de funding e consumidores com financiamentos ativos.`,
     action: `Liquidar divida de curto prazo agora (antes de renovar com taxa maior). Negociar prazos mais longos com fornecedores. Alocar caixa ocioso em CDI/Tesouro SELIC. Cortar gastos nao-essenciais para preservar liquidez. Evitar expansao alavancada.`,
     modules: ['Cenarios & Forecast', 'Cockpit Financeiro'],
+    opportunity: `Empresas com caixa forte lucram com renda fixa a ${selic.toFixed(1)}% a.a. Quem não depende de crédito ganha vantagem competitiva sobre endividados.`,
   })
 
   // ── IPCA ──
@@ -108,6 +110,7 @@ function buildCausalChains(data: any): CausalChain[] {
     affected: `Todo o varejo de bens nao-essenciais, servicos premium, restaurantes, empresas com cadeia importada e contratos reajustados por indices de inflacao.`,
     action: `Renegociar contratos anuais com fornecedores antes do reajuste. Revisar mix de produtos priorizando margens maiores. Comunicar valor, nao so preco. Considerar precificacao dinamica. Reavaliar contratos indexados ao IPCA na renovacao.`,
     modules: ['Smart Pricing', 'Cockpit Financeiro'],
+    opportunity: `Quem reajusta preço rápido mantém margem. Bens essenciais (alimentação, saúde, energia) ganham — demanda é inelástica.`,
   })
 
   // ── CÂMBIO ──
@@ -133,6 +136,7 @@ function buildCausalChains(data: any): CausalChain[] {
     affected: `Empresas de tecnologia com custos em dolar, e-commerce com estoque importado, industria com insumos internacionais, empresas com divida em moeda estrangeira.`,
     action: `Mapear toda a exposicao cambial (custo + receita). Contratar hedge (NDF ou opcao) para contratos futuros em dolar. Priorizar fornecedores nacionais. Negociar prazo maior de pagamento no exterior. Considerar precificacao atrelada ao dolar se produto/servico tem concorrencia importada.`,
     modules: ['Cenarios & Forecast', 'Smart Pricing'],
+    opportunity: `Exportadores lucram com dólar alto. Fornecedores nacionais ganham competitividade contra importados.`,
   })
 
   // ── CAC / Plataformas ──
@@ -158,6 +162,7 @@ function buildCausalChains(data: any): CausalChain[] {
     affected: `E-commerce, SaaS B2C, apps de consumo, marketplaces e qualquer negocio dependente de midia paga para aquisicao de clientes.`,
     action: `Testar TikTok Ads agora (CPM baixo = janela de 3-6 meses). Investir em SEO e conteudo organico para reduzir dependencia. Ativar programa de indicacao para aquisicao por referral (CAC quase zero). Focar em retencao para aumentar LTV. Revisar segmentacao de campanhas com mais dados first-party.`,
     modules: ['Mercado & Concorrencia', 'Smart Pricing'],
+    opportunity: `Quem tem marca forte e tráfego orgânico gasta menos. Investir em SEO e conteúdo agora cria vantagem duradoura.`,
   })
 
   // ── Talento ──
@@ -181,6 +186,7 @@ function buildCausalChains(data: any): CausalChain[] {
     affected: `Empresas de tecnologia, agencias digitais, fintechs, consultorias e qualquer empresa com times de produto, dados ou engenharia.`,
     action: `Investir em cultura e ambiente antes de salario. Criar plano de carreira claro. Oferecer flexibilidade real (nao so no papel). Usar IA para aumentar produtividade do time atual. Contratar seniores que multiplicam juniors em vez de so contratar juniors.`,
     modules: ['Pessoas & Lideranca'],
+    opportunity: `Empresas que oferecem equity + flexibilidade atraem talento sem competir por salário. Remote-first reduz custo de contratação.`,
   })
 
   // ── IA Disrupting ──
@@ -204,6 +210,7 @@ function buildCausalChains(data: any): CausalChain[] {
     affected: `Agencias de conteudo, call centers, analistas de dados junior, redatores sem especializacao, e qualquer papel baseado em tarefas repetitivas de conhecimento.`,
     action: `Adotar IA imediatamente em conteudo e atendimento (ROI rapido). Treinar time em ferramentas (Claude, ChatGPT, Midjourney). Reposicionar profissionais afetados para funcoes de supervisao de IA. Criar vantagem competitiva baseada em dados proprietarios que a IA nao tem acesso.`,
     modules: ['Inovacao & Tendencias'],
+    opportunity: `Adotar IA agora corta custos 30-60%. Quem implementa primeiro opera com estrutura 3x mais eficiente que concorrente tradicional.`,
   })
 
   // ── Setores em queda ──
@@ -227,6 +234,7 @@ function buildCausalChains(data: any): CausalChain[] {
     affected: `Redes de varejo fisico, shopping centers, franquias de moda e eletronicos, distribuidores que dependem do varejo como canal.`,
     action: `Transformar loja em experiencia (o que e-commerce nao pode oferecer). Integrar estoque online com fisico. Usar dados de CRM para personalizar atendimento. Renegociar alugueis agressivamente. Avaliar formato de loja menor com maior giro.`,
     modules: ['Mercado & Concorrencia'],
+    opportunity: `M&A barato — adquirir concorrentes em dificuldade. Concorrência sai do mercado = mais share pra quem sobrevive.`,
   })
 
   if (sectorMedia && sectorMedia.change < -20) chains.push({
@@ -247,6 +255,7 @@ function buildCausalChains(data: any): CausalChain[] {
     affected: `Jornais, revistas, distribuidores de midia impressa e anunciantes que ainda dependem de midia offline como principal canal.`,
     action: `Nao anunciar em midia impressa como canal principal. Redirecionar budget para digital. Avaliar parcerias com veiculos digitais de nicho com audiencia qualificada.`,
     modules: ['Mercado & Concorrencia'],
+    opportunity: `M&A barato — adquirir concorrentes em dificuldade. Concorrência sai do mercado = mais share pra quem sobrevive.`,
   })
 
   // ── PIB (oportunidade) ──
@@ -269,6 +278,7 @@ function buildCausalChains(data: any): CausalChain[] {
     affected: `Varejo essencial, servicos, agritech, logistica, construcao civil e educacao corporativa.`,
     action: `Janela para expansao geografica antes de ciclo de alta de juros encerrar crescimento. Investir em brand building. Construir reserva para a proxima desaceleracao. Aproveitar para renegociar contratos de fornecimento com volumes maiores.`,
     modules: ['Canvas & Pitch', 'Mercado & Concorrencia'],
+    opportunity: `Janela para expansao geografica antes de ciclo de alta de juros encerrar crescimento. Investir em brand building. Construir reserva para a proxima desaceleracao. Aproveitar para renegociar contratos de fornecimento com volumes maiores.`,
   })
 
   // ── TikTok CPM ──
@@ -291,6 +301,7 @@ function buildCausalChains(data: any): CausalChain[] {
     affected: `Qualquer empresa com produto visual, massa, ou voltado para publico jovem — moda, alimentos, tecnologia, servicos de consumo.`,
     action: `Alocar 10-20% do budget de paid para TikTok agora. Produzir conteudo nativo (nao reutilizar criativos de outras plataformas). Testar por 30 dias com meta de ROAS > 2x. Se funcionar, escalar antes de competicao aumentar.`,
     modules: ['Mercado & Concorrencia'],
+    opportunity: `Alocar 10-20% do budget de paid para TikTok agora. Produzir conteudo nativo (nao reutilizar criativos de outras plataformas). Testar por 30 dias com meta de ROAS > 2x. Se funcionar, escalar antes de competicao aumentar.`,
   })
 
   // ── IA em conteúdo ──
@@ -312,6 +323,7 @@ function buildCausalChains(data: any): CausalChain[] {
     affected: `Agencias, equipes de marketing interno, e-commerce com catalogo grande e qualquer empresa que produz conteudo regularmente.`,
     action: `Adotar Claude/ChatGPT para rascunho de conteudo imediatamente. Treinar time em prompts. Criar processo de revisao humana para qualidade. Liberar time para estrategia ao inves de execucao repetitiva.`,
     modules: ['Inovacao & Tendencias'],
+    opportunity: `Adotar Claude/ChatGPT para rascunho de conteudo imediatamente. Treinar time em prompts. Criar processo de revisao humana para qualidade. Liberar time para estrategia ao inves de execucao repetitiva.`,
   })
 
   // ── Agro B2B ──
@@ -333,6 +345,7 @@ function buildCausalChains(data: any): CausalChain[] {
     affected: `Startups de agritech, SaaS de gestao rural, fintechs de credito rural, logistica agricola e marketplaces de insumos.`,
     action: `Mapear dor especifica do produtor (nao generica). Parceria com cooperativas como canal de distribuicao. Produto simples que funciona offline — conectividade ainda e barreira no campo.`,
     modules: ['Canvas & Pitch', 'Mercado & Concorrencia'],
+    opportunity: `Mapear dor especifica do produtor (nao generica). Parceria com cooperativas como canal de distribuicao. Produto simples que funciona offline — conectividade ainda e barreira no campo.`,
   })
 
   return chains.sort((a, b) => b.urgency - a.urgency)
@@ -491,6 +504,14 @@ function ExpandedDetail({ chain }: { chain: CausalChain }) {
         <p className="text-[13px] text-white/45 leading-relaxed">{chain.action}</p>
       </div>
 
+      {/* COMO LUCRAR */}
+      {chain.opportunity && (
+        <div className="rounded-sm p-2.5" style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}15` }}>
+          <span className="font-mono text-[9px] font-bold tracking-[0.2em] block mb-1" style={{ color: GREEN }}>COMO LUCRAR COM ISSO</span>
+          <p className="text-[11px] text-white/45 leading-relaxed">{chain.opportunity}</p>
+        </div>
+      )}
+
       {/* QUEM E AFETADO */}
       <div className="rounded-sm p-2.5" style={{ background: `${RED}06`, border: `1px solid ${RED}12` }}>
         <span className="font-mono text-[13px] font-bold tracking-[0.2em] block mb-1" style={{ color: RED }}>QUEM E AFETADO</span>
@@ -544,6 +565,13 @@ function BigRiskCard({ chain, index, isExpanded, onToggle }: {
           <p className="text-[13px] leading-none mb-1.5" style={{ color: GREEN }}>
             COMO AGIR: {chain.action.split('.')[0]}.
           </p>
+          {/* COMO LUCRAR */}
+          {chain.opportunity && (
+            <div className="rounded-sm p-2.5 mb-1.5" style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}15` }}>
+              <span className="font-mono text-[9px] font-bold tracking-[0.2em] block mb-1" style={{ color: GREEN }}>COMO LUCRAR COM ISSO</span>
+              <p className="text-[11px] text-white/45 leading-relaxed">{chain.opportunity}</p>
+            </div>
+          )}
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-[12px] text-white/25 font-mono">{'\u2192'} Resolver em:</span>
             {chain.modules.map((mod) => (
