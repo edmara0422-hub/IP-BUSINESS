@@ -145,15 +145,69 @@ const ADMIN_MODULES: Record<string, string[]> = {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
+// ██  DYNAMIC QUESTION HEADER LOGIC
+// ══════════════════════════════════════════════════════════════════════════
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function dynamicQuestionHeader(dims: DimScore[], data: any): string {
+  const vv = (n: number | undefined, fb: number) => (n != null && Number.isFinite(n)) ? n : fb
+  const selic = vv(data.macro.selic?.value, 10.5)
+  const ipca  = vv(data.macro.ipca?.value, 4.8)
+  const pib   = vv(data.macro.pib?.value, 2.9)
+  const cacDelta = data.marketing?.cacTrend?.delta ?? 12
+  const sectors = data.sectors as Array<{ heat: number }>
+  const avgHeat = Math.round(sectors.reduce((s, sec) => s + sec.heat, 0) / Math.max(1, sectors.length))
+
+  // Find most impactful dimension (highest weight * deviation from 50)
+  let maxImpact = 0
+  let dominantShort = ''
+  for (const d of dims) {
+    const impact = d.weight * Math.abs(d.score - 50)
+    if (impact > maxImpact) { maxImpact = impact; dominantShort = d.short }
+  }
+
+  // Find lowest and highest scoring dimensions
+  const sorted = [...dims].sort((a, b) => a.score - b.score)
+  const lowest = sorted[0]
+  const highest = sorted[sorted.length - 1]
+
+  if (lowest.short === 'ECON' && selic > 13) return `SELIC ${selic.toFixed(1)}% está frenando o mercado`
+  if (lowest.short === 'IPCA' && ipca > 5) return `Inflação ${ipca.toFixed(2)}% está corroendo margens`
+  if (lowest.short === 'MRKT' && cacDelta > 15) return `CAC subindo ${cacDelta.toFixed(0)}% — aquisição cara`
+  if (highest.short === 'MKTD') return `Mercado aquecido — ${avgHeat}/100 de calor`
+  if (highest.short === 'ECON' && pib > 2.5) return `PIB ${pib.toFixed(1)}% impulsiona demanda`
+
+  // Also check dominant factor for extra context
+  if (dominantShort === 'ECON' && selic > 13) return `SELIC ${selic.toFixed(1)}% está frenando o mercado`
+  if (dominantShort === 'IPCA' && ipca > 5) return `Inflação ${ipca.toFixed(2)}% está corroendo margens`
+
+  return 'O que está movendo a economia?'
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 // ██  DimensionCard — interactive card with expand/collapse
 // ══════════════════════════════════════════════════════════════════════════
 
-function DimensionCard({ dim, isExpanded, onToggle, businessImpact }: {
+function DimensionCard({ dim, isExpanded, onToggle, businessImpact, glowType }: {
   dim: DimScore; isExpanded: boolean; onToggle: () => void; businessImpact: string
+  glowType: 'critical' | 'best' | 'none'
 }) {
   const color = dimColor(dim.status)
   const statusLabel = dim.status === 'good' ? 'SAUDÁVEL' : dim.status === 'warning' ? 'MODERADO' : 'CRÍTICO'
   const modules = ADMIN_MODULES[dim.short] ?? []
+
+  // Improvement 1: glow styles
+  const glowStyle: React.CSSProperties = glowType === 'critical'
+    ? { boxShadow: `0 0 12px ${RED}25`, animation: 'pulse-glow 2s ease-in-out infinite' }
+    : glowType === 'best'
+    ? { boxShadow: `0 0 12px ${GREEN}25` }
+    : {}
+
+  const borderColor = glowType === 'critical'
+    ? `${RED}50`
+    : glowType === 'best'
+    ? `${GREEN}50`
+    : isExpanded ? `${color}40` : 'rgba(255,255,255,0.06)'
 
   return (
     <motion.div
@@ -162,8 +216,9 @@ function DimensionCard({ dim, isExpanded, onToggle, businessImpact }: {
       className="rounded-lg overflow-hidden cursor-pointer"
       style={{
         background: isExpanded ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.3)',
-        border: `1px solid ${isExpanded ? color + '40' : 'rgba(255,255,255,0.06)'}`,
+        border: `1px solid ${borderColor}`,
         gridColumn: isExpanded ? '1 / -1' : undefined,
+        ...glowStyle,
       }}
       transition={{ layout: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
     >
@@ -195,6 +250,13 @@ function DimensionCard({ dim, isExpanded, onToggle, businessImpact }: {
         </div>
 
         <p className="font-mono text-[12px] text-white/30 mt-1.5 leading-tight truncate">{dim.driver}</p>
+
+        {/* Improvement 4: Show impact sentence on collapsed cards */}
+        {!isExpanded && businessImpact && (
+          <p className="font-mono text-[11px] mt-1 leading-tight truncate" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            {businessImpact}
+          </p>
+        )}
       </div>
 
       {/* Expanded content */}
@@ -256,6 +318,119 @@ function DimensionCard({ dim, isExpanded, onToggle, businessImpact }: {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
+// ██  STACKED CONTRIBUTION BAR
+// ══════════════════════════════════════════════════════════════════════════
+
+function StackedContributionBar({ dimensions }: { dimensions: DimScore[] }) {
+  const totalWeighted = dimensions.reduce((a, d) => a + d.score * d.weight, 0)
+  if (totalWeighted === 0) return null
+
+  const segments = dimensions.map(d => ({
+    short: d.short,
+    pct: (d.score * d.weight / totalWeighted) * 100,
+    color: dimColor(d.status),
+  }))
+
+  return (
+    <div className="mt-3 w-full max-w-[320px]">
+      {/* Stacked bar */}
+      <div className="flex w-full h-[8px] rounded-full overflow-hidden" style={{ gap: '1px' }}>
+        {segments.map((seg) => (
+          <motion.div
+            key={seg.short}
+            className="h-full first:rounded-l-full last:rounded-r-full"
+            style={{ background: seg.color }}
+            initial={{ width: 0 }}
+            animate={{ width: `${seg.pct}%` }}
+            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          />
+        ))}
+      </div>
+      {/* Tiny labels */}
+      <div className="flex w-full mt-1" style={{ gap: '1px' }}>
+        {segments.map((seg) => (
+          <div key={seg.short} className="text-center" style={{ width: `${seg.pct}%` }}>
+            <span className="font-mono text-[9px] text-white/25 leading-none">{seg.short}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// ██  DESTAQUES SECTION
+// ══════════════════════════════════════════════════════════════════════════
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function DestaquesSection({ data }: { data: any }) {
+  const sectors = (data.sectors as Array<{ id: string; label?: string; heat: number; change: number }>)
+    .slice()
+    .sort((a, b) => b.heat - a.heat)
+    .slice(0, 3)
+
+  const commodities = Object.entries(data.commodities as Record<string, { label?: string; delta: number }>)
+    .filter(([, c]) => Math.abs(c.delta) > 1)
+    .map(([key, c]) => ({ key, label: c.label ?? key, delta: c.delta }))
+
+  if (sectors.length === 0 && commodities.length === 0) return null
+
+  const trendColor = (val: number) => val > 0 ? GREEN : val < 0 ? RED : AMBER
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}
+      className="rounded-lg px-3 py-3"
+      style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.06)' }}
+    >
+      {/* Row 1: Setores */}
+      {sectors.length > 0 && (
+        <div className="mb-2.5">
+          <span className="font-mono text-[11px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">SETORES EM DESTAQUE</span>
+          <div className="flex flex-wrap gap-1.5">
+            {sectors.map((s) => (
+              <span
+                key={s.id}
+                className="font-mono text-[11px] px-2 py-0.5 rounded-sm inline-flex items-center gap-1"
+                style={{
+                  background: `${trendColor(s.change)}10`,
+                  color: trendColor(s.change),
+                  border: `1px solid ${trendColor(s.change)}25`,
+                }}
+              >
+                {s.label ?? s.id} {s.heat}/100 {s.change > 0 ? '\u25B2' : '\u25BC'}{Math.abs(s.change).toFixed(1)}%
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Row 2: Commodities */}
+      {commodities.length > 0 && (
+        <div>
+          <span className="font-mono text-[11px] font-bold tracking-[0.2em] text-white/20 block mb-1.5">COMMODITIES EM MOVIMENTO</span>
+          <div className="flex flex-wrap gap-1.5">
+            {commodities.map((c) => (
+              <span
+                key={c.key}
+                className="font-mono text-[11px] px-2 py-0.5 rounded-sm inline-flex items-center gap-1"
+                style={{
+                  background: `${trendColor(c.delta)}10`,
+                  color: trendColor(c.delta),
+                  border: `1px solid ${trendColor(c.delta)}25`,
+                }}
+              >
+                {c.label} {c.delta > 0 ? '\u25B2' : '\u25BC'}{Math.abs(c.delta).toFixed(1)}%
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </motion.div>
+  )
+}
+
+// ══════════════════════════════════════════════════════════════════════════
 // ██  PRINCIPAL
 // ══════════════════════════════════════════════════════════════════════════
 
@@ -282,14 +457,38 @@ export default function MacroSection({ data }: { data: any }) {
     ? `Ambiente moderado: crescimento existe mas juro alto freia expansão.`
     : `Ambiente crítico: foco em resiliência e eficiência operacional.`
 
+  // ── Improvement 2: Dynamic question header ──
+  const questionHeader = useMemo(() => dynamicQuestionHeader(dimensions, data), [dimensions, data])
+
+  // ── Improvement 1: Find lowest/highest score indices ──
+  const { lowestIdx, highestIdx } = useMemo(() => {
+    let lo = 0, hi = 0
+    for (let i = 1; i < dimensions.length; i++) {
+      if (dimensions[i].score < dimensions[lo].score) lo = i
+      if (dimensions[i].score > dimensions[hi].score) hi = i
+    }
+    return { lowestIdx: lo, highestIdx: hi }
+  }, [dimensions])
+
   return (
     <div className="flex flex-col gap-4 px-4 pb-8">
+
+      {/* Pulse animation keyframes */}
+      <style>{`
+        @keyframes pulse-glow {
+          0%, 100% { box-shadow: 0 0 12px ${RED}25; }
+          50% { box-shadow: 0 0 20px ${RED}40; }
+        }
+      `}</style>
 
       {/* ── 1. QUESTION HEADER ── */}
       <div className="text-center mb-4">
         <p className="font-mono text-[12px] font-bold tracking-[0.3em] text-white/20 uppercase">Análise Macroeconômica</p>
         <h2 className="text-[15px] font-semibold text-white/60 mt-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          O que está movendo a <span className="text-white/90">economia</span>?
+          {questionHeader === 'O que está movendo a economia?'
+            ? <>O que está movendo a <span className="text-white/90">economia</span>?</>
+            : <span className="text-white/90">{questionHeader}</span>
+          }
         </h2>
       </div>
 
@@ -315,6 +514,9 @@ export default function MacroSection({ data }: { data: any }) {
             transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
           />
         </div>
+
+        {/* Improvement 3: Stacked contribution bar */}
+        <StackedContributionBar dimensions={dimensions} />
       </motion.div>
 
       {/* ── 3. DIMENSION CARDS GRID ── */}
@@ -329,9 +531,18 @@ export default function MacroSection({ data }: { data: any }) {
             isExpanded={expandedIdx === i}
             onToggle={() => handleToggle(i)}
             businessImpact={businessImpactSentence(dim, data)}
+            glowType={
+              lowestIdx === highestIdx ? 'none'
+                : i === lowestIdx ? 'critical'
+                : i === highestIdx ? 'best'
+                : 'none'
+            }
           />
         ))}
       </motion.div>
+
+      {/* ── 4. DESTAQUES SECTION ── */}
+      <DestaquesSection data={data} />
 
     </div>
   )
