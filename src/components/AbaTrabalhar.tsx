@@ -20,6 +20,7 @@ import dynamic from 'next/dynamic'
 const IAAdvisor = dynamic(() => import('@/components/workspace/IAAdvisor'), { ssr: false })
 const CockpitFinanceiro = dynamic(() => import('@/components/workspace/CockpitFinanceiro'), { ssr: false })
 const CenariosForecast = dynamic(() => import('@/components/workspace/CenariosForecast'), { ssr: false })
+const SmartPricing = dynamic(() => import('@/components/workspace/SmartPricing'), { ssr: false })
 
 interface ModuleConfig {
   id: number
@@ -317,6 +318,8 @@ export default function AbaTrabalhar() {
                         <CockpitFinanceiro marketData={marketData} />
                       ) : mod.id === 3 ? (
                         <CenariosForecast marketData={marketData} />
+                      ) : mod.id === 4 ? (
+                        <SmartPricing marketData={marketData} />
                       ) : (
                         <>
                           {/* Descriptions */}
