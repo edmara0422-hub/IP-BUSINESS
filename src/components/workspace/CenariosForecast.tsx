@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 
 const RED = '#c0392b'
@@ -8,29 +8,72 @@ const GREEN = '#1e8449'
 const AMBER = '#9a7d0a'
 const BLUE = '#1a5276'
 
-interface ScenarioOffsets { selic: number; ipca: number; pib: number; usd: number }
-
-const SCENARIOS: { title: string; color: string; bg: string; offsets: ScenarioOffsets }[] = [
-  { title: 'Cenário Pessimista', color: RED, bg: 'rgba(192,57,43,0.08)', offsets: { selic: 2, ipca: 1.5, pib: -1, usd: 0.8 } },
-  { title: 'Cenário Realista', color: AMBER, bg: 'rgba(154,125,10,0.08)', offsets: { selic: 0, ipca: 0, pib: 0, usd: 0 } },
-  { title: 'Cenário Otimista', color: GREEN, bg: 'rgba(30,132,73,0.08)', offsets: { selic: -2, ipca: -1, pib: 1, usd: -0.5 } },
-]
-
-function interpret(selic: number, ipca: number, pib: number, usd: number) {
-  return {
-    custo: `${(selic * 2.5).toFixed(1)}% a.a.`,
-    poder: ipca > 4.75 ? 'caindo' : 'estável',
-    demanda: pib > 2 ? 'crescendo' : pib > 0 ? 'fraca' : 'contraindo',
-    importacao: `R$${usd.toFixed(2)} (${usd > 5.5 ? 'cara' : 'acessível'})`,
-  }
+interface SliderConfig {
+  key: 'selic' | 'ipca' | 'pib' | 'usd'
+  label: string
+  min: number
+  max: number
+  step: number
+  suffix: string
+  greenMax: number
+  amberMax: number
+  impactText: (val: number) => string
 }
 
-function ImpactLine({ label, value, good }: { label: string; value: string; good?: boolean }) {
-  return (
-    <p style={{ fontFamily: 'monospace', fontSize: 13, color: good === undefined ? '#aaa' : good ? GREEN : RED, margin: '2px 0' }}>
-      {label}: <span style={{ fontWeight: 600 }}>{value}</span>
-    </p>
-  )
+const SLIDER_CONFIGS: SliderConfig[] = [
+  {
+    key: 'selic', label: 'SELIC', min: 5, max: 20, step: 0.25, suffix: '%',
+    greenMax: 10, amberMax: 13,
+    impactText: (val) => `Financiamento: ${(val * 2.5).toFixed(1)}% a.a. → ${val > 13 ? 'PMEs sem crédito' : 'crédito acessível'}`,
+  },
+  {
+    key: 'ipca', label: 'IPCA', min: 1, max: 12, step: 0.25, suffix: '%',
+    greenMax: 4, amberMax: 5,
+    impactText: (val) => `Poder de compra: ${val > 5 ? 'caindo rápido' : 'controlado'}`,
+  },
+  {
+    key: 'pib', label: 'PIB', min: -3, max: 6, step: 0.1, suffix: '%',
+    greenMax: 6, amberMax: 2,
+    impactText: (val) => `Demanda: ${val > 2 ? 'expandindo' : val > 0 ? 'fraca' : 'contraindo'}`,
+  },
+  {
+    key: 'usd', label: 'USD', min: 4, max: 8, step: 0.1, suffix: '',
+    greenMax: 5.3, amberMax: 6,
+    impactText: (val) => `Importação: ${val > 6 ? 'muito cara' : val > 5.3 ? 'cara' : 'acessível'}`,
+  },
+]
+
+const PRESETS: { label: string; values: { selic: number; ipca: number; pib: number; usd: number } }[] = [
+  { label: 'SELIC vai a 16%', values: { selic: 16, ipca: 0, pib: 0, usd: 0 } },
+  { label: 'Câmbio bate R$7', values: { selic: 0, ipca: 0, pib: 0, usd: 7 } },
+  { label: 'Recessão (PIB -2%)', values: { selic: 15, ipca: 0, pib: -2, usd: 0 } },
+  { label: 'Cenário ideal', values: { selic: 9, ipca: 3, pib: 4, usd: 4.5 } },
+]
+
+function calcHealth(selic: number, ipca: number, pib: number, usd: number) {
+  return Math.min(95, Math.max(10, 50 + pib * 5 - (selic - 10) * 3 - (ipca - 3) * 4 - (usd - 5) * 2))
+}
+
+function sliderColor(val: number, cfg: SliderConfig) {
+  if (cfg.key === 'pib') {
+    if (val > cfg.amberMax) return GREEN
+    if (val > 0) return AMBER
+    return RED
+  }
+  if (val <= cfg.greenMax) return GREEN
+  if (val <= cfg.amberMax) return AMBER
+  return RED
+}
+
+function formatVal(key: string, val: number) {
+  if (key === 'usd') return `R$${val.toFixed(2)}`
+  return `${val.toFixed(2)}%`
+}
+
+// Seeded random for consistent chart noise
+function seededRandom(seed: number) {
+  const x = Math.sin(seed * 9301 + 49297) * 49297
+  return x - Math.floor(x)
 }
 
 export default function CenariosForecast({ marketData }: { marketData: any }) {
@@ -45,17 +88,78 @@ export default function CenariosForecast({ marketData }: { marketData: any }) {
   const [aiResponse, setAiResponse] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
 
-  const stressImpact = interpret(stress.selic, stress.ipca, stress.pib, stress.usd)
-  const custoBaseline = base.selic * 2.5
-  const custoDiff = stress.selic * 2.5 - custoBaseline
-  const despesasDiff = ((stress.ipca / 100) * 120000).toFixed(0)
-  const cambioDiffPct = (((stress.usd - base.usd) / base.usd) * 100).toFixed(1)
+  const health = calcHealth(stress.selic, stress.ipca, stress.pib, stress.usd)
+
+  // Chart data
+  const chartData = useMemo(() => {
+    const months = Array.from({ length: 12 }, (_, i) => i + 1)
+    return months.map((m) => {
+      const noise = (seed: number) => (seededRandom(m * 100 + seed) - 0.5) * 6
+      const realista = Math.min(95, Math.max(10, health + noise(1)))
+      const pessimista = Math.min(95, Math.max(10, health * 0.7 + noise(2)))
+      const otimista = Math.min(95, Math.max(10, health * 1.3 + noise(3)))
+      return { month: m, pessimista, realista, otimista }
+    })
+  }, [health])
+
+  // Scenario table rows
+  const scenarios = [
+    { name: 'Pessimista', color: RED, bg: 'rgba(192,57,43,0.10)', selic: stress.selic + 2, ipca: stress.ipca + 1.5, pib: stress.pib - 1, usd: stress.usd + 0.8 },
+    { name: 'Realista', color: AMBER, bg: 'rgba(154,125,10,0.10)', selic: stress.selic, ipca: stress.ipca, pib: stress.pib, usd: stress.usd },
+    { name: 'Otimista', color: GREEN, bg: 'rgba(30,132,73,0.10)', selic: stress.selic - 2, ipca: stress.ipca - 1, pib: stress.pib + 1, usd: stress.usd - 0.5 },
+  ]
+
+  function demandaText(pib: number) {
+    return pib > 2 ? 'Expandindo' : pib > 0 ? 'Fraca' : 'Contraindo'
+  }
+  function importText(usd: number) {
+    return usd > 6 ? 'Muito cara' : usd > 5.3 ? 'Cara' : 'Acessível'
+  }
+
+  function applyPreset(p: typeof PRESETS[0]) {
+    setStress({
+      selic: p.values.selic || stress.selic,
+      ipca: p.values.ipca || stress.ipca,
+      pib: p.values.pib !== 0 ? p.values.pib : (p.label === 'Cenário ideal' ? p.values.pib : stress.pib),
+      usd: p.values.usd || stress.usd,
+    })
+    // Special cases: full overwrite for presets that set all values
+    if (p.label === 'Cenário ideal') {
+      setStress(p.values)
+    }
+    if (p.label === 'Recessão (PIB -2%)') {
+      setStress((prev) => ({ ...prev, selic: 15, pib: -2 }))
+    }
+    if (p.label === 'SELIC vai a 16%') {
+      setStress((prev) => ({ ...prev, selic: 16 }))
+    }
+    if (p.label === 'Câmbio bate R$7') {
+      setStress((prev) => ({ ...prev, usd: 7 }))
+    }
+  }
 
   async function analyzeWithAI() {
     setAiLoading(true)
     setAiResponse('')
     try {
-      const prompt = `Analise este cenário: SELIC ${stress.selic}%, IPCA ${stress.ipca}%, PIB ${stress.pib}%, USD R$${stress.usd.toFixed(2)}. Compare com a base atual (SELIC ${base.selic}%, IPCA ${base.ipca}%, PIB ${base.pib}%, USD R$${base.usd.toFixed(2)}). Qual o impacto para uma empresa média? Quais ações tomar?`
+      const projData = chartData.map((d) => `Mês ${d.month}: Pess=${d.pessimista.toFixed(0)}, Real=${d.realista.toFixed(0)}, Otim=${d.otimista.toFixed(0)}`).join('; ')
+      const prompt = `Analise este cenário macroeconômico para uma empresa média brasileira:
+
+CENÁRIO AJUSTADO: SELIC ${stress.selic}%, IPCA ${stress.ipca}%, PIB ${stress.pib}%, USD R$${stress.usd.toFixed(2)}.
+BASE ATUAL: SELIC ${base.selic}%, IPCA ${base.ipca}%, PIB ${base.pib}%, USD R$${base.usd.toFixed(2)}.
+
+PROJEÇÃO 12 MESES (Índice de Saúde Empresarial 0-100):
+${projData}
+
+Cenário Pessimista: SELIC ${(stress.selic + 2).toFixed(1)}%, IPCA ${(stress.ipca + 1.5).toFixed(1)}%, PIB ${(stress.pib - 1).toFixed(1)}%, USD R$${(stress.usd + 0.8).toFixed(2)}
+Cenário Otimista: SELIC ${(stress.selic - 2).toFixed(1)}%, IPCA ${(stress.ipca - 1).toFixed(1)}%, PIB ${(stress.pib + 1).toFixed(1)}%, USD R$${(stress.usd - 0.5).toFixed(2)}
+
+Faça uma análise estratégica considerando:
+1. Impacto no custo de financiamento
+2. Impacto na demanda e receita
+3. Risco cambial para importações
+4. Recomendações práticas (3-5 ações concretas)
+5. Janela de oportunidade se houver`
       const res = await fetch('/api/advisor-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -70,6 +174,28 @@ export default function CenariosForecast({ marketData }: { marketData: any }) {
     }
   }
 
+  // SVG chart helpers
+  const chartW = 600
+  const chartH = 200
+  const padL = 36
+  const padR = 12
+  const padT = 12
+  const padB = 28
+  const plotW = chartW - padL - padR
+  const plotH = chartH - padT - padB
+
+  function toX(month: number) { return padL + ((month - 1) / 11) * plotW }
+  function toY(val: number) { return padT + plotH - (val / 100) * plotH }
+
+  function polyline(data: { month: number; val: number }[]) {
+    return data.map((d) => `${toX(d.month).toFixed(1)},${toY(d.val).toFixed(1)}`).join(' ')
+  }
+
+  const sty = {
+    section: { marginBottom: 24 } as React.CSSProperties,
+    sectionTitle: { fontSize: 14, fontWeight: 700 as const, color: '#fff', marginBottom: 12, textTransform: 'uppercase' as const, letterSpacing: 1 },
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -77,10 +203,10 @@ export default function CenariosForecast({ marketData }: { marketData: any }) {
       transition={{ duration: 0.4 }}
       style={{ color: '#e0e0e0', padding: 24 }}
     >
-      {/* 1. Current Base */}
+      {/* 1. Base Atual */}
       <div style={{ background: 'rgba(26,82,118,0.12)', border: `1px solid ${BLUE}`, borderRadius: 10, padding: 16, marginBottom: 24 }}>
         <p style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
-          BASE ATUAL — dados reais do mercado
+          Base Atual — dados reais do mercado
         </p>
         <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
           {[
@@ -97,87 +223,166 @@ export default function CenariosForecast({ marketData }: { marketData: any }) {
         </div>
       </div>
 
-      {/* 2. Scenario Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16, marginBottom: 28 }}>
-        {SCENARIOS.map((sc) => {
-          const vals = {
-            selic: +(base.selic + sc.offsets.selic).toFixed(2),
-            ipca: +(base.ipca + sc.offsets.ipca).toFixed(2),
-            pib: +(base.pib + sc.offsets.pib).toFixed(2),
-            usd: +(base.usd + sc.offsets.usd).toFixed(2),
-          }
-          const imp = interpret(vals.selic, vals.ipca, vals.pib, vals.usd)
-          return (
-            <motion.div
-              key={sc.title}
-              whileHover={{ scale: 1.02 }}
-              style={{ background: sc.bg, borderRadius: 10, borderTop: `3px solid ${sc.color}`, padding: 16 }}
+      {/* 5. "E se..." Quick Scenarios — placed before sliders for UX */}
+      <div style={{ ...sty.section }}>
+        <p style={{ ...sty.sectionTitle, fontSize: 12 }}>E se...</p>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {PRESETS.map((p) => (
+            <motion.button
+              key={p.label}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => applyPreset(p)}
+              style={{
+                padding: '6px 14px',
+                borderRadius: 20,
+                border: '1px solid rgba(255,255,255,0.15)',
+                background: 'rgba(255,255,255,0.04)',
+                color: '#ccc',
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
             >
-              <h3 style={{ fontSize: 15, fontWeight: 700, color: sc.color, marginBottom: 10 }}>{sc.title}</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 12 }}>
-                <span style={{ fontSize: 13 }}>SELIC: <b>{vals.selic}%</b></span>
-                <span style={{ fontSize: 13 }}>IPCA: <b>{vals.ipca}%</b></span>
-                <span style={{ fontSize: 13 }}>PIB: <b>{vals.pib}%</b></span>
-                <span style={{ fontSize: 13 }}>USD: <b>R${vals.usd.toFixed(2)}</b></span>
-              </div>
-              <div style={{ borderTop: `1px solid ${sc.color}33`, paddingTop: 8 }}>
-                <ImpactLine label="Custo financeiro" value={imp.custo} />
-                <ImpactLine label="Poder de compra" value={imp.poder} good={imp.poder === 'estável'} />
-                <ImpactLine label="Demanda" value={imp.demanda} good={imp.demanda === 'crescendo'} />
-                <ImpactLine label="Importação" value={imp.importacao} good={!imp.importacao.includes('cara')} />
-              </div>
-            </motion.div>
-          )
-        })}
+              {p.label}
+            </motion.button>
+          ))}
+        </div>
       </div>
 
-      {/* 3. Stress Test */}
+      {/* 2. Stress Test Sliders */}
       <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: 10, padding: 20, marginBottom: 24 }}>
-        <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 16 }}>Stress Test — E se...?</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
-          {([
-            { key: 'selic' as const, label: 'SELIC', min: 5, max: 20, step: 0.25, suffix: '%' },
-            { key: 'ipca' as const, label: 'IPCA', min: 1, max: 12, step: 0.25, suffix: '%' },
-            { key: 'pib' as const, label: 'PIB', min: -3, max: 6, step: 0.1, suffix: '%' },
-            { key: 'usd' as const, label: 'USD', min: 4, max: 8, step: 0.1, suffix: '' },
-          ]).map((s) => (
-            <div key={s.key}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                <label style={{ fontSize: 13, color: '#ccc' }}>{s.label}</label>
-                <span style={{ fontSize: 13, fontWeight: 700, color: BLUE }}>
-                  {s.key === 'usd' ? `R$${stress[s.key].toFixed(2)}` : `${stress[s.key].toFixed(2)}${s.suffix}`}
-                </span>
+        <h3 style={{ ...sty.sectionTitle, marginBottom: 16 }}>Stress Test</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 20 }}>
+          {SLIDER_CONFIGS.map((cfg) => {
+            const val = stress[cfg.key]
+            const baseVal = base[cfg.key]
+            const color = sliderColor(val, cfg)
+            const pct = ((val - cfg.min) / (cfg.max - cfg.min)) * 100
+            return (
+              <div key={cfg.key}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+                  <label style={{ fontSize: 13, color: '#ccc', fontWeight: 600 }}>{cfg.label}</label>
+                  <div style={{ fontSize: 13, display: 'flex', gap: 8, alignItems: 'baseline' }}>
+                    <span style={{ color: '#666', fontSize: 11 }}>base {formatVal(cfg.key, baseVal)}</span>
+                    <span style={{ fontWeight: 700, color, fontSize: 15 }}>{formatVal(cfg.key, val)}</span>
+                  </div>
+                </div>
+                <div style={{ position: 'relative', height: 6, borderRadius: 3, background: '#222', marginBottom: 6 }}>
+                  <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', borderRadius: 3, width: `${pct}%`, background: color, opacity: 0.7, transition: 'all 0.15s' }} />
+                  <input
+                    type="range"
+                    min={cfg.min}
+                    max={cfg.max}
+                    step={cfg.step}
+                    value={val}
+                    onChange={(e) => setStress((prev) => ({ ...prev, [cfg.key]: parseFloat(e.target.value) }))}
+                    style={{ position: 'absolute', top: -6, left: 0, width: '100%', height: 18, opacity: 0, cursor: 'pointer' }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: -4,
+                      left: `${pct}%`,
+                      transform: 'translateX(-50%)',
+                      width: 14,
+                      height: 14,
+                      borderRadius: '50%',
+                      background: color,
+                      border: '2px solid #fff',
+                      transition: 'left 0.15s',
+                      pointerEvents: 'none',
+                    }}
+                  />
+                </div>
+                <p style={{ fontFamily: 'monospace', fontSize: 11, color: '#888', margin: 0, lineHeight: 1.4 }}>
+                  {cfg.impactText(val)}
+                </p>
               </div>
-              <input
-                type="range"
-                min={s.min}
-                max={s.max}
-                step={s.step}
-                value={stress[s.key]}
-                onChange={(e) => setStress((prev) => ({ ...prev, [s.key]: parseFloat(e.target.value) }))}
-                style={{ width: '100%', accentColor: BLUE }}
-              />
+            )
+          })}
+        </div>
+      </div>
+
+      {/* 3. Projecao 12 Meses SVG Chart */}
+      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: 10, padding: 20, marginBottom: 24 }}>
+        <h3 style={{ ...sty.sectionTitle, marginBottom: 16 }}>Projecao 12 Meses — Indice de Saude Empresarial</h3>
+        <svg viewBox={`0 0 ${chartW} ${chartH}`} style={{ width: '100%', height: 'auto' }}>
+          {/* Gridlines */}
+          {[0, 25, 50, 75, 100].map((v) => (
+            <g key={v}>
+              <line x1={padL} y1={toY(v)} x2={chartW - padR} y2={toY(v)} stroke="rgba(255,255,255,0.06)" strokeWidth={1} />
+              <text x={padL - 4} y={toY(v) + 4} fill="#666" fontSize={9} textAnchor="end">{v}</text>
+            </g>
+          ))}
+          {/* X axis labels */}
+          {chartData.map((d) => (
+            <text key={d.month} x={toX(d.month)} y={chartH - 6} fill="#666" fontSize={9} textAnchor="middle">
+              {d.month}
+            </text>
+          ))}
+          {/* Lines */}
+          <polyline points={polyline(chartData.map((d) => ({ month: d.month, val: d.pessimista })))} fill="none" stroke={RED} strokeWidth={2} strokeLinejoin="round" />
+          <polyline points={polyline(chartData.map((d) => ({ month: d.month, val: d.realista })))} fill="none" stroke={AMBER} strokeWidth={2} strokeLinejoin="round" />
+          <polyline points={polyline(chartData.map((d) => ({ month: d.month, val: d.otimista })))} fill="none" stroke={GREEN} strokeWidth={2} strokeLinejoin="round" />
+          {/* Dots at endpoints */}
+          {[
+            { val: chartData[11].pessimista, color: RED },
+            { val: chartData[11].realista, color: AMBER },
+            { val: chartData[11].otimista, color: GREEN },
+          ].map((d, i) => (
+            <circle key={i} cx={toX(12)} cy={toY(d.val)} r={3} fill={d.color} />
+          ))}
+        </svg>
+        {/* Legend */}
+        <div style={{ display: 'flex', gap: 20, justifyContent: 'center', marginTop: 8 }}>
+          {[
+            { label: 'Pessimista', color: RED },
+            { label: 'Realista', color: AMBER },
+            { label: 'Otimista', color: GREEN },
+          ].map((l) => (
+            <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: l.color }} />
+              <span style={{ fontSize: 11, color: '#aaa' }}>{l.label}</span>
             </div>
           ))}
         </div>
-
-        <div style={{ background: 'rgba(26,82,118,0.1)', borderRadius: 8, padding: 14 }}>
-          <p style={{ fontFamily: 'monospace', fontSize: 13, margin: '4px 0', color: custoDiff >= 0 ? RED : GREEN }}>
-            Custo financeiro: {(stress.selic * 2.5).toFixed(1)}% a.a. ({custoDiff >= 0 ? '+' : ''}{custoDiff.toFixed(1)}pp vs atual)
-          </p>
-          <p style={{ fontFamily: 'monospace', fontSize: 13, margin: '4px 0', color: stress.ipca > base.ipca ? RED : GREEN }}>
-            Inflação acumulada 12m: {stress.ipca.toFixed(2)}% → despesas sobem R${despesasDiff}
-          </p>
-          <p style={{ fontFamily: 'monospace', fontSize: 13, margin: '4px 0', color: stress.pib > 2 ? GREEN : stress.pib > 0 ? AMBER : RED }}>
-            Demanda: PIB {stress.pib.toFixed(1)}% → {stressImpact.demanda}
-          </p>
-          <p style={{ fontFamily: 'monospace', fontSize: 13, margin: '4px 0', color: stress.usd > base.usd ? RED : GREEN }}>
-            Câmbio: R${stress.usd.toFixed(2)} → importação {parseFloat(cambioDiffPct) >= 0 ? '+' : ''}{cambioDiffPct}% vs atual
-          </p>
-        </div>
       </div>
 
-      {/* 4. AI Button */}
+      {/* 4. Tabela de Impacto */}
+      <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid #333', borderRadius: 10, padding: 20, marginBottom: 24, overflowX: 'auto' }}>
+        <h3 style={{ ...sty.sectionTitle, marginBottom: 16 }}>Tabela de Impacto</h3>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <thead>
+            <tr>
+              {['Cenario', 'SELIC', 'IPCA', 'PIB', 'USD', 'Financiamento', 'Demanda', 'Importacao'].map((h) => (
+                <th key={h} style={{ padding: '8px 10px', textAlign: 'left', borderBottom: '1px solid rgba(255,255,255,0.06)', color: '#888', fontWeight: 600, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {scenarios.map((sc) => (
+              <tr key={sc.name} style={{ background: sc.bg }}>
+                <td style={{ padding: '10px', fontWeight: 700, color: sc.color, borderLeft: `3px solid ${sc.color}`, borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  {sc.name}
+                </td>
+                <td style={{ padding: '10px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>{sc.selic.toFixed(1)}%</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>{sc.ipca.toFixed(1)}%</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>{sc.pib.toFixed(1)}%</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>R${sc.usd.toFixed(2)}</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid rgba(255,255,255,0.04)', fontFamily: 'monospace' }}>{(sc.selic * 2.5).toFixed(1)}% a.a.</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid rgba(255,255,255,0.04)', color: sc.pib > 2 ? GREEN : sc.pib > 0 ? AMBER : RED }}>{demandaText(sc.pib)}</td>
+                <td style={{ padding: '10px', borderBottom: '1px solid rgba(255,255,255,0.04)', color: sc.usd > 6 ? RED : sc.usd > 5.3 ? AMBER : GREEN }}>{importText(sc.usd)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 6. IA Analysis */}
       <motion.button
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.97 }}
@@ -196,7 +401,7 @@ export default function CenariosForecast({ marketData }: { marketData: any }) {
           marginBottom: 16,
         }}
       >
-        {aiLoading ? 'Analisando...' : 'Analisar com IA'}
+        {aiLoading ? 'Analisando cenarios...' : 'Analisar Cenarios com IA'}
       </motion.button>
 
       {aiResponse && (
@@ -205,7 +410,7 @@ export default function CenariosForecast({ marketData }: { marketData: any }) {
           animate={{ opacity: 1, height: 'auto' }}
           style={{ background: 'rgba(26,82,118,0.08)', border: `1px solid ${BLUE}33`, borderRadius: 8, padding: 16 }}
         >
-          <p style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Resposta IA</p>
+          <p style={{ fontSize: 12, color: '#888', marginBottom: 6 }}>Analise IA — Cenarios & Forecast</p>
           <p style={{ fontSize: 14, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{aiResponse}</p>
         </motion.div>
       )}
