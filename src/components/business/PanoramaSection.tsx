@@ -453,7 +453,7 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
         <div className="relative rounded-lg border border-white/[0.06] overflow-hidden"
           style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.01) 0%, rgba(0,0,0,0.5) 80%)' }}>
           {/* Pergunta central — perspectiva 3D dentro do globo */}
-          <div className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center" style={{ perspective: '800px' }}>
+          <div className="absolute inset-0 z-10 pointer-events-none flex items-end justify-center pb-20 md:pb-24" style={{ perspective: '800px' }}>
             <motion.div
               initial={{ opacity: 0, rotateX: 40, scale: 0.7 }}
               animate={{ opacity: 1, rotateX: 12, scale: 1 }}
