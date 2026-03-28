@@ -67,11 +67,11 @@ export async function GET() {
       aaplRes, googlRes, metaRes, amznRes, valeRes, petrRes,
       techRes, agroRes, healthRes, energyRes, fintechRes, logRes, retailRes,
     ] = await Promise.allSettled([
-      // Macro (APIs brasileiras gratuitas)
+      // Macro (APIs brasileiras que FUNCIONAM)
       safeFetch('https://economia.awesomeapi.com.br/json/last/USD-BRL'),
       safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/1?formato=json'),
-      safeFetch('https://servicodados.ibge.gov.br/api/v3/agregados/433/periodos/-2/variaveis/2266?localidades=N1[all]'),
-      safeFetch('https://servicodados.ibge.gov.br/api/v3/agregados/1621/periodos/-2/variaveis/584?localidades=N1[all]'),
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.13522/dados/ultimos/1?formato=json'), // IPCA acumulado 12m
+      safeFetch('https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?$filter=Indicador%20eq%20%27PIB%20Total%27%20and%20DataReferencia%20eq%20%272026%27&$top=1&$orderby=Data%20desc&$format=json'), // PIB Focus
       // Commodities (Yahoo Finance)
       safeFetch(yh('GC=F'),  YH),   // Ouro
       safeFetch(yh('CL=F'),  YH),   // Petróleo WTI
@@ -111,22 +111,20 @@ export async function GET() {
         if (Number.isFinite(val)) selic = val
       } catch { /* fallback */ }
     }
+    // IPCA acumulado 12m via BCB série 13522
     if (ipcaRes.status === 'fulfilled' && ipcaRes.value) {
       try {
         const d = await ipcaRes.value.json()
-        const serie = d?.[0]?.resultados?.[0]?.series?.[0]?.serie ?? {}
-        const vals  = Object.values(serie) as string[]
-        const last  = parseFloat(vals[vals.length - 1])
-        if (Number.isFinite(last)) ipca = last
+        const val = parseFloat(d?.[0]?.valor)
+        if (Number.isFinite(val)) ipca = val
       } catch { /* fallback */ }
     }
+    // PIB via BCB Focus (projeção mercado)
     if (pibRes.status === 'fulfilled' && pibRes.value) {
       try {
         const d = await pibRes.value.json()
-        const serie = d?.[0]?.resultados?.[0]?.series?.[0]?.serie ?? {}
-        const vals  = Object.values(serie) as string[]
-        const last  = parseFloat(vals[vals.length - 1])
-        if (Number.isFinite(last)) pib = last
+        const val = parseFloat(d?.value?.[0]?.Mediana)
+        if (Number.isFinite(val)) pib = val
       } catch { /* fallback */ }
     }
 
