@@ -10,7 +10,7 @@ export interface WorkspaceProfile {
   subtype: string
   sectors: string[]
   revenue: string
-  product: string
+  product: string[]
 }
 
 interface Props {
@@ -153,7 +153,7 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
     subtype: '',
     sectors: [],
     revenue: '',
-    product: '',
+    product: [],
   })
 
   // helper for "não sei" path
@@ -198,7 +198,12 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
       { id: 'slu', title: 'SLU', sub: 'Empresa individual, Simples Nacional' },
       { id: 'ltda', title: 'LTDA', sub: 'Sociedade com sócios' },
     ]
-    const activities = ['E-commerce', 'Freelancer', 'App/SaaS', 'Conteúdo', 'Serviços', 'Outro']
+    const activities = [
+      'E-commerce', 'Marketplace', 'App/SaaS', 'Freelancer', 'Consultoria',
+      'Conteúdo', 'Infoproduto', 'Dropshipping', 'Agência', 'Delivery',
+      'Serviços', 'Saúde', 'Educação', 'Moda', 'Beleza',
+      'Alimentação', 'Artesanato', 'Imobiliário', 'Financeiro', 'Outro',
+    ]
 
     return (
       <div className="flex flex-col gap-4">
@@ -214,13 +219,14 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
         ))}
 
         <p className="mt-4 text-center text-[13px] text-white/40">O que você faz?</p>
+        <p className="text-center text-[10px] text-white/20 -mt-2">Selecione um ou mais</p>
         <div className="flex flex-wrap justify-center gap-2">
           {activities.map((a) => (
             <Chip
               key={a}
               label={a}
-              selected={profile.product === a}
-              onClick={() => patch({ product: a })}
+              selected={profile.product.includes(a)}
+              onClick={() => toggleProduct(a)}
             />
           ))}
         </div>
@@ -360,6 +366,13 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
     setProfile(p => ({
       ...p,
       sectors: p.sectors.includes(s) ? p.sectors.filter(x => x !== s) : [...p.sectors, s],
+    }))
+  }
+
+  const toggleProduct = (a: string) => {
+    setProfile(p => ({
+      ...p,
+      product: p.product.includes(a) ? p.product.filter(x => x !== a) : [...p.product, a],
     }))
   }
 
