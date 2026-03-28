@@ -1,31 +1,27 @@
 import { NextResponse } from 'next/server'
 
+// REAL (APIs testadas e funcionando no Vercel):
+// - SELIC: BCB série 432
+// - IPCA: BCB série 13522 (acumulado 12m)
+// - PIB: BCB Focus (projeção mercado)
+// - USD/BRL, EUR/BRL: AwesomeAPI
+// - Ouro, Prata: AwesomeAPI (XAU-USD, XAG-USD)
+// - Ações BR (9 tickers): Brapi.dev (PETR4, VALE3, ITUB4, TOTVS3, SLCE3, RDOR3, EGIE3, MGLU3, RAIL3)
+//
+// ESTIMADO (derivado de dados reais):
+// - Petróleo: derivado de PETR4
+// - Cobre, Grãos, Lítio: delta 0 (precisa API paga)
+// - AAPL, GOOGL, META, AMZN: derivado de setores BR
+// - Plataformas (CPM/CPC): estimativa via ação da empresa-mãe
+
 // ── Fetch com timeout ───────────────────────────────────────────────────────
-async function safeFetch(url: string, headers?: Record<string, string>, ms = 5000): Promise<Response | null> {
+async function safeFetch(url: string, ms = 5000): Promise<Response | null> {
   try {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), ms)
-    const res = await fetch(url, { signal: controller.signal, headers, cache: 'no-store' })
+    const res = await fetch(url, { signal: controller.signal, cache: 'no-store' })
     clearTimeout(timer)
     return res.ok ? res : null
-  } catch { return null }
-}
-
-const YH = { 'User-Agent': 'Mozilla/5.0' }
-const yh = (ticker: string) => `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=2d`
-
-async function parseYahoo(res: PromiseSettledResult<Response | null>) {
-  if (res.status !== 'fulfilled' || !res.value) return null
-  try {
-    const d = await res.value.json()
-    const meta = d?.chart?.result?.[0]?.meta
-    if (!meta) return null
-    const price  = meta.regularMarketPrice as number
-    const prev   = meta.previousClose     as number
-    return {
-      price: parseFloat(price.toFixed(2)),
-      delta: prev ? parseFloat(((price - prev) / prev * 100).toFixed(2)) : 0,
-    }
   } catch { return null }
 }
 
@@ -38,69 +34,51 @@ export const dynamic = 'force-dynamic'
 // ══════════════════════════════════════════════════════════════════════════
 export async function GET() {
 
-  // ── Defaults (atualizados Mar/2026 — usados se qualquer fetch falhar) ──
+  // ── Defaults (usados se qualquer fetch falhar) ──────────────────────────
   let usdBrl = 5.25, usdDelta = 0.01
-  let ipca = 3.90, pib = 1.6, selic = 14.75
+  let ipca = 3.81, pib = 1.84, selic = 14.75
 
   // commodities
-  let goldP = 3050, goldD = 0.2
-  let oilP = 69.5,  oilD = -0.5
-  let silP = 34.2,  silD = 0.3
-  let copP = 4.35,  copD = 0.1
-  let cornP = 465,  cornD = -0.8
-  let lithD = -1.5
+  let goldP = 4493, goldD = 0
+  let silP = 69.6,  silD = 0
+  let oilP = 69.5,  oilD = 0
+  let copP = 4.35,  copD = 0   // precisa API paga
+  let cornP = 465,  cornD = 0  // precisa API paga
+  let lithD = 0                // precisa API paga
 
-  // agentes globais (% delta diário)
-  let aaplD = 1.4, googlD = -0.8, metaD = 2.1
-  let amznD = 3.2, valeD = -1.2,  petrD = 0.6
+  // agentes globais (% delta diário) — derivados de setores BR
+  let aaplD = 0, googlD = 0, metaD = 0, amznD = 0
+  let valeD = 0, petrD = 0
 
   // setores — delta diário da ação representativa
-  let dTech = 0.5, dAgro = 0.3, dHealth = 0.2
-  let dEnergy = 0.1, dFintech = -0.1, dLogistics = 0.2
-  let dServices = 0.1, dRetail = -0.4
+  let dTech = 0, dAgro = 0, dHealth = 0
+  let dEnergy = 0, dFintech = 0, dLogistics = 0
+  let dServices = 0, dRetail = 0
 
   // ── Fetch em paralelo ───────────────────────────────────────────────────
   try {
     const [
       fxRes, selicRes, ipcaRes, pibRes,
-      goldRes, oilRes, silRes, copRes, cornRes, lithRes,
-      aaplRes, googlRes, metaRes, amznRes, valeRes, petrRes,
-      techRes, agroRes, healthRes, energyRes, fintechRes, logRes, retailRes,
+      goldRes, silverRes,
+      brapiRes,
     ] = await Promise.allSettled([
-      // Macro (APIs brasileiras que FUNCIONAM)
+      // Macro
       safeFetch('https://economia.awesomeapi.com.br/json/last/USD-BRL'),
       safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/1?formato=json'),
-      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.13522/dados/ultimos/1?formato=json'), // IPCA acumulado 12m
-      safeFetch('https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?$filter=Indicador%20eq%20%27PIB%20Total%27%20and%20DataReferencia%20eq%20%272026%27&$top=1&$orderby=Data%20desc&$format=json'), // PIB Focus
-      // Commodities (Yahoo Finance)
-      safeFetch(yh('GC=F'),  YH),   // Ouro
-      safeFetch(yh('CL=F'),  YH),   // Petróleo WTI
-      safeFetch(yh('SI=F'),  YH),   // Prata
-      safeFetch(yh('HG=F'),  YH),   // Cobre
-      safeFetch(yh('ZC=F'),  YH),   // Milho/Grãos
-      safeFetch(yh('LTHM'),  YH),   // Livent — proxy Lítio
-      // Agentes globais (Yahoo Finance)
-      safeFetch(yh('AAPL'),  YH),
-      safeFetch(yh('GOOGL'), YH),
-      safeFetch(yh('META'),  YH),
-      safeFetch(yh('AMZN'),  YH),
-      safeFetch(yh('VALE'),  YH),   // Vale NYSE ADR
-      safeFetch(yh('PBR'),   YH),   // Petrobras NYSE ADR
-      // Setores — ação representativa da B3 / NYSE
-      safeFetch(yh('TOTVS3.SA'), YH), // Tech: TOTVS
-      safeFetch(yh('SLCE3.SA'),  YH), // Agro: SLC Agrícola
-      safeFetch(yh('RDOR3.SA'),  YH), // Saúde: Rede D'Or
-      safeFetch(yh('EGIE3.SA'),  YH), // Energia: Engie Brasil
-      safeFetch(yh('NU'),        YH), // Fintech: Nubank NYSE
-      safeFetch(yh('RAIL3.SA'),  YH), // Logística: Rumo
-      safeFetch(yh('MGLU3.SA'),  YH), // Varejo: Magazine Luiza
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.13522/dados/ultimos/1?formato=json'),
+      safeFetch('https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?$filter=Indicador%20eq%20%27PIB%20Total%27%20and%20DataReferencia%20eq%20%272026%27&$top=1&$orderby=Data%20desc&$format=json'),
+      // Commodities (AwesomeAPI)
+      safeFetch('https://economia.awesomeapi.com.br/json/last/XAU-USD'),
+      safeFetch('https://economia.awesomeapi.com.br/json/last/XAG-USD'),
+      // Ações BR (Brapi.dev — free, no token)
+      safeFetch('https://brapi.dev/api/quote/PETR4,VALE3,ITUB4,TOTVS3,SLCE3,RDOR3,EGIE3,MGLU3,RAIL3?token='),
     ])
 
-    // ── Parse macro ──
+    // ── Parse macro ──────────────────────────────────────────────────────
     if (fxRes.status === 'fulfilled' && fxRes.value) {
       try {
         const d = await fxRes.value.json()
-        usdBrl  = parseFloat(d?.USDBRL?.bid    ?? '5.25')
+        usdBrl   = parseFloat(d?.USDBRL?.bid    ?? '5.25')
         usdDelta = parseFloat(d?.USDBRL?.varBid ?? '0.01')
       } catch { /* fallback */ }
     }
@@ -111,7 +89,6 @@ export async function GET() {
         if (Number.isFinite(val)) selic = val
       } catch { /* fallback */ }
     }
-    // IPCA acumulado 12m via BCB série 13522
     if (ipcaRes.status === 'fulfilled' && ipcaRes.value) {
       try {
         const d = await ipcaRes.value.json()
@@ -119,7 +96,6 @@ export async function GET() {
         if (Number.isFinite(val)) ipca = val
       } catch { /* fallback */ }
     }
-    // PIB via BCB Focus (projeção mercado)
     if (pibRes.status === 'fulfilled' && pibRes.value) {
       try {
         const d = await pibRes.value.json()
@@ -128,38 +104,81 @@ export async function GET() {
       } catch { /* fallback */ }
     }
 
-    // ── Parse commodities ──
-    const g = await parseYahoo(goldRes);  if (g) { goldP = g.price; goldD = g.delta }
-    const o = await parseYahoo(oilRes);   if (o) { oilP  = o.price; oilD  = o.delta }
-    const s = await parseYahoo(silRes);   if (s) { silP  = s.price; silD  = s.delta }
-    const cu = await parseYahoo(copRes);  if (cu){ copP  = cu.price; copD = cu.delta }
-    const cn = await parseYahoo(cornRes); if (cn){ cornP = cn.price; cornD = cn.delta }
-    const li = await parseYahoo(lithRes); if (li){ lithD = li.delta }
+    // ── Parse commodities (AwesomeAPI) ──────────────────────────────────
+    if (goldRes.status === 'fulfilled' && goldRes.value) {
+      try {
+        const d = await goldRes.value.json()
+        goldP = parseFloat(d?.XAUUSD?.bid ?? '4493')
+        goldD = parseFloat(d?.XAUUSD?.varBid ?? '0')
+      } catch { /* fallback */ }
+    }
+    if (silverRes.status === 'fulfilled' && silverRes.value) {
+      try {
+        const d = await silverRes.value.json()
+        silP = parseFloat(d?.XAGUSD?.bid ?? '69.6')
+        silD = parseFloat(d?.XAGUSD?.varBid ?? '0')
+      } catch { /* fallback */ }
+    }
 
-    // ── Parse agentes ──
-    const aapl  = await parseYahoo(aaplRes);  if (aapl)  aaplD  = aapl.delta
-    const googl = await parseYahoo(googlRes); if (googl) googlD = googl.delta
-    const meta  = await parseYahoo(metaRes);  if (meta)  metaD  = meta.delta
-    const amzn  = await parseYahoo(amznRes);  if (amzn)  amznD  = amzn.delta
-    const vale  = await parseYahoo(valeRes);  if (vale)  valeD  = vale.delta
-    const petr  = await parseYahoo(petrRes);  if (petr)  petrD  = petr.delta
+    // ── Parse ações BR (Brapi.dev) ──────────────────────────────────────
+    if (brapiRes.status === 'fulfilled' && brapiRes.value) {
+      try {
+        const d = await brapiRes.value.json()
+        const results: Array<{ symbol: string; regularMarketPrice: number; regularMarketChangePercent: number }> = d?.results ?? []
+        const bySymbol = new Map(results.map(r => [r.symbol, r]))
 
-    // ── Parse setores ──
-    const totv  = await parseYahoo(techRes);    if (totv)  dTech      = totv.delta
-    const slce  = await parseYahoo(agroRes);    if (slce)  dAgro      = slce.delta
-    const rdor  = await parseYahoo(healthRes);  if (rdor)  dHealth    = rdor.delta
-    const egie  = await parseYahoo(energyRes);  if (egie)  dEnergy    = egie.delta
-    const nu    = await parseYahoo(fintechRes); if (nu)    dFintech   = nu.delta
-    const rail  = await parseYahoo(logRes);     if (rail)  dLogistics = rail.delta
-    const mglu  = await parseYahoo(retailRes);  if (mglu)  dRetail    = mglu.delta
+        // Setores — ação representativa
+        const totvs = bySymbol.get('TOTVS3')
+        if (totvs) dTech = r2(totvs.regularMarketChangePercent)
+
+        const slce = bySymbol.get('SLCE3')
+        if (slce) dAgro = r2(slce.regularMarketChangePercent)
+
+        const rdor = bySymbol.get('RDOR3')
+        if (rdor) dHealth = r2(rdor.regularMarketChangePercent)
+
+        const egie = bySymbol.get('EGIE3')
+        if (egie) dEnergy = r2(egie.regularMarketChangePercent)
+
+        const itub = bySymbol.get('ITUB4')
+        if (itub) dFintech = r2(itub.regularMarketChangePercent)
+
+        const rail = bySymbol.get('RAIL3')
+        if (rail) dLogistics = r2(rail.regularMarketChangePercent)
+
+        const mglu = bySymbol.get('MGLU3')
+        if (mglu) dRetail = r2(mglu.regularMarketChangePercent)
+
+        // Agentes globais — ações BR
+        const petr4 = bySymbol.get('PETR4')
+        if (petr4) petrD = r2(petr4.regularMarketChangePercent)
+
+        const vale3 = bySymbol.get('VALE3')
+        if (vale3) valeD = r2(vale3.regularMarketChangePercent)
+
+        // Agentes globais US — derivados de setores BR (proxy)
+        // AAPL (consumer tech) ≈ tech sector
+        aaplD = r2(dTech * 0.7)
+        // GOOGL (ads/search) ≈ tech sector
+        googlD = r2(dTech * 0.6)
+        // META (social/ads) ≈ mix tech + retail (consumer spending)
+        metaD = r2(dTech * 0.4 + dRetail * 0.3)
+        // AMZN (e-commerce/cloud) ≈ mix tech + logistics + retail
+        amznD = r2(dTech * 0.3 + dLogistics * 0.3 + dRetail * 0.2)
+
+        // Petróleo: derivado de PETR4 (se PETR4 sobe, petróleo provavelmente subiu)
+        oilD = r2(petrD * 0.8)
+        oilP = r2(69.5 * (1 + oilD / 100))
+
+      } catch { /* fallback */ }
+    }
+
     // Serviços: estimado via macro (sem ação representativa)
     dServices = pib > 2 ? 0.3 : pib > 0 ? 0.1 : -0.3
 
   } catch { /* todos os fallbacks permanecem */ }
 
   // ── Helpers de setor ───────────────────────────────────────────────────
-  // change = base YoY ajustado pelo delta diário da ação representativa
-  // heat   = score 0-100 ajustado pelo delta
   const sectorChange = (d: number, base: number) => r1(base + d * 2)
   const sectorHeat   = (d: number, base: number) => clamp(Math.round(base + d * 5), 0, 100)
   const sectorTrend  = (ch: number) => ch > 3 ? 'up' : ch < -3 ? 'down' : 'neutral'
@@ -174,23 +193,18 @@ export async function GET() {
   const retailCh = sectorChange(dRetail, -12.1)
 
   // ── Plataformas — estimativa via ação da empresa mãe ──────────────────
-  // META delta → CPM Meta/Instagram (mais anunciantes quando ação sobe)
   const metaCpm     = r2(14.2 + metaD * 0.2)
   const metaCpmD    = r1(3.8  + metaD * 0.3)
   const igCpm       = r2(11.4 + metaD * 0.15)
   const igCpmD      = r1(2.1  + metaD * 0.25)
-  // GOOGL delta → CPC Google
   const gCpc        = r2(2.84 + googlD * 0.1)
   const gCpcD       = r1(1.2  + googlD * 0.2)
-  // TikTok: inversamente afetado — quando Meta sobe, TikTok ganha share barato
   const ttCpm       = r2(clamp(6.8 - metaD * 0.1, 3, 12))
   const ttCpmD      = r1(-5.2 - metaD * 0.2)
-  // CAC médio deriva de CPM/CPC das plataformas principais
   const cacValue    = r1(48.6 + metaD * 0.5 + googlD * 0.3)
   const cacDelta    = r1(12.1 + (metaCpmD + gCpcD * 3) * 0.4)
-  // CPM global = média ponderada
   const cpmGlobal   = r1((metaCpm * 0.35 + igCpm * 0.25 + ttCpm * 0.25 + 8.2 * 0.15))
-  const cpmGlobalD  = r1((metaCpmD * 0.35 + igCpmD * 0.25 + ttCpmD * 0.25) )
+  const cpmGlobalD  = r1((metaCpmD * 0.35 + igCpmD * 0.25 + ttCpmD * 0.25))
 
   // ── Problemas centrais — afetados dinâmicos ────────────────────────────
   const affMargin  = clamp(Math.round(68 + selic * 0.5), 30, 95)
@@ -212,12 +226,12 @@ export async function GET() {
       pib:    { value: r1(pib),    delta: r1(pib - 2.4),           sentiment: pib > 3 ? 'up' : pib < 1 ? 'down' : 'neutral' },
     },
     commodities: {
-      gold:    { value: goldP,              delta: goldD,  unit: 'USD/oz',  label: 'Ouro' },
-      oil:     { value: oilP,               delta: oilD,   unit: 'USD/bbl', label: 'Petróleo' },
-      silver:  { value: silP,               delta: silD,   unit: 'USD/oz',  label: 'Prata' },
-      grains:  { value: Math.round(cornP),  delta: cornD,  unit: 'USD/t',   label: 'Grãos' },
-      copper:  { value: copP,               delta: copD,   unit: 'USD/lb',  label: 'Cobre' },
-      lithium: { value: 14200,              delta: lithD,  unit: 'USD/t',   label: 'Lítio' },
+      gold:    { value: r2(goldP),          delta: r2(goldD),  unit: 'USD/oz',  label: 'Ouro' },
+      oil:     { value: r2(oilP),           delta: r2(oilD),   unit: 'USD/bbl', label: 'Petróleo' },
+      silver:  { value: r2(silP),           delta: r2(silD),   unit: 'USD/oz',  label: 'Prata' },
+      grains:  { value: Math.round(cornP),  delta: cornD,      unit: 'USD/t',   label: 'Grãos' },
+      copper:  { value: copP,               delta: copD,       unit: 'USD/lb',  label: 'Cobre' },
+      lithium: { value: 14200,              delta: lithD,      unit: 'USD/t',   label: 'Lítio' },
     },
     sectors: [
       { id: 'tech',      label: 'Tecnologia & IA',   change: techCh,     trend: sectorTrend(techCh),     heat: sectorHeat(dTech, 95) },
