@@ -132,69 +132,185 @@ Terminal de mercado ao vivo. IA cruza dados nativamente.
 
 ---
 
-## 4. ACESSIBILIDADE E INCLUSÃO
+## 4. ACESSIBILIDADE, INCLUSÃO, DIVERSIDADE E IGUALDADE
 
-### Princípio: Acessível por Design (não retrofit)
+### Princípio: O IPB é CSV na prática
 
-**Criatividade (cocriação):**
-- Onboarding pergunta necessidades de acessibilidade
-- Usuários com deficiência como beta testers
+O IPB não FALA sobre inclusão — PRATICA inclusão. Não é uma seção do app, é o DNA.
 
-**Inovação (IA adaptativa):**
-- IA traduz dados complexos em linguagem simples (já faz)
-- IA lê gráficos em texto: "Setor tech heat 98, subindo 35%"
+**Criatividade (cocriação):** Plataforma desenhada com usuários diversos como consultores de UX desde a fase 0. Não é "adaptar depois" — é construir COM.
 
-**Sustentabilidade (TBL do próprio IPB):**
-- Profit: SaaS por assinatura, IA grátis = margem alta
-- People: acessibilidade, inclusão, plano social pra ONGs
-- Planet: 100% digital, sem papel
+**Inovação (IA adaptativa):** IA que traduz dados complexos em linguagem acessível para QUALQUER pessoa — independente de escolaridade, deficiência, idioma, contexto.
 
-### Modos de Acessibilidade
+**Sustentabilidade (TBL do IPB):**
+- Profit: SaaS acessível = mercado maior. 45 milhões de PcD no Brasil, 80 milhões sem acesso a consultoria.
+- People: inclusão real, não selo decorativo. Plano social pra ONGs, MEIs, iniciantes.
+- Planet: 100% digital, pegada mínima.
 
-#### Modo Foco (TDAH) 🔲 A IMPLEMENTAR
-- Uma informação por tela
-- Bullets curtos, máximo 3 linhas
-- "A coisa mais importante agora é: X"
-- Barra de progresso: "Você viu 2 de 4"
-- Notificações mínimas
+---
 
-#### Modo Calmo (TEA/Autismo) 🔲 A IMPLEMENTAR
-- Sem animações (prefers-reduced-motion)
-- Cores estáticas, sem pulse/glow
-- Estrutura previsível e fixa
-- Linguagem literal, sem metáforas
-- Opção de ver TODOS os dados sem simplificação
+### 4.1 ACESSIBILIDADE (Deficiência)
 
-#### Acessibilidade Visual 🔲 A IMPLEMENTAR
-- Modo alto contraste
-- Fontes ajustáveis (A+ A-)
-- Compatível com leitores de tela (aria-labels)
-- Modo daltônico (formas além de cores: ▲▼● )
-- IA audiodescrição de gráficos
+**Quem é excluído hoje de inteligência de mercado?**
+Praticamente TODOS que têm alguma deficiência. Dashboards são visuais, textos são técnicos, navegação exige mouse.
 
-#### Acessibilidade Auditiva ✅ NATIVO
-- App já é 100% visual/texto
-- Não depende de áudio
+#### Neurodiversidade
 
-#### Acessibilidade Motora 🔲 PARCIAL
-- Navegação por teclado (Tab + Enter)
-- Botões com tamanho adequado
+**Modo Foco (TDAH)** 🔲 A IMPLEMENTAR
+- Uma informação por tela, não 50 ao mesmo tempo
+- Bullets curtos, máximo 3 linhas por resposta da IA
+- "A coisa mais importante agora é: X" — hierarquia clara
+- Barra de progresso: "Você viu 2 de 4 seções"
+- Timer de foco: "Dedique 5 min a isso"
+- Notificações mínimas e configuráveis
+- Hiperfoco como aliado: gamificação sutil (progresso, conquistas)
 
-#### Libras 🔲 FUTURO
-- Integração VLibras ou similar
-- Avatar tradutor
+**Modo Calmo (TEA/Autismo)** 🔲 A IMPLEMENTAR
+- Sem animações (CSS prefers-reduced-motion)
+- Cores estáticas, sem pulse/glow/piscando
+- Estrutura previsível: mesma posição, mesma ordem SEMPRE
+- Linguagem literal, sem metáforas ("mercado aquecido" → "setor crescendo 35%")
+- Roteiro fixo: "Primeiro veja isso → depois isso → ação"
+- Opção de ver TODOS os dados sem simplificação (detalhismo TEA como vantagem)
+- Transições suaves ou desligáveis
 
-### No Onboarding 🔲 A IMPLEMENTAR
-Adicionar pergunta: "Precisa de acessibilidade?"
-- "Modo Foco (TDAH)" → ativa modo foco
-- "Modo Calmo (sensorial)" → desliga animações
-- "Alto contraste / fontes maiores" → modo visual
-- "Modo padrão" → sem alterações
+#### Deficiência Visual
 
-### No ESG do Workspace 🔲 A IMPLEMENTAR
-Adicionar indicador: "Acessibilidade do seu produto/serviço"
-- "Seu produto é acessível para PcD?"
-- IA analisa e recomenda melhorias
+**Alto Contraste + Fontes** 🔲 A IMPLEMENTAR
+- Toggle alto contraste no perfil
+- Fontes ajustáveis (A+ A- no header)
+- Compatível com VoiceOver (iOS) e TalkBack (Android) via aria-labels
+- IA audiodescrição: "O gráfico mostra que tech está em 98 de 100, subindo 35%"
+- Modo daltônico: usar formas além de cores (▲ subindo, ▼ caindo, ● estável)
+
+#### Deficiência Auditiva ✅ NATIVO
+- App já é 100% visual/texto — não depende de áudio
+- Se adicionar vídeos: legendas obrigatórias
+
+**Libras** 🔲 FUTURO
+- Integração VLibras (widget governamental gratuito)
+- Avatar tradutor nas explicações da IA
+
+#### Deficiência Motora 🔲 PARCIAL
+- Navegação completa por teclado (Tab + Enter + Arrows)
+- Botões com área de toque mínima 44x44px (WCAG)
+- Alternativa a drag-and-drop (em Processos & Operações)
+
+---
+
+### 4.2 INCLUSÃO SOCIAL
+
+**Quem não tem acesso a inteligência de mercado hoje?**
+- MEIs e PFs que não podem pagar consultoria
+- Periferias e interior sem acesso a educação de negócios
+- Primeira geração de empreendedores na família
+- Imigrantes e refugiados empreendendo no Brasil
+
+**O que o IPB faz:**
+
+| Barreira | Como o IPB resolve |
+|----------|-------------------|
+| "Não entendo economia" | IA traduz: "SELIC alta = crédito caro pra você" |
+| "Não tenho dinheiro pra consultor" | IA grátis (Groq), plano freemium |
+| "Não sei por onde começar" | Onboarding: "Não sei" → IA guia passo a passo |
+| "Não tenho formação" | Intelligence: currículo PUCPR acessível |
+| "Sou do interior" | 100% online, funciona com internet básica |
+| "Meu negócio é pequeno demais" | De MEI a LTDA — o app cresce com você |
+
+**Planos de inclusão social** 🔲 A DEFINIR
+- Plano gratuito para MEIs (módulos básicos)
+- Plano social para ONGs, associações, fundações
+- Parceria com incubadoras e aceleradoras sociais
+- Programa "Primeiro Negócio" para iniciantes
+
+---
+
+### 4.3 DIVERSIDADE
+
+**O app reconhece que negócios são diversos?**
+
+| Diversidade | Como o IPB atende |
+|-------------|-------------------|
+| **Gênero** | Onboarding não assume gênero. Dados de gap salarial no módulo Pessoas. ESG mede diversidade em liderança. |
+| **Raça/Etnia** | Módulo Pessoas: indicadores de diversidade racial. ESG: inclusão como indicador de governança. |
+| **LGBTQIA+** | Linguagem neutra no app. Sem suposições sobre estrutura familiar/societária. |
+| **Idade** | Interface legível pra +50. Fontes ajustáveis. IA explica termos técnicos. |
+| **Geográfica** | Dados de mercado cobrem todo o Brasil, não só eixo SP-RJ. Agro forte = interior representado. |
+| **Porte** | De PF sem CNPJ a empresa listada em bolsa — mesmo app, experiência adaptada. |
+| **Setor** | 21 setores no onboarding. ESG adaptado por setor. Dados de mercado por setor. |
+| **Tipo de produto** | Físico, digital, SaaS, marketplace, serviço — cada um com métricas diferentes. |
+
+**No módulo Pessoas & Liderança** 🔲 A IMPLEMENTAR
+- Indicadores de diversidade: gênero, raça, idade em cargos de liderança
+- Gap salarial por gênero (mesma função)
+- Índice de inclusão (pesquisa interna)
+- Metas de diversidade com acompanhamento
+- IA analisa e recomenda ações
+
+---
+
+### 4.4 IGUALDADE
+
+**Igualdade de acesso à informação = igualdade de oportunidade**
+
+O problema central: inteligência de mercado é cara e excludente. Quem tem dinheiro contrata McKinsey. Quem não tem, decide no escuro.
+
+**O IPB equaliza:**
+
+| Antes do IPB | Com o IPB |
+|-------------|-----------|
+| Consultoria R$50-200k | IA grátis com mesmos dados |
+| Relatório de mercado em inglês | Português brasileiro, linguagem simples |
+| Dashboard pra quem sabe ler dados | IA explica o que cada número significa |
+| Só pra quem tem CNPJ | Funciona pra PF, MEI, iniciante |
+| Sustentabilidade só pra grande empresa | ESG acessível pra qualquer porte |
+| Análise manual e lenta | Tempo real, atualizado a cada 60s |
+
+**Igualdade no app:**
+- Mesma qualidade de IA pra todos os planos
+- Dados de mercado reais pra todos (não mock pra plano free)
+- ESG não é só pra empresa grande — MEI pode começar com TBL
+- Mesma interface: PF vê a mesma qualidade visual que LTDA
+
+---
+
+### 4.5 NO ONBOARDING 🔲 A IMPLEMENTAR
+
+Adicionar após a seleção de setor:
+
+"Como podemos adaptar o IPB pra você?"
+- "Modo Foco — menos informação por tela, direto ao ponto" (TDAH)
+- "Modo Calmo — sem animações, estrutura previsível" (TEA)
+- "Fontes maiores / alto contraste" (Visual)
+- "Modo padrão" (sem alterações)
+
+→ Salva no localStorage e aplica em todo o app
+
+---
+
+### 4.6 NO ESG DO WORKSPACE 🔲 A IMPLEMENTAR
+
+Adicionar 11ª pergunta ao diagnóstico ESG:
+
+"Seu produto/serviço é acessível para pessoas com deficiência?"
+- "Sim, foi projetado com acessibilidade" → score 3
+- "Parcialmente, temos algumas adaptações" → score 2
+- "Não pensamos nisso" → score 0
+
+IA analisa e recomenda: "Seu produto não é acessível → 45M de PcD no Brasil são mercado potencial não atendido. Acessibilidade é CSV: lucro + impacto social."
+
+---
+
+### 4.7 O IPB COMO REFERÊNCIA
+
+O IPB pratica o que ensina no ESG:
+- **TBL People:** inclusão real no código, não em slide
+- **CSV:** lucra PORQUE inclui — mercado maior, não menor
+- **ODS 4 (Educação):** Intelligence democratiza conhecimento
+- **ODS 8 (Trabalho Decente):** Workspace capacita empreendedores
+- **ODS 10 (Redução de Desigualdades):** mesma inteligência pra MEI e LTDA
+- **ODS 5 (Igualdade de Gênero):** indicadores de gap no módulo Pessoas
+- **Anti-Greenwashing:** não fala de inclusão sem praticar — o código prova
 
 ---
 
