@@ -38,17 +38,17 @@ export const dynamic = 'force-dynamic'
 // ══════════════════════════════════════════════════════════════════════════
 export async function GET() {
 
-  // ── Defaults (usados se qualquer fetch falhar) ──────────────────────────
-  let usdBrl = 5.72, usdDelta = 0.04
-  let ipca = 4.83, pib = 2.9, selic = 10.5
+  // ── Defaults (atualizados Mar/2026 — usados se qualquer fetch falhar) ──
+  let usdBrl = 5.25, usdDelta = 0.01
+  let ipca = 3.90, pib = 1.6, selic = 14.75
 
   // commodities
-  let goldP = 2840, goldD = 0.4
-  let oilP = 74.2,  oilD = -0.8
-  let silP = 32.1,  silD = 0.2
-  let copP = 4.18,  copD = -0.3
-  let cornP = 512,  cornD = 1.2
-  let lithD = -2.1
+  let goldP = 3050, goldD = 0.2
+  let oilP = 69.5,  oilD = -0.5
+  let silP = 34.2,  silD = 0.3
+  let copP = 4.35,  copD = 0.1
+  let cornP = 465,  cornD = -0.8
+  let lithD = -1.5
 
   // agentes globais (% delta diário)
   let aaplD = 1.4, googlD = -0.8, metaD = 2.1
@@ -100,8 +100,8 @@ export async function GET() {
     if (fxRes.status === 'fulfilled' && fxRes.value) {
       try {
         const d = await fxRes.value.json()
-        usdBrl  = parseFloat(d?.USDBRL?.bid    ?? '5.72')
-        usdDelta = parseFloat(d?.USDBRL?.varBid ?? '0.04')
+        usdBrl  = parseFloat(d?.USDBRL?.bid    ?? '5.25')
+        usdDelta = parseFloat(d?.USDBRL?.varBid ?? '0.01')
       } catch { /* fallback */ }
     }
     if (selicRes.status === 'fulfilled' && selicRes.value) {
