@@ -456,6 +456,37 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
           </div>
         </div>
 
+        {/* Acessibilidade */}
+        <div className="rounded-[1.4rem] border border-white/[0.08] bg-white/[0.03] px-6 py-5">
+          <p className="mb-3 text-[12px] uppercase tracking-widest text-white/30">Acessibilidade</p>
+          <p className="text-[11px] text-white/35 mb-3">Como podemos adaptar o IPB pra você?</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: 'foco', label: 'Modo Foco', desc: 'Menos informação por tela' },
+              { id: 'calmo', label: 'Modo Calmo', desc: 'Sem animações' },
+              { id: 'contraste', label: 'Alto Contraste', desc: 'Fontes maiores' },
+              { id: 'padrao', label: 'Modo Padrão', desc: 'Sem alterações' },
+            ].map(a => (
+              <button
+                key={a.id}
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('ipb-accessibility', a.id)
+                  }
+                }}
+                className="flex flex-col items-start rounded-xl px-3 py-2 transition-all text-left"
+                style={{
+                  background: (typeof window !== 'undefined' && localStorage.getItem('ipb-accessibility') === a.id) ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.02)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}
+              >
+                <span className="text-[11px] font-medium text-white/60">{a.label}</span>
+                <span className="text-[9px] text-white/25">{a.desc}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
