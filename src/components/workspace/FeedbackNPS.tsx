@@ -14,9 +14,20 @@ export default function FeedbackNPS() {
   const npsLabel = npsScore === null ? '' : npsScore >= 9 ? 'Promotor' : npsScore >= 7 ? 'Neutro' : 'Detrator'
   const npsColor = npsScore === null ? '' : npsScore >= 9 ? '#1e8449' : npsScore >= 7 ? '#9a7d0a' : '#c0392b'
 
-  const handleSubmit = () => {
-    // TODO: enviar para Supabase
-    console.log({ npsScore, category, feedback })
+  const handleSubmit = async () => {
+    try {
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      await supabase.from('feedbacks').insert({
+        nps_score: npsScore,
+        category,
+        message: feedback || null,
+        user_id: user?.id ?? null,
+      })
+    } catch (e) {
+      console.error('Erro ao salvar feedback:', e)
+    }
     setSubmitted(true)
   }
 

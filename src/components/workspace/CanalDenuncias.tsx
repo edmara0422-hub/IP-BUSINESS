@@ -18,9 +18,18 @@ export default function CanalDenuncias() {
     'Outro',
   ]
 
-  const handleSubmit = () => {
-    // TODO: enviar para Supabase (tabela anônima, sem user_id)
-    console.log({ type, description, anonymous: true })
+  const handleSubmit = async () => {
+    try {
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      await supabase.from('denuncias').insert({
+        tipo: type,
+        descricao: description,
+        // SEM user_id — 100% anônimo
+      })
+    } catch (e) {
+      console.error('Erro ao salvar denúncia:', e)
+    }
     setSubmitted(true)
   }
 
