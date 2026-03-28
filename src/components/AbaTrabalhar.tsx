@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Brain, LayoutDashboard, Activity, Tag, Zap,
   ShieldCheck, Globe, Users, Target, Lightbulb,
+  MessageSquare, AlertTriangle,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAccessibility, type AccessibilityMode } from '@/hooks/useAccessibility'
@@ -14,40 +15,47 @@ const CockpitFinanceiro = dynamic(() => import('@/components/workspace/CockpitFi
 const CenariosForecast = dynamic(() => import('@/components/workspace/CenariosForecast'), { ssr: false })
 const SmartPricing = dynamic(() => import('@/components/workspace/SmartPricing'), { ssr: false })
 const ESGDiagnostico = dynamic(() => import('@/components/workspace/ESGDiagnostico'), { ssr: false })
+const FeedbackNPS = dynamic(() => import('@/components/workspace/FeedbackNPS'), { ssr: false })
+const CanalDenuncias = dynamic(() => import('@/components/workspace/CanalDenuncias'), { ssr: false })
 
 interface ModuleMeta {
-  id: number
+  id: string
   title: string
   short: string
   icon: React.ElementType
   color: string
-  status: 'ready' | 'building'
+  group: 'trabalho' | 'compliance'
 }
 
 const MODULES: ModuleMeta[] = [
-  { id: 1, title: 'IA Advisor', short: 'IA', icon: Brain, color: '#5dade2', status: 'ready' },
-  { id: 2, title: 'Cockpit Financeiro', short: 'Cockpit', icon: LayoutDashboard, color: '#1e8449', status: 'ready' },
-  { id: 3, title: 'Cenários & Forecast', short: 'Cenários', icon: Activity, color: '#9a7d0a', status: 'ready' },
-  { id: 4, title: 'Smart Pricing', short: 'Pricing', icon: Tag, color: '#c0392b', status: 'ready' },
-  { id: 5, title: 'Inovação', short: 'Inovação', icon: Zap, color: '#7d3c98', status: 'building' },
-  { id: 6, title: 'ESG', short: 'ESG', icon: ShieldCheck, color: '#1a5276', status: 'ready' },
-  { id: 7, title: 'Mercado', short: 'Mercado', icon: Globe, color: '#b7950b', status: 'building' },
-  { id: 8, title: 'Pessoas', short: 'Pessoas', icon: Users, color: '#a04000', status: 'building' },
-  { id: 9, title: 'Processos', short: 'Processos', icon: Target, color: '#2471a3', status: 'building' },
-  { id: 10, title: 'Canvas & Pitch', short: 'Canvas', icon: Lightbulb, color: '#27ae60', status: 'building' },
+  // Trabalho
+  { id: 'ia', title: 'IA Advisor', short: 'IA', icon: Brain, color: '#5dade2', group: 'trabalho' },
+  { id: 'cockpit', title: 'Cockpit Financeiro', short: 'Cockpit', icon: LayoutDashboard, color: '#1e8449', group: 'trabalho' },
+  { id: 'cenarios', title: 'Cenários & Forecast', short: 'Cenários', icon: Activity, color: '#9a7d0a', group: 'trabalho' },
+  { id: 'pricing', title: 'Smart Pricing', short: 'Pricing', icon: Tag, color: '#c0392b', group: 'trabalho' },
+  { id: 'inovacao', title: 'Inovação', short: 'Inovação', icon: Zap, color: '#7d3c98', group: 'trabalho' },
+  { id: 'esg', title: 'ESG', short: 'ESG', icon: ShieldCheck, color: '#1a5276', group: 'trabalho' },
+  { id: 'mercado', title: 'Mercado', short: 'Mercado', icon: Globe, color: '#b7950b', group: 'trabalho' },
+  { id: 'pessoas', title: 'Pessoas', short: 'Pessoas', icon: Users, color: '#a04000', group: 'trabalho' },
+  { id: 'processos', title: 'Processos', short: 'Processos', icon: Target, color: '#2471a3', group: 'trabalho' },
+  { id: 'canvas', title: 'Canvas & Pitch', short: 'Canvas', icon: Lightbulb, color: '#27ae60', group: 'trabalho' },
+  // Compliance
+  { id: 'feedback', title: 'Feedback & NPS', short: 'Feedback', icon: MessageSquare, color: '#5dade2', group: 'compliance' },
+  { id: 'denuncia', title: 'Canal de Denúncias', short: 'Denúncias', icon: AlertTriangle, color: '#c0392b', group: 'compliance' },
 ]
 
-const ACCESSIBILITY_OPTIONS: { id: AccessibilityMode; label: string }[] = [
-  { id: 'padrao', label: 'Padrão' },
-  { id: 'foco', label: 'Foco' },
-  { id: 'calmo', label: 'Calmo' },
-  { id: 'contraste', label: 'Contraste' },
+const ACC_OPTIONS: { id: AccessibilityMode; label: string; desc: string }[] = [
+  { id: 'padrao', label: 'Padrão', desc: 'Experiência completa' },
+  { id: 'foco', label: 'Foco', desc: 'Menos estímulos visuais' },
+  { id: 'calmo', label: 'Calmo', desc: 'Sem animações' },
+  { id: 'contraste', label: 'Contraste', desc: 'Fontes maiores' },
 ]
 
 function Placeholder({ mod }: { mod: ModuleMeta }) {
+  const Icon = mod.icon
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center">
-      <mod.icon size={32} style={{ color: mod.color, opacity: 0.3 }} />
+      <Icon size={32} style={{ color: mod.color, opacity: 0.3 }} />
       <p className="mt-4 text-[15px] font-semibold text-white/50">{mod.title}</p>
       <p className="mt-1 text-[12px] text-white/25">Em construção — será ativado com IA e dados reais</p>
     </div>
@@ -56,7 +64,7 @@ function Placeholder({ mod }: { mod: ModuleMeta }) {
 
 export default function AbaTrabalhar() {
   const { mode, changeMode } = useAccessibility()
-  const [activeId, setActiveId] = useState(1)
+  const [activeId, setActiveId] = useState('ia')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [marketData, setMarketData] = useState<any>(null)
 
@@ -68,19 +76,24 @@ export default function AbaTrabalhar() {
 
   const renderModule = () => {
     switch (activeId) {
-      case 1: return <IAAdvisor marketData={marketData} />
-      case 2: return <CockpitFinanceiro marketData={marketData} />
-      case 3: return <CenariosForecast marketData={marketData} />
-      case 4: return <SmartPricing marketData={marketData} />
-      case 6: return <ESGDiagnostico marketData={marketData} />
+      case 'ia': return <IAAdvisor marketData={marketData} />
+      case 'cockpit': return <CockpitFinanceiro marketData={marketData} />
+      case 'cenarios': return <CenariosForecast marketData={marketData} />
+      case 'pricing': return <SmartPricing marketData={marketData} />
+      case 'esg': return <ESGDiagnostico marketData={marketData} />
+      case 'feedback': return <FeedbackNPS />
+      case 'denuncia': return <CanalDenuncias />
       default: return <Placeholder mod={active} />
     }
   }
 
+  const trabalho = MODULES.filter(m => m.group === 'trabalho')
+  const compliance = MODULES.filter(m => m.group === 'compliance')
+
   return (
     <div className="w-full">
 
-      {/* ── Mobile: tabs horizontais no topo ── */}
+      {/* ── Mobile: tabs horizontais ── */}
       <div className="md:hidden overflow-x-auto scrollbar-hide border-b border-white/5">
         <div className="flex gap-0.5 px-2 py-2 min-w-max">
           {MODULES.map(mod => {
@@ -90,7 +103,7 @@ export default function AbaTrabalhar() {
               <button
                 key={mod.id}
                 onClick={() => setActiveId(mod.id)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-left transition-all shrink-0"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg shrink-0 transition-all"
                 style={{
                   background: isActive ? `${mod.color}18` : 'transparent',
                   borderLeft: isActive ? `2px solid ${mod.color}` : '2px solid transparent',
@@ -100,9 +113,6 @@ export default function AbaTrabalhar() {
                 <span className={`text-[11px] font-medium ${isActive ? 'text-white/70' : 'text-white/25'}`}>
                   {mod.short}
                 </span>
-                {mod.status === 'building' && (
-                  <span className="w-1 h-1 rounded-full bg-amber-500/50" />
-                )}
               </button>
             )
           })}
@@ -112,16 +122,15 @@ export default function AbaTrabalhar() {
       {/* ── Desktop: sidebar + conteúdo ── */}
       <div className="flex min-h-[70vh]">
 
-        {/* Sidebar — desktop only */}
+        {/* Sidebar */}
         <div className="hidden md:flex flex-col w-[200px] shrink-0 border-r border-white/5 py-3">
-          {/* Header */}
-          <div className="px-3 mb-3">
+          <div className="px-3 mb-2">
             <p className="font-mono text-[9px] font-bold tracking-[0.2em] text-white/15 uppercase">Workspace</p>
           </div>
 
-          {/* Module list */}
-          <div className="flex flex-col gap-0.5 px-1.5 flex-1">
-            {MODULES.map(mod => {
+          {/* Módulos de trabalho */}
+          <div className="flex flex-col gap-0.5 px-1.5">
+            {trabalho.map(mod => {
               const Icon = mod.icon
               const isActive = activeId === mod.id
               return (
@@ -135,63 +144,88 @@ export default function AbaTrabalhar() {
                   }}
                 >
                   <Icon size={15} style={{ color: isActive ? mod.color : 'rgba(255,255,255,0.25)' }} />
-                  <div className="flex-1 min-w-0">
-                    <span className={`text-[12px] font-medium block truncate ${isActive ? 'text-white/80' : 'text-white/30'}`}>
-                      {mod.title}
-                    </span>
-                  </div>
-                  {mod.status === 'building' && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500/40 shrink-0" />
-                  )}
+                  <span className={`text-[12px] font-medium truncate ${isActive ? 'text-white/80' : 'text-white/30'}`}>
+                    {mod.title}
+                  </span>
                 </button>
               )
             })}
           </div>
 
-          {/* Accessibility + config */}
-          <div className="px-3 pt-3 border-t border-white/5 space-y-2">
-            <div className="flex flex-wrap gap-1">
-              {ACCESSIBILITY_OPTIONS.map(a => (
+          {/* Divider */}
+          <div className="mx-3 my-3 h-px bg-white/5" />
+          <div className="px-3 mb-2">
+            <p className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/12 uppercase">Compliance</p>
+          </div>
+
+          {/* Módulos de compliance */}
+          <div className="flex flex-col gap-0.5 px-1.5">
+            {compliance.map(mod => {
+              const Icon = mod.icon
+              const isActive = activeId === mod.id
+              return (
                 <button
-                  key={a.id}
-                  onClick={() => changeMode(a.id)}
-                  className="font-mono text-[8px] px-2 py-0.5 rounded-full transition-all"
+                  key={mod.id}
+                  onClick={() => setActiveId(mod.id)}
+                  className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-all"
                   style={{
-                    background: mode === a.id ? 'rgba(255,255,255,0.1)' : 'transparent',
-                    border: mode === a.id ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.05)',
-                    color: mode === a.id ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)',
+                    background: isActive ? `${mod.color}15` : 'transparent',
+                    borderLeft: isActive ? `3px solid ${mod.color}` : '3px solid transparent',
                   }}
                 >
-                  {a.label}
+                  <Icon size={15} style={{ color: isActive ? mod.color : 'rgba(255,255,255,0.25)' }} />
+                  <span className={`text-[12px] font-medium truncate ${isActive ? 'text-white/80' : 'text-white/30'}`}>
+                    {mod.title}
+                  </span>
                 </button>
-              ))}
+              )
+            })}
+          </div>
+
+          {/* Acessibilidade + Config */}
+          <div className="mt-auto px-3 pt-3 border-t border-white/5 space-y-3">
+            <div>
+              <p className="font-mono text-[8px] font-bold tracking-[0.15em] text-white/15 uppercase mb-2">Acessibilidade</p>
+              <div className="flex flex-col gap-1">
+                {ACC_OPTIONS.map(a => (
+                  <button
+                    key={a.id}
+                    onClick={() => changeMode(a.id)}
+                    className="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left transition-all"
+                    style={{
+                      background: mode === a.id ? 'rgba(93,173,226,0.12)' : 'transparent',
+                      border: mode === a.id ? '1px solid rgba(93,173,226,0.25)' : '1px solid rgba(255,255,255,0.04)',
+                    }}
+                  >
+                    <span className={`text-[11px] font-medium ${mode === a.id ? 'text-white/70' : 'text-white/25'}`}>
+                      {a.label}
+                    </span>
+                    <span className={`text-[9px] ${mode === a.id ? 'text-white/40' : 'text-white/12'}`}>
+                      {a.desc}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
+
             <button
               onClick={() => { localStorage.removeItem('ipb-workspace-ready'); window.location.reload() }}
-              className="font-mono text-[9px] text-white/15 hover:text-white/30 transition-colors"
+              className="w-full text-center font-mono text-[10px] text-white/15 hover:text-white/35 transition-colors py-1"
             >
               Refazer configuração
             </button>
           </div>
         </div>
 
-        {/* Conteúdo — área principal, largura total */}
+        {/* Conteúdo */}
         <div className="flex-1 min-w-0 overflow-y-auto">
-          {/* Module header */}
+          {(() => { const Icon = active.icon; return (
           <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
-            <active.icon size={18} style={{ color: active.color }} />
-            <div>
-              <p className="text-[14px] font-bold text-white/80">{active.title}</p>
-            </div>
-            {active.status === 'ready' && (
-              <span className="ml-auto text-[9px] px-2 py-0.5 rounded-full"
-                style={{ background: 'rgba(39,174,96,0.15)', color: '#27ae60' }}>
-                Conectado
-              </span>
-            )}
+            <Icon size={18} style={{ color: active.color }} />
+            <p className="text-[14px] font-bold text-white/80">{active.title}</p>
           </div>
+          ) })()}
 
-          {/* Module content */}
           <AnimatePresence mode="wait">
             <motion.div
               key={activeId}
@@ -207,17 +241,17 @@ export default function AbaTrabalhar() {
         </div>
       </div>
 
-      {/* Mobile: accessibility + config */}
+      {/* Mobile: acessibilidade */}
       <div className="md:hidden flex items-center justify-between px-4 py-3 border-t border-white/5">
         <div className="flex gap-1">
-          {ACCESSIBILITY_OPTIONS.map(a => (
+          {ACC_OPTIONS.map(a => (
             <button
               key={a.id}
               onClick={() => changeMode(a.id)}
-              className="font-mono text-[8px] px-2 py-0.5 rounded-full"
+              className="text-[9px] px-2.5 py-1 rounded-full transition-all"
               style={{
-                background: mode === a.id ? 'rgba(255,255,255,0.1)' : 'transparent',
-                border: mode === a.id ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(255,255,255,0.05)',
+                background: mode === a.id ? 'rgba(93,173,226,0.12)' : 'transparent',
+                border: mode === a.id ? '1px solid rgba(93,173,226,0.25)' : '1px solid rgba(255,255,255,0.05)',
                 color: mode === a.id ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)',
               }}
             >
