@@ -16,6 +16,7 @@ import {
   ChevronDown,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import { useAccessibility, type AccessibilityMode } from '@/hooks/useAccessibility'
 
 const IAAdvisor = dynamic(() => import('@/components/workspace/IAAdvisor'), { ssr: false })
 const CockpitFinanceiro = dynamic(() => import('@/components/workspace/CockpitFinanceiro'), { ssr: false })
@@ -199,8 +200,17 @@ const modules: ModuleConfig[] = [
   },
 ]
 
+const ACCESSIBILITY_OPTIONS: { id: AccessibilityMode; label: string; desc: string }[] = [
+  { id: 'padrao', label: 'Padrão', desc: 'Experiência completa' },
+  { id: 'foco', label: 'Foco', desc: 'Menos estímulos (TDAH)' },
+  { id: 'calmo', label: 'Calmo', desc: 'Sem animações (TEA)' },
+  { id: 'contraste', label: 'Contraste', desc: 'Fontes maiores' },
+]
+
 export default function AbaTrabalhar() {
+  const { mode, changeMode } = useAccessibility()
   const [expandedId, setExpandedId] = useState<number | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [marketData, setMarketData] = useState<any>(null)
 
   useEffect(() => {
@@ -227,9 +237,28 @@ export default function AbaTrabalhar() {
         >
           Seu espaço de <span className="text-white/95">trabalho</span>
         </h2>
+        {/* Seletor de acessibilidade */}
+        <div className="flex items-center justify-center gap-1.5 mt-4 mb-2">
+          {ACCESSIBILITY_OPTIONS.map(a => (
+            <button
+              key={a.id}
+              onClick={() => changeMode(a.id)}
+              className="font-mono text-[9px] px-2.5 py-1 rounded-full transition-all"
+              style={{
+                background: mode === a.id ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.02)',
+                border: mode === a.id ? '1px solid rgba(255,255,255,0.25)' : '1px solid rgba(255,255,255,0.06)',
+                color: mode === a.id ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)',
+              }}
+              title={a.desc}
+            >
+              {a.label}
+            </button>
+          ))}
+        </div>
+
         <button
           onClick={() => { localStorage.removeItem('ipb-workspace-ready'); window.location.reload() }}
-          className="mt-3 font-mono text-[10px] text-white/20 hover:text-white/40 transition-colors"
+          className="mt-1 font-mono text-[10px] text-white/20 hover:text-white/40 transition-colors"
         >
           Refazer configuração
         </button>
