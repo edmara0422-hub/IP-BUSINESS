@@ -231,7 +231,7 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
           ))}
         </div>
 
-        {profile.subtype && profile.product && (
+        {profile.subtype && profile.product.length > 0 && (
           <motion.button
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
