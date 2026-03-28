@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Brain, SendHorizontal, Loader2, Sparkles, RefreshCw } from 'lucide-react'
+import { useAccessibility } from '@/hooks/useAccessibility'
 
 interface Message {
   id: string
@@ -12,6 +13,7 @@ interface Message {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function IAAdvisor({ marketData }: { marketData: any }) {
+  const { iaModifier } = useAccessibility()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -113,7 +115,7 @@ OPORTUNIDADES:
 
 🚀 AÇÃO IMEDIATA — as 3 coisas que qualquer empresa deveria fazer AGORA baseado nesses dados
 
-Use TODOS os dados que te passei. Seja específico com números reais. Não seja genérico.`,
+Use TODOS os dados que te passei. Seja específico com números reais. Não seja genérico.${iaModifier}`,
           marketContext: ctx,
         }),
       })
@@ -147,7 +149,7 @@ Use TODOS os dados que te passei. Seja específico com números reais. Não seja
       const res = await fetch('/api/advisor-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: userMsg.content, marketContext: ctx }),
+        body: JSON.stringify({ question: userMsg.content + iaModifier, marketContext: ctx }),
       })
       const data = await res.json()
       setMessages(prev => [...prev, {

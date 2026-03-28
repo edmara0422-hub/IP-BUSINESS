@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Bell, BookOpen, Briefcase, Globe, Search, LogOut, Shield, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
+import { useAccessibility } from '@/hooks/useAccessibility'
 
 type Tab = 'business' | 'estudo' | 'admin'
 
@@ -207,6 +208,7 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
 }
 
 export default function MainApp() {
+  useAccessibility() // Applies CSS classes to body based on saved mode
   const [activeTab, setActiveTab] = useState<Tab>('business')
   const [workspaceReady, setWorkspaceReady] = useState(() => {
     if (typeof window !== 'undefined') return localStorage.getItem('ipb-workspace-ready') === 'true'

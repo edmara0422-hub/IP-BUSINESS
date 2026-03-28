@@ -482,3 +482,51 @@ body {
         transform: scale(1);
     }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   ACESSIBILIDADE — Modos adaptativos
+   ══════════════════════════════════════════════════════════════ */
+
+/* Modo Foco (TDAH) — menos estímulos visuais */
+body.ipb-foco * {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.1s !important;
+}
+body.ipb-foco .animate-pulse,
+body.ipb-foco .animate-spin {
+    animation: none !important;
+}
+
+/* Modo Calmo (TEA) — sem animações, estrutura estática */
+body.ipb-calmo *,
+body.ipb-calmo *::before,
+body.ipb-calmo *::after {
+    animation: none !important;
+    animation-duration: 0s !important;
+    transition: none !important;
+}
+
+/* Alto Contraste — fontes maiores, bordas mais visíveis */
+body.ipb-contraste {
+    font-size: 110% !important;
+}
+body.ipb-contraste * {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+body.ipb-contraste p,
+body.ipb-contraste span,
+body.ipb-contraste div {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+body.ipb-contraste button {
+    border-width: 2px !important;
+}
+
+/* Respeita preferência do sistema */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
