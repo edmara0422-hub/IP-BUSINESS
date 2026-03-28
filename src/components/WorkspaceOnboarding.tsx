@@ -248,7 +248,11 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
   const renderStep2PJ = () => {
     const types = ['MEI', 'SLU', 'LTDA', 'Startup', 'Associação', 'Fundação']
     const revenues = ['Até R$81k', 'R$81k–360k', 'R$360k–4.8M', 'Acima R$4.8M']
-    const products = ['Digital/SaaS', 'Físico', 'Marketplace', 'Serviço']
+    const products = [
+      'Digital/SaaS', 'E-commerce', 'Marketplace', 'Físico', 'Serviço',
+      'Consultoria', 'Agência', 'Infoproduto', 'App', 'Delivery',
+      'Franquia', 'Indústria', 'Importação/Exportação', 'Outro',
+    ]
 
     return (
       <div className="flex flex-col gap-5">
@@ -285,12 +289,12 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
           <p className="mb-2 text-[12px] uppercase tracking-widest text-white/30">Produto</p>
           <div className="flex flex-wrap gap-2">
             {products.map((p) => (
-              <Chip key={p} label={p} selected={profile.product === p} onClick={() => patch({ product: p })} />
+              <Chip key={p} label={p} selected={profile.product.includes(p)} onClick={() => toggleProduct(p)} />
             ))}
           </div>
         </div>
 
-        {profile.subtype && profile.sectors.length > 0 && profile.revenue && profile.product && (
+        {profile.subtype && profile.sectors.length > 0 && profile.revenue && profile.product.length > 0 && (
           <motion.button
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -445,12 +449,12 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
                 </div>
               </>
             )}
-            {profile.product && (
+            {profile.product.length > 0 && (
               <>
                 <div className="h-px bg-white/[0.06]" />
                 <div className="flex items-center justify-between">
-                  <span className="text-[12px] uppercase tracking-widest text-white/30">Produto</span>
-                  <span className="font-mono text-[13px] text-white/70">{profile.product}</span>
+                  <span className="text-[12px] uppercase tracking-widest text-white/30">Atividades</span>
+                  <span className="font-mono text-[12px] text-white/70 text-right max-w-[200px]">{profile.product.join(', ')}</span>
                 </div>
               </>
             )}
