@@ -4,6 +4,12 @@ import { useState } from 'react'
 import dynamic from 'next/dynamic'
 
 const TBLFramework = dynamic(() => import('./frameworks/TBLFramework'), { ssr: false })
+const ESGRatingFramework = dynamic(() => import('./frameworks/ESGRatingFramework'), { ssr: false })
+const GRIFramework = dynamic(() => import('./frameworks/GRIFramework'), { ssr: false })
+const SASBFramework = dynamic(() => import('./frameworks/SASBFramework'), { ssr: false })
+const ODSFramework = dynamic(() => import('./frameworks/ODSFramework'), { ssr: false })
+const CSVFramework = dynamic(() => import('./frameworks/CSVFramework'), { ssr: false })
+const ISEISPFramework = dynamic(() => import('./frameworks/ISEISPFramework'), { ssr: false })
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronDown, Leaf, BarChart3, FileText, Building2,
@@ -35,32 +41,32 @@ const SectionTitle = ({ color, children }: { color: string; children: React.Reac
 )
 
 const Bullet = ({ color, children }: { color: string; children: React.ReactNode }) => (
-  <li className="flex items-start gap-2 text-[13px] text-zinc-300 leading-relaxed">
+  <li className="flex items-start gap-2 text-[13px] text-white/50 leading-relaxed">
     <span className="mt-[7px] w-[5px] h-[5px] rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
     <span>{children}</span>
   </li>
 )
 
 const KeyQuestion = ({ children }: { children: React.ReactNode }) => (
-  <p className="text-[13px] italic text-zinc-400 mt-2 pl-4 border-l-2 border-zinc-700">
+  <p className="text-[13px] italic text-white/40 mt-2 pl-4 border-l-2 border-zinc-700">
     {children}
   </p>
 )
 
 const ExampleBox = ({ children }: { children: React.ReactNode }) => (
-  <div className="bg-zinc-800/50 rounded-md px-4 py-3 mt-2 text-[13px] text-zinc-300 leading-relaxed">
+  <div className="bg-[rgba(255,255,255,0.04)]/50 rounded-md px-4 py-3 mt-2 text-[13px] text-white/50 leading-relaxed">
     {children}
   </div>
 )
 
-const Divider = () => <hr className="border-zinc-800 my-4" />
+const Divider = () => <hr className="border-white/5 my-4" />
 
 /* ── Framework content ── */
 
 const TBLContent = () => (
   <div className="space-y-1">
     <SectionTitle color={GREEN}>O QUE E</SectionTitle>
-    <p className="text-[13px] text-zinc-300 leading-relaxed">
+    <p className="text-[13px] text-white/50 leading-relaxed">
       O TBL propoe que o sucesso de uma empresa seja medido em tres dimensoes simultaneas — nao apenas no lucro.
     </p>
 
@@ -69,7 +75,7 @@ const TBLContent = () => (
 
     {/* PROFIT */}
     <p className="text-[14px] font-bold text-amber-400 mt-3">PROFIT (Economico) — &quot;A empresa e viavel?&quot;</p>
-    <p className="text-[11px] uppercase tracking-wider text-zinc-500 mt-2 mb-1">O que medir:</p>
+    <p className="text-[11px] uppercase tracking-wider text-white/30 mt-2 mb-1">O que medir:</p>
     <ul className="space-y-1">
       <Bullet color="#f59e0b">Receita liquida e margem operacional</Bullet>
       <Bullet color="#f59e0b">Empregos gerados (diretos e indiretos)</Bullet>
@@ -81,7 +87,7 @@ const TBLContent = () => (
 
     {/* PEOPLE */}
     <p className="text-[14px] font-bold text-blue-400 mt-5">PEOPLE (Social) — &quot;A empresa e justa?&quot;</p>
-    <p className="text-[11px] uppercase tracking-wider text-zinc-500 mt-2 mb-1">O que medir:</p>
+    <p className="text-[11px] uppercase tracking-wider text-white/30 mt-2 mb-1">O que medir:</p>
     <ul className="space-y-1">
       <Bullet color="#3b82f6">Horas de treinamento por colaborador/ano</Bullet>
       <Bullet color="#3b82f6">Gap salarial entre generos (mesma funcao)</Bullet>
@@ -94,7 +100,7 @@ const TBLContent = () => (
 
     {/* PLANET */}
     <p className="text-[14px] font-bold text-green-400 mt-5">PLANET (Ambiental) — &quot;A empresa e sustentavel?&quot;</p>
-    <p className="text-[11px] uppercase tracking-wider text-zinc-500 mt-2 mb-1">O que medir:</p>
+    <p className="text-[11px] uppercase tracking-wider text-white/30 mt-2 mb-1">O que medir:</p>
     <ul className="space-y-1">
       <Bullet color="#22c55e">Emissoes de CO2 (Escopo 1, 2 e 3)</Bullet>
       <Bullet color="#22c55e">Consumo de agua por unidade produzida</Bullet>
@@ -107,11 +113,11 @@ const TBLContent = () => (
     <Divider />
     <SectionTitle color={GREEN}>COMO APLICAR — PASSO A PASSO</SectionTitle>
     <ol className="space-y-1 list-decimal pl-5">
-      <li className="text-[13px] text-zinc-300">Escolha 3 indicadores por pilar (total: 9 metricas)</li>
-      <li className="text-[13px] text-zinc-300">Estabeleca a linha de base (onde estamos hoje)</li>
-      <li className="text-[13px] text-zinc-300">Defina metas para 12 meses</li>
-      <li className="text-[13px] text-zinc-300">Integre no relatorio trimestral junto com resultados financeiros</li>
-      <li className="text-[13px] text-zinc-300">Apresente ao conselho/diretoria com o mesmo peso dos resultados financeiros</li>
+      <li className="text-[13px] text-white/50">Escolha 3 indicadores por pilar (total: 9 metricas)</li>
+      <li className="text-[13px] text-white/50">Estabeleca a linha de base (onde estamos hoje)</li>
+      <li className="text-[13px] text-white/50">Defina metas para 12 meses</li>
+      <li className="text-[13px] text-white/50">Integre no relatorio trimestral junto com resultados financeiros</li>
+      <li className="text-[13px] text-white/50">Apresente ao conselho/diretoria com o mesmo peso dos resultados financeiros</li>
     </ol>
 
     <Divider />
@@ -120,7 +126,7 @@ const TBLContent = () => (
       Em 2018, John Elkington publicou na Harvard Business Review: <strong className="text-white">&quot;25 Years Ago I Coined the Phrase Triple Bottom Line. Here&apos;s Why It&apos;s Time to Rethink It.&quot;</strong> Ele fez um recall do proprio conceito.
     </ExampleBox>
 
-    <p className="text-[11px] uppercase tracking-wider text-zinc-500 mt-3 mb-1">O que deu errado:</p>
+    <p className="text-[11px] uppercase tracking-wider text-white/30 mt-3 mb-1">O que deu errado:</p>
     <ul className="space-y-2">
       <Bullet color="#ef4444">
         <strong className="text-white">Trade-off em vez de Sinergia</strong> — empresas usavam TBL para compensar: &quot;poluimos, mas geramos empregos&quot;. Mineradora desmata 500ha mas patrocina escola R$200k. Dano ambiental: R$50M.
@@ -139,11 +145,11 @@ const TBLContent = () => (
       <strong className="text-white">Economia &#8834; Sociedade &#8834; Planeta</strong> — a economia existe DENTRO da sociedade, que existe DENTRO do planeta.
     </ExampleBox>
 
-    <p className="text-[11px] uppercase tracking-wider text-zinc-500 mt-3 mb-1">Teste dos Circulos:</p>
+    <p className="text-[11px] uppercase tracking-wider text-white/30 mt-3 mb-1">Teste dos Circulos:</p>
     <ol className="space-y-1 list-decimal pl-5">
-      <li className="text-[13px] text-zinc-300">Isso viola algum limite ecologico? (Se sim → <span className="text-red-400 font-bold">PARE</span>)</li>
-      <li className="text-[13px] text-zinc-300">Isso prejudica algum grupo social? (Se sim → <span className="text-amber-400 font-bold">REDESENHE</span>)</li>
-      <li className="text-[13px] text-zinc-300">Isso e financeiramente viavel? (Se sim → <span className="text-green-400 font-bold">EXECUTE</span>)</li>
+      <li className="text-[13px] text-white/50">Isso viola algum limite ecologico? (Se sim → <span className="text-red-400 font-bold">PARE</span>)</li>
+      <li className="text-[13px] text-white/50">Isso prejudica algum grupo social? (Se sim → <span className="text-amber-400 font-bold">REDESENHE</span>)</li>
+      <li className="text-[13px] text-white/50">Isso e financeiramente viavel? (Se sim → <span className="text-green-400 font-bold">EXECUTE</span>)</li>
     </ol>
 
     <Divider />
@@ -157,7 +163,7 @@ const TBLContent = () => (
 const ESGContent = () => (
   <div className="space-y-1">
     <SectionTitle color={BLUE}>O QUE E</SectionTitle>
-    <p className="text-[13px] text-zinc-300 leading-relaxed">
+    <p className="text-[13px] text-white/50 leading-relaxed">
       Como o mercado financeiro avalia sustentabilidade. Sao os 3 pilares que investidores analisam.
     </p>
 
@@ -172,7 +178,7 @@ const ESGContent = () => (
       <Bullet color="#22c55e">Energia renovavel (% da matriz)</Bullet>
       <Bullet color="#22c55e">Risco climatico (exposicao a eventos extremos)</Bullet>
     </ul>
-    <p className="text-[11px] text-zinc-500 mt-1 italic">Como medir: GHG Protocol (ghgprotocol.org), inventario agua/energia 12 meses</p>
+    <p className="text-[11px] text-white/30 mt-1 italic">Como medir: GHG Protocol (ghgprotocol.org), inventario agua/energia 12 meses</p>
 
     {/* S */}
     <p className="text-[14px] font-bold text-blue-400 mt-5">S — Social</p>
@@ -183,7 +189,7 @@ const ESGContent = () => (
       <Bullet color="#3b82f6">Direitos humanos na cadeia (trabalho analogo)</Bullet>
       <Bullet color="#3b82f6">Satisfacao colaboradores (eNPS, turnover)</Bullet>
     </ul>
-    <p className="text-[11px] text-zinc-500 mt-1 italic">Como medir: gap salarial por genero, eNPS trimestral, auditoria fornecedores</p>
+    <p className="text-[11px] text-white/30 mt-1 italic">Como medir: gap salarial por genero, eNPS trimestral, auditoria fornecedores</p>
 
     {/* G */}
     <p className="text-[14px] font-bold text-amber-400 mt-5">G — Governance</p>
@@ -194,11 +200,11 @@ const ESGContent = () => (
       <Bullet color="#f59e0b">Transparencia fiscal e tributaria</Bullet>
       <Bullet color="#f59e0b">Remuneracao executiva atrelada a metas ESG</Bullet>
     </ul>
-    <p className="text-[11px] text-zinc-500 mt-1 italic">Como medir: canal denuncias anonimo, metas ESG no bonus</p>
+    <p className="text-[11px] text-white/30 mt-1 italic">Como medir: canal denuncias anonimo, metas ESG no bonus</p>
 
     <Divider />
     <SectionTitle color={BLUE}>RATING ESG</SectionTitle>
-    <p className="text-[13px] text-zinc-300 leading-relaxed">
+    <p className="text-[13px] text-white/50 leading-relaxed">
       Agencias como <strong className="text-white">MSCI</strong>, <strong className="text-white">Sustainalytics</strong> e <strong className="text-white">ISS</strong> avaliam empresas de CCC a AAA.
     </p>
     <ExampleBox>
@@ -211,10 +217,10 @@ const ESGContent = () => (
 const GRIContent = () => (
   <div className="space-y-1">
     <SectionTitle color={AMBER}>O QUE E</SectionTitle>
-    <p className="text-[13px] text-zinc-300 leading-relaxed">
+    <p className="text-[13px] text-white/50 leading-relaxed">
       Padrao mais usado no mundo para relatos de sustentabilidade. <strong className="text-white">75% das 250 maiores usam.</strong>
     </p>
-    <p className="text-[13px] text-zinc-400 italic mt-1">Logica: &quot;De dentro para fora — como a empresa impacta o mundo&quot;</p>
+    <p className="text-[13px] text-white/40 italic mt-1">Logica: &quot;De dentro para fora — como a empresa impacta o mundo&quot;</p>
 
     <Divider />
     <SectionTitle color={AMBER}>ESTRUTURA</SectionTitle>
@@ -230,10 +236,10 @@ const GRIContent = () => (
     <Divider />
     <SectionTitle color={AMBER}>COMO APLICAR EM PMEs</SectionTitle>
     <ol className="space-y-1 list-decimal pl-5">
-      <li className="text-[13px] text-zinc-300"><strong className="text-white">Analise de Materialidade</strong> — liste stakeholders, identifique temas relevantes, cruze</li>
-      <li className="text-[13px] text-zinc-300"><strong className="text-white">Coleta de Dados</strong> — para cada tema material, defina indicadores GRI</li>
-      <li className="text-[13px] text-zinc-300"><strong className="text-white">Elaboracao do Relatorio</strong> — contexto + dados + metas + comparacao periodo anterior</li>
-      <li className="text-[13px] text-zinc-300"><strong className="text-white">Verificacao Externa</strong> (opcional mas recomendada)</li>
+      <li className="text-[13px] text-white/50"><strong className="text-white">Analise de Materialidade</strong> — liste stakeholders, identifique temas relevantes, cruze</li>
+      <li className="text-[13px] text-white/50"><strong className="text-white">Coleta de Dados</strong> — para cada tema material, defina indicadores GRI</li>
+      <li className="text-[13px] text-white/50"><strong className="text-white">Elaboracao do Relatorio</strong> — contexto + dados + metas + comparacao periodo anterior</li>
+      <li className="text-[13px] text-white/50"><strong className="text-white">Verificacao Externa</strong> (opcional mas recomendada)</li>
     </ol>
     <ExampleBox>
       Erro: &quot;Reportar tudo. GRI nao exige todos os 300+ indicadores.&quot;
@@ -244,16 +250,16 @@ const GRIContent = () => (
 const SASBContent = () => (
   <div className="space-y-1">
     <SectionTitle color={PURPLE}>O QUE E</SectionTitle>
-    <p className="text-[13px] text-zinc-300 leading-relaxed">
+    <p className="text-[13px] text-white/50 leading-relaxed">
       Padrao por industria focado em materialidade <strong className="text-white">FINANCEIRA</strong>.
     </p>
-    <p className="text-[13px] text-zinc-400 italic mt-1">Logica: &quot;De fora para dentro — como o mundo impacta a empresa financeiramente&quot;</p>
+    <p className="text-[13px] text-white/40 italic mt-1">Logica: &quot;De fora para dentro — como o mundo impacta a empresa financeiramente&quot;</p>
 
     <Divider />
     <ExampleBox>
       Complementa o GRI: <strong className="text-amber-400">GRI = impacto da empresa no mundo</strong>. <strong className="text-purple-400">SASB = risco financeiro da empresa</strong>.
     </ExampleBox>
-    <p className="text-[13px] text-zinc-400 mt-2">
+    <p className="text-[13px] text-white/40 mt-2">
       <strong className="text-white">Quando usar:</strong> empresas listadas, investidores internacionais
     </p>
   </div>
@@ -262,7 +268,7 @@ const SASBContent = () => (
 const ODSContent = () => (
   <div className="space-y-1">
     <SectionTitle color={ORANGE}>O QUE E</SectionTitle>
-    <p className="text-[13px] text-zinc-300 leading-relaxed">
+    <p className="text-[13px] text-white/50 leading-relaxed">
       17 metas globais da ONU ate 2030. Bussola estrategica.
     </p>
 
@@ -278,11 +284,11 @@ const ODSContent = () => (
     <Divider />
     <SectionTitle color={ORANGE}>COMO CONECTAR A ESTRATEGIA</SectionTitle>
     <ol className="space-y-1 list-decimal pl-5">
-      <li className="text-[13px] text-zinc-300">Mapeie impactos (positivos e negativos) na cadeia de valor</li>
-      <li className="text-[13px] text-zinc-300">Cruze com os ODS</li>
-      <li className="text-[13px] text-zinc-300">Priorize 3-5 ODS (maximo!) — <span className="text-red-400">&quot;contribuimos para todos os 17&quot; = greenwashing</span></li>
-      <li className="text-[13px] text-zinc-300">Defina metas concretas: &quot;ODS 8 → Reduzir gap salarial de 22% para 5% ate 2026&quot;</li>
-      <li className="text-[13px] text-zinc-300">Integre ao ESG: <strong className="text-white">&quot;ODS = O QUE. ESG = COMO.&quot;</strong></li>
+      <li className="text-[13px] text-white/50">Mapeie impactos (positivos e negativos) na cadeia de valor</li>
+      <li className="text-[13px] text-white/50">Cruze com os ODS</li>
+      <li className="text-[13px] text-white/50">Priorize 3-5 ODS (maximo!) — <span className="text-red-400">&quot;contribuimos para todos os 17&quot; = greenwashing</span></li>
+      <li className="text-[13px] text-white/50">Defina metas concretas: &quot;ODS 8 → Reduzir gap salarial de 22% para 5% ate 2026&quot;</li>
+      <li className="text-[13px] text-white/50">Integre ao ESG: <strong className="text-white">&quot;ODS = O QUE. ESG = COMO.&quot;</strong></li>
     </ol>
 
     <ExampleBox>
@@ -294,8 +300,8 @@ const ODSContent = () => (
 const CSVContent = () => (
   <div className="space-y-1">
     <SectionTitle color={GREEN}>O QUE E</SectionTitle>
-    <p className="text-[13px] text-zinc-300 leading-relaxed">
-      Diferenca fundamental: <strong className="text-zinc-400">CSR distribui parte do lucro</strong>. <strong className="text-white">CSV gera lucro PORQUE resolve problemas sociais.</strong>
+    <p className="text-[13px] text-white/50 leading-relaxed">
+      Diferenca fundamental: <strong className="text-white/40">CSR distribui parte do lucro</strong>. <strong className="text-white">CSV gera lucro PORQUE resolve problemas sociais.</strong>
     </p>
 
     <Divider />
@@ -353,13 +359,13 @@ const ISEContent = () => (
       <Bullet color={BLUE}>Diferente de doacao: alinha com RSC, busca impacto duradouro</Bullet>
       <Bullet color={BLUE}>Educacao, saude, meio ambiente, inclusao social</Bullet>
     </ul>
-    <p className="text-[11px] uppercase tracking-wider text-zinc-500 mt-3 mb-1">Caracteristicas:</p>
+    <p className="text-[11px] uppercase tracking-wider text-white/30 mt-3 mb-1">Caracteristicas:</p>
     <ul className="space-y-1">
       <Bullet color={BLUE}>Natureza voluntaria</Bullet>
       <Bullet color={BLUE}>Visao de longo prazo</Bullet>
       <Bullet color={BLUE}>Interesse social genuino</Bullet>
     </ul>
-    <p className="text-[13px] text-zinc-400 mt-2">
+    <p className="text-[13px] text-white/40 mt-2">
       <strong className="text-white">RSC:</strong> praticas alem das obrigacoes legais — condicoes justas, direitos humanos, recursos responsaveis
     </p>
 
@@ -452,7 +458,7 @@ export default function ESGFrameworks({ marketData }: { marketData?: any }) {
         <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
           Frameworks de Sustentabilidade
         </h1>
-        <p className="text-zinc-400 text-[13px] md:text-[14px]">
+        <p className="text-white/40 text-[13px] md:text-[14px]">
           7 frameworks de referencia — clique para expandir e explorar cada um em profundidade.
         </p>
       </motion.div>
@@ -475,12 +481,12 @@ export default function ESGFrameworks({ marketData }: { marketData?: any }) {
               {/* Header button */}
               <button
                 onClick={() => toggle(fw.id)}
-                className="w-full flex items-center gap-3 px-4 py-3 bg-zinc-900 hover:bg-zinc-800/80 transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 bg-[rgba(0,0,0,0.3)] hover:bg-[rgba(255,255,255,0.04)]/80 transition-colors text-left"
               >
                 <Icon size={20} style={{ color: fw.color, flexShrink: 0 }} />
                 <div className="flex-1 min-w-0">
                   <p className="text-white font-semibold text-[14px] truncate">{fw.title}</p>
-                  <p className="text-zinc-500 text-[11px] truncate">{fw.subtitle}</p>
+                  <p className="text-white/30 text-[11px] truncate">{fw.subtitle}</p>
                 </div>
                 <span
                   className="text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0"
@@ -492,7 +498,7 @@ export default function ESGFrameworks({ marketData }: { marketData?: any }) {
                   animate={{ rotate: isOpen ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <ChevronDown size={16} className="text-zinc-500" />
+                  <ChevronDown size={16} className="text-white/30" />
                 </motion.div>
               </button>
 
@@ -506,13 +512,42 @@ export default function ESGFrameworks({ marketData }: { marketData?: any }) {
                     transition={{ duration: 0.25 }}
                     className="overflow-hidden"
                   >
-                    <div className="px-5 py-4 bg-zinc-900/60 border-t border-zinc-800">
+                    <div className="px-5 py-4 bg-[rgba(0,0,0,0.3)]/60 border-t border-white/5">
                       {fw.content}
-                      {/* TBL executável dentro do card TBL */}
+                      {/* Framework executável DENTRO do card */}
                       {fw.id === 'tbl' && marketData && (
                         <div style={{ marginTop: 24, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
-                          <p style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginBottom: 12 }}>Executar TBL</p>
                           <TBLFramework marketData={marketData} />
+                        </div>
+                      )}
+                      {fw.id === 'esg' && marketData && (
+                        <div style={{ marginTop: 24, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
+                          <ESGRatingFramework marketData={marketData} />
+                        </div>
+                      )}
+                      {fw.id === 'gri' && marketData && (
+                        <div style={{ marginTop: 24, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
+                          <GRIFramework marketData={marketData} />
+                        </div>
+                      )}
+                      {fw.id === 'sasb' && marketData && (
+                        <div style={{ marginTop: 24, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
+                          <SASBFramework marketData={marketData} />
+                        </div>
+                      )}
+                      {fw.id === 'ods' && marketData && (
+                        <div style={{ marginTop: 24, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
+                          <ODSFramework marketData={marketData} />
+                        </div>
+                      )}
+                      {fw.id === 'csv' && marketData && (
+                        <div style={{ marginTop: 24, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
+                          <CSVFramework marketData={marketData} />
+                        </div>
+                      )}
+                      {fw.id === 'ise' && marketData && (
+                        <div style={{ marginTop: 24, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
+                          <ISEISPFramework marketData={marketData} />
                         </div>
                       )}
                     </div>

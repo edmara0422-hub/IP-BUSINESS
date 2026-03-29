@@ -87,7 +87,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 overflow-hidden bg-[#030303]"
+      className="fixed inset-0 z-50 overflow-hidden bg-[#050505]"
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease: 'easeInOut' }}
     >

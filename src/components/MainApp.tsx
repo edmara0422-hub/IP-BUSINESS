@@ -18,13 +18,7 @@ const WorkspaceOnboarding = dynamic(() => import('@/components/WorkspaceOnboardi
 function ShellBackdrop() {
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(255,255,255,0.14),transparent_22%),linear-gradient(180deg,rgba(255,255,255,0.05)_0%,transparent_24%,rgba(0,0,0,0.18)_100%)]" />
-      <div className="absolute left-1/2 top-0 h-[24rem] w-[min(72rem,96vw)] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(214,220,228,0.16)_0%,rgba(214,220,228,0.04)_46%,transparent_76%)] blur-3xl" />
-      <div className="absolute left-[12%] top-[18%] h-[24rem] w-[24rem] rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.08)_0%,transparent_70%)] blur-[120px]" />
-      <div className="absolute right-[10%] top-[24%] h-[22rem] w-[26rem] rounded-full bg-[radial-gradient(circle,rgba(176,184,193,0.1)_0%,transparent_70%)] blur-[120px]" />
-      <div className="absolute inset-x-[10%] bottom-[-10rem] h-[20rem] rounded-full bg-[radial-gradient(ellipse_at_center,rgba(213,219,227,0.14)_0%,rgba(213,219,227,0.03)_42%,transparent_70%)] blur-[100px]" />
-      <div className="absolute left-[14%] top-0 h-full w-px bg-[linear-gradient(180deg,rgba(255,255,255,0.16),transparent_28%,transparent_72%,rgba(255,255,255,0.08))]" />
-      <div className="absolute right-[14%] top-0 h-full w-px bg-[linear-gradient(180deg,rgba(255,255,255,0.16),transparent_28%,transparent_72%,rgba(255,255,255,0.08))]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(255,255,255,0.04),transparent_30%)]" />
     </div>
   )
 }
@@ -129,7 +123,7 @@ function TopBar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="chrome-shell mx-auto flex h-[3.4rem] max-w-7xl items-center justify-between gap-3 rounded-[1.4rem] px-3 md:h-[4.8rem] md:gap-4 md:rounded-[1.9rem] md:px-6">
+      <div className="chrome-shell mx-auto flex h-[2.8rem] max-w-7xl items-center justify-between gap-3 rounded-[1.2rem] px-3 md:h-[3.4rem] md:gap-4 md:rounded-[1.4rem] md:px-5">
         <div className="flex items-center gap-2 md:gap-4">
           <div
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.7rem] border border-white/16 md:h-11 md:w-11 md:rounded-[1.05rem]"
@@ -173,7 +167,7 @@ function TopBar() {
 function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) => void }) {
   return (
     <motion.div
-      className="fixed bottom-3 left-1/2 z-40 w-[min(40rem,calc(100vw-1rem))] -translate-x-1/2"
+      className="fixed bottom-3 left-1/2 z-40 w-[min(40rem,calc(100vw-2rem))] max-w-7xl -translate-x-1/2"
       initial={{ y: 70, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
@@ -181,7 +175,7 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
       <div className="chrome-pill grid grid-cols-3 gap-1 rounded-[1.2rem] p-1">
         <button
           onClick={() => onSwitch('business')}
-          className={`flex items-center justify-center gap-1 rounded-[0.9rem] px-2 py-2 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'business' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
+          className={`flex items-center justify-center gap-1 rounded-[0.8rem] px-2 py-1.5 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'business' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
         >
           <Globe className="h-3 w-3" />
           <span>BUSINESS</span>
@@ -189,7 +183,7 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
 
         <button
           onClick={() => onSwitch('estudo')}
-          className={`flex items-center justify-center gap-1 rounded-[0.9rem] px-2 py-2 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'estudo' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
+          className={`flex items-center justify-center gap-1 rounded-[0.8rem] px-2 py-1.5 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'estudo' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
         >
           <BookOpen className="h-3 w-3" />
           <span>INTELLIGENCE</span>
@@ -197,7 +191,7 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
 
         <button
           onClick={() => onSwitch('admin')}
-          className={`flex items-center justify-center gap-1 rounded-[0.9rem] px-2 py-2 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'admin' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
+          className={`flex items-center justify-center gap-1 rounded-[0.8rem] px-2 py-1.5 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'admin' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
         >
           <Briefcase className="h-3 w-3" />
           <span>WORKSPACE</span>

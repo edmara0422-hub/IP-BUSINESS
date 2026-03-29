@@ -21,7 +21,7 @@ export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
   }, [])
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-[#050507]">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-[#050505]">
 
       {/* Background */}
       <div className="pointer-events-none absolute inset-0">

@@ -41,7 +41,7 @@ export default function Home() {
   // 2. Loading auth
   if (loading && !justLoggedIn) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#050507]">
+      <main className="flex min-h-screen items-center justify-center bg-[#050505]">
         <span className="text-[0.7rem] uppercase tracking-[0.3em] text-white/30">Carregando...</span>
       </main>
     )
@@ -55,7 +55,7 @@ export default function Home() {
   // 4. Logado → Splash
   if (showSplash) {
     return (
-      <main className="min-h-screen bg-[#030303]">
+      <main className="min-h-screen bg-[#050505]">
         <AnimatePresence mode="wait">
           <SplashScreen key="splash" onComplete={() => setShowSplash(false)} />
         </AnimatePresence>
