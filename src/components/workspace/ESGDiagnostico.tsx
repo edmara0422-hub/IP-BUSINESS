@@ -246,8 +246,6 @@ export default function ESGDiagnostico({ marketData }: { marketData: any }) {
   const ESG_TABS = [
     { id: 'diagnostico' as const, label: 'Diagnóstico' },
     { id: 'frameworks' as const, label: 'Frameworks' },
-    { id: 'tbl' as const, label: 'TBL' },
-    { id: 'executar' as const, label: 'Ferramentas' },
   ]
 
   if (esgTab === 'frameworks') {
@@ -262,38 +260,10 @@ export default function ESGDiagnostico({ marketData }: { marketData: any }) {
           ))}
         </div>
         <ESGFrameworks />
-      </div>
-    )
-  }
-
-  if (esgTab === 'tbl') {
-    return (
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '24px 16px' }}>
-        <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 8 }}>
-          {ESG_TABS.map(t => (
-            <button key={t.id} onClick={() => setEsgTab(t.id)}
-              style={{ flex: 1, padding: '8px 0', fontSize: 12, fontWeight: 700, fontFamily: 'monospace', letterSpacing: 1, borderBottom: esgTab === t.id ? '2px solid #1e8449' : '2px solid transparent', color: esgTab === t.id ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
-              {t.label}
-            </button>
-          ))}
+        {/* TBL completo dentro de Frameworks */}
+        <div style={{ marginTop: 32, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 24 }}>
+          <TBLFramework marketData={marketData} />
         </div>
-        <TBLFramework marketData={marketData} />
-      </div>
-    )
-  }
-
-  if (esgTab === 'executar') {
-    return (
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '24px 16px' }}>
-        <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 8 }}>
-          {ESG_TABS.map(t => (
-            <button key={t.id} onClick={() => setEsgTab(t.id)}
-              style={{ flex: 1, padding: '8px 0', fontSize: 13, fontWeight: 700, fontFamily: 'monospace', letterSpacing: 1, borderBottom: esgTab === t.id ? '2px solid #1a5276' : '2px solid transparent', color: esgTab === t.id ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
-              {t.label}
-            </button>
-          ))}
-        </div>
-        <ESGExecutar marketData={marketData} />
       </div>
     )
   }

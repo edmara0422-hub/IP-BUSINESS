@@ -438,7 +438,7 @@ export default function ESGFrameworks() {
   const toggle = (id: string) => setOpenId(prev => (prev === id ? null : id))
 
   return (
-    <div className="min-h-screen bg-zinc-950 p-6 md:p-10">
+    <div className="p-2">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

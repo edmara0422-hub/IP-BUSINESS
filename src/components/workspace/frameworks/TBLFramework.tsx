@@ -247,7 +247,7 @@ GERE:
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: index * 0.05 }}
         style={{
-          background: '#1a1a2e',
+          background: 'rgba(0,0,0,0.35)',
           borderRadius: 10,
           borderLeft: `4px solid ${meta.color}`,
           padding: '16px 20px',
@@ -291,7 +291,7 @@ GERE:
               value={answers[q.id] !== undefined ? String(answers[q.id]) : ''}
               onChange={e => handleAnswer(q.id, Number(e.target.value))}
               style={{
-                background: '#0d0d1a',
+                background: 'rgba(0,0,0,0.25)',
                 border: '1px solid #333',
                 borderRadius: 6,
                 color: '#fff',
@@ -315,7 +315,7 @@ GERE:
                   key={opt.label}
                   onClick={() => handleAnswer(q.id, opt.label)}
                   style={{
-                    background: selected ? `${meta.color}22` : '#0d0d1a',
+                    background: selected ? `${meta.color}22` : 'rgba(0,0,0,0.25)',
                     border: `1px solid ${selected ? meta.color : '#333'}`,
                     borderRadius: 20,
                     color: selected ? '#fff' : '#aaa',
@@ -367,7 +367,7 @@ GERE:
         {/* Pillar summary */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          background: '#0d0d1a', borderRadius: 10, padding: '12px 20px', marginTop: 8,
+          background: 'rgba(0,0,0,0.25)', borderRadius: 10, padding: '12px 20px', marginTop: 8,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ color: '#888', fontSize: 13 }}>Score:</span>
@@ -408,7 +408,7 @@ GERE:
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               style={{
-                background: '#0f0f1e',
+                background: 'rgba(0,0,0,0.3)',
                 border: `1px solid ${meta.color}44`,
                 borderRadius: 10,
                 padding: 16,
@@ -457,7 +457,7 @@ GERE:
             const b = badge(ps.pct)
             return (
               <div key={p} style={{
-                flex: '1 1 200px', background: '#1a1a2e', borderRadius: 10, padding: 16,
+                flex: '1 1 200px', background: 'rgba(0,0,0,0.35)', borderRadius: 10, padding: 16,
                 borderTop: `3px solid ${meta.color}`, textAlign: 'center',
               }}>
                 <p style={{ margin: 0, fontSize: 13, color: meta.color, fontWeight: 700 }}>{meta.label}</p>
@@ -483,7 +483,7 @@ GERE:
                 <span style={{ fontSize: 12, color: '#aaa' }}>{meta.label}</span>
                 <span style={{ fontSize: 12, color: '#aaa', fontFamily: 'monospace' }}>{ps.pct}%</span>
               </div>
-              <div style={{ background: '#0d0d1a', borderRadius: 6, height: 12, overflow: 'hidden' }}>
+              <div style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 6, height: 12, overflow: 'hidden' }}>
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${ps.pct}%` }}
@@ -496,7 +496,7 @@ GERE:
         })}
 
         <div style={{
-          background: '#0d0d1a', borderRadius: 10, padding: 16, marginTop: 16, textAlign: 'center',
+          background: 'rgba(0,0,0,0.25)', borderRadius: 10, padding: 16, marginTop: 16, textAlign: 'center',
         }}>
           <span style={{ color: '#888', fontSize: 13 }}>TBL Score Geral:</span>
           <span style={{ color: '#fff', fontSize: 24, fontWeight: 800, marginLeft: 12, fontFamily: 'monospace' }}>
@@ -523,7 +523,7 @@ GERE:
           { key: 'finance', text: 'Sua operação é financeiramente viável?', yesColor: GREEN, yesMsg: 'EXECUTE — o caminho está correto', yesIcon: CheckCircle2 },
         ].map(item => (
           <div key={item.key} style={{
-            background: '#1a1a2e', borderRadius: 10, padding: 16, marginBottom: 12,
+            background: 'rgba(0,0,0,0.35)', borderRadius: 10, padding: 16, marginBottom: 12,
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
               <p style={{ margin: 0, fontSize: 13, color: '#e0e0e0', flex: 1 }}>{item.text}</p>
@@ -536,7 +536,7 @@ GERE:
                       key={opt}
                       onClick={() => setCircles(prev => ({ ...prev, [item.key]: val }))}
                       style={{
-                        background: selected ? (val ? item.yesColor + '33' : '#33333366') : '#0d0d1a',
+                        background: selected ? (val ? item.yesColor + '33' : '#33333366') : 'rgba(0,0,0,0.25)',
                         border: `1px solid ${selected ? (val ? item.yesColor : '#666') : '#333'}`,
                         color: selected ? '#fff' : '#888', borderRadius: 8,
                         padding: '6px 16px', fontSize: 12, fontWeight: 600, cursor: 'pointer',
@@ -584,7 +584,7 @@ GERE:
         </h3>
 
         {greenwashAlerts.length === 0 ? (
-          <div style={{ background: '#1a1a2e', borderRadius: 10, padding: 16, borderLeft: `4px solid ${GREEN}` }}>
+          <div style={{ background: 'rgba(0,0,0,0.35)', borderRadius: 10, padding: 16, borderLeft: `4px solid ${GREEN}` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <CheckCircle2 size={16} color={GREEN} />
               <span style={{ fontSize: 13, color: GREEN, fontWeight: 600 }}>
@@ -600,7 +600,7 @@ GERE:
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.1 }}
               style={{
-                background: '#1a1a2e', borderRadius: 10, padding: 16,
+                background: 'rgba(0,0,0,0.35)', borderRadius: 10, padding: 16,
                 borderLeft: `4px solid ${alert.color}`, marginBottom: 10,
                 display: 'flex', alignItems: 'center', gap: 10,
               }}
@@ -642,7 +642,7 @@ GERE:
               style={{ marginTop: 16 }}
             >
               <div style={{
-                background: '#0d0d1a', border: '1px solid #333', borderRadius: 12, padding: 20,
+                background: 'rgba(0,0,0,0.25)', border: '1px solid #333', borderRadius: 12, padding: 20,
               }}>
                 <p style={{ fontSize: 13, color: '#ccc', whiteSpace: 'pre-wrap', lineHeight: 1.7, margin: 0 }}>
                   {report}
