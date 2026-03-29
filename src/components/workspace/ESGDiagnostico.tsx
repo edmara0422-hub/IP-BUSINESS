@@ -93,6 +93,20 @@ function maturityLabel(v: number) {
   return { label: 'INICIAL', color: RED }
 }
 
+/* ── IA help prompts per question (when score = 0) ── */
+const IA_HELP: Record<string, string> = {
+  q1: 'Minha empresa não sabe mensurar resíduos e emissões. Me ajude a: 1) Listar os principais resíduos/emissões do meu setor. 2) Dar uma estimativa da pegada de carbono de uma empresa digital/escritório. 3) Sugerir 3 ações práticas para começar a medir. Seja específico e prático.',
+  q2: 'Minha empresa nunca pensou em energia renovável ou metas de carbono. Me ajude a: 1) Calcular quanto gastaria para migrar para energia renovável. 2) Sugerir metas realistas de redução de carbono para o primeiro ano. 3) Listar fornecedores de energia renovável no Brasil. Seja prático.',
+  q3: 'Minha empresa não tem política de diversidade, inclusão ou análise de gap salarial. Gere um MODELO DE POLÍTICA DE DIVERSIDADE E INCLUSÃO completo para uma empresa do meu porte, incluindo: 1) Princípios e valores. 2) Metas mensuráveis (gênero, raça, PcD). 3) Processo de análise de gap salarial. 4) Cronograma de implementação em 6 meses.',
+  q4: 'Minha empresa não investe na comunidade (ISP). Me ajude a: 1) Calcular quanto deveria investir (% da receita recomendado para ISP). 2) Sugerir 5 ações de Investimento Social Privado para o meu setor. 3) Explicar como isso geraria valor compartilhado (CSV). 4) Comparar ISP vs ISE — qual a diferença e se minha empresa poderia buscar o ISE.',
+  q5: 'Minha empresa não tem canal de denúncias nem compliance. Gere: 1) Modelo de Canal de Denúncias (anônimo, LGPD). 2) Checklist básico de compliance para meu porte. 3) Código de ética modelo. 4) Como implementar em 30 dias com custo mínimo.',
+  q6: 'Minha empresa não publica relatórios financeiros ou de impacto. Gere: 1) Template de relatório ESG simplificado (para PME). 2) Quais dados coletar nos primeiros 90 dias. 3) Modelo GRI simplificado para empresa pequena. 4) Como publicar de forma transparente.',
+  q7: 'Não sei se meu produto/serviço resolve um problema social ou ambiental. Me ajude a analisar: 1) Qual problema social/ambiental meu setor causa ou poderia resolver. 2) Como aplicar CSV (Creating Shared Value) de Porter ao meu negócio — nos 3 níveis. 3) Exemplos de empresas do meu setor que fazem CSV. 4) Se meu produto já resolve algo sem eu perceber.',
+  q8: 'Não sei o que são ODS (Objetivos de Desenvolvimento Sustentável). Me ajude: 1) Explique os 17 ODS em 1 frase cada. 2) Mapeie quais 3-5 ODS meu setor mais impacta. 3) Explique a diferença: ODS = O QUÊ, ESG = COMO. 4) Dê exemplo da Natura (ODS 12, 13, 15 → rating AAA). 5) ALERTA: abraçar todos os 17 = greenwashing.',
+  q9: 'Não sei se meu setor exige certificações de sustentabilidade. Me ajude: 1) Liste todas as certificações relevantes para o meu setor. 2) Quais são obrigatórias vs recomendadas. 3) Custo médio e tempo de obtenção de cada uma. 4) Se vale a pena buscar a certificação B Corp.',
+  q10: 'Não sei o que é ISE B3 nem rating ESG. Me ajude: 1) Explique o ISE B3 e quem pode entrar. 2) Como funciona o rating ESG (MSCI: CCC a AAA). 3) Quanto custa buscar um rating. 4) Exemplo: Natura AAA vs Vale B pós-Brumadinho. 5) O que minha empresa precisa para ser elegível.',
+}
+
 /* ── Component ── */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function ESGDiagnostico({ marketData }: { marketData: any }) {
@@ -100,6 +114,8 @@ export default function ESGDiagnostico({ marketData }: { marketData: any }) {
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [iaLoading, setIaLoading] = useState(false)
   const [iaResponse, setIaResponse] = useState('')
+  const [helpLoading, setHelpLoading] = useState<string | null>(null)
+  const [helpResponses, setHelpResponses] = useState<Record<string, string>>({})
 
   const allAnswered = Object.keys(answers).length === 10
 
@@ -144,6 +160,26 @@ export default function ESGDiagnostico({ marketData }: { marketData: any }) {
 
     return list
   }, [answers, scores])
+
+  /* ── IA help per question ── */
+  const callHelp = async (qId: string) => {
+    const prompt = IA_HELP[qId]
+    if (!prompt) return
+    setHelpLoading(qId)
+    try {
+      const res = await fetch('/api/advisor-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: prompt, marketContext: JSON.stringify(marketData ?? {}) }),
+      })
+      const data = await res.json()
+      setHelpResponses(prev => ({ ...prev, [qId]: data.answer ?? 'Sem resposta.' }))
+    } catch {
+      setHelpResponses(prev => ({ ...prev, [qId]: 'Erro ao consultar IA.' }))
+    } finally {
+      setHelpLoading(null)
+    }
+  }
 
   /* ── IA call ── */
   const callIA = async () => {
@@ -265,6 +301,51 @@ export default function ESGDiagnostico({ marketData }: { marketData: any }) {
                         )
                       })}
                     </div>
+
+                    {/* IA Help button — when answer is score 0 or "não sei" */}
+                    {answers[q.id] === 0 && !helpResponses[q.id] && (
+                      <motion.button
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        onClick={() => callHelp(q.id)}
+                        disabled={helpLoading === q.id}
+                        style={{
+                          marginTop: 12, fontSize: 12, fontWeight: 600,
+                          padding: '8px 16px', borderRadius: 8, cursor: 'pointer',
+                          background: 'rgba(93,173,226,0.12)',
+                          border: '1px solid rgba(93,173,226,0.25)',
+                          color: '#5dade2',
+                          display: 'flex', alignItems: 'center', gap: 6,
+                        }}
+                      >
+                        {helpLoading === q.id ? (
+                          <><Loader2 size={14} className="animate-spin" /> Gerando...</>
+                        ) : (
+                          <>IA ajuda a criar →</>
+                        )}
+                      </motion.button>
+                    )}
+
+                    {/* IA Help response */}
+                    {helpResponses[q.id] && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        style={{
+                          marginTop: 12, padding: '14px 16px',
+                          borderRadius: 8,
+                          background: 'rgba(93,173,226,0.06)',
+                          border: '1px solid rgba(93,173,226,0.15)',
+                        }}
+                      >
+                        <p style={{ fontSize: 10, fontWeight: 700, color: '#5dade2', marginBottom: 8, letterSpacing: 1 }}>
+                          RECOMENDAÇÃO IA
+                        </p>
+                        <div style={{ fontSize: 13, color: '#d1d5db', lineHeight: 1.7, whiteSpace: 'pre-line' }}>
+                          {helpResponses[q.id]}
+                        </div>
+                      </motion.div>
+                    )}
                   </motion.div>
                 )
               })}
