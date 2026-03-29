@@ -45,13 +45,13 @@ function ProfileButton() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="relative flex h-8 w-8 items-center justify-center rounded-[0.7rem] border border-white/14 text-white transition hover:border-white/24 md:h-11 md:w-11 md:rounded-[1rem]"
+        className="relative flex h-6 w-6 items-center justify-center rounded-[0.5rem] border border-white/14 text-white transition hover:border-white/24 md:h-7 md:w-7 md:rounded-[0.6rem]"
         style={{
           background: 'linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(220,225,232,0.08) 16%, rgba(76,80,87,0.94) 44%, rgba(10,10,12,0.98) 100%)',
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
         }}
       >
-        <span className="text-[13px] font-semibold text-white/88">{initials}</span>
+        <span className="text-[10px] font-semibold text-white/88">{initials}</span>
         {isAdmin && (
           <span className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full border border-black bg-white/90">
             <Shield className="h-2 w-2 text-[#050505]" />
@@ -123,20 +123,20 @@ function TopBar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="chrome-pill mx-auto flex h-[2.8rem] max-w-7xl items-center justify-between gap-3 rounded-[1.2rem] px-3 md:h-[3.4rem] md:gap-4 md:rounded-[1.4rem] md:px-5">
+      <div className="chrome-pill mx-auto flex h-[2.2rem] max-w-7xl items-center justify-between gap-2 rounded-[1.2rem] px-2.5 md:h-[2.6rem] md:gap-3 md:rounded-[1.4rem] md:px-4">
         <div className="flex items-center gap-2 md:gap-4">
           <div
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.7rem] border border-white/16 md:h-11 md:w-11 md:rounded-[1.05rem]"
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[0.5rem] border border-white/16 md:h-7 md:w-7 md:rounded-[0.6rem]"
             style={{
               background: 'linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(219,225,232,0.36) 16%, rgba(96,101,108,0.94) 42%, rgba(14,15,18,0.98) 100%)',
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.24), inset 0 -1px 0 rgba(255,255,255,0.05), 0 16px 32px rgba(0,0,0,0.36)',
             }}
           >
-            <span className="text-[0.6rem] font-semibold tracking-[0.32em] text-white md:text-[0.8rem]" style={{ fontFamily: 'Poppins, sans-serif', paddingLeft: '0.32em' }}>
+            <span className="text-[0.45rem] font-semibold tracking-[0.28em] text-white md:text-[0.55rem]" style={{ fontFamily: 'Poppins, sans-serif', paddingLeft: '0.32em' }}>
               IPB
             </span>
           </div>
-          <p className="metal-text hidden text-[10px] font-semibold uppercase tracking-[0.14em] text-white/74 sm:block md:text-[11px]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <p className="metal-text hidden text-[8px] font-semibold uppercase tracking-[0.12em] text-white/60 sm:block md:text-[9px]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Intelligence Platform BUSINESS
           </p>
         </div>
@@ -152,10 +152,10 @@ function TopBar() {
 
         <div className="flex shrink-0 items-center gap-1.5 md:gap-2">
           <button
-            className="flex h-8 w-8 items-center justify-center rounded-[0.7rem] border border-white/12 text-white/70 transition hover:text-white md:h-11 md:w-11 md:rounded-[1rem]"
+            className="flex h-6 w-6 items-center justify-center rounded-[0.5rem] border border-white/12 text-white/70 transition hover:text-white md:h-7 md:w-7 md:rounded-[0.6rem]"
             style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(18,18,20,0.84) 60%, rgba(8,8,10,0.98) 100%)' }}
           >
-            <Bell className="h-4 w-4" />
+            <Bell className="h-3 w-3" />
           </button>
           <ProfileButton />
         </div>
