@@ -129,7 +129,6 @@ export default function SASBFramework({ marketData }: { marketData: any }) {
   const [report, setReport] = useState('')
   const [reportLoading, setReportLoading] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [dropdownOpen, setDropdownOpen] = useState(false)
 
   const marketContext = useMemo(() => {
     if (!marketData) return 'Dados de mercado indisponíveis'
@@ -228,24 +227,23 @@ GERE:
       {/* Sector selector */}
       <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginBottom: 28 }}>
         <h3 style={{ fontSize: 16, color: '#fff', fontWeight: 700, marginBottom: 16, borderBottom: '1px solid #333', paddingBottom: 8 }}>Qual seu setor?</h3>
-        <div style={{ position: 'relative' }}>
-          <button onClick={() => setDropdownOpen(!dropdownOpen)}
-            style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid #333', borderRadius: 10, color: selectedSector ? '#fff' : '#888', fontSize: 14, padding: '12px 20px', width: '100%', textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            {sector ? sector.label : 'Selecione o setor da empresa...'} <ChevronDown size={16} color="#888" />
-          </button>
-          <AnimatePresence>
-            {dropdownOpen && (
-              <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
-                style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'rgba(20,20,20,0.98)', border: '1px solid #333', borderRadius: 10, marginTop: 4, zIndex: 10, maxHeight: 300, overflowY: 'auto' }}>
-                {SECTORS.map(s => (
-                  <button key={s.id} onClick={() => { setSelectedSector(s.id); setDropdownOpen(false); setAnswers({}); setSectorAnalysis(''); setReport('') }}
-                    style={{ background: 'transparent', border: 'none', color: '#e0e0e0', fontSize: 13, padding: '10px 20px', width: '100%', textAlign: 'left', cursor: 'pointer', borderBottom: '1px solid #222', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Building size={14} color={BLUE} />{s.label}
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {SECTORS.map(s => {
+            const isSelected = selectedSector === s.id
+            return (
+              <button key={s.id} onClick={() => { setSelectedSector(s.id); setAnswers({}); setSectorAnalysis(''); setReport('') }}
+                style={{
+                  background: isSelected ? `${BLUE}22` : 'rgba(0,0,0,0.35)',
+                  border: `1px solid ${isSelected ? BLUE : '#333'}`,
+                  borderRadius: 10, color: isSelected ? '#fff' : '#aaa',
+                  fontSize: 13, padding: '10px 18px', cursor: 'pointer',
+                  fontWeight: isSelected ? 600 : 400,
+                  display: 'flex', alignItems: 'center', gap: 8,
+                }}>
+                <Building size={14} color={isSelected ? BLUE : '#555'} />{s.label}
+              </button>
+            )
+          })}
         </div>
       </motion.section>
 
