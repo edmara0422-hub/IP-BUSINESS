@@ -10,6 +10,7 @@ import {
 
 const ESGFrameworks = dynamic(() => import('./ESGFrameworks'), { ssr: false })
 const ESGExecutar = dynamic(() => import('./ESGExecutar'), { ssr: false })
+const TBLFramework = dynamic(() => import('./frameworks/TBLFramework'), { ssr: false })
 
 /* ── Colors ── */
 const RED = '#c0392b'
@@ -114,7 +115,7 @@ const IA_HELP: Record<string, string> = {
 /* ── Component ── */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function ESGDiagnostico({ marketData }: { marketData: any }) {
-  const [esgTab, setEsgTab] = useState<'diagnostico' | 'frameworks' | 'executar'>('diagnostico')
+  const [esgTab, setEsgTab] = useState<'diagnostico' | 'frameworks' | 'executar' | 'tbl'>('diagnostico')
   const [phase, setPhase] = useState<'DIAG' | 'RESULT'>('DIAG')
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [iaLoading, setIaLoading] = useState(false)
@@ -245,7 +246,8 @@ export default function ESGDiagnostico({ marketData }: { marketData: any }) {
   const ESG_TABS = [
     { id: 'diagnostico' as const, label: 'Diagnóstico' },
     { id: 'frameworks' as const, label: 'Frameworks' },
-    { id: 'executar' as const, label: 'Executar' },
+    { id: 'tbl' as const, label: 'TBL' },
+    { id: 'executar' as const, label: 'Ferramentas' },
   ]
 
   if (esgTab === 'frameworks') {
@@ -260,6 +262,22 @@ export default function ESGDiagnostico({ marketData }: { marketData: any }) {
           ))}
         </div>
         <ESGFrameworks />
+      </div>
+    )
+  }
+
+  if (esgTab === 'tbl') {
+    return (
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '24px 16px' }}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 8 }}>
+          {ESG_TABS.map(t => (
+            <button key={t.id} onClick={() => setEsgTab(t.id)}
+              style={{ flex: 1, padding: '8px 0', fontSize: 12, fontWeight: 700, fontFamily: 'monospace', letterSpacing: 1, borderBottom: esgTab === t.id ? '2px solid #1e8449' : '2px solid transparent', color: esgTab === t.id ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <TBLFramework marketData={marketData} />
       </div>
     )
   }
