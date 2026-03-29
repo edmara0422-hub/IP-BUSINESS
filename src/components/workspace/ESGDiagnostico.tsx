@@ -2,10 +2,14 @@
 
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import {
   Leaf, Users, Shield, Target, TrendingUp, Loader2,
   CheckCircle2, RotateCcw, ChevronRight,
 } from 'lucide-react'
+
+const ESGFrameworks = dynamic(() => import('./ESGFrameworks'), { ssr: false })
+const ESGExecutar = dynamic(() => import('./ESGExecutar'), { ssr: false })
 
 /* ── Colors ── */
 const RED = '#c0392b'
@@ -110,6 +114,7 @@ const IA_HELP: Record<string, string> = {
 /* ── Component ── */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function ESGDiagnostico({ marketData }: { marketData: any }) {
+  const [esgTab, setEsgTab] = useState<'diagnostico' | 'frameworks' | 'executar'>('diagnostico')
   const [phase, setPhase] = useState<'DIAG' | 'RESULT'>('DIAG')
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [iaLoading, setIaLoading] = useState(false)
@@ -236,8 +241,56 @@ export default function ESGDiagnostico({ marketData }: { marketData: any }) {
   const mat = maturityLabel(scores.totalScore)
 
   /* ══════════ RENDER ══════════ */
+
+  const ESG_TABS = [
+    { id: 'diagnostico' as const, label: 'Diagnóstico' },
+    { id: 'frameworks' as const, label: 'Frameworks' },
+    { id: 'executar' as const, label: 'Executar' },
+  ]
+
+  if (esgTab === 'frameworks') {
+    return (
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '24px 16px' }}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 8 }}>
+          {ESG_TABS.map(t => (
+            <button key={t.id} onClick={() => setEsgTab(t.id)}
+              style={{ flex: 1, padding: '8px 0', fontSize: 13, fontWeight: 700, fontFamily: 'monospace', letterSpacing: 1, borderBottom: esgTab === t.id ? '2px solid #1a5276' : '2px solid transparent', color: esgTab === t.id ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <ESGFrameworks />
+      </div>
+    )
+  }
+
+  if (esgTab === 'executar') {
+    return (
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '24px 16px' }}>
+        <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 8 }}>
+          {ESG_TABS.map(t => (
+            <button key={t.id} onClick={() => setEsgTab(t.id)}
+              style={{ flex: 1, padding: '8px 0', fontSize: 13, fontWeight: 700, fontFamily: 'monospace', letterSpacing: 1, borderBottom: esgTab === t.id ? '2px solid #1a5276' : '2px solid transparent', color: esgTab === t.id ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <ESGExecutar marketData={marketData} />
+      </div>
+    )
+  }
+
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: '24px 16px' }}>
+      {/* Tab selector */}
+      <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 8 }}>
+        {ESG_TABS.map(t => (
+          <button key={t.id} onClick={() => setEsgTab(t.id)}
+            style={{ flex: 1, padding: '8px 0', fontSize: 13, fontWeight: 700, fontFamily: 'monospace', letterSpacing: 1, borderBottom: esgTab === t.id ? '2px solid #1a5276' : '2px solid transparent', color: esgTab === t.id ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+            {t.label}
+          </button>
+        ))}
+      </div>
       <AnimatePresence mode="wait">
         {phase === 'DIAG' ? (
           <motion.div key="diag" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.35 }}>
