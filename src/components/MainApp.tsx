@@ -167,12 +167,12 @@ function TopBar() {
 function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) => void }) {
   return (
     <motion.div
-      className="fixed bottom-3 left-1/2 z-40 w-[min(40rem,calc(100vw-2rem))] max-w-7xl -translate-x-1/2"
+      className="fixed bottom-3 left-0 right-0 z-40 px-3 md:px-6"
       initial={{ y: 70, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="chrome-pill grid grid-cols-3 gap-1 rounded-[1.2rem] p-1">
+      <div className="chrome-pill mx-auto grid max-w-7xl grid-cols-3 gap-1 rounded-[1.2rem] p-0.5 md:rounded-[1.4rem]">
         <button
           onClick={() => onSwitch('business')}
           className={`flex items-center justify-center gap-1 rounded-[0.8rem] px-2 py-1.5 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'business' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
