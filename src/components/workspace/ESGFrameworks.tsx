@@ -1,6 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
+
+const TBLFramework = dynamic(() => import('./frameworks/TBLFramework'), { ssr: false })
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ChevronDown, Leaf, BarChart3, FileText, Building2,
@@ -432,7 +435,8 @@ const FRAMEWORKS: Framework[] = [
 ]
 
 /* ── Main component ── */
-export default function ESGFrameworks() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function ESGFrameworks({ marketData }: { marketData?: any }) {
   const [openId, setOpenId] = useState<string | null>(null)
 
   const toggle = (id: string) => setOpenId(prev => (prev === id ? null : id))
@@ -504,6 +508,13 @@ export default function ESGFrameworks() {
                   >
                     <div className="px-5 py-4 bg-zinc-900/60 border-t border-zinc-800">
                       {fw.content}
+                      {/* TBL executável dentro do card TBL */}
+                      {fw.id === 'tbl' && marketData && (
+                        <div style={{ marginTop: 24, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
+                          <p style={{ fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginBottom: 12 }}>Executar TBL</p>
+                          <TBLFramework marketData={marketData} />
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 )}

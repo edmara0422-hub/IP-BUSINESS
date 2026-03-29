@@ -259,11 +259,7 @@ export default function ESGDiagnostico({ marketData }: { marketData: any }) {
             </button>
           ))}
         </div>
-        <ESGFrameworks />
-        {/* TBL completo dentro de Frameworks */}
-        <div style={{ marginTop: 32, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 24 }}>
-          <TBLFramework marketData={marketData} />
-        </div>
+        <ESGFrameworks marketData={marketData} />
       </div>
     )
   }
