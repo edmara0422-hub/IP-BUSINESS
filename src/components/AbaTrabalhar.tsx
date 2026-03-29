@@ -17,6 +17,7 @@ const SmartPricing = dynamic(() => import('@/components/workspace/SmartPricing')
 const ESGDiagnostico = dynamic(() => import('@/components/workspace/ESGDiagnostico'), { ssr: false })
 const FeedbackNPS = dynamic(() => import('@/components/workspace/FeedbackNPS'), { ssr: false })
 const CanalDenuncias = dynamic(() => import('@/components/workspace/CanalDenuncias'), { ssr: false })
+const AdminPanel = dynamic(() => import('@/components/workspace/AdminPanel'), { ssr: false })
 
 interface ModuleMeta {
   id: string
@@ -42,6 +43,7 @@ const MODULES: ModuleMeta[] = [
   // Compliance
   { id: 'feedback', title: 'Feedback & NPS', short: 'Feedback', icon: MessageSquare, color: '#5dade2', group: 'compliance' },
   { id: 'denuncia', title: 'Canal de Denúncias', short: 'Denúncias', icon: AlertTriangle, color: '#c0392b', group: 'compliance' },
+  { id: 'admin', title: 'Painel Admin', short: 'Admin', icon: ShieldCheck, color: '#5dade2', group: 'compliance' },
 ]
 
 const ACC_OPTIONS: { id: AccessibilityMode; label: string; desc: string }[] = [
@@ -83,6 +85,7 @@ export default function AbaTrabalhar() {
       case 'esg': return <ESGDiagnostico marketData={marketData} />
       case 'feedback': return <FeedbackNPS />
       case 'denuncia': return <CanalDenuncias />
+      case 'admin': return <AdminPanel />
       default: return <Placeholder mod={active} />
     }
   }
