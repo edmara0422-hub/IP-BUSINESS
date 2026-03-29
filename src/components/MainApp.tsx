@@ -123,7 +123,7 @@ function TopBar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="chrome-pill mx-auto flex h-[2.2rem] max-w-7xl items-center justify-between gap-2 rounded-[1.2rem] px-2.5 md:h-[2.6rem] md:gap-3 md:rounded-[1.4rem] md:px-4">
+      <div className="chrome-pill mx-auto flex max-w-7xl items-center justify-between gap-2 rounded-[1.2rem] p-0.5 px-2.5 md:rounded-[1.4rem] md:px-4">
         <div className="flex items-center gap-2 md:gap-4">
           <div
             className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[0.5rem] border border-white/16 md:h-7 md:w-7 md:rounded-[0.6rem]"
