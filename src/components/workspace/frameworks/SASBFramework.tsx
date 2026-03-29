@@ -236,7 +236,7 @@ GERE:
           <AnimatePresence>
             {dropdownOpen && (
               <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
-                style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'rgba(20,20,20,0.98)', border: '1px solid #333', borderRadius: 10, marginTop: 4, zIndex: 10, overflow: 'hidden' }}>
+                style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'rgba(20,20,20,0.98)', border: '1px solid #333', borderRadius: 10, marginTop: 4, zIndex: 10, maxHeight: 300, overflowY: 'auto' }}>
                 {SECTORS.map(s => (
                   <button key={s.id} onClick={() => { setSelectedSector(s.id); setDropdownOpen(false); setAnswers({}); setSectorAnalysis(''); setReport('') }}
                     style={{ background: 'transparent', border: 'none', color: '#e0e0e0', fontSize: 13, padding: '10px 20px', width: '100%', textAlign: 'left', cursor: 'pointer', borderBottom: '1px solid #222', display: 'flex', alignItems: 'center', gap: 8 }}>
