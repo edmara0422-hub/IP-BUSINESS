@@ -113,6 +113,76 @@ const SECTORS: SASBSector[] = [
       { label: 'Plantio direto + rotação', score: 3 }, { label: 'Algumas práticas', score: 2 }, { label: 'Convencional', score: 0 },
     ]},
   ]},
+  { id: 'transporte', label: 'Transporte e Logística', topics: [
+    { id: 'tr1', label: 'Emissões de Frota', question: 'Monitora emissões da frota?', options: [
+      { label: 'Inventário completo + metas', score: 3 }, { label: 'Monitora parcial', score: 2 }, { label: 'Não monitora', score: 0 },
+    ]},
+    { id: 'tr2', label: 'Segurança Viária', question: 'Taxa de acidentes com frota?', options: [
+      { label: 'Zero acidentes graves', score: 3 }, { label: 'Abaixo da média do setor', score: 2 }, { label: 'Acima da média', score: 0 },
+    ]},
+    { id: 'tr3', label: 'Eficiência Energética', question: 'Frota elétrica ou híbrida?', options: [
+      { label: '>30% da frota', score: 3 }, { label: 'Em transição', score: 2 }, { label: '100% combustível', score: 0 },
+    ]},
+    { id: 'tr4', label: 'Condições de Trabalho', question: 'Jornada dos motoristas?', options: [
+      { label: 'Dentro da lei + benefícios', score: 3 }, { label: 'Dentro da lei', score: 2 }, { label: 'Jornada excessiva', score: 0 },
+    ]},
+  ]},
+  { id: 'construcao', label: 'Construção e Imobiliário', topics: [
+    { id: 'co1', label: 'Eficiência Hídrica', question: 'Reúso de água nas obras?', options: [
+      { label: 'Sistema de reúso + metas', score: 3 }, { label: 'Parcial', score: 2 }, { label: 'Sem gestão', score: 0 },
+    ]},
+    { id: 'co2', label: 'Resíduos de Construção', question: 'Gestão de RCC?', options: [
+      { label: '>80% reciclado', score: 3 }, { label: '50-80%', score: 2 }, { label: '<50%', score: 0 },
+    ]},
+    { id: 'co3', label: 'Segurança do Trabalho', question: 'Taxa de acidentes em obra?', options: [
+      { label: 'Zero acidentes fatais', score: 3 }, { label: 'Abaixo da média', score: 2 }, { label: 'Acima da média', score: 0 },
+    ]},
+    { id: 'co4', label: 'Certificação Verde', question: 'Empreendimentos com selo verde?', options: [
+      { label: 'LEED / AQUA certificado', score: 3 }, { label: 'Em processo', score: 2 }, { label: 'Não', score: 0 },
+    ]},
+  ]},
+  { id: 'educacao', label: 'Educação e EdTech', topics: [
+    { id: 'ed1', label: 'Acessibilidade', question: 'Plataforma acessível para PcD?', options: [
+      { label: 'WCAG AA + Libras', score: 3 }, { label: 'Parcialmente acessível', score: 2 }, { label: 'Não acessível', score: 0 },
+    ]},
+    { id: 'ed2', label: 'Evasão', question: 'Taxa de conclusão dos alunos?', options: [
+      { label: '>80%', score: 3 }, { label: '50-80%', score: 2 }, { label: '<50%', score: 0 },
+    ]},
+    { id: 'ed3', label: 'Privacidade de Dados', question: 'Protege dados de menores?', options: [
+      { label: 'LGPD + COPPA compliance', score: 3 }, { label: 'LGPD básica', score: 2 }, { label: 'Sem política', score: 0 },
+    ]},
+    { id: 'ed4', label: 'Inclusão Social', question: 'Bolsas ou acesso gratuito?', options: [
+      { label: 'Programa formal >10%', score: 3 }, { label: 'Bolsas pontuais', score: 1 }, { label: 'Não', score: 0 },
+    ]},
+  ]},
+  { id: 'servicos', label: 'Serviços Profissionais', topics: [
+    { id: 'sv1', label: 'Diversidade', question: 'Diversidade em cargos de liderança?', options: [
+      { label: '>40% diverso', score: 3 }, { label: '20-40%', score: 2 }, { label: '<20%', score: 0 },
+    ]},
+    { id: 'sv2', label: 'Ética Profissional', question: 'Código de conduta e canal?', options: [
+      { label: 'Código + canal anônimo', score: 3 }, { label: 'Só código', score: 2 }, { label: 'Não tem', score: 0 },
+    ]},
+    { id: 'sv3', label: 'Bem-estar', question: 'Programa de saúde mental?', options: [
+      { label: 'Programa + métricas', score: 3 }, { label: 'Benefícios básicos', score: 1 }, { label: 'Não', score: 0 },
+    ]},
+    { id: 'sv4', label: 'Dados de Clientes', question: 'Segurança de dados sensíveis?', options: [
+      { label: 'ISO 27001 / SOC2', score: 3 }, { label: 'LGPD compliance', score: 2 }, { label: 'Básico', score: 0 },
+    ]},
+  ]},
+  { id: 'alimentacao', label: 'Alimentação e Bebidas', topics: [
+    { id: 'al1', label: 'Segurança Alimentar', question: 'Certificações de segurança?', options: [
+      { label: 'FSSC 22000 / ISO 22000', score: 3 }, { label: 'APPCC básico', score: 2 }, { label: 'Sem certificação', score: 0 },
+    ]},
+    { id: 'al2', label: 'Desperdício', question: 'Gestão de perdas na cadeia?', options: [
+      { label: '<5% de perda', score: 3 }, { label: '5-15%', score: 2 }, { label: '>15%', score: 0 },
+    ]},
+    { id: 'al3', label: 'Embalagem Sustentável', question: 'Embalagens recicláveis?', options: [
+      { label: '>80% reciclável', score: 3 }, { label: '50-80%', score: 2 }, { label: '<50%', score: 0 },
+    ]},
+    { id: 'al4', label: 'Cadeia de Fornecedores', question: 'Rastreabilidade de origem?', options: [
+      { label: '100% rastreável', score: 3 }, { label: 'Parcial', score: 2 }, { label: 'Sem rastreio', score: 0 },
+    ]},
+  ]},
 ]
 
 function badge(pct: number): { label: string; color: string } {
