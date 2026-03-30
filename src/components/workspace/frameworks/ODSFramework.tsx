@@ -14,6 +14,7 @@ const BLUE = '#1a5276'
 interface ODS {
   id: number
   title: string
+  desc: string
   color: string
   category: 'people' | 'prosperity' | 'planet' | 'peace' | 'partnership'
   metrics: string[]
@@ -21,23 +22,23 @@ interface ODS {
 }
 
 const ODS_LIST: ODS[] = [
-  { id: 1, title: 'Erradicação da Pobreza', color: '#e5243b', category: 'people', metrics: ['% funcionários acima do salário digno', 'Investimento na comunidade'], suggestedTarget: '100% acima do salário digno' },
-  { id: 2, title: 'Fome Zero', color: '#dda63a', category: 'people', metrics: ['Doações alimentares (ton)', 'Desperdício na cadeia'], suggestedTarget: 'Reduzir desperdício em 50%' },
-  { id: 3, title: 'Saúde e Bem-estar', color: '#4c9f38', category: 'people', metrics: ['Taxa de acidentes', 'Cobertura de plano de saúde'], suggestedTarget: 'Zero acidentes + 100% cobertura' },
-  { id: 4, title: 'Educação de Qualidade', color: '#c5192d', category: 'people', metrics: ['Horas de treinamento/pessoa', 'Bolsas de estudo'], suggestedTarget: '40h/pessoa/ano' },
-  { id: 5, title: 'Igualdade de Gênero', color: '#ff3a21', category: 'people', metrics: ['% mulheres em liderança', 'Equidade salarial'], suggestedTarget: '50% mulheres em liderança' },
-  { id: 6, title: 'Água Potável e Saneamento', color: '#26bde2', category: 'planet', metrics: ['Consumo de água (m³)', 'Reúso de água (%)'], suggestedTarget: 'Reduzir consumo em 30%' },
-  { id: 7, title: 'Energia Acessível e Limpa', color: '#fcc30b', category: 'prosperity', metrics: ['% energia renovável', 'Eficiência energética'], suggestedTarget: '100% energia renovável' },
-  { id: 8, title: 'Trabalho Decente', color: '#a21942', category: 'prosperity', metrics: ['Turnover', 'eNPS', 'Empregos criados'], suggestedTarget: 'eNPS >50 + turnover <15%' },
-  { id: 9, title: 'Indústria, Inovação e Infraestrutura', color: '#fd6925', category: 'prosperity', metrics: ['Investimento em P&D (%)', 'Patentes registradas'], suggestedTarget: '>5% da receita em P&D' },
-  { id: 10, title: 'Redução das Desigualdades', color: '#dd1367', category: 'prosperity', metrics: ['Razão salarial max/min', 'Diversidade'], suggestedTarget: 'Razão max/min <20x' },
-  { id: 11, title: 'Cidades Sustentáveis', color: '#fd9d24', category: 'prosperity', metrics: ['Mobilidade sustentável', 'Impacto urbanístico'], suggestedTarget: '50% mobilidade limpa' },
-  { id: 12, title: 'Consumo Responsável', color: '#bf8b2e', category: 'planet', metrics: ['Resíduos reciclados (%)', 'Circularidade'], suggestedTarget: '>80% reciclagem' },
-  { id: 13, title: 'Ação Contra Mudança do Clima', color: '#3f7e44', category: 'planet', metrics: ['Emissões CO2 (tCO2e)', 'Meta SBTi'], suggestedTarget: 'Net zero até 2050' },
-  { id: 14, title: 'Vida na Água', color: '#0a97d9', category: 'planet', metrics: ['Efluentes tratados (%)', 'Impacto em ecossistemas'], suggestedTarget: '100% efluentes tratados' },
-  { id: 15, title: 'Vida Terrestre', color: '#56c02b', category: 'planet', metrics: ['Área preservada (ha)', 'Desmatamento zero'], suggestedTarget: 'Desmatamento zero na cadeia' },
-  { id: 16, title: 'Paz, Justiça e Instituições', color: '#00689d', category: 'peace', metrics: ['Canal de denúncias', 'Anticorrupção'], suggestedTarget: 'Compliance 100%' },
-  { id: 17, title: 'Parcerias', color: '#19486a', category: 'partnership', metrics: ['Parcerias ESG ativas', 'Participação em iniciativas'], suggestedTarget: '>3 parcerias ESG ativas' },
+  { id: 1, title: 'Erradicação da Pobreza', color: '#e5243b', category: 'people', desc: 'Acabar com a pobreza em todas as suas formas. Para empresas: garantir salário digno, não explorar mão-de-obra barata, investir em comunidades de baixa renda.', metrics: ['% funcionários acima do salário digno', 'Investimento na comunidade'], suggestedTarget: '100% acima do salário digno' },
+  { id: 2, title: 'Fome Zero', color: '#dda63a', category: 'people', desc: 'Acabar com a fome e promover agricultura sustentável. Para empresas: reduzir desperdício alimentar na cadeia, doar excedentes, apoiar agricultura familiar.', metrics: ['Doações alimentares (ton)', 'Desperdício na cadeia'], suggestedTarget: 'Reduzir desperdício em 50%' },
+  { id: 3, title: 'Saúde e Bem-estar', color: '#4c9f38', category: 'people', desc: 'Assegurar vida saudável e bem-estar para todos. Para empresas: saúde ocupacional, plano de saúde, programa de bem-estar mental, zero acidentes de trabalho.', metrics: ['Taxa de acidentes', 'Cobertura de plano de saúde'], suggestedTarget: 'Zero acidentes + 100% cobertura' },
+  { id: 4, title: 'Educação de Qualidade', color: '#c5192d', category: 'people', desc: 'Garantir educação inclusiva e equitativa de qualidade. Para empresas: treinamento contínuo, bolsas de estudo, parcerias com escolas, programas de mentoria.', metrics: ['Horas de treinamento/pessoa', 'Bolsas de estudo'], suggestedTarget: '40h/pessoa/ano' },
+  { id: 5, title: 'Igualdade de Gênero', color: '#ff3a21', category: 'people', desc: 'Alcançar igualdade de gênero e empoderar mulheres. Para empresas: equidade salarial, mulheres em liderança, licença parental igualitária, combate ao assédio.', metrics: ['% mulheres em liderança', 'Equidade salarial'], suggestedTarget: '50% mulheres em liderança' },
+  { id: 6, title: 'Água Potável e Saneamento', color: '#26bde2', category: 'planet', desc: 'Garantir gestão sustentável da água. Para empresas: reduzir consumo, reutilizar água, tratar efluentes, não contaminar fontes hídricas.', metrics: ['Consumo de água (m³)', 'Reúso de água (%)'], suggestedTarget: 'Reduzir consumo em 30%' },
+  { id: 7, title: 'Energia Acessível e Limpa', color: '#fcc30b', category: 'prosperity', desc: 'Garantir acesso a energia acessível e sustentável. Para empresas: migrar para energia renovável, eficiência energética, reduzir consumo por unidade produzida.', metrics: ['% energia renovável', 'Eficiência energética'], suggestedTarget: '100% energia renovável' },
+  { id: 8, title: 'Trabalho Decente', color: '#a21942', category: 'prosperity', desc: 'Promover crescimento econômico sustentado e trabalho decente. Para empresas: salários justos, ambiente seguro, sem trabalho análogo à escravidão na cadeia, inclusão.', metrics: ['Turnover', 'eNPS', 'Empregos criados'], suggestedTarget: 'eNPS >50 + turnover <15%' },
+  { id: 9, title: 'Indústria, Inovação e Infraestrutura', color: '#fd6925', category: 'prosperity', desc: 'Construir infraestrutura resiliente e fomentar inovação. Para empresas: investir em P&D, adotar tecnologias limpas, inovar em processos sustentáveis.', metrics: ['Investimento em P&D (%)', 'Patentes registradas'], suggestedTarget: '>5% da receita em P&D' },
+  { id: 10, title: 'Redução das Desigualdades', color: '#dd1367', category: 'prosperity', desc: 'Reduzir desigualdade dentro e entre países. Para empresas: razão salarial justa, diversidade em todos os níveis, acessibilidade, inclusão de PcD.', metrics: ['Razão salarial max/min', 'Diversidade'], suggestedTarget: 'Razão max/min <20x' },
+  { id: 11, title: 'Cidades Sustentáveis', color: '#fd9d24', category: 'prosperity', desc: 'Tornar cidades inclusivas, seguras e sustentáveis. Para empresas: mobilidade limpa, impacto urbanístico positivo, construções verdes, logística eficiente.', metrics: ['Mobilidade sustentável', 'Impacto urbanístico'], suggestedTarget: '50% mobilidade limpa' },
+  { id: 12, title: 'Consumo Responsável', color: '#bf8b2e', category: 'planet', desc: 'Garantir padrões de consumo e produção sustentáveis. Para empresas: economia circular, reduzir resíduos, embalagens sustentáveis, transparência ao consumidor.', metrics: ['Resíduos reciclados (%)', 'Circularidade'], suggestedTarget: '>80% reciclagem' },
+  { id: 13, title: 'Ação Contra Mudança do Clima', color: '#3f7e44', category: 'planet', desc: 'Tomar medidas urgentes contra mudança do clima. Para empresas: medir pegada de carbono, definir metas de redução (SBTi), compensar emissões, net zero.', metrics: ['Emissões CO2 (tCO2e)', 'Meta SBTi'], suggestedTarget: 'Net zero até 2050' },
+  { id: 14, title: 'Vida na Água', color: '#0a97d9', category: 'planet', desc: 'Conservar e usar de forma sustentável os oceanos. Para empresas: tratar efluentes, não contaminar rios/mares, reduzir plástico, proteger ecossistemas marinhos.', metrics: ['Efluentes tratados (%)', 'Impacto em ecossistemas'], suggestedTarget: '100% efluentes tratados' },
+  { id: 15, title: 'Vida Terrestre', color: '#56c02b', category: 'planet', desc: 'Proteger ecossistemas terrestres e combater desmatamento. Para empresas: desmatamento zero na cadeia, restauração florestal, proteção da biodiversidade.', metrics: ['Área preservada (ha)', 'Desmatamento zero'], suggestedTarget: 'Desmatamento zero na cadeia' },
+  { id: 16, title: 'Paz, Justiça e Instituições', color: '#00689d', category: 'peace', desc: 'Promover sociedades pacíficas e instituições eficazes. Para empresas: anticorrupção, canal de denúncias, compliance robusto, transparência total.', metrics: ['Canal de denúncias', 'Anticorrupção'], suggestedTarget: 'Compliance 100%' },
+  { id: 17, title: 'Parcerias', color: '#19486a', category: 'partnership', desc: 'Fortalecer parcerias para implementação. Para empresas: parcerias com ONGs, governo, academia. Participar de iniciativas coletivas (Pacto Global, ISE).', metrics: ['Parcerias ESG ativas', 'Participação em iniciativas'], suggestedTarget: '>3 parcerias ESG ativas' },
 ]
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -50,6 +51,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 export default function ODSFramework({ marketData }: { marketData: any }) {
   const [selectedODS, setSelectedODS] = useState<number[]>([])
+  const [expandedODS, setExpandedODS] = useState<number | null>(null)
   const [odsStatus, setOdsStatus] = useState<Record<number, string>>({})
   const [report, setReport] = useState('')
   const [reportLoading, setReportLoading] = useState(false)
@@ -142,22 +144,42 @@ GERE:
             <h3 style={{ fontSize: 14, color: '#aaa', fontWeight: 700, marginBottom: 12, textTransform: 'uppercase', letterSpacing: 1 }}>
               {CATEGORY_LABELS[cat]}
             </h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {odsInCat.map(ods => {
                 const selected = selectedODS.includes(ods.id)
+                const expanded = expandedODS === ods.id
                 const disabled = !selected && selectedODS.length >= 5
                 return (
-                  <motion.button key={ods.id} whileHover={{ scale: disabled ? 1 : 1.05 }} whileTap={{ scale: 0.95 }}
-                    onClick={() => !disabled && toggleODS(ods.id)}
-                    style={{
-                      background: selected ? `${ods.color}33` : 'rgba(0,0,0,0.35)',
-                      border: `2px solid ${selected ? ods.color : '#333'}`,
-                      borderRadius: 12, padding: '12px 14px', width: 120, cursor: disabled ? 'not-allowed' : 'pointer',
-                      opacity: disabled ? 0.4 : 1, textAlign: 'center', transition: 'all 0.2s',
-                    }}>
-                    <div style={{ fontSize: 24, fontWeight: 800, color: ods.color, marginBottom: 4 }}>{ods.id}</div>
-                    <div style={{ fontSize: 11, color: selected ? '#fff' : '#888', lineHeight: 1.3 }}>{ods.title}</div>
-                  </motion.button>
+                  <motion.div key={ods.id} layout style={{ borderRadius: 12, overflow: 'hidden', border: `1px solid ${selected ? ods.color : '#333'}`, background: selected ? `${ods.color}12` : 'rgba(0,0,0,0.35)', opacity: disabled ? 0.4 : 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', cursor: disabled ? 'not-allowed' : 'pointer' }}
+                      onClick={() => !disabled && setExpandedODS(expanded ? null : ods.id)}>
+                      <div style={{ width: 36, height: 36, borderRadius: 8, background: ods.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{ods.id}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#e0e0e0' }}>{ods.title}</div>
+                        {!expanded && <div style={{ fontSize: 11, color: '#666', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ods.desc.split('.')[0]}.</div>}
+                      </div>
+                      {selected && <div style={{ width: 8, height: 8, borderRadius: '50%', background: ods.color, flexShrink: 0 }} />}
+                    </div>
+                    <AnimatePresence>
+                      {expanded && (
+                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} style={{ overflow: 'hidden' }}>
+                          <div style={{ padding: '0 14px 14px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                            <p style={{ fontSize: 13, color: '#aaa', lineHeight: 1.6, margin: '10px 0' }}>{ods.desc}</p>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 10 }}>
+                              {ods.metrics.map(m => (
+                                <span key={m} style={{ background: `${ods.color}15`, border: `1px solid ${ods.color}33`, borderRadius: 20, fontSize: 11, color: '#ccc', padding: '3px 10px' }}>{m}</span>
+                              ))}
+                            </div>
+                            <div style={{ fontSize: 12, color: '#888', marginBottom: 8 }}>Meta: <span style={{ color: ods.color, fontWeight: 600 }}>{ods.suggestedTarget}</span></div>
+                            <button onClick={(e) => { e.stopPropagation(); toggleODS(ods.id) }}
+                              style={{ background: selected ? 'rgba(192,57,43,0.15)' : `${ods.color}22`, border: `1px solid ${selected ? '#c0392b' : ods.color}`, borderRadius: 8, color: selected ? '#c0392b' : ods.color, fontSize: 12, fontWeight: 700, padding: '8px 16px', cursor: 'pointer' }}>
+                              {selected ? 'Remover' : 'Selecionar este ODS'}
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
                 )
               })}
             </div>
