@@ -36,6 +36,7 @@ import { SIM_M1_CREATIVITY } from '@/components/intelligence/SimulationsM1Creati
 import { FallacyDetector, EthicsDilemmas, PhilosophyTribunal, ProfitOptimization, DataInterpretation, InvestmentCalculator, BreakevenSimulator, KPIDashboard, DataToDecision } from '@/components/intelligence/SimulationsM4'
 import { ArgumentBuilder, LeanCanvas, MacroScenario, TextReview, PitchEvaluation, ConjunturaAnalysis } from '@/components/intelligence/SimulationsM5'
 import { SIM_ESG } from '@/components/intelligence/SimulationsESG'
+import SmartContentRenderer from '@/components/intelligence/SmartContentRenderer'
 
 const SIM_COMPONENTS: Record<string, React.ComponentType> = {
   ...SIM_M3,
@@ -148,19 +149,9 @@ function CadernoBlock({ block }: { block: ContentBlock }) {
   const [videoOpen, setVideoOpen] = useState(false)
 
   if (block.type === 'text') {
-    const paragraphs = block.body.split('\n\n').filter(Boolean)
     return (
-      <div id={`block-${block.id}`} className="scroll-mt-6">
-        {block.title && (
-          <h4 className="mb-4 text-[1rem] font-semibold leading-snug tracking-[-0.01em] text-white/88" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            {block.title}
-          </h4>
-        )}
-        <div className="space-y-4">
-          {paragraphs.map((para, i) => (
-            <p key={i} className="text-[14px] leading-[1.85] text-white/64 whitespace-pre-line text-justify">{para}</p>
-          ))}
-        </div>
+      <div id={`block-${block.id}`}>
+        <SmartContentRenderer title={block.title} body={block.body} />
       </div>
     )
   }
