@@ -97,9 +97,9 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,255,255,0.12),transparent_18%),radial-gradient(circle_at_50%_78%,rgba(173,181,192,0.06),transparent_24%),linear-gradient(180deg,rgba(3,3,3,0.12)_0%,rgba(3,3,3,0.62)_56%,rgba(3,3,3,0.92)_100%)]" />
 
-      {/* Logo central */}
-      <div className="relative flex min-h-screen flex-col items-center justify-center px-5 text-center">
-        <div className="w-full max-w-4xl">
+      {/* Logo central — absolute center matching SplashCanvas */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="text-center px-5">
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -133,6 +133,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       </div>
 
       {/* Barra de progresso */}
+
       <div className="absolute bottom-[16vh] md:bottom-[10vh] left-1/2 -translate-x-1/2 w-full max-w-md px-8">
         <ProgressRail progress={progress} />
       </div>
