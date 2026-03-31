@@ -438,7 +438,12 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
   const commodities = data.commodities as Record<string, { value: number; delta: number; label: string }>
 
   return (
-    <div className="flex flex-col gap-5 px-4 pb-8">
+    <div className="flex flex-col gap-3 px-4 pb-8">
+
+      {/* ── Relógio estático acima do globo ── */}
+      <div className="px-0">
+        <BusinessClock variant="hero" showGreeting />
+      </div>
 
       {/* ══ BLOCO 1: GLOBO 3D CENTRAL + DADOS FLUTUANTES ══ */}
       <div>
@@ -569,11 +574,6 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
                 </motion.div>
               )
             })}
-          </div>
-
-          {/* Relógio no rodapé do globo, acima das commodities */}
-          <div className="absolute bottom-12 left-3 right-3 z-20">
-            <BusinessClock variant="hero" showGreeting />
           </div>
 
           {/* Commodities inline no rodapé do globo */}

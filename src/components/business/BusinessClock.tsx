@@ -42,7 +42,7 @@ export default function BusinessClock({
   if (variant === 'hero') {
     return (
       <div
-        className={`floating-silver-strip relative w-full overflow-hidden rounded-[0.75rem] border border-white/12 px-2 py-0.5 text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-xl md:px-4 md:py-0.5 ${className}`}
+        className={`relative w-full overflow-hidden rounded-[0.75rem] border border-white/12 px-2 py-0.5 text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] md:px-4 md:py-0.5 ${className}`}
         style={{
           background:
             'linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(231,236,243,0.3) 14%, rgba(86,92,101,0.9) 42%, rgba(9,10,12,0.98) 100%)',

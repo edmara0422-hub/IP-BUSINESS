@@ -118,7 +118,7 @@ function ProfileButton() {
 function TopBar() {
   return (
     <motion.header
-      className="fixed left-0 right-0 top-0 z-40 px-3 pt-2 pb-2 md:px-6" style={{ background: 'rgba(5,5,5,0.95)' }}
+      className="fixed left-0 right-0 top-0 z-40 px-3 pt-2 pb-2 md:px-6" style={{ background: '#050505' }}
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -167,7 +167,7 @@ function TopBar() {
 function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) => void }) {
   return (
     <motion.div
-      className="fixed bottom-10 left-0 right-0 z-40 px-3 pb-2 md:bottom-3 md:px-6" style={{ background: 'rgba(5,5,5,0.95)' }}
+      className="fixed bottom-10 left-0 right-0 z-40 px-3 pb-2 md:bottom-3 md:px-6" style={{ background: '#050505' }}
       initial={{ y: 70, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
@@ -225,7 +225,7 @@ export default function MainApp() {
       <ShellBackdrop />
       <TopBar />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-2 mt-[4.5rem] mb-[6rem] md:px-8 md:mt-[5rem] md:mb-[5rem]">
+      <div className="relative z-10 mx-auto max-w-7xl px-2 mt-[3rem] mb-[6rem] md:px-8 md:mt-[3.5rem] md:mb-[5rem]">
         <div className="w-full overflow-hidden rounded-[2.2rem]">
           <AnimatePresence mode="wait">
             {activeTab === 'business' && <AbaBusiness key="business" />}
