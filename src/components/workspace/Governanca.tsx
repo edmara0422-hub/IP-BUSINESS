@@ -813,6 +813,12 @@ export default function Governanca() {
   const [empresa, setEmpresa] = useState('')
   const [setor, setSetor] = useState('')
   const [porte, setPorte] = useState('')
+  const [funcionarios, setFuncionarios] = useState('')
+  const [faturamento, setFaturamento] = useState('')
+  const [tipoProduto, setTipoProduto] = useState('')
+  const [temInvestidores, setTemInvestidores] = useState('')
+  const [exporta, setExporta] = useState('')
+  const [temESG, setTemESG] = useState('')
 
   const contextReady = empresa.trim().length > 0 && setor.length > 0 && porte.length > 0
 
@@ -826,7 +832,7 @@ export default function Governanca() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           question: prompt,
-          marketContext: `Documento corporativo para empresa brasileira "${empresa.trim()}", setor ${setor}, porte ${porte}.`,
+          marketContext: `Documento corporativo para empresa brasileira "${empresa.trim()}", setor ${setor}, porte ${porte}. ${funcionarios ? 'Funcionários: ' + funcionarios + '.' : ''} ${faturamento ? 'Faturamento: ' + faturamento + '.' : ''} ${tipoProduto ? 'Produto: ' + tipoProduto + '.' : ''} ${temInvestidores ? 'Investidores: ' + temInvestidores + '.' : ''} ${exporta ? 'Exporta: ' + exporta + '.' : ''} ${temESG ? 'Já tem ESG: ' + temESG + '.' : ''}`,
         }),
       })
       const data = await res.json()
@@ -1002,8 +1008,90 @@ export default function Governanca() {
                     </div>
                   </div>
 
+                  {/* Funcionários */}
+                  <div className="mt-3">
+                    <label className="text-[11px] text-white/30 mb-1 block">Número de funcionários</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['1-5', '6-20', '21-50', '51-200', '200+'].map(f => (
+                        <button key={f} onClick={() => setFuncionarios(funcionarios === f ? '' : f)}
+                          className="text-[11px] px-2.5 py-1 rounded-full transition-all"
+                          style={{ background: funcionarios === f ? `${GREEN}22` : 'rgba(0,0,0,0.3)', border: `1px solid ${funcionarios === f ? GREEN : 'rgba(255,255,255,0.08)'}`, color: funcionarios === f ? GREEN : 'rgba(255,255,255,0.4)' }}>
+                          {f}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Faturamento */}
+                  <div className="mt-3">
+                    <label className="text-[11px] text-white/30 mb-1 block">Faturamento anual</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Até R$81k', 'R$81k-360k', 'R$360k-4.8M', 'Acima R$4.8M'].map(f => (
+                        <button key={f} onClick={() => setFaturamento(faturamento === f ? '' : f)}
+                          className="text-[11px] px-2.5 py-1 rounded-full transition-all"
+                          style={{ background: faturamento === f ? `${GREEN}22` : 'rgba(0,0,0,0.3)', border: `1px solid ${faturamento === f ? GREEN : 'rgba(255,255,255,0.08)'}`, color: faturamento === f ? GREEN : 'rgba(255,255,255,0.4)' }}>
+                          {f}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Tipo de produto */}
+                  <div className="mt-3">
+                    <label className="text-[11px] text-white/30 mb-1 block">Tipo de produto/serviço</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Digital/SaaS', 'Físico', 'Serviço', 'Marketplace', 'E-commerce', 'Consultoria'].map(t => (
+                        <button key={t} onClick={() => setTipoProduto(tipoProduto === t ? '' : t)}
+                          className="text-[11px] px-2.5 py-1 rounded-full transition-all"
+                          style={{ background: tipoProduto === t ? `${GREEN}22` : 'rgba(0,0,0,0.3)', border: `1px solid ${tipoProduto === t ? GREEN : 'rgba(255,255,255,0.08)'}`, color: tipoProduto === t ? GREEN : 'rgba(255,255,255,0.4)' }}>
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Investidores + Exporta + ESG */}
+                  <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                      <label className="text-[11px] text-white/30 mb-1 block">Tem investidores?</label>
+                      <div className="flex gap-1.5">
+                        {['Sim', 'Não'].map(v => (
+                          <button key={v} onClick={() => setTemInvestidores(temInvestidores === v ? '' : v)}
+                            className="text-[11px] px-3 py-1 rounded-full flex-1 transition-all"
+                            style={{ background: temInvestidores === v ? `${GREEN}22` : 'rgba(0,0,0,0.3)', border: `1px solid ${temInvestidores === v ? GREEN : 'rgba(255,255,255,0.08)'}`, color: temInvestidores === v ? GREEN : 'rgba(255,255,255,0.4)' }}>
+                            {v}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[11px] text-white/30 mb-1 block">Exporta?</label>
+                      <div className="flex gap-1.5">
+                        {['Sim', 'Não'].map(v => (
+                          <button key={v} onClick={() => setExporta(exporta === v ? '' : v)}
+                            className="text-[11px] px-3 py-1 rounded-full flex-1 transition-all"
+                            style={{ background: exporta === v ? `${GREEN}22` : 'rgba(0,0,0,0.3)', border: `1px solid ${exporta === v ? GREEN : 'rgba(255,255,255,0.08)'}`, color: exporta === v ? GREEN : 'rgba(255,255,255,0.4)' }}>
+                            {v}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[11px] text-white/30 mb-1 block">Já tem política ESG?</label>
+                      <div className="flex gap-1.5">
+                        {['Sim', 'Não'].map(v => (
+                          <button key={v} onClick={() => setTemESG(temESG === v ? '' : v)}
+                            className="text-[11px] px-3 py-1 rounded-full flex-1 transition-all"
+                            style={{ background: temESG === v ? `${GREEN}22` : 'rgba(0,0,0,0.3)', border: `1px solid ${temESG === v ? GREEN : 'rgba(255,255,255,0.08)'}`, color: temESG === v ? GREEN : 'rgba(255,255,255,0.4)' }}>
+                            {v}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
                   {!contextReady && (
-                    <p className="text-[11px] text-white/20 mt-3 italic">Preencha todos os campos acima para habilitar a geracao de documentos.</p>
+                    <p className="text-[11px] text-white/20 mt-3 italic">Preencha nome, setor e porte para habilitar a geração.</p>
                   )}
                 </div>
 
