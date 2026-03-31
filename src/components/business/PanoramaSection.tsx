@@ -440,24 +440,10 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
   return (
     <div className="flex flex-col gap-5 px-4 pb-8">
 
-      {/* ── Header: LIVE + Timer ── */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <LivePulse />
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/20">Intelligence Network — Tempo Real</span>
-        </div>
-        <UpdateTimer />
-      </div>
-
       {/* ══ BLOCO 1: GLOBO 3D CENTRAL + DADOS FLUTUANTES ══ */}
       <div>
-        <div className="relative rounded-lg border border-white/[0.06] overflow-hidden"
-          style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.01) 0%, rgba(0,0,0,0.5) 80%)' }}>
-          {/* Relógio dentro do globo */}
-          <div className="absolute top-3 left-3 right-3 z-20">
-            <BusinessClock variant="hero" showGreeting />
-          </div>
-
+        <div className="relative rounded-lg overflow-hidden"
+          style={{ background: 'rgba(0,0,0,0.5)' }}>
           {/* Pergunta central — perspectiva 3D dentro do globo */}
           <div className="absolute inset-0 z-10 pointer-events-none flex items-end justify-center pb-20 md:pb-24" style={{ perspective: '800px' }}>
             <motion.div
