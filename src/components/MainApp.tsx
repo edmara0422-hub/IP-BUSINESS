@@ -167,7 +167,7 @@ function TopBar() {
 function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) => void }) {
   return (
     <motion.div
-      className="fixed bottom-5 left-0 right-0 z-40 px-3 md:bottom-3 md:px-6"
+      className="fixed bottom-8 left-0 right-0 z-40 px-3 md:bottom-3 md:px-6"
       initial={{ y: 70, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
@@ -225,7 +225,7 @@ export default function MainApp() {
       <ShellBackdrop />
       <TopBar />
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-start px-2 pb-24 pt-[9rem] md:px-8 md:pb-32 md:pt-28">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl items-start px-2 pb-28 pt-[5rem] md:px-8 md:pb-32 md:pt-28">
         <div className="command-stage w-full overflow-hidden rounded-[2.2rem]">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.06)_18%,rgba(255,255,255,0.36)_50%,rgba(255,255,255,0.06)_82%,transparent_100%)] opacity-60" />
           <div className="pointer-events-none absolute bottom-0 left-[7%] right-[7%] h-px bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.03)_20%,rgba(255,255,255,0.14)_50%,rgba(255,255,255,0.03)_80%,transparent_100%)] opacity-45" />
