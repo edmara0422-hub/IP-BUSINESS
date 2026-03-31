@@ -35,10 +35,12 @@ import { SIM_COMPONENTS as SIM_M3 } from '@/components/intelligence/SimulationsM
 import { SIM_M1_CREATIVITY } from '@/components/intelligence/SimulationsM1Creativity'
 import { FallacyDetector, EthicsDilemmas, PhilosophyTribunal, ProfitOptimization, DataInterpretation, InvestmentCalculator, BreakevenSimulator, KPIDashboard, DataToDecision } from '@/components/intelligence/SimulationsM4'
 import { ArgumentBuilder, LeanCanvas, MacroScenario, TextReview, PitchEvaluation, ConjunturaAnalysis } from '@/components/intelligence/SimulationsM5'
+import { SIM_ESG } from '@/components/intelligence/SimulationsESG'
 
 const SIM_COMPONENTS: Record<string, React.ComponentType> = {
   ...SIM_M3,
   ...SIM_M1_CREATIVITY,
+  ...SIM_ESG,
   'fallacy-detector': FallacyDetector,
   'ethics-dilemmas': EthicsDilemmas,
   'philosophy-tribunal': PhilosophyTribunal,
