@@ -134,7 +134,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
 
       {/* Barra de progresso */}
 
-      <div className="absolute bottom-[16vh] md:bottom-[10vh] left-1/2 -translate-x-1/2 w-full max-w-md px-8">
+      <div className="absolute bottom-[16vh] md:bottom-[10vh] left-0 right-0 flex justify-center px-8">
         <ProgressRail progress={progress} />
       </div>
     </motion.div>
