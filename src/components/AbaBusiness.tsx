@@ -137,7 +137,7 @@ export default function AbaBusiness() {
     <motion.div className="flex flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
 
       {/* ── Navegação por seções ── */}
-      <div className="shrink-0 mb-2">
+      <div className="shrink-0 mb-2 mt-2">
         <BusinessSectionNav />
       </div>
 
