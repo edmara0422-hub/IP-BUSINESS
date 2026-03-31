@@ -225,7 +225,7 @@ export default function MainApp() {
       <ShellBackdrop />
       <TopBar />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-2 mt-[5rem] mb-[8rem] md:px-8 md:mt-[5rem] md:mb-[6rem]">
+      <div className="relative z-10 mx-auto max-w-7xl px-2 mt-[5rem] mb-[12rem] md:px-8 md:mt-[5rem] md:mb-[8rem]">
         <div className="w-full rounded-[2.2rem]">
           <AnimatePresence mode="wait">
             {activeTab === 'business' && <AbaBusiness key="business" />}
