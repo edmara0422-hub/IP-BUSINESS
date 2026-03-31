@@ -31,7 +31,7 @@ function parseBold(text: string): React.ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*)/g)
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className="text-white/80 font-semibold">{part.slice(2, -2)}</strong>
+      return <strong key={i} className="text-white/70 font-semibold">{part.slice(2, -2)}</strong>
     }
     return <span key={i}>{part}</span>
   })
@@ -88,8 +88,8 @@ function TextBlock({ content }: { content: string }) {
 function HeaderBlock({ content }: { content: string }) {
   return (
     <div className="flex items-center gap-2 mt-2">
-      <div className="w-1 h-5 rounded-full" style={{ background: BLUE }} />
-      <h4 className="text-[15px] font-bold text-white/80" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <div className="w-1 h-5 rounded-full bg-white/20" />
+      <h4 className="text-[15px] font-bold text-white/85" style={{ fontFamily: 'Poppins, sans-serif' }}>
         {content}
       </h4>
     </div>
@@ -136,9 +136,9 @@ function ExampleBlock({ content }: { content: string }) {
   const rest = content.split('\n').slice(1).join('\n').trim()
 
   return (
-    <div className="rounded-xl overflow-hidden" style={{ background: `${GREEN}08`, borderLeft: `3px solid ${GREEN}40` }}>
+    <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.02)', borderLeft: '3px solid rgba(255,255,255,0.12)' }}>
       <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-3 px-4 py-3 text-left">
-        <BookOpen size={16} color={GREEN} className="shrink-0" />
+        <BookOpen size={16} className="shrink-0 text-white/35" />
         <span className="text-[13px] font-semibold text-white/60 flex-1">{parseBold(firstLine)}</span>
         <motion.div animate={{ rotate: open ? 180 : 0 }}>
           <ChevronDown size={14} className="text-white/25" />
@@ -170,11 +170,11 @@ function ImportantBlock({ content }: { content: string }) {
 
 function TipBlock({ content }: { content: string }) {
   return (
-    <div className="rounded-xl p-4" style={{ background: `${BLUE}08`, borderLeft: `3px solid ${BLUE}40` }}>
+    <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.03)', borderLeft: '3px solid rgba(255,255,255,0.15)' }}>
       <div className="flex items-start gap-3">
-        <Lightbulb size={16} color={BLUE} className="shrink-0 mt-0.5" />
+        <Lightbulb size={16} className="shrink-0 mt-0.5 text-white/40" />
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: BLUE }}>Na Prática</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider mb-1 text-white/40">Na Prática</p>
           <p className="text-[13px] text-white/55 leading-relaxed">{parseBold(content)}</p>
         </div>
       </div>
@@ -212,7 +212,7 @@ function StepsBlock({ content }: { content: string }) {
         if (match) {
           return (
             <div key={i} className="flex items-start gap-3 rounded-lg px-3 py-2" style={{ background: 'rgba(0,0,0,0.2)' }}>
-              <span className="flex items-center justify-center w-6 h-6 rounded-full shrink-0 text-[11px] font-bold" style={{ background: `${BLUE}20`, color: BLUE }}>
+              <span className="flex items-center justify-center w-6 h-6 rounded-full shrink-0 text-[11px] font-bold bg-white/10 text-white/60">
                 {match[1]}
               </span>
               <p className="text-[13px] text-white/55 leading-relaxed pt-0.5">{parseBold(match[2])}</p>
@@ -283,7 +283,7 @@ export default function SmartContentRenderer({ title, body }: Props) {
   return (
     <div className="scroll-mt-6">
       {title && (
-        <h4 className="mb-5 text-[1.05rem] font-semibold leading-snug tracking-[-0.01em] text-white/88" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <h4 className="mb-5 text-[1.05rem] font-semibold leading-snug tracking-[-0.01em] text-white/80" style={{ fontFamily: 'Poppins, sans-serif' }}>
           {title}
         </h4>
       )}
