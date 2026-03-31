@@ -136,7 +136,7 @@ function TopBar() {
               IPB
             </span>
           </div>
-          <p className="metal-text hidden text-[8px] font-semibold uppercase tracking-[0.12em] text-white/60 sm:block md:text-[9px]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <p className="metal-text text-[6px] font-semibold uppercase tracking-[0.1em] text-white/50 sm:text-[8px] md:text-[9px] md:tracking-[0.12em]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Intelligence Platform BUSINESS
           </p>
         </div>
@@ -167,7 +167,7 @@ function TopBar() {
 function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) => void }) {
   return (
     <motion.div
-      className="fixed bottom-3 left-0 right-0 z-40 px-3 md:px-6"
+      className="fixed bottom-5 left-0 right-0 z-40 px-3 md:bottom-3 md:px-6"
       initial={{ y: 70, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}

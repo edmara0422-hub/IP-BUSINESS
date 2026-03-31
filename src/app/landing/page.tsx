@@ -105,7 +105,7 @@ export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
         {/* CTA */}
         <motion.button
           onClick={onEnter}
-          className="mt-6 group inline-flex items-center justify-center gap-2 rounded-[1rem] border border-white/10 bg-white/[0.05] px-8 py-3 text-[10px] uppercase tracking-[0.22em] text-white/65 transition hover:bg-white/[0.09] hover:text-white/85"
+          className="mt-6 group inline-flex items-center justify-center gap-1.5 rounded-[0.8rem] border border-white/10 bg-white/[0.05] px-6 py-2 text-[9px] uppercase tracking-[0.2em] text-white/55 transition hover:bg-white/[0.09] hover:text-white/85"
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1 }}
           whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
         >
