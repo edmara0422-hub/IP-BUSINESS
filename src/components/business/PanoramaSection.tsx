@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { motion, useSpring, useTransform, AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { apiFetch } from '@/lib/api'
+import BusinessClock from '@/components/business/BusinessClock'
 
 const Globe3D = dynamic(() => import('./Globe3D'), { ssr: false, loading: () => <div className="flex h-full items-center justify-center"><span className="text-[10px] text-white/20">Carregando globo...</span></div> })
 
@@ -452,6 +453,11 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
       <div>
         <div className="relative rounded-lg border border-white/[0.06] overflow-hidden"
           style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.01) 0%, rgba(0,0,0,0.5) 80%)' }}>
+          {/* Relógio dentro do globo */}
+          <div className="absolute top-3 left-3 right-3 z-20">
+            <BusinessClock variant="hero" showGreeting />
+          </div>
+
           {/* Pergunta central — perspectiva 3D dentro do globo */}
           <div className="absolute inset-0 z-10 pointer-events-none flex items-end justify-center pb-20 md:pb-24" style={{ perspective: '800px' }}>
             <motion.div

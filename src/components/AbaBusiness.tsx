@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import BusinessClock from '@/components/business/BusinessClock'
 import BusinessSectionNav from '@/components/business/BusinessSectionNav'
 import PanoramaSection from '@/components/business/PanoramaSection'
 import RiscosSection from '@/components/business/RiscosSection'
@@ -136,11 +135,6 @@ export default function AbaBusiness() {
 
   return (
     <motion.div className="flex flex-col" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-
-      {/* ── Relógio (NÃO MEXER NUNCA) ── */}
-      <div className="shrink-0 px-4 pt-3 pb-3">
-        <BusinessClock variant="hero" showGreeting />
-      </div>
 
       {/* ── Navegação por seções ── */}
       <div className="shrink-0 mb-2">
