@@ -571,6 +571,11 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
             })}
           </div>
 
+          {/* Relógio no rodapé do globo, acima das commodities */}
+          <div className="absolute bottom-12 left-3 right-3 z-20">
+            <BusinessClock variant="hero" showGreeting />
+          </div>
+
           {/* Commodities inline no rodapé do globo */}
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-4 rounded-lg px-4 py-2"
             style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
