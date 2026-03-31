@@ -79,7 +79,7 @@ function classifyParagraph(para: string): { type: BlockType; content: string } {
 // Individual block renderers
 function TextBlock({ content }: { content: string }) {
   return (
-    <p className="text-[14px] leading-[1.85] text-white/55">
+    <p className="text-[14px] leading-[1.85] text-white/55 text-justify">
       {parseBold(content)}
     </p>
   )
@@ -148,7 +148,7 @@ function ExampleBlock({ content }: { content: string }) {
         {open && rest && (
           <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
             <div className="px-4 pb-3 pl-11">
-              <p className="text-[13px] text-white/45 leading-relaxed whitespace-pre-line">{parseBold(rest)}</p>
+              <p className="text-[13px] text-white/45 leading-relaxed whitespace-pre-line text-justify">{parseBold(rest)}</p>
             </div>
           </motion.div>
         )}
@@ -162,7 +162,7 @@ function ImportantBlock({ content }: { content: string }) {
     <div className="rounded-xl p-4" style={{ background: `${RED}08`, borderLeft: `3px solid ${RED}40` }}>
       <div className="flex items-start gap-3">
         <XCircle size={16} color={RED} className="shrink-0 mt-0.5" />
-        <p className="text-[13px] text-white/55 leading-relaxed">{parseBold(content)}</p>
+        <p className="text-[13px] text-white/55 leading-relaxed text-justify">{parseBold(content)}</p>
       </div>
     </div>
   )
@@ -175,7 +175,7 @@ function TipBlock({ content }: { content: string }) {
         <Lightbulb size={16} className="shrink-0 mt-0.5 text-white/40" />
         <div>
           <p className="text-[11px] font-bold uppercase tracking-wider mb-1 text-white/40">Na Prática</p>
-          <p className="text-[13px] text-white/55 leading-relaxed">{parseBold(content)}</p>
+          <p className="text-[13px] text-white/55 leading-relaxed text-justify">{parseBold(content)}</p>
         </div>
       </div>
     </div>
