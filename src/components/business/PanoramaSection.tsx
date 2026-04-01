@@ -473,16 +473,16 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
             </motion.div>
           </div>
 
-          {/* Globo grande centralizado */}
-          <div className="h-[480px] lg:h-[540px]">
+          {/* Globo grande centralizado — maior no mobile */}
+          <div className="h-[520px] md:h-[560px] lg:h-[600px]">
             <Globe3D data={{ agents }} />
           </div>
 
-          {/* ── HUD Indicators ── */}
-          <div className="absolute top-4 left-4 flex flex-col gap-3">
+          {/* ── HUD Indicators — desktop: flutuantes nos cantos / mobile: barra inferior ── */}
+          <div className="hidden md:flex absolute top-4 left-4 flex-col gap-3">
             {[
-              { label: 'SELIC', value: v(data.macro.selic?.value, 10.5), suf: '%', dec: 1, delta: v(data.macro.selic?.delta, 0), desc: 'TAXA BÁSICA DE JUROS', min: 2, max: 20, alert: v(data.macro.selic?.value, 10.5) > 12 },
-              { label: 'IPCA', value: v(data.macro.ipca?.value, 4.8), suf: '%', dec: 2, delta: v(data.macro.ipca?.delta, 0), desc: 'INFLAÇÃO 12 MESES', min: 0, max: 12, alert: v(data.macro.ipca?.value, 4.8) > 6 },
+              { label: 'SELIC', value: v(data.macro.selic?.value, 14.75), suf: '%', dec: 1, delta: v(data.macro.selic?.delta, 0), desc: 'TAXA BÁSICA DE JUROS', min: 2, max: 20, alert: v(data.macro.selic?.value, 14.75) > 12 },
+              { label: 'IPCA', value: v(data.macro.ipca?.value, 3.81), suf: '%', dec: 2, delta: v(data.macro.ipca?.delta, 0), desc: 'INFLAÇÃO 12 MESES', min: 0, max: 12, alert: v(data.macro.ipca?.value, 3.81) > 6 },
             ].map(ind => {
               const pct = Math.max(0, Math.min(100, ((ind.value - ind.min) / (ind.max - ind.min)) * 100))
               const alertColor = ind.alert ? 'rgba(192,57,43,0.7)' : 'rgba(192,192,192,0.4)'
@@ -528,10 +528,10 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
             })}
           </div>
 
-          <div className="absolute top-4 right-4 flex flex-col gap-3 items-end">
+          <div className="hidden md:flex absolute top-4 right-4 flex-col gap-3 items-end">
             {[
-              { label: 'PIB', value: v(data.macro.pib?.value, 2.9), suf: '%', dec: 1, delta: v(data.macro.pib?.delta, 0), pre: '', desc: 'CRESCIMENTO ANUAL', min: -3, max: 8, good: v(data.macro.pib?.value, 2.9) > 2 },
-              { label: 'USD/BRL', value: v(data.macro.usdBrl?.value, 5.72), pre: 'R$', suf: '', dec: 2, delta: v(data.macro.usdBrl?.delta, 0), desc: 'COTAÇÃO DO DÓLAR', min: 3, max: 8, good: false },
+              { label: 'PIB', value: v(data.macro.pib?.value, 1.84), suf: '%', dec: 1, delta: v(data.macro.pib?.delta, 0), pre: '', desc: 'CRESCIMENTO ANUAL', min: -3, max: 8, good: v(data.macro.pib?.value, 1.84) > 2 },
+              { label: 'USD/BRL', value: v(data.macro.usdBrl?.value, 5.16), pre: 'R$', suf: '', dec: 2, delta: v(data.macro.usdBrl?.delta, 0), desc: 'COTAÇÃO DO DÓLAR', min: 3, max: 8, good: false },
             ].map(ind => {
               const pct = Math.max(0, Math.min(100, ((ind.value - ind.min) / (ind.max - ind.min)) * 100))
               const color = ind.good ? 'rgba(52,211,153,0.6)' : 'rgba(192,192,192,0.4)'
@@ -576,8 +576,8 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
             })}
           </div>
 
-          {/* Commodities inline no rodapé do globo */}
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-4 rounded-lg px-4 py-2"
+          {/* Commodities inline no rodapé do globo — desktop only */}
+          <div className="hidden md:flex absolute bottom-3 left-1/2 -translate-x-1/2 items-center gap-4 rounded-lg px-4 py-2"
             style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
             {Object.entries(commodities).slice(0, 4).map(([key, c]) => (
               <div key={key} className="flex items-center gap-1">
@@ -591,6 +591,42 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* ── MOBILE: 4 indicadores macro em grid abaixo do globo ── */}
+        <div className="grid grid-cols-2 gap-2 md:hidden mt-2">
+          {[
+            { label: 'SELIC', value: v(data.macro.selic?.value, 14.75), suf: '%', dec: 1, delta: v(data.macro.selic?.delta, 0), desc: 'Taxa Básica', alert: v(data.macro.selic?.value, 14.75) > 12 },
+            { label: 'IPCA', value: v(data.macro.ipca?.value, 3.81), suf: '%', dec: 2, delta: v(data.macro.ipca?.delta, 0), desc: 'Inflação 12m', alert: v(data.macro.ipca?.value, 3.81) > 6 },
+            { label: 'USD/BRL', value: v(data.macro.usdBrl?.value, 5.16), pre: 'R$', suf: '', dec: 2, delta: v(data.macro.usdBrl?.delta, 0), desc: 'Dólar' },
+            { label: 'PIB', value: v(data.macro.pib?.value, 1.84), suf: '%', dec: 1, delta: v(data.macro.pib?.delta, 0), desc: 'Crescimento', good: v(data.macro.pib?.value, 1.84) > 2 },
+          ].map(ind => {
+            const isAlert = 'alert' in ind && ind.alert
+            const isGood = 'good' in ind && ind.good
+            const color = isAlert ? 'rgba(192,57,43,0.7)' : isGood ? 'rgba(52,211,153,0.6)' : 'rgba(192,192,192,0.4)'
+            return (
+              <motion.div key={ind.label} className="relative rounded-lg overflow-hidden"
+                style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid ${color}22` }}
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
+                <div className="px-3 py-2.5">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="font-mono text-[9px] font-bold tracking-[0.15em]" style={{ color }}>{ind.label}</span>
+                    {isAlert && <motion.span className="text-[7px] text-red-400/70" animate={{ opacity: [1, 0.3] }} transition={{ duration: 0.8, repeat: Infinity }}>ALERT</motion.span>}
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="font-mono text-[22px] font-bold leading-none text-white/90">
+                      <AnimVal value={ind.value} dec={ind.dec} pre={'pre' in ind ? (ind.pre ?? '') : ''} suf={ind.suf} />
+                    </span>
+                    <span className={`font-mono text-[10px] font-bold ${ind.delta > 0 ? 'text-red-400/60' : ind.delta < 0 ? 'text-emerald-400/60' : 'text-white/15'}`}>
+                      {ind.delta > 0 ? '▲' : ind.delta < 0 ? '▼' : '–'}{Math.abs(ind.delta).toFixed(ind.dec)}
+                    </span>
+                  </div>
+                  <span className="font-mono text-[8px] text-white/18 uppercase tracking-wider">{ind.desc}</span>
+                </div>
+              </motion.div>
+            )
+          })}
         </div>
 
         {/* Commodities restantes abaixo do globo */}

@@ -402,7 +402,8 @@ interface Slide {
 }
 
 function groupIntoSlides(blocks: Array<{ type: BlockType; content: string }>): Slide[] {
-  if (blocks.length <= 4) {
+  // Só divide em slides se o conteúdo for muito longo (10+ blocos)
+  if (blocks.length <= 10) {
     return [{ blocks, label: 'Conteúdo' }]
   }
 
@@ -411,8 +412,8 @@ function groupIntoSlides(blocks: Array<{ type: BlockType; content: string }>): S
   let slideNum = 1
 
   for (const block of blocks) {
-    // Start new slide on headers
-    if (block.type === 'header' && current.blocks.length > 0) {
+    // Start new slide on headers — mas só se o slide atual já tem bastante conteúdo
+    if (block.type === 'header' && current.blocks.length >= 6) {
       if (!current.label) current.label = `Parte ${slideNum}`
       slides.push(current)
       slideNum++
@@ -422,8 +423,8 @@ function groupIntoSlides(blocks: Array<{ type: BlockType; content: string }>): S
 
     current.blocks.push(block)
 
-    // Split if slide gets too long (>4 blocks)
-    if (current.blocks.length >= 5 && block.type === 'text') {
+    // Split if slide gets very long (>10 blocks)
+    if (current.blocks.length >= 10 && block.type === 'text') {
       if (!current.label) current.label = `Parte ${slideNum}`
       slides.push(current)
       slideNum++
