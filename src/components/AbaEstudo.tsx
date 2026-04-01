@@ -33,6 +33,8 @@ import type { ContentBlock, TutorMessage } from '@/types/intelligence'
 import { INTELLIGENCE_CONTENT } from '@/data/intelligence-content'
 import { SIM_COMPONENTS as SIM_M3 } from '@/components/intelligence/SimulationsM3'
 import { SIM_M1_CREATIVITY } from '@/components/intelligence/SimulationsM1Creativity'
+import { SIM_M2 } from '@/components/intelligence/SimulationsM2'
+import { SIM_M6 } from '@/components/intelligence/SimulationsM6'
 import { FallacyDetector, EthicsDilemmas, PhilosophyTribunal, ProfitOptimization, DataInterpretation, InvestmentCalculator, BreakevenSimulator, KPIDashboard, DataToDecision } from '@/components/intelligence/SimulationsM4'
 import { ArgumentBuilder, LeanCanvas, MacroScenario, TextReview, PitchEvaluation, ConjunturaAnalysis } from '@/components/intelligence/SimulationsM5'
 import { SIM_ESG } from '@/components/intelligence/SimulationsESG'
@@ -41,6 +43,8 @@ import SmartContentRenderer from '@/components/intelligence/SmartContentRenderer
 const SIM_COMPONENTS: Record<string, React.ComponentType> = {
   ...SIM_M3,
   ...SIM_M1_CREATIVITY,
+  ...SIM_M2,
+  ...SIM_M6,
   ...SIM_ESG,
   'fallacy-detector': FallacyDetector,
   'ethics-dilemmas': EthicsDilemmas,

@@ -393,19 +393,76 @@ function SectionDivider() {
 }
 
 // ══════════════════════════════════════════════════════════════
+// ██  GROUP BLOCKS INTO MICRO-LESSONS (SLIDES)
+// ══════════════════════════════════════════════════════════════
+
+interface Slide {
+  blocks: Array<{ type: BlockType | 'divider'; content: string }>
+  label: string
+}
+
+function groupIntoSlides(blocks: Array<{ type: BlockType; content: string }>): Slide[] {
+  if (blocks.length <= 4) {
+    return [{ blocks, label: 'Conteúdo' }]
+  }
+
+  const slides: Slide[] = []
+  let current: Slide = { blocks: [], label: '' }
+  let slideNum = 1
+
+  for (const block of blocks) {
+    // Start new slide on headers
+    if (block.type === 'header' && current.blocks.length > 0) {
+      if (!current.label) current.label = `Parte ${slideNum}`
+      slides.push(current)
+      slideNum++
+      current = { blocks: [block], label: block.content }
+      continue
+    }
+
+    current.blocks.push(block)
+
+    // Split if slide gets too long (>4 blocks)
+    if (current.blocks.length >= 5 && block.type === 'text') {
+      if (!current.label) current.label = `Parte ${slideNum}`
+      slides.push(current)
+      slideNum++
+      current = { blocks: [], label: '' }
+    }
+  }
+
+  if (current.blocks.length > 0) {
+    if (!current.label) current.label = `Parte ${slideNum}`
+    slides.push(current)
+  }
+
+  return slides
+}
+
+// ══════════════════════════════════════════════════════════════
 // ██  MAIN RENDERER
 // ══════════════════════════════════════════════════════════════
 
 export default function SmartContentRenderer({ title, body }: Props) {
   const paragraphs = body.split('\n\n').filter(Boolean)
   const blocks = useMemo(() => paragraphs.map(p => classifyParagraph(p)), [body])
+  const slides = useMemo(() => groupIntoSlides(blocks), [blocks])
   const flashcards = useMemo(() => extractKeyTerms(body), [body])
   const summaryPoints = useMemo(() => extractSummaryPoints(body), [body])
 
-  // Inserir dividers entre headers
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const isMultiSlide = slides.length > 1
+  const slide = slides[currentSlide] ?? slides[0]
+
+  const goNext = () => setCurrentSlide(c => Math.min(c + 1, slides.length - 1))
+  const goPrev = () => setCurrentSlide(c => Math.max(c - 1, 0))
+  const isLast = currentSlide >= slides.length - 1
+  const isFirst = currentSlide === 0
+
+  // Add dividers between headers within a slide
   const withDividers: Array<{ type: BlockType | 'divider'; content: string }> = []
   let lastWasHeader = false
-  for (const block of blocks) {
+  for (const block of slide.blocks) {
     if (block.type === 'header' && !lastWasHeader && withDividers.length > 0) {
       withDividers.push({ type: 'divider', content: '' })
     }
@@ -415,52 +472,104 @@ export default function SmartContentRenderer({ title, body }: Props) {
 
   return (
     <div className="scroll-mt-6">
-      <ReadingProgress total={blocks.length} />
+      {/* Progress */}
+      {isMultiSlide && (
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex-1 flex gap-1">
+            {slides.map((_, i) => (
+              <button key={i} onClick={() => setCurrentSlide(i)}
+                className="flex-1 h-1 rounded-full transition-all"
+                style={{ background: i <= currentSlide ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.06)' }} />
+            ))}
+          </div>
+          <span className="text-[10px] text-white/20 font-mono shrink-0">{currentSlide + 1}/{slides.length}</span>
+        </div>
+      )}
 
-      {title && (
+      {!isMultiSlide && <ReadingProgress total={blocks.length} />}
+
+      {title && isFirst && (
         <h4 className="mb-5 text-[1.05rem] font-semibold leading-snug tracking-[-0.01em] text-white/80" style={{ fontFamily: 'Poppins, sans-serif' }}>
           {title}
         </h4>
       )}
 
-      <div className="space-y-4">
-        {withDividers.map((block, i) => (
-          <motion.div key={i}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: Math.min(i * 0.02, 0.5), duration: 0.3 }}>
-            {block.type === 'divider' && <SectionDivider />}
-            {block.type === 'text' && <TextBlock content={block.content} />}
-            {block.type === 'header' && <HeaderBlock content={block.content} />}
-            {block.type === 'question' && <QuestionBlock content={block.content} />}
-            {block.type === 'example' && <ExampleBlock content={block.content} />}
-            {block.type === 'important' && <ImportantBlock content={block.content} />}
-            {block.type === 'tip' && <TipBlock content={block.content} />}
-            {block.type === 'list' && <ListBlock content={block.content} />}
-            {block.type === 'steps' && <StepsBlock content={block.content} />}
-            {block.type === 'quote' && <QuoteBlock content={block.content} />}
-            {block.type === 'comparison' && <ComparisonBlock content={block.content} />}
-          </motion.div>
-        ))}
+      {/* Slide label */}
+      {isMultiSlide && !isFirst && slide.label && (
+        <p className="text-[11px] font-bold uppercase tracking-wider text-white/20 mb-3">{slide.label}</p>
+      )}
 
-        {/* Flashcards */}
-        {flashcards.length > 0 && (
-          <div className="mt-6">
-            <SectionDivider />
-            <p className="text-[11px] font-bold uppercase tracking-wider text-white/20 mb-3 mt-4">Conceitos-chave — toque para virar</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {flashcards.map((card, i) => <Flashcard key={i} front={card.front} back={card.back} />)}
-            </div>
+      {/* Slide content */}
+      <AnimatePresence mode="wait">
+        <motion.div key={currentSlide}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.25 }}>
+          <div className="space-y-4">
+            {withDividers.map((block, i) => (
+              <motion.div key={i}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(i * 0.04, 0.3), duration: 0.3 }}>
+                {block.type === 'divider' && <SectionDivider />}
+                {block.type === 'text' && <TextBlock content={block.content} />}
+                {block.type === 'header' && <HeaderBlock content={block.content} />}
+                {block.type === 'question' && <QuestionBlock content={block.content} />}
+                {block.type === 'example' && <ExampleBlock content={block.content} />}
+                {block.type === 'important' && <ImportantBlock content={block.content} />}
+                {block.type === 'tip' && <TipBlock content={block.content} />}
+                {block.type === 'list' && <ListBlock content={block.content} />}
+                {block.type === 'steps' && <StepsBlock content={block.content} />}
+                {block.type === 'quote' && <QuoteBlock content={block.content} />}
+                {block.type === 'comparison' && <ComparisonBlock content={block.content} />}
+              </motion.div>
+            ))}
           </div>
-        )}
+        </motion.div>
+      </AnimatePresence>
 
-        {/* Resumo */}
-        {summaryPoints.length > 0 && (
-          <div className="mt-4">
-            <TopicSummary points={summaryPoints} />
+      {/* Navigation */}
+      {isMultiSlide && (
+        <div className="flex items-center justify-between mt-6 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+          <button onClick={goPrev} disabled={isFirst}
+            className="text-[12px] font-medium px-4 py-2 rounded-lg transition-all disabled:opacity-20"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}>
+            ← Anterior
+          </button>
+          <span className="text-[11px] text-white/15 font-mono">{currentSlide + 1} de {slides.length}</span>
+          {isLast ? (
+            <span className="text-[12px] font-medium px-4 py-2 rounded-lg"
+              style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.3)' }}>
+              Fim ✓
+            </span>
+          ) : (
+            <button onClick={goNext}
+              className="text-[12px] font-medium px-4 py-2 rounded-lg transition-all"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}>
+              Próximo →
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Flashcards — only on last slide */}
+      {(!isMultiSlide || isLast) && flashcards.length > 0 && (
+        <div className="mt-6">
+          <SectionDivider />
+          <p className="text-[11px] font-bold uppercase tracking-wider text-white/20 mb-3 mt-4">Conceitos-chave — toque para virar</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {flashcards.map((card, i) => <Flashcard key={i} front={card.front} back={card.back} />)}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Summary — only on last slide */}
+      {(!isMultiSlide || isLast) && summaryPoints.length > 0 && (
+        <div className="mt-4">
+          <TopicSummary points={summaryPoints} />
+        </div>
+      )}
     </div>
   )
 }

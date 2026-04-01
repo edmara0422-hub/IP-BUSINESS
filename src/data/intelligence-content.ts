@@ -321,9 +321,126 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
   {
     moduleId: 'M2',
     topics: [
-      { id: 'M2-0', title: 'Gestao de Negocios', blocks: [] },
-      { id: 'M2-1', title: 'Demonstracoes Contabeis', blocks: [] },
-      { id: 'M2-2', title: 'Matematica Financeira', blocks: [] },
+      {
+        id: 'M2-0',
+        title: 'Gestao de Negocios',
+        blocks: [
+          {
+            id: 'M2-0-t1',
+            type: 'text',
+            title: 'Modelos de Negócio: O que é, Para que Serve e Como Estruturar',
+            body: 'Um modelo de negócio descreve a lógica pela qual uma organização cria, entrega e captura valor. Não é o mesmo que plano de negócio — o modelo é a arquitetura estratégica; o plano é o documento operacional que detalha a execução.\n\n**Alexander Osterwalder** (2010) formalizou o conceito com o Business Model Canvas — um framework visual com 9 blocos que permite mapear qualquer negócio em uma única página.\n\n**Os 9 blocos do Canvas:**\n\n**Proposta de Valor** — o que você oferece que resolve um problema ou satisfaz uma necessidade do cliente? Qual dor você elimina? Qual ganho você entrega? A proposta de valor é o coração do modelo — tudo gira ao redor dela.\n\n**Segmentos de Clientes** — para quem você cria valor? Mercado de massa, nicho, plataforma multilateral? Sem clareza sobre quem é o cliente, toda estratégia é genérica.\n\n**Canais** — como você alcança e entrega valor ao cliente? Canais de comunicação, distribuição e venda. Digital, físico ou híbrido.\n\n**Relacionamento com Clientes** — que tipo de relação você mantém? Autoatendimento, comunidade, assistência pessoal, co-criação?\n\n**Fontes de Receita** — como o negócio gera dinheiro? Venda direta, assinatura, licenciamento, comissão, freemium? Um modelo pode ter múltiplas fontes.\n\n**Recursos-chave** — quais ativos são essenciais? Físicos (fábricas), intelectuais (patentes, marca), humanos (equipe), financeiros (capital).\n\n**Atividades-chave** — o que a empresa precisa fazer excepcionalmente bem? Produção, resolução de problemas, gestão de plataforma.\n\n**Parcerias-chave** — quem são os aliados estratégicos? Fornecedores, alianças com concorrentes, joint ventures.\n\n**Estrutura de Custos** — quais são os custos mais relevantes? Modelo orientado a custo (low-cost) ou orientado a valor (premium)?\n\nPergunta-chave: Se você tivesse que explicar como sua empresa ganha dinheiro em 2 minutos para um investidor, conseguiria? O Canvas força essa clareza.',
+          },
+          {
+            id: 'M2-0-s1',
+            type: 'simulation',
+            title: 'Business Model Canvas — Monte Seu Modelo de Negócio',
+            simulationId: 'business-model-canvas',
+            description: 'Preencha os 9 blocos do Canvas para estruturar ou repensar seu modelo de negócio. Compare com exemplos de empresas reais.',
+          },
+          {
+            id: 'M2-0-t2',
+            type: 'text',
+            title: 'Planejamento Estratégico: SWOT, Porter e Objetivos',
+            body: 'Planejamento estratégico é o processo de definir a direção de longo prazo de uma organização — onde ela quer chegar e como pretende chegar lá. Sem planejamento, a empresa opera por reação; com planejamento, opera por intenção.\n\n**Análise SWOT** (Strengths, Weaknesses, Opportunities, Threats)\nFramework que cruza fatores internos (forças e fraquezas) com fatores externos (oportunidades e ameaças). O valor não está em preencher os quadrantes — está em cruzar: como usar forças para capturar oportunidades? Como mitigar fraquezas que amplificam ameaças?\n\n**5 Forças de Porter** — modelo que analisa a intensidade competitiva de um setor:\n1. Rivalidade entre concorrentes — quantos competem? Com qual intensidade?\n2. Poder de barganha dos fornecedores — poucos fornecedores = alto poder = margens comprimidas\n3. Poder de barganha dos compradores — cliente concentrado pressiona preços\n4. Ameaça de substitutos — produtos alternativos que resolvem o mesmo problema\n5. Ameaça de novos entrantes — barreiras de entrada protegem ou expõem o mercado?\n\n**Definindo Objetivos Estratégicos:**\n— Objetivos SMART: Específicos, Mensuráveis, Atingíveis, Relevantes, Temporais\n— OKRs (Objectives & Key Results): Objetivo qualitativo + resultados-chave quantitativos\n— KPIs: indicadores que medem se os objetivos estão sendo atingidos\n\nNa prática: A maioria das empresas falha na execução, não na estratégia. O planejamento precisa ser vivo — revisado trimestralmente, com responsáveis claros e métricas acompanhadas semanalmente.\n\nPergunta-chave: Sua empresa tem um plano estratégico documentado e revisado? Ou a estratégia existe apenas na cabeça do fundador?',
+          },
+          {
+            id: 'M2-0-t3',
+            type: 'text',
+            title: 'Gestão de Processos e Cadeia de Valor',
+            body: 'Um processo é uma sequência de atividades que transforma insumos em resultados. Toda empresa é, essencialmente, um conjunto de processos — alguns geram valor, outros geram custo sem valor.\n\n**Cadeia de Valor (Michael Porter)**\nModelo que divide as atividades de uma empresa em primárias e de suporte:\n\n**Atividades Primárias** — geram valor direto:\n— Logística de entrada: recebimento e armazenamento de insumos\n— Operações: transformação de insumos em produto/serviço final\n— Logística de saída: distribuição do produto ao cliente\n— Marketing e vendas: como o cliente descobre e compra\n— Serviço pós-venda: suporte, garantia, fidelização\n\n**Atividades de Suporte** — viabilizam as primárias:\n— Infraestrutura da empresa (finanças, planejamento, jurídico)\n— Gestão de recursos humanos\n— Desenvolvimento de tecnologia\n— Aquisição (procurement)\n\n**BPM — Business Process Management:**\nMetodologia para mapear, analisar, redesenhar e monitorar processos. O ciclo:\n1. Mapear o processo atual (AS-IS)\n2. Identificar gargalos e desperdícios\n3. Redesenhar o processo otimizado (TO-BE)\n4. Implementar e automatizar\n5. Monitorar com indicadores\n\nExemplo prático: Uma loja virtual que demora 5 dias para despachar um pedido pode ter gargalos em conferência de estoque (processo) ou na embalagem (operação). O BPM identifica onde o tempo é desperdiçado.\n\nDica: Processos mal gerenciados são o maior dreno silencioso de lucratividade. Antes de cortar custos, mapeie onde o dinheiro é desperdiçado.',
+          },
+          {
+            id: 'M2-0-t4',
+            type: 'text',
+            title: 'Tipos de Empresa, Regime Tributário e Formalização',
+            body: 'A escolha da estrutura jurídica e do regime tributário impacta diretamente a carga fiscal, a responsabilidade dos sócios e a capacidade de crescimento do negócio.\n\n**Tipos de Empresa no Brasil:**\n\n**MEI** (Microempreendedor Individual) — faturamento até R$ 81.000/ano. Tributos fixos (~R$ 70/mês). Ideal para profissionais autônomos e pequenos negócios. Limitação: apenas 1 funcionário.\n\n**ME** (Microempresa) — faturamento até R$ 360.000/ano. Pode optar pelo Simples Nacional. Permite mais funcionários e sócios.\n\n**EPP** (Empresa de Pequeno Porte) — faturamento de R$ 360.000 a R$ 4.800.000/ano. Ainda elegível ao Simples.\n\n**LTDA** (Sociedade Limitada) — responsabilidade dos sócios limitada ao capital social. A mais comum no Brasil.\n\n**S.A.** (Sociedade Anônima) — capital dividido em ações. Necessária para empresas listadas em bolsa.\n\n**Regimes Tributários:**\n\n**Simples Nacional** — alíquota única progressiva (6% a 33%) que unifica 8 tributos. Simples na declaração, mas nem sempre é o mais barato. Empresas de serviços com alta folha podem pagar mais no Simples do que no Lucro Presumido.\n\n**Lucro Presumido** — tributos calculados sobre margem presumida (8% comércio, 32% serviços). Vantajoso quando a margem real é maior que a presumida.\n\n**Lucro Real** — tributos sobre o lucro efetivo. Obrigatório para faturamento > R$ 78M/ano. Vantajoso quando a margem é baixa ou há prejuízos.\n\nCuidado: Escolher o regime tributário errado pode significar pagar até 40% mais impostos do que o necessário. Simulações comparativas são essenciais antes de optar.\n\nPergunta-chave: Quando foi a última vez que sua empresa simulou a mudança de regime tributário? A maioria nunca fez.',
+          },
+        ],
+      },
+      {
+        id: 'M2-1',
+        title: 'Demonstracoes Contabeis',
+        blocks: [
+          {
+            id: 'M2-1-t1',
+            type: 'text',
+            title: 'Balanço Patrimonial: Ativos, Passivos e Patrimônio Líquido',
+            body: 'O Balanço Patrimonial é a fotografia financeira da empresa em um determinado momento. Ele responde: "o que a empresa tem, o que ela deve e quanto sobra para os donos?"\n\n**A equação fundamental da contabilidade:**\nAtivo = Passivo + Patrimônio Líquido\n\nSe esta equação não fecha, algo está errado. Sempre.\n\n**Ativo** — tudo que a empresa possui e que tem valor econômico:\n— Ativo Circulante: caixa, contas a receber, estoque, aplicações de curto prazo (conversíveis em até 12 meses)\n— Ativo Não Circulante: imóveis, máquinas, veículos, marcas, patentes (realizáveis após 12 meses)\n\n**Passivo** — tudo que a empresa deve:\n— Passivo Circulante: fornecedores, salários, impostos, empréstimos de curto prazo (vencimento até 12 meses)\n— Passivo Não Circulante: financiamentos de longo prazo, debêntures (vencimento após 12 meses)\n\n**Patrimônio Líquido** — o que sobra para os sócios após pagar todas as dívidas:\n— Capital Social: valor investido pelos sócios\n— Reservas de Lucro: lucros retidos para reinvestimento\n— Lucros/Prejuízos Acumulados: resultado líquido histórico\n\nExemplo prático: Uma empresa com R$ 500k em ativos e R$ 450k em passivos tem PL de R$ 50k. Se o passivo superar o ativo, o PL fica negativo — a empresa está tecnicamente insolvente.\n\nPergunta-chave: Qual é o índice de endividamento da sua empresa? (Passivo Total ÷ Ativo Total). Acima de 0.7 acende o alerta.\n\nDica: O balanço não mostra se a empresa é lucrativa — mostra se ela é solvente. Lucro está na DRE; solvência está no Balanço.',
+          },
+          {
+            id: 'M2-1-s1',
+            type: 'simulation',
+            title: 'Monte um Balanço Patrimonial — Ativo = Passivo + PL',
+            simulationId: 'balance-sheet-builder',
+            description: 'Construa um balanço patrimonial equilibrado. Insira ativos, passivos e patrimônio líquido e veja se a equação fundamental fecha.',
+          },
+          {
+            id: 'M2-1-t2',
+            type: 'text',
+            title: 'DRE — Demonstração do Resultado do Exercício',
+            body: 'A DRE mostra o desempenho financeiro da empresa ao longo de um período (mês, trimestre, ano). Ela responde: "a operação gerou lucro ou prejuízo?"\n\n**Estrutura da DRE (de cima para baixo):**\n\n**Receita Bruta** — tudo que a empresa vendeu no período\n(–) Deduções (impostos sobre vendas, devoluções, descontos)\n= **Receita Líquida**\n\n(–) CMV/CPV (Custo da Mercadoria/Produto Vendido)\n= **Lucro Bruto** → mostra a eficiência produtiva\n\n(–) Despesas Operacionais (administrativas, comerciais, P&D)\n= **EBITDA** → lucro antes de juros, impostos, depreciação e amortização\n\n(–) Depreciação e Amortização\n= **EBIT** (Lucro Operacional)\n\n(+/–) Resultado Financeiro (receitas financeiras – despesas financeiras)\n= **Lucro Antes do IR (LAIR)**\n\n(–) IR e CSLL\n= **Lucro Líquido** → o resultado final\n\n**Margens que importam:**\n— Margem Bruta = Lucro Bruto ÷ Receita Líquida (eficiência do produto)\n— Margem EBITDA = EBITDA ÷ Receita Líquida (eficiência operacional)\n— Margem Líquida = Lucro Líquido ÷ Receita Líquida (eficiência total)\n\nExemplo: Empresa com Receita de R$ 1M, CMV de R$ 400k e despesas de R$ 350k tem Margem Bruta de 60% e EBITDA de 25%. Se a margem líquida cai para 5%, o problema está abaixo da linha operacional — juros ou impostos estão corroendo o resultado.\n\nIMPORTANTE: Faturamento alto não significa lucro. Uma empresa pode faturar R$ 10M e ter prejuízo. A DRE revela onde o dinheiro está sendo consumido.',
+          },
+          {
+            id: 'M2-1-s2',
+            type: 'simulation',
+            title: 'Simulador de DRE — Calcule Suas Margens',
+            simulationId: 'dre-analyzer',
+            description: 'Monte uma DRE completa: insira receita, custos e despesas. Veja automaticamente lucro bruto, EBITDA e lucro líquido com margens calculadas.',
+          },
+          {
+            id: 'M2-1-t3',
+            type: 'text',
+            title: 'Fluxo de Caixa: O Oxigênio do Negócio',
+            body: 'Fluxo de caixa é o registro de todas as entradas e saídas de dinheiro da empresa. Diferente da DRE (que usa regime de competência), o fluxo de caixa usa regime de caixa — registra quando o dinheiro efetivamente entra ou sai.\n\n**Por que o fluxo de caixa é mais importante que o lucro?**\nUma empresa pode ter lucro contábil e quebrar por falta de caixa. Isso acontece quando:\n— Vende a prazo mas paga à vista\n— Tem estoque parado (dinheiro imobilizado)\n— Investe em ativos antes de gerar receita suficiente\n\n**Estrutura do Fluxo de Caixa (DFC):**\n\n**Fluxo Operacional** — dinheiro gerado pelas atividades principais: recebimento de vendas, pagamento de fornecedores, salários, impostos. Se este é negativo, a operação não se sustenta.\n\n**Fluxo de Investimento** — dinheiro gasto ou recebido em ativos: compra de equipamentos, aquisições, venda de imóveis. Negativo pode ser sinal de crescimento (investindo).\n\n**Fluxo de Financiamento** — dinheiro de empréstimos, aportes de sócios, pagamento de dívidas, distribuição de dividendos.\n\n**Indicadores críticos:**\n— Burn Rate: quanto a empresa queima de caixa por mês (startups)\n— Runway: quantos meses de operação o caixa atual sustenta (Caixa ÷ Burn Rate)\n— Ciclo Financeiro: tempo entre pagar o fornecedor e receber do cliente\n\nNa prática: Projete o fluxo de caixa para os próximos 6 meses. Se algum mês fica negativo, você precisa agir AGORA — renegociar prazos, antecipar recebíveis ou buscar capital.\n\nPergunta-chave: Quantos meses de runway sua empresa tem hoje? Se a resposta é "não sei", este é o primeiro número que você precisa calcular.',
+          },
+          {
+            id: 'M2-1-s3',
+            type: 'simulation',
+            title: 'Projeção de Fluxo de Caixa — 6 Meses',
+            simulationId: 'cash-flow-projection',
+            description: 'Projete receitas e custos para 6 meses e veja seu saldo, burn rate e runway. Identifique meses críticos antes que aconteçam.',
+          },
+        ],
+      },
+      {
+        id: 'M2-2',
+        title: 'Matematica Financeira',
+        blocks: [
+          {
+            id: 'M2-2-t1',
+            type: 'text',
+            title: 'Juros Simples vs Juros Compostos: A Diferença que Muda Tudo',
+            body: 'A matemática financeira é a base de toda decisão econômica — de um empréstimo pessoal a um investimento de R$ 100 milhões. Compreender juros é compreender o custo do tempo.\n\n**Juros Simples:**\nJ = C × i × n\nO juro incide sempre sobre o capital inicial. A cada período, o valor dos juros é o mesmo.\n— Capital: R$ 10.000 | Taxa: 2% ao mês | 12 meses\n— Juros = 10.000 × 0,02 × 12 = R$ 2.400\n— Montante = R$ 12.400\n\n**Juros Compostos:**\nM = C × (1 + i)^n\nO juro incide sobre o montante acumulado (capital + juros anteriores). É o "juro sobre juro".\n— Capital: R$ 10.000 | Taxa: 2% ao mês | 12 meses\n— Montante = 10.000 × (1,02)^12 = R$ 12.682,42\n— Diferença: R$ 282,42 a mais que juros simples\n\n**Por que isso importa?**\nEm 12 meses a diferença é pequena. Em 60 meses:\n— Simples: R$ 22.000\n— Compostos: R$ 32.810\n— Diferença: R$ 10.810 (49% a mais!)\n\nEm 120 meses (10 anos):\n— Simples: R$ 34.000\n— Compostos: R$ 107.652\n— Diferença: R$ 73.652 (3x mais!)\n\nIMPORTANTE: Juros compostos trabalham a seu favor quando você investe e contra você quando deve. Um cartão de crédito a 14% ao mês (compostos) transforma R$ 1.000 em R$ 4.887 em 12 meses. É matematicamente impossível ganhar dinheiro pagando essa taxa.\n\nPergunta-chave: Seus investimentos rendem juros compostos a uma taxa maior do que seus empréstimos cobram? Se não, a prioridade financeira é clara: eliminar a dívida primeiro.',
+          },
+          {
+            id: 'M2-2-s1',
+            type: 'simulation',
+            title: 'Simulador Juros Simples vs Compostos',
+            simulationId: 'compound-interest',
+            description: 'Compare visualmente o crescimento de juros simples e compostos ao longo do tempo. Ajuste capital, taxa e prazo e veja a diferença acumular.',
+          },
+          {
+            id: 'M2-2-t2',
+            type: 'text',
+            title: 'Valor do Dinheiro no Tempo: VP, VF e Fluxos de Caixa',
+            body: 'O princípio mais importante da matemática financeira: R$ 1 hoje vale mais do que R$ 1 amanhã. Isso ocorre por três razões: inflação, custo de oportunidade e risco.\n\n**Valor Futuro (VF):**\nVF = VP × (1 + i)^n\nQuanto R$ 1.000 de hoje valerão daqui a 5 anos investidos a 10% ao ano?\nVF = 1.000 × (1,10)^5 = R$ 1.610,51\n\n**Valor Presente (VP):**\nVP = VF ÷ (1 + i)^n\nQuanto vale hoje uma promessa de R$ 10.000 daqui a 3 anos, se a taxa de desconto é 12%?\nVP = 10.000 ÷ (1,12)^3 = R$ 7.117,80\n— Ou seja: aceitar R$ 7.118 hoje é equivalente a receber R$ 10.000 em 3 anos a 12%.\n\n**VPL — Valor Presente Líquido:**\nSoma dos fluxos de caixa futuros trazidos a valor presente, menos o investimento inicial.\n— VPL > 0: o projeto gera valor acima do custo de capital → aceitar\n— VPL = 0: o projeto empata com o custo de capital → indiferente\n— VPL < 0: o projeto destrói valor → rejeitar\n\n**TIR — Taxa Interna de Retorno:**\nÉ a taxa de desconto que faz o VPL = 0. Se TIR > taxa mínima de atratividade (TMA), o projeto é viável.\n\n**Payback:**\n— Simples: em quantos períodos o investimento se paga (sem considerar valor do dinheiro)\n— Descontado: considera o valor do dinheiro no tempo (mais preciso)\n\nNa prática: Toda decisão de investimento — comprar equipamento, abrir filial, lançar produto — deve passar pelo filtro VPL + TIR + Payback. Investir sem calcular é apostar.\n\nExemplo: Investir R$ 50k em uma máquina que gera R$ 15k/ano por 5 anos. TMA = 15%. VPL = R$ 50.282 – R$ 50.000 = R$ 282 (marginal). A TIR é ~15.2%. O projeto empata — qualquer atraso ou custo adicional o inviabiliza.',
+          },
+          {
+            id: 'M2-2-t3',
+            type: 'text',
+            title: 'Indicadores Financeiros: ROI, Liquidez e Endividamento',
+            body: 'Indicadores financeiros transformam dados contábeis em inteligência decisória. Sem eles, balanço e DRE são apenas números — com eles, revelam a saúde do negócio.\n\n**Indicadores de Rentabilidade:**\n\n**ROI** (Retorno sobre Investimento) = (Ganho – Custo) ÷ Custo × 100\n— ROI de 30% significa: para cada R$ 1 investido, retornou R$ 1,30\n— Serve para comparar projetos: qual gera mais retorno por real investido?\n\n**ROE** (Retorno sobre Patrimônio) = Lucro Líquido ÷ Patrimônio Líquido\n— Mede quanto os donos ganham sobre o capital investido\n— ROE > Custo de Capital = empresa gera valor para acionistas\n\n**ROIC** (Retorno sobre Capital Investido) = NOPAT ÷ Capital Investido\n— Mede a eficiência do capital total (próprio + terceiros)\n\n**Indicadores de Liquidez:**\n\n**Liquidez Corrente** = Ativo Circulante ÷ Passivo Circulante\n— > 1.0: empresa cobre obrigações de curto prazo\n— < 1.0: alerta — pode faltar caixa para pagar contas\n\n**Liquidez Seca** = (Ativo Circulante – Estoque) ÷ Passivo Circulante\n— Exclui estoque (que pode não ser vendido rapidamente)\n\n**Indicadores de Endividamento:**\n\n**Grau de Endividamento** = Passivo Total ÷ Ativo Total\n— Mede quanto do ativo é financiado por dívida\n— Indústria: até 0.6 é aceitável | Serviços: até 0.5\n\n**Cobertura de Juros** = EBITDA ÷ Despesas Financeiras\n— < 1.5: empresa mal cobre os juros → risco alto\n— > 3.0: confortável\n\nPergunta-chave: Qual é o ROI do seu principal produto/serviço? Se você não sabe, está operando no escuro.\n\nDica: Analise indicadores em conjunto, nunca isolados. Uma empresa com ROI alto mas liquidez baixa pode ser lucrativa e quebrar por falta de caixa.',
+          },
+          {
+            id: 'M2-2-s2',
+            type: 'simulation',
+            title: 'Quiz de Indicadores Financeiros — Calcule e Interprete',
+            simulationId: 'financial-indicators',
+            description: 'Receba cenários financeiros reais e calcule ROI, margens, liquidez e endividamento. Teste seu domínio dos números que importam.',
+          },
+        ],
+      },
     ],
   },
   {
@@ -1051,24 +1168,182 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
   {
     moduleId: 'M6',
     topics: [
-      { id: 'M6-0', title: 'Analise Financeira', blocks: [] },
-      { id: 'M6-1', title: 'Precificacao', blocks: [] },
-      { id: 'M6-2', title: 'Etica', blocks: [] },
+      {
+        id: 'M6-0',
+        title: 'Analise Financeira',
+        blocks: [
+          {
+            id: 'M6-0-t1',
+            type: 'text',
+            title: 'Análise Vertical e Horizontal: Lendo as Entrelinhas dos Números',
+            body: 'Demonstrações contábeis são um mapa — mas sem análise, são apenas números. A análise financeira transforma dados em diagnóstico.\n\n**Análise Vertical:**\nCompara cada item com um referencial dentro do mesmo período.\n— Na DRE: cada linha como % da Receita Líquida\n— No Balanço: cada conta como % do Ativo Total\n\nExemplo: Se o CMV representa 65% da receita líquida e no setor a média é 45%, sua operação é ineficiente. O problema pode ser: preço de compra alto, desperdício, ou produto subprecificado.\n\n**Análise Horizontal:**\nCompara o mesmo item ao longo de diferentes períodos.\n— Receita cresceu 15% ao ano? Lucro cresceu também ou foi consumido por despesas?\n— Despesas administrativas cresceram 40% enquanto receita cresceu 10%? A estrutura está inchando.\n\n**Combinando as duas:**\nA análise mais poderosa cruza vertical com horizontal:\n— Vertical mostra a estrutura (composição)\n— Horizontal mostra a tendência (evolução)\n— Juntas revelam: "a empresa está melhorando ou piorando, e onde?"\n\n**Índices de Análise Fundamentais:**\n\n**Ciclo Operacional** = Prazo Médio de Estoque + Prazo Médio de Recebimento\n— Quanto tempo entre comprar insumo e receber do cliente\n\n**Ciclo Financeiro** = Ciclo Operacional – Prazo Médio de Pagamento\n— Quanto tempo a empresa financia a operação com capital próprio\n— Negativo = empresa recebe antes de pagar (ideal: Mercado Livre, iFood)\n\n**Giro do Ativo** = Receita Líquida ÷ Ativo Total\n— Quantas vezes o ativo "gira" em receita por ano\n— Varejo: giro alto (3-5x) | Indústria pesada: giro baixo (0.5-1x)\n\nDica: Nunca analise um indicador isolado. ROE alto com endividamento explosivo é uma bomba-relógio. Liquidez alta com ROI baixo é ineficiência. Contexto é tudo.',
+          },
+          {
+            id: 'M6-0-s1',
+            type: 'simulation',
+            title: 'Simulador de Valuation — DCF e Múltiplos',
+            simulationId: 'valuation-sim',
+            description: 'Calcule o valor da sua empresa usando dois métodos: Fluxo de Caixa Descontado (DCF) e Múltiplos de Mercado. Compare os resultados.',
+          },
+          {
+            id: 'M6-0-t2',
+            type: 'text',
+            title: 'Valuation: Quanto Vale uma Empresa?',
+            body: 'Valuation é a estimativa do valor justo de uma empresa. É usado em fusões, aquisições, captação de investimento, venda de participação e planejamento sucessório.\n\n**3 Métodos Principais:**\n\n**1. Fluxo de Caixa Descontado (DCF)**\nO método mais robusto. Projeta os fluxos de caixa livres futuros e traz a valor presente usando uma taxa de desconto (WACC).\n— Valor = Σ(FCL futuro ÷ (1+WACC)^n) + Valor Residual\n— Requer: projeção de receita, custos, investimentos e capital de giro\n— Premissa-chave: taxa de crescimento e taxa de desconto\n— Sensível a: pequenas mudanças nas premissas mudam drasticamente o resultado\n\n**2. Múltiplos de Mercado**\nCompara a empresa com outras similares usando ratios:\n— EV/EBITDA: quantas vezes o EBITDA o mercado está pagando\n— P/L (Preço/Lucro): quantos anos de lucro para "pagar" o preço da ação\n— EV/Receita: usado quando a empresa não tem lucro (startups)\n— Benchmark: SaaS = 8-15x receita | Varejo = 6-10x EBITDA | Indústria = 4-7x EBITDA\n\n**3. Valor Patrimonial**\nValor dos ativos líquidos (Ativo – Passivo). Usado quando a empresa vale mais "desmontada" do que operando, ou para negócios asset-heavy.\n\n**Para startups (pré-receita):**\n— Método Berkus: 5 fatores qualitativos (ideia, protótipo, equipe, mercado, vendas) × até R$ 500k cada\n— Método Scorecard: compara com valuations de startups similares na região\n— Método VC: parte do retorno esperado pelo investidor e calcula para trás\n\nPergunta-chave: Se alguém quisesse comprar sua empresa hoje, qual número você apresentaria? E como justificaria?\n\nCuidado: Valuation não é ciência exata — é argumentação fundamentada. O valor "certo" é aquele que comprador e vendedor concordam.',
+          },
+          {
+            id: 'M6-0-t3',
+            type: 'text',
+            title: 'Gestão de Capital de Giro e Tesouraria',
+            body: 'Capital de giro é o dinheiro necessário para manter a operação funcionando no dia a dia. É a diferença entre quanto a empresa tem disponível no curto prazo e quanto deve no curto prazo.\n\n**Capital de Giro Líquido = Ativo Circulante – Passivo Circulante**\n— Positivo: a empresa tem folga para operar\n— Negativo: depende de financiamento externo para girar\n— Zero: opera no limite — qualquer imprevisto gera crise\n\n**Os 4 componentes do ciclo de capital de giro:**\n\n**Estoque** — dinheiro parado em produto. Quanto maior o estoque, mais capital imobilizado.\n— Giro de Estoque = CMV ÷ Estoque Médio\n— Prazo Médio de Estoque = 360 ÷ Giro\n— Meta: reduzir sem causar ruptura (falta de produto)\n\n**Contas a Receber** — dinheiro que o cliente deve.\n— Prazo Médio de Recebimento = (Contas a Receber ÷ Receita) × 360\n— Risco: inadimplência. Taxa média no Brasil: 5-8% do faturamento\n\n**Contas a Pagar** — tempo que o fornecedor financia a empresa.\n— Prazo Médio de Pagamento = (Fornecedores ÷ Compras) × 360\n— Negociar prazos maiores é financiamento gratuito\n\n**Caixa** — reserva de segurança. Regra: mínimo 3 meses de despesas fixas.\n\n**Estratégias para otimizar capital de giro:**\n— Reduzir estoque: just-in-time, previsão de demanda, dropshipping\n— Antecipar recebíveis: desconto de duplicatas (custo: 1.5-4%/mês)\n— Alongar pagamentos: negociar 30→60→90 dias com fornecedores\n— Descontos à vista: oferecer 3-5% para cliente pagar antecipado\n\nIMPORTANTE: 60% das falências no Brasil são causadas por má gestão de capital de giro, não por falta de vendas. A empresa vende, mas o dinheiro não circula na velocidade necessária.',
+          },
+        ],
+      },
+      {
+        id: 'M6-1',
+        title: 'Precificacao',
+        blocks: [
+          {
+            id: 'M6-1-t1',
+            type: 'text',
+            title: 'Precificação Estratégica: Custo, Valor e Mercado',
+            body: 'Preço é a única variável do marketing mix que gera receita — todas as outras geram custo. Precificar errado pode destruir um negócio mesmo com produto excelente.\n\n**3 Abordagens de Precificação:**\n\n**1. Baseada em Custo (Cost-Plus)**\nPreço = Custo Total + Margem desejada\n— Vantagem: simples, garante margem mínima\n— Problema: ignora quanto o cliente está disposto a pagar\n— Risco: se o custo for alto, o preço fica fora do mercado\n— Uso: commodities, licitações, indústria\n\n**2. Baseada em Valor (Value-Based)**\nPreço = Valor percebido pelo cliente\n— Vantagem: captura máximo disposição a pagar\n— Problema: requer pesquisa profunda sobre percepção do cliente\n— Exemplo: iPhone — custo de produção ~US$ 400, preço de venda ~US$ 1.200\n— Uso: marcas fortes, produtos diferenciados, SaaS, consultoria\n\n**3. Baseada em Competição (Market-Based)**\nPreço = Referência do mercado ± posicionamento\n— Vantagem: mantém competitividade\n— Problema: corrida ao fundo (race to bottom) se todos baixam preço\n— Uso: mercados commoditizados, e-commerce, varejo\n\n**Conceitos avançados:**\n\n**Elasticidade-Preço** — quanto a demanda muda quando o preço muda:\n— Elástica: variação de 10% no preço → queda > 10% na demanda (luxo, não-essencial)\n— Inelástica: variação de 10% no preço → queda < 10% (combustível, remédios, utilities)\n\n**Preço Âncora** — o primeiro preço que o consumidor vê define a referência mental. "De R$ 299 por R$ 199" funciona porque a âncora (299) define o valor percebido.\n\n**Tiered Pricing** — oferecer 3 opções (básico, profissional, premium). 60-70% dos clientes escolhem o meio. Funciona para SaaS, consultorias e serviços.\n\nPergunta-chave: Você sabe exatamente qual é o seu custo unitário total (incluindo rateio de custos fixos)? Se não sabe, qualquer preço é um chute.',
+          },
+          {
+            id: 'M6-1-s1',
+            type: 'simulation',
+            title: 'Calculadora de Precificação — 3 Métodos',
+            simulationId: 'pricing-strategy',
+            description: 'Compare preço por custo, valor e mercado. Descubra qual estratégia maximiza seu resultado.',
+          },
+          {
+            id: 'M6-1-t2',
+            type: 'text',
+            title: 'Markup, Margem e Ponto de Equilíbrio',
+            body: 'Markup e margem são conceitos relacionados mas diferentes — confundi-los é um erro comum que distorce toda a análise de preço.\n\n**Markup** (fator multiplicador):\nMarkup = Preço de Venda ÷ Custo\n— Custo: R$ 50 | Preço: R$ 100 → Markup = 2.0 (ou 100%)\n— Fórmula reversa: Preço = Custo × (1 + Markup%)\n\n**Margem de Lucro** (% do preço):\nMargem = (Preço – Custo) ÷ Preço × 100\n— Custo: R$ 50 | Preço: R$ 100 → Margem = 50%\n\n**A armadilha:**\nMarkup de 100% NÃO é margem de 100%. É margem de 50%.\nMarkup de 50% = margem de 33%.\nMarkup de 30% = margem de 23%.\nMuitos empreendedores acham que aplicam 50% de margem quando na verdade aplicam 33%.\n\n**Ponto de Equilíbrio (Break-Even):**\nQuantas unidades preciso vender para cobrir todos os custos?\n— PE (unidades) = Custos Fixos ÷ (Preço Unitário – Custo Variável Unitário)\n— PE (receita) = Custos Fixos ÷ Margem de Contribuição %\n\nExemplo:\n— Custos Fixos: R$ 30.000/mês (aluguel, salários, sistemas)\n— Preço de Venda: R$ 100\n— Custo Variável: R$ 40/unidade\n— Margem de Contribuição: R$ 60 (60%)\n— PE = 30.000 ÷ 60 = 500 unidades/mês\n— Abaixo de 500: prejuízo. Acima: lucro.\n\n**Margem de Contribuição** é o conceito mais importante da precificação:\nMC = Preço – Custos Variáveis\n— Cada venda contribui com MC para cobrir custos fixos\n— Após cobrir fixos, cada MC adicional é lucro puro\n— MC negativa: cada venda AUMENTA o prejuízo (vender mais piora a situação)\n\nIMPORTANTE: Se sua margem de contribuição é negativa, o problema não é volume — é preço ou custo variável. Vender mais só acelera o prejuízo.',
+          },
+          {
+            id: 'M6-1-s2',
+            type: 'simulation',
+            title: 'Calculadora de Break-Even — Ponto de Equilíbrio',
+            simulationId: 'breakeven-calc',
+            description: 'Descubra quantas unidades precisa vender para cobrir seus custos. Visualize lucro vs prejuízo.',
+          },
+        ],
+      },
+      {
+        id: 'M6-2',
+        title: 'Etica',
+        blocks: [
+          {
+            id: 'M6-2-t1',
+            type: 'text',
+            title: 'Ética Empresarial: Fundamentos e Frameworks Decisórios',
+            body: 'Ética empresarial não é filantropia nem compliance — é o sistema de princípios que orienta decisões quando a lei não dá resposta clara ou quando o legal não coincide com o correto.\n\n**Por que ética importa para negócios?**\n— Reputação é o ativo mais valioso e mais frágil de uma empresa\n— 73% dos consumidores deixam de comprar de marcas envolvidas em escândalos éticos (Edelman Trust Barometer)\n— Processos trabalhistas, ambientais e de consumidor custam em média 8% do faturamento anual\n— ESG e governança exigem postura ética documentada e praticada\n\n**4 Frameworks Éticos para Decisão:**\n\n**Utilitarismo** (Bentham, Mill)\n— Pergunta: "Qual decisão gera o maior bem para o maior número de pessoas?"\n— Aplicação: análise custo-benefício social\n— Limite: pode justificar sacrificar uma minoria pelo bem da maioria\n\n**Deontologia** (Kant)\n— Pergunta: "Eu aceitaria que essa ação fosse uma regra universal?"\n— Aplicação: princípios invioláveis (não mentir, não explorar, cumprir contratos)\n— Limite: pode ser rígido em situações de trade-off complexo\n\n**Ética das Virtudes** (Aristóteles)\n— Pergunta: "Uma pessoa de caráter exemplar faria isso?"\n— Aplicação: cultura organizacional, formação de líderes\n— Limite: subjetivo — depende do que se considera "virtuoso"\n\n**Contratualismo** (Rawls)\n— Pergunta: "Se eu não soubesse qual papel ocuparia nessa situação, aceitaria essa decisão?"\n— Aplicação: políticas de diversidade, equidade salarial, justiça organizacional\n— Limite: abstrato para decisões operacionais rápidas\n\nNa prática: Quando enfrentar um dilema ético, passe a decisão pelos 4 filtros. Se todos apontam na mesma direção, a resposta é clara. Se divergem, o dilema é real e merece deliberação coletiva.\n\nPergunta-chave: Sua empresa tem um código de ética? Se sim, os funcionários sabem que ele existe? Se sabem, já viram ele ser aplicado em uma situação real?',
+          },
+          {
+            id: 'M6-2-t2',
+            type: 'text',
+            title: 'Dilemas Éticos Contemporâneos: IA, Dados e Trabalho',
+            body: 'A tecnologia criou novos dilemas éticos que não existiam há 10 anos. Gestores precisam navegar essas questões sem precedentes claros.\n\n**IA e Viés Algorítmico:**\n— Algoritmos de RH que discriminam por gênero, raça ou idade\n— IA de crédito que nega empréstimos baseada em CEP (proxy para raça/classe)\n— Reconhecimento facial com taxas de erro 10x maiores para pessoas negras\n— Pergunta ética: quem é responsável quando a IA erra — o desenvolvedor, a empresa que contratou, ou o gestor que aprovou?\n\n**Privacidade e Dados:**\n— LGPD/GDPR: consentimento informado para coleta e uso de dados\n— Dark patterns: interfaces que manipulam o usuário para compartilhar mais dados\n— Venda de dados para terceiros sem transparência\n— Monitoramento de funcionários (câmeras, keyloggers, rastreamento de produtividade)\n— Pergunta ética: até onde a empresa pode monitorar sem invadir a privacidade?\n\n**Trabalho e Dignidade:**\n— Gig economy: motoristas e entregadores sem direitos trabalhistas\n— Precarização disfarçada de "empreendedorismo"\n— Automação que elimina postos — a empresa tem responsabilidade com os demitidos?\n— Disparidade salarial: CEO ganha 300x mais que operário médio (nos EUA)\n— Pergunta ética: eficiência justifica qualquer forma de relação de trabalho?\n\n**Greenwashing e Socialwashing:**\n— Empresas que vendem imagem sustentável sem práticas reais\n— Marketing de diversidade sem diversidade no board\n— Relatórios ESG com métricas escolhidas a dedo\n— Certificações compradas sem mudança de comportamento\n\nDica: A ética empresarial não é sobre ter respostas certas — é sobre fazer as perguntas certas antes de agir. O teste do jornal: "Se essa decisão saísse na capa do jornal amanhã, eu ficaria confortável?"',
+          },
+          {
+            id: 'M6-2-s1',
+            type: 'simulation',
+            title: 'Árvore de Decisão Ética — Navegue os Dilemas',
+            simulationId: 'ethics-decision-tree',
+            description: 'Enfrente 5 dilemas éticos empresariais e descubra qual framework filosófico mais alinha com suas decisões.',
+          },
+        ],
+      },
     ],
   },
   {
     moduleId: 'M7',
     topics: [
-      { id: 'M7-0', title: 'Empreendedorismo Social', blocks: [] },
-      { id: 'M7-1', title: 'Teologia e Sociedade', blocks: [] },
-      { id: 'M7-2', title: 'Projeto de Intervencao em Negocios', blocks: [] },
+      {
+        id: 'M7-0',
+        title: 'Empreendedorismo Social',
+        blocks: [
+          {
+            id: 'M7-0-t1',
+            type: 'text',
+            title: 'Empreendedorismo Social: Lucro com Propósito',
+            body: 'Empreendedorismo social aplica a lógica empresarial para resolver problemas sociais e ambientais. Diferente de ONG (que depende de doações) e de empresa tradicional (que maximiza lucro), o negócio social busca sustentabilidade financeira COM impacto positivo.\n\n**Muhammad Yunus** (Nobel da Paz, 2006) — fundou o Grameen Bank em Bangladesh: microcrédito para pessoas em extrema pobreza sem garantias. Provou que os mais pobres são bons pagadores (inadimplência < 2%) e que negócios podem existir para resolver problemas sociais.\n\n**Tipos de Empreendedorismo Social:**\n\n**Negócio Social (Yunus)** — empresa que cobre custos e gera lucro moderado, mas reinveste tudo na missão social. Não distribui dividendos.\n\n**Empresa B (B Corp)** — empresa tradicional com compromisso formal de gerar benefício social/ambiental. Certificada pelo B Lab. Distribui lucro, mas equilibra retorno financeiro com impacto.\n\n**Organização Híbrida** — combina receita de mercado com doações/grants. Modelo comum em educação e saúde.\n\n**Negócio de Impacto** — qualquer negócio que resolve um problema social/ambiental de forma sustentável financeiramente.\n\n**Exemplos brasileiros:**\n— Gerando Falcões: ecossistema de impacto social em favelas (educação, emprego, moradia)\n— Badu Design: transforma resíduos têxteis em produtos de moda em comunidades\n— Geekie: tecnologia educacional adaptativa para escolas públicas\n— Vivenda: reforma de moradias precárias com financiamento acessível\n— BrazilFoundation: conecta doadores internacionais a projetos sociais brasileiros\n\n**Teoria da Mudança (Theory of Change):**\nFramework que conecta:\n1. Recursos (inputs) → o que você investe\n2. Atividades → o que você faz\n3. Produtos (outputs) → o que você entrega\n4. Resultados (outcomes) → o que muda na vida das pessoas\n5. Impacto → a mudança sistêmica de longo prazo\n\nPergunta-chave: Qual problema social ou ambiental sua empresa poderia resolver como parte do modelo de negócio — não como filantropia, mas como estratégia?',
+          },
+          {
+            id: 'M7-0-t2',
+            type: 'text',
+            title: 'Medindo Impacto Social: SROI e Métricas de Resultado',
+            body: 'Sem medir, não há como provar impacto — e sem provar, não há como escalar. A mensuração de impacto social é o equivalente ao DRE para negócios sociais.\n\n**SROI — Social Return on Investment:**\nConceito: para cada R$ 1 investido, quanto valor social é gerado?\n— SROI de 3:1 significa que cada real investido gera R$ 3 em valor social\n— Combina dados quantitativos (econômicos) com qualitativos (bem-estar, dignidade)\n\n**Cálculo simplificado:**\n1. Identificar stakeholders afetados\n2. Mapear mudanças (outcomes) para cada grupo\n3. Atribuir valor monetário às mudanças (proxy financeiro)\n4. Deduzir o que teria acontecido sem a intervenção (deadweight)\n5. Calcular: SROI = Valor Social Líquido ÷ Investimento Total\n\n**Outras Métricas de Impacto:**\n\n**IRIS+** (GIIN — Global Impact Investing Network)\n— Catálogo padronizado de métricas de impacto\n— 500+ indicadores organizados por tema (educação, saúde, meio ambiente, emprego)\n— Permite comparabilidade entre organizações\n\n**ODS como framework de impacto:**\n— Conectar suas métricas aos 17 Objetivos de Desenvolvimento Sustentável da ONU\n— Exemplo: programa de capacitação profissional → ODS 4 (educação), ODS 8 (trabalho), ODS 10 (redução de desigualdades)\n\n**Armadilhas da mensuração:**\n— Confundir outputs com outcomes (formar 100 pessoas ≠ 100 pessoas empregadas)\n— Não considerar deadweight (o que teria acontecido sem a intervenção)\n— Cherry-picking de métricas favoráveis\n— Ignorar efeitos negativos não-intencionais\n\nNa prática: Comece simples. Defina 3-5 indicadores-chave que conectam sua atividade ao resultado na vida das pessoas. Meça trimestralmente. Relate com transparência — inclusive fracassos.',
+          },
+        ],
+      },
+      {
+        id: 'M7-1',
+        title: 'Teologia e Sociedade',
+        blocks: [
+          {
+            id: 'M7-1-t1',
+            type: 'text',
+            title: 'Fé, Valores e Liderança: A Dimensão Espiritual nos Negócios',
+            body: 'A interseção entre espiritualidade e gestão é um campo crescente na academia e na prática empresarial. Não se trata de religião institucional — trata-se de propósito, valores e sentido do trabalho.\n\n**Por que isso importa para gestores?**\n— 87% dos brasileiros se declaram religiosos ou espirituais (Datafolha, 2023)\n— Funcionários que encontram sentido no trabalho são 3x mais engajados (Gallup)\n— Empresas com propósito definido superam S&P 500 em 400% em 10 anos (Firms of Endearment)\n— A geração Z prioriza propósito sobre salário na escolha de emprego\n\n**Doutrina Social da Igreja e Negócios:**\nA Doutrina Social da Igreja Católica, desenvolvida desde a Rerum Novarum (1891), oferece princípios aplicáveis à gestão:\n\n**Dignidade da Pessoa Humana** — todo trabalho deve preservar a dignidade. Implicação: condições de trabalho, salário justo, respeito à diversidade.\n\n**Bem Comum** — a empresa existe não apenas para o acionista, mas para contribuir com a sociedade. Implicação: stakeholder capitalism vs shareholder capitalism.\n\n**Subsidiariedade** — decisões devem ser tomadas no nível mais próximo possível de quem é afetado. Implicação: descentralização, empowerment, liderança servidora.\n\n**Solidariedade** — interdependência entre as pessoas. Implicação: cadeia de valor justa, comércio justo, responsabilidade com comunidades.\n\n**Destino Universal dos Bens** — os bens da Terra são para todos. Implicação: acesso, inclusão, combate à concentração excessiva.\n\n**Liderança Servidora (Robert Greenleaf):**\nO líder existe para servir a equipe, não o contrário. Características:\n— Escuta ativa antes de decidir\n— Empatia como ferramenta de gestão\n— Compromisso com o crescimento das pessoas\n— Construção de comunidade no ambiente de trabalho\n\nPergunta-chave: Se sua empresa fechasse amanhã, além do impacto financeiro, qual vazio ela deixaria na comunidade? Se a resposta é "nenhum", há uma oportunidade de propósito não explorada.',
+          },
+        ],
+      },
+      {
+        id: 'M7-2',
+        title: 'Projeto de Intervencao em Negocios',
+        blocks: [
+          {
+            id: 'M7-2-t1',
+            type: 'text',
+            title: 'Metodologia de Projeto de Intervenção: Do Diagnóstico à Ação',
+            body: 'Um projeto de intervenção é uma ação planejada para resolver um problema específico identificado em uma organização. Diferente de consultoria (que diagnostica e recomenda), a intervenção executa a mudança.\n\n**Etapas do Projeto de Intervenção:**\n\n**1. Diagnóstico Situacional**\n— Análise SWOT aplicada ao problema específico\n— Entrevistas com stakeholders (gestores, funcionários, clientes)\n— Coleta de dados quantitativos (indicadores, relatórios, pesquisas)\n— Resultado: definição clara do problema e suas causas-raiz\n\n**2. Definição do Problema**\n— O problema deve ser específico, mensurável e relevante\n— Errado: "a empresa precisa melhorar"\n— Certo: "a taxa de inadimplência cresceu de 5% para 12% nos últimos 6 meses, causada pela ausência de análise de crédito nos pedidos acima de R$ 5.000"\n\n**3. Objetivos e Metas**\n— Objetivo geral: o que se pretende alcançar (reduzir inadimplência)\n— Objetivos específicos: como (implantar análise de crédito, treinar equipe comercial)\n— Metas: quantificação (reduzir de 12% para 5% em 90 dias)\n\n**4. Plano de Ação (5W2H)**\n— What: o que será feito?\n— Why: por que será feito?\n— Where: onde será implementado?\n— When: quando começa e termina?\n— Who: quem é responsável?\n— How: como será executado?\n— How much: quanto custará?\n\n**5. Execução e Monitoramento**\n— Cronograma com marcos (milestones)\n— Reuniões semanais de acompanhamento\n— Indicadores de progresso vs meta\n— Ajustes rápidos quando algo não funciona\n\n**6. Avaliação de Resultados**\n— Comparar indicadores antes vs depois\n— Documentar lições aprendidas\n— Identificar sustentabilidade da mudança (vai continuar sem o projeto?)\n\n**Ferramentas úteis:**\n— Diagrama de Ishikawa (espinha de peixe): mapear causas-raiz\n— 5 Porquês: aprofundar a causa real do problema\n— Matriz GUT (Gravidade, Urgência, Tendência): priorizar problemas\n— PDCA (Plan-Do-Check-Act): ciclo de melhoria contínua\n\nDica: O maior erro em projetos de intervenção é resolver o sintoma sem atacar a causa. Dedicar 40% do tempo ao diagnóstico correto economiza 80% do tempo de execução.',
+          },
+        ],
+      },
     ],
   },
   {
     moduleId: 'M8',
     topics: [
-      { id: 'M8-0', title: 'Educacao, Identidade e Solidariedade', blocks: [] },
-      { id: 'M8-1', title: 'Pesquisa Aplicada a Negocios', blocks: [] },
+      {
+        id: 'M8-0',
+        title: 'Educacao, Identidade e Solidariedade',
+        blocks: [
+          {
+            id: 'M8-0-t1',
+            type: 'text',
+            title: 'Educação Corporativa: Aprendizagem como Vantagem Competitiva',
+            body: 'A educação corporativa vai além de treinamento — é a estratégia de desenvolver competências alinhadas aos objetivos do negócio. Empresas que aprendem mais rápido que a concorrência vencem no longo prazo.\n\n**Peter Senge e a Organização que Aprende:**\n5 disciplinas para construir uma learning organization:\n1. Domínio Pessoal — compromisso individual com o aprendizado contínuo\n2. Modelos Mentais — questionar premissas e crenças que limitam a visão\n3. Visão Compartilhada — criar um propósito comum que engaja a equipe\n4. Aprendizagem em Equipe — diálogo > debate. Pensar coletivamente > pensar individualmente\n5. Pensamento Sistêmico — ver o todo, não apenas as partes. Entender como ações em uma área afetam o sistema inteiro\n\n**Andragogia — Como Adultos Aprendem:**\nMalcolm Knowles definiu que adultos aprendem diferente de crianças:\n— Precisam saber POR QUE estão aprendendo\n— Aprendem melhor resolvendo problemas reais\n— Trazem experiência prévia que deve ser respeitada\n— São motivados por aplicação prática, não por nota\n— Precisam de autonomia no processo\n\n**Implicações para empresas:**\n— Treinamentos longos e teóricos não funcionam para adultos\n— Microlearning (conteúdo curto, 5-10min) tem retenção 20% maior\n— Learning by doing: projetos reais > salas de aula\n— Mentoria e coaching: aprendizado contextualizado\n— Comunidades de prática: grupos que compartilham conhecimento\n\n**Universidades Corporativas:**\n— Ambev, Natura, Itaú, Magazine Luiza: investem milhões em educação interna\n— Foco: não é substituir universidade formal, é desenvolver competências específicas do negócio\n— ROI da educação corporativa: R$ 4-8 para cada R$ 1 investido (ATD Research)\n\nPergunta-chave: Quanto sua empresa investe por ano em capacitação? A média brasileira é 1.5% da folha de pagamento. Empresas líderes investem 3-5%.',
+          },
+          {
+            id: 'M8-0-t2',
+            type: 'text',
+            title: 'Identidade Organizacional e Cultura: DNA do Negócio',
+            body: 'A identidade organizacional é o conjunto de características que tornam a empresa única — como ela se vê, como quer ser vista e como é percebida de fato.\n\n**Os 3 elementos da identidade:**\n\n**Missão** — por que a empresa existe? Qual problema resolve?\n— Ruim: "Ser a melhor empresa do segmento" (genérico, não diferencia)\n— Bom: "Democratizar o acesso à educação financeira para empreendedores brasileiros" (específico, claro, acionável)\n\n**Visão** — onde a empresa quer chegar?\n— Define a ambição de longo prazo\n— Deve ser inspiradora mas alcançável\n— Deve ser revisada a cada 3-5 anos\n\n**Valores** — o que a empresa não negocia?\n— Valores reais vs valores de parede\n— Teste: sua empresa já demitiu alguém por violar um valor? Se não, eles são decorativos.\n— Valores devem guiar decisões difíceis, não apenas discursos bonitos.\n\n**Cultura Organizacional (Edgar Schein):**\n3 níveis de cultura:\n\n**Artefatos** (visível) — escritório, dress code, linguagem, rituais, ferramentas\n— Open office vs salas fechadas diz muito sobre hierarquia\n— Happy hour vs meditação matinal diz muito sobre valores\n\n**Valores Declarados** (consciente) — o que a empresa diz que valoriza\n— Documentado em código de ética, site, onboarding\n\n**Pressupostos Básicos** (inconsciente) — crenças profundas que governam comportamento\n— "Erro é aprendizado" vs "erro é punição"\n— "Meritocracia" vs "quem manda é quem tem mais tempo"\n— "O cliente tem sempre razão" vs "protegemos nosso time primeiro"\n\nDica: Para descobrir a cultura real de uma empresa, não leia o site — observe como as pessoas se comportam quando o chefe não está olhando. A cultura é o que acontece quando ninguém está monitorando.\n\nPergunta-chave: Se um funcionário novo perguntasse "como as coisas realmente funcionam aqui?", o que os colegas diriam em particular?',
+          },
+        ],
+      },
+      {
+        id: 'M8-1',
+        title: 'Pesquisa Aplicada a Negocios',
+        blocks: [
+          {
+            id: 'M8-1-t1',
+            type: 'text',
+            title: 'Pesquisa Aplicada: Métodos para Decisão Empresarial',
+            body: 'Pesquisa aplicada a negócios usa métodos científicos para responder perguntas práticas do dia a dia empresarial. Diferente da pesquisa acadêmica (que busca conhecimento), a pesquisa aplicada busca solução.\n\n**Quando usar pesquisa no negócio?**\n— Antes de lançar um produto: o mercado quer isso?\n— Para entender churn: por que clientes estão saindo?\n— Para precificar: quanto o cliente pagaria?\n— Para expandir: qual região tem maior potencial?\n— Para inovar: quais dores não estão sendo atendidas?\n\n**Pesquisa Quantitativa:**\n— Dados numéricos, amostras grandes, análise estatística\n— Ferramentas: questionários (Google Forms, Typeform), analytics, A/B testing\n— Vantagem: generalizável, objetiva, comparável\n— Quando usar: validar hipóteses, medir satisfação, dimensionar mercado\n\n**Pesquisa Qualitativa:**\n— Dados descritivos, amostras pequenas, análise interpretativa\n— Ferramentas: entrevistas em profundidade, grupos focais, observação, etnografia\n— Vantagem: profundidade, nuance, descoberta de insights não óbvios\n— Quando usar: explorar motivações, entender comportamentos, gerar hipóteses\n\n**Métodos Mistos (Mixed Methods):**\n— Combinar quanti + quali para visão completa\n— Exemplo: pesquisa com 500 clientes (quanti) + 15 entrevistas em profundidade (quali)\n— O quanti diz O QUE acontece; o quali explica POR QUE acontece\n\n**Ferramentas práticas para gestores:**\n— NPS (Net Promoter Score): "de 0-10, recomendaria?" — simples e poderoso\n— Customer Discovery (Steve Blank): sair do escritório e conversar com 100 potenciais clientes\n— Design Thinking: empatizar → definir → idear → prototipar → testar\n— Jobs to Be Done: qual "trabalho" o cliente está "contratando" seu produto para fazer?\n\nNa prática: Não precisa de PhD para fazer pesquisa útil. 10 entrevistas de 30 minutos com clientes reais revelam mais do que qualquer relatório de mercado comprado.\n\nPergunta-chave: Quando foi a última vez que alguém da sua empresa conversou diretamente com um cliente insatisfeito para entender o porquê?',
+          },
+          {
+            id: 'M8-1-t2',
+            type: 'text',
+            title: 'Análise de Dados para Negócios: Do Excel ao BI',
+            body: 'A análise de dados é a competência mais valorizada do mercado atual. Não se trata de ser cientista de dados — trata-se de saber fazer as perguntas certas e interpretar as respostas.\n\n**4 Níveis de Análise de Dados:**\n\n**Descritiva** — O que aconteceu?\n— Dashboards, relatórios, KPIs\n— Ferramentas: Excel, Google Sheets, Power BI, Google Data Studio\n— Exemplo: "Vendas caíram 15% no último trimestre"\n\n**Diagnóstica** — Por que aconteceu?\n— Drill-down, correlações, análise de causa-raiz\n— Ferramentas: tabelas dinâmicas, filtros cruzados, segmentação\n— Exemplo: "Vendas caíram porque o produto X perdeu share para concorrente Y na região Sul"\n\n**Preditiva** — O que vai acontecer?\n— Modelos estatísticos, machine learning, séries temporais\n— Ferramentas: Python, R, AutoML, forecasting\n— Exemplo: "Com base na tendência, vendas cairão mais 8% se nenhuma ação for tomada"\n\n**Prescritiva** — O que devemos fazer?\n— Otimização, simulação, cenários\n— Ferramentas: solver, simulação Monte Carlo, árvores de decisão\n— Exemplo: "Recomendação: desconto de 10% no produto X + campanha focada na região Sul"\n\n**Métricas que todo negócio deveria acompanhar:**\n\n**Receita:**\n— MRR (Monthly Recurring Revenue): receita recorrente mensal\n— ARR (Annual Recurring Revenue): MRR × 12\n— Ticket Médio: receita ÷ número de vendas\n\n**Clientes:**\n— CAC (Custo de Aquisição): quanto custa trazer um novo cliente\n— LTV (Lifetime Value): quanto um cliente gera ao longo da relação\n— Churn Rate: % de clientes que cancelam por período\n— Regra de ouro: LTV > 3 × CAC\n\n**Operação:**\n— Margem de contribuição por produto/serviço\n— Ponto de equilíbrio atualizado mensalmente\n— Ciclo financeiro (prazo de recebimento – prazo de pagamento)\n\nIMPORTANTE: Dados sem ação são custo, não investimento. A pergunta não é "quais dados temos?" — é "quais decisões precisamos tomar e quais dados as informam?"',
+          },
+        ],
+      },
     ],
   },
 ]
