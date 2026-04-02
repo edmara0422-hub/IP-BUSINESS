@@ -478,7 +478,25 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
             <Globe3D data={{ agents }} />
           </div>
 
-          {/* ── HUD Indicators — desktop: flutuantes nos cantos / mobile: barra inferior ── */}
+          {/* ── MOBILE HUD — compacto nos 4 cantos do globo ── */}
+          <div className="md:hidden absolute top-3 left-3 z-20 rounded-lg px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)', border: '1px solid rgba(192,192,192,0.1)' }}>
+            <span className="font-mono text-[8px] font-bold tracking-[0.15em]" style={{ color: v(data.macro.selic?.value, 14.75) > 12 ? 'rgba(192,57,43,0.7)' : 'rgba(192,192,192,0.5)' }}>SELIC</span>
+            <div className="flex items-baseline gap-1"><span className="font-mono text-[18px] font-bold text-white/90"><AnimVal value={v(data.macro.selic?.value, 14.75)} dec={1} suf="%" /></span></div>
+          </div>
+          <div className="md:hidden absolute top-3 right-3 z-20 rounded-lg px-2.5 py-2 text-right" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)', border: '1px solid rgba(192,192,192,0.1)' }}>
+            <span className="font-mono text-[8px] font-bold tracking-[0.15em]" style={{ color: 'rgba(192,192,192,0.5)' }}>USD/BRL</span>
+            <div className="flex items-baseline gap-1"><span className="font-mono text-[18px] font-bold text-white/90"><AnimVal value={v(data.macro.usdBrl?.value, 5.16)} dec={2} pre="R$" /></span></div>
+          </div>
+          <div className="md:hidden absolute bottom-14 left-3 z-20 rounded-lg px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)', border: '1px solid rgba(192,192,192,0.1)' }}>
+            <span className="font-mono text-[8px] font-bold tracking-[0.15em]" style={{ color: v(data.macro.ipca?.value, 3.81) > 6 ? 'rgba(192,57,43,0.7)' : 'rgba(192,192,192,0.5)' }}>IPCA</span>
+            <div className="flex items-baseline gap-1"><span className="font-mono text-[18px] font-bold text-white/90"><AnimVal value={v(data.macro.ipca?.value, 3.81)} dec={2} suf="%" /></span></div>
+          </div>
+          <div className="md:hidden absolute bottom-14 right-3 z-20 rounded-lg px-2.5 py-2 text-right" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)', border: '1px solid rgba(52,211,153,0.1)' }}>
+            <span className="font-mono text-[8px] font-bold tracking-[0.15em]" style={{ color: v(data.macro.pib?.value, 1.84) > 2 ? 'rgba(52,211,153,0.6)' : 'rgba(192,192,192,0.5)' }}>PIB</span>
+            <div className="flex items-baseline gap-1"><span className="font-mono text-[18px] font-bold text-white/90"><AnimVal value={v(data.macro.pib?.value, 1.84)} dec={1} suf="%" /></span></div>
+          </div>
+
+          {/* ── DESKTOP HUD — flutuantes nos cantos com detalhes ── */}
           <div className="hidden md:flex absolute top-4 left-4 flex-col gap-3">
             {[
               { label: 'SELIC', value: v(data.macro.selic?.value, 14.75), suf: '%', dec: 1, delta: v(data.macro.selic?.delta, 0), desc: 'TAXA BÁSICA DE JUROS', min: 2, max: 20, alert: v(data.macro.selic?.value, 14.75) > 12 },
@@ -593,40 +611,16 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
           </div>
         </div>
 
-        {/* ── MOBILE: 4 indicadores macro em grid abaixo do globo ── */}
-        <div className="grid grid-cols-2 gap-2 md:hidden mt-2">
-          {[
-            { label: 'SELIC', value: v(data.macro.selic?.value, 14.75), suf: '%', dec: 1, delta: v(data.macro.selic?.delta, 0), desc: 'Taxa Básica', alert: v(data.macro.selic?.value, 14.75) > 12 },
-            { label: 'IPCA', value: v(data.macro.ipca?.value, 3.81), suf: '%', dec: 2, delta: v(data.macro.ipca?.delta, 0), desc: 'Inflação 12m', alert: v(data.macro.ipca?.value, 3.81) > 6 },
-            { label: 'USD/BRL', value: v(data.macro.usdBrl?.value, 5.16), pre: 'R$', suf: '', dec: 2, delta: v(data.macro.usdBrl?.delta, 0), desc: 'Dólar' },
-            { label: 'PIB', value: v(data.macro.pib?.value, 1.84), suf: '%', dec: 1, delta: v(data.macro.pib?.delta, 0), desc: 'Crescimento', good: v(data.macro.pib?.value, 1.84) > 2 },
-          ].map(ind => {
-            const isAlert = 'alert' in ind && ind.alert
-            const isGood = 'good' in ind && ind.good
-            const color = isAlert ? 'rgba(192,57,43,0.7)' : isGood ? 'rgba(52,211,153,0.6)' : 'rgba(192,192,192,0.4)'
-            return (
-              <motion.div key={ind.label} className="relative rounded-lg overflow-hidden"
-                style={{ background: 'rgba(0,0,0,0.5)', border: `1px solid ${color}22` }}
-                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
-                <div className="px-3 py-2.5">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <span className="font-mono text-[9px] font-bold tracking-[0.15em]" style={{ color }}>{ind.label}</span>
-                    {isAlert && <motion.span className="text-[7px] text-red-400/70" animate={{ opacity: [1, 0.3] }} transition={{ duration: 0.8, repeat: Infinity }}>ALERT</motion.span>}
-                  </div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="font-mono text-[22px] font-bold leading-none text-white/90">
-                      <AnimVal value={ind.value} dec={ind.dec} pre={'pre' in ind ? (ind.pre ?? '') : ''} suf={ind.suf} />
-                    </span>
-                    <span className={`font-mono text-[10px] font-bold ${ind.delta > 0 ? 'text-red-400/60' : ind.delta < 0 ? 'text-emerald-400/60' : 'text-white/15'}`}>
-                      {ind.delta > 0 ? '▲' : ind.delta < 0 ? '▼' : '–'}{Math.abs(ind.delta).toFixed(ind.dec)}
-                    </span>
-                  </div>
-                  <span className="font-mono text-[8px] text-white/18 uppercase tracking-wider">{ind.desc}</span>
-                </div>
-              </motion.div>
-            )
-          })}
+        {/* Mobile commodities abaixo do globo */}
+        <div className="flex md:hidden items-center justify-center gap-3 mt-1 flex-wrap">
+          {Object.entries(commodities).slice(0, 4).map(([key, c]) => (
+            <div key={key} className="flex items-center gap-1">
+              <span className="text-[7px] font-bold uppercase text-white/20">{c.label}</span>
+              <span className="font-mono text-[10px] font-semibold text-white/50">
+                <AnimVal value={c.value} dec={c.value > 1000 ? 0 : 1} pre="$" />
+              </span>
+            </div>
+          ))}
         </div>
 
         {/* Commodities restantes abaixo do globo */}
