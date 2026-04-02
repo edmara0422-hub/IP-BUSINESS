@@ -478,26 +478,8 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
             <Globe3D data={{ agents }} />
           </div>
 
-          {/* ── MOBILE HUD — compacto nos 4 cantos do globo ── */}
-          <div className="md:hidden absolute top-3 left-3 z-20 rounded-lg px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)', border: '1px solid rgba(192,192,192,0.1)' }}>
-            <span className="font-mono text-[8px] font-bold tracking-[0.15em]" style={{ color: v(data.macro.selic?.value, 14.75) > 12 ? 'rgba(192,57,43,0.7)' : 'rgba(192,192,192,0.5)' }}>SELIC</span>
-            <div className="flex items-baseline gap-1"><span className="font-mono text-[18px] font-bold text-white/90"><AnimVal value={v(data.macro.selic?.value, 14.75)} dec={1} suf="%" /></span></div>
-          </div>
-          <div className="md:hidden absolute top-3 right-3 z-20 rounded-lg px-2.5 py-2 text-right" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)', border: '1px solid rgba(192,192,192,0.1)' }}>
-            <span className="font-mono text-[8px] font-bold tracking-[0.15em]" style={{ color: 'rgba(192,192,192,0.5)' }}>USD/BRL</span>
-            <div className="flex items-baseline gap-1"><span className="font-mono text-[18px] font-bold text-white/90"><AnimVal value={v(data.macro.usdBrl?.value, 5.16)} dec={2} pre="R$" /></span></div>
-          </div>
-          <div className="md:hidden absolute bottom-14 left-3 z-20 rounded-lg px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)', border: '1px solid rgba(192,192,192,0.1)' }}>
-            <span className="font-mono text-[8px] font-bold tracking-[0.15em]" style={{ color: v(data.macro.ipca?.value, 3.81) > 6 ? 'rgba(192,57,43,0.7)' : 'rgba(192,192,192,0.5)' }}>IPCA</span>
-            <div className="flex items-baseline gap-1"><span className="font-mono text-[18px] font-bold text-white/90"><AnimVal value={v(data.macro.ipca?.value, 3.81)} dec={2} suf="%" /></span></div>
-          </div>
-          <div className="md:hidden absolute bottom-14 right-3 z-20 rounded-lg px-2.5 py-2 text-right" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(10px)', border: '1px solid rgba(52,211,153,0.1)' }}>
-            <span className="font-mono text-[8px] font-bold tracking-[0.15em]" style={{ color: v(data.macro.pib?.value, 1.84) > 2 ? 'rgba(52,211,153,0.6)' : 'rgba(192,192,192,0.5)' }}>PIB</span>
-            <div className="flex items-baseline gap-1"><span className="font-mono text-[18px] font-bold text-white/90"><AnimVal value={v(data.macro.pib?.value, 1.84)} dec={1} suf="%" /></span></div>
-          </div>
-
-          {/* ── DESKTOP HUD — flutuantes nos cantos com detalhes ── */}
-          <div className="hidden md:flex absolute top-4 left-4 flex-col gap-3">
+          {/* ── HUD Indicators — esquerda: SELIC + IPCA ── */}
+          <div className="absolute top-4 left-3 md:left-4 flex flex-col gap-2 md:gap-3 z-20">
             {[
               { label: 'SELIC', value: v(data.macro.selic?.value, 14.75), suf: '%', dec: 1, delta: v(data.macro.selic?.delta, 0), desc: 'TAXA BÁSICA DE JUROS', min: 2, max: 20, alert: v(data.macro.selic?.value, 14.75) > 12 },
               { label: 'IPCA', value: v(data.macro.ipca?.value, 3.81), suf: '%', dec: 2, delta: v(data.macro.ipca?.delta, 0), desc: 'INFLAÇÃO 12 MESES', min: 0, max: 12, alert: v(data.macro.ipca?.value, 3.81) > 6 },
@@ -507,7 +489,7 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
               const ontem = (ind.value - ind.delta).toFixed(ind.dec)
               return (
                 <motion.div key={ind.label} className="relative cursor-pointer group"
-                  style={{ width: 148 }}
+                  className="w-[120px] md:w-[148px]"
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
                   <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(14px)' }} />
@@ -519,24 +501,24 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
                   <motion.div className="absolute left-0 right-0 h-px pointer-events-none"
                     style={{ background: `linear-gradient(90deg, transparent, ${alertColor}, transparent)`, opacity: 0.4 }}
                     animate={{ top: ['0%', '100%'] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 1.5 }} />
-                  <div className="relative px-3 pt-2.5 pb-2.5">
+                  <div className="relative px-2 md:px-3 pt-2 md:pt-2.5 pb-2 md:pb-2.5">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-mono text-[9px] font-bold tracking-[0.2em]" style={{ color: alertColor }}>{ind.label}</span>
-                      {ind.alert && <motion.span className="font-mono text-[8px] text-red-400/70" animate={{ opacity: [1, 0.3] }} transition={{ duration: 0.8, repeat: Infinity }}>◆ ALERT</motion.span>}
+                      <span className="font-mono text-[8px] md:text-[9px] font-bold tracking-[0.2em]" style={{ color: alertColor }}>{ind.label}</span>
+                      {ind.alert && <motion.span className="font-mono text-[7px] md:text-[8px] text-red-400/70" animate={{ opacity: [1, 0.3] }} transition={{ duration: 0.8, repeat: Infinity }}>◆ ALERT</motion.span>}
                     </div>
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-mono text-[26px] font-bold leading-none text-white/90">
+                    <div className="flex items-baseline gap-1 md:gap-2">
+                      <span className="font-mono text-[20px] md:text-[26px] font-bold leading-none text-white/90">
                         <AnimVal value={ind.value} dec={ind.dec} suf={ind.suf} />
                       </span>
-                      <span className={`font-mono text-xs font-bold ${ind.delta > 0 ? 'text-red-400/70' : ind.delta < 0 ? 'text-emerald-400/70' : 'text-white/20'}`}>
+                      <span className={`font-mono text-[10px] md:text-xs font-bold ${ind.delta > 0 ? 'text-red-400/70' : ind.delta < 0 ? 'text-emerald-400/70' : 'text-white/20'}`}>
                         {ind.delta > 0 ? '▲' : ind.delta < 0 ? '▼' : '–'}{Math.abs(ind.delta).toFixed(1)}
                       </span>
                     </div>
-                    <div className="mt-2 h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <div className="mt-1.5 md:mt-2 h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
                       <motion.div className="h-full rounded-full" style={{ background: alertColor }}
                         initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 1.2, ease: 'easeOut' }} />
                     </div>
-                    <div className="flex items-center justify-between mt-1">
+                    <div className="hidden md:flex items-center justify-between mt-1">
                       <span className="font-mono text-[8px] tracking-[0.1em]" style={{ color: 'rgba(255,255,255,0.2)' }}>{ind.desc}</span>
                       <span className="font-mono text-[8px]" style={{ color: 'rgba(255,255,255,0.18)' }}>ONTEM {ontem}{ind.suf}</span>
                     </div>
@@ -546,7 +528,7 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
             })}
           </div>
 
-          <div className="hidden md:flex absolute top-4 right-4 flex-col gap-3 items-end">
+          <div className="absolute top-4 right-3 md:right-4 flex flex-col gap-2 md:gap-3 items-end z-20">
             {[
               { label: 'PIB', value: v(data.macro.pib?.value, 1.84), suf: '%', dec: 1, delta: v(data.macro.pib?.delta, 0), pre: '', desc: 'CRESCIMENTO ANUAL', min: -3, max: 8, good: v(data.macro.pib?.value, 1.84) > 2 },
               { label: 'USD/BRL', value: v(data.macro.usdBrl?.value, 5.16), pre: 'R$', suf: '', dec: 2, delta: v(data.macro.usdBrl?.delta, 0), desc: 'COTAÇÃO DO DÓLAR', min: 3, max: 8, good: false },
@@ -556,7 +538,7 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
               const ontem = ((ind.pre ?? '') + (ind.value - ind.delta).toFixed(ind.dec) + ind.suf)
               return (
                 <motion.div key={ind.label} className="relative cursor-pointer group"
-                  style={{ width: 148 }}
+                  className="w-[120px] md:w-[148px]"
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
                   <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(14px)' }} />
@@ -568,23 +550,23 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
                   <motion.div className="absolute left-0 right-0 h-px pointer-events-none"
                     style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)`, opacity: 0.4 }}
                     animate={{ top: ['0%', '100%'] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 2 }} />
-                  <div className="relative px-3 pt-2.5 pb-2.5">
+                  <div className="relative px-2 md:px-3 pt-2 md:pt-2.5 pb-2 md:pb-2.5">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-mono text-[9px] font-bold tracking-[0.2em]" style={{ color }}>{ind.label}</span>
+                      <span className="font-mono text-[8px] md:text-[9px] font-bold tracking-[0.2em]" style={{ color }}>{ind.label}</span>
                     </div>
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-mono text-[26px] font-bold leading-none text-white/90">
+                    <div className="flex items-baseline gap-1 md:gap-2">
+                      <span className="font-mono text-[20px] md:text-[26px] font-bold leading-none text-white/90">
                         <AnimVal value={ind.value} dec={ind.dec} pre={ind.pre ?? ''} suf={ind.suf} />
                       </span>
-                      <span className={`font-mono text-xs font-bold ${ind.delta > 0 ? (ind.good ? 'text-emerald-400/70' : 'text-red-400/70') : ind.delta < 0 ? (ind.good ? 'text-red-400/70' : 'text-emerald-400/70') : 'text-white/20'}`}>
+                      <span className={`font-mono text-[10px] md:text-xs font-bold ${ind.delta > 0 ? (ind.good ? 'text-emerald-400/70' : 'text-red-400/70') : ind.delta < 0 ? (ind.good ? 'text-red-400/70' : 'text-emerald-400/70') : 'text-white/20'}`}>
                         {ind.delta > 0 ? '▲' : ind.delta < 0 ? '▼' : '–'}{Math.abs(ind.delta).toFixed(2)}
                       </span>
                     </div>
-                    <div className="mt-2 h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <div className="mt-1.5 md:mt-2 h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
                       <motion.div className="h-full rounded-full" style={{ background: color }}
                         initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 1.2, ease: 'easeOut' }} />
                     </div>
-                    <div className="flex items-center justify-between mt-1">
+                    <div className="hidden md:flex items-center justify-between mt-1">
                       <span className="font-mono text-[8px] tracking-[0.1em] text-right" style={{ color: 'rgba(255,255,255,0.2)' }}>{ind.desc}</span>
                       <span className="font-mono text-[8px]" style={{ color: 'rgba(255,255,255,0.18)' }}>ONTEM {ontem}</span>
                     </div>
@@ -594,8 +576,8 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
             })}
           </div>
 
-          {/* Commodities inline no rodapé do globo — desktop only */}
-          <div className="hidden md:flex absolute bottom-3 left-1/2 -translate-x-1/2 items-center gap-4 rounded-lg px-4 py-2"
+          {/* Commodities inline no rodapé do globo */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 md:gap-4 rounded-lg px-3 md:px-4 py-1.5 md:py-2 z-20"
             style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
             {Object.entries(commodities).slice(0, 4).map(([key, c]) => (
               <div key={key} className="flex items-center gap-1">
@@ -611,17 +593,6 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
           </div>
         </div>
 
-        {/* Mobile commodities abaixo do globo */}
-        <div className="flex md:hidden items-center justify-center gap-3 mt-1 flex-wrap">
-          {Object.entries(commodities).slice(0, 4).map(([key, c]) => (
-            <div key={key} className="flex items-center gap-1">
-              <span className="text-[7px] font-bold uppercase text-white/20">{c.label}</span>
-              <span className="font-mono text-[10px] font-semibold text-white/50">
-                <AnimVal value={c.value} dec={c.value > 1000 ? 0 : 1} pre="$" />
-              </span>
-            </div>
-          ))}
-        </div>
 
         {/* Commodities restantes abaixo do globo */}
         <div className="flex items-center justify-center gap-3 mt-2">
