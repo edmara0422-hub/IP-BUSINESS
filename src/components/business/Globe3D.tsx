@@ -105,7 +105,7 @@ function GlobeScene() {
 
 const Globe3DInner = memo(function Globe3DInner() {
   return (
-    <Canvas camera={{ position: [0, 0, 2.5], fov: 45 }} gl={{ antialias: false, powerPreference: 'high-performance' }} dpr={[1, 1.5]}>
+    <Canvas camera={{ position: [0, 0, 2.5], fov: 45 }} gl={{ antialias: false, powerPreference: 'high-performance' }} dpr={[1, 1.5]} style={{ width: '100%', height: '100%' }}>
       <ambientLight intensity={0.6} />
       <GlobeScene />
     </Canvas>
@@ -114,10 +114,12 @@ const Globe3DInner = memo(function Globe3DInner() {
 
 export default function Globe3D({ className = '' }: { className?: string; data?: unknown }) {
   return (
-    <div className={`h-full w-full ${className}`}>
-      <Suspense fallback={<div className="flex h-full w-full items-center justify-center"><div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white/60" /></div>}>
-        <Globe3DInner />
-      </Suspense>
+    <div className={`h-full w-full flex items-center justify-center ${className}`} style={{ position: 'relative' }}>
+      <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
+        <Suspense fallback={<div className="flex h-full w-full items-center justify-center"><div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white/60" /></div>}>
+          <Globe3DInner />
+        </Suspense>
+      </div>
     </div>
   )
 }
