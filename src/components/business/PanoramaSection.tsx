@@ -473,13 +473,13 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
             </motion.div>
           </div>
 
-          {/* Globo grande centralizado — maior no mobile */}
-          <div className="h-[520px] md:h-[560px] lg:h-[600px]">
+          {/* Globo centralizado */}
+          <div className="h-[480px] lg:h-[540px]">
             <Globe3D data={{ agents }} />
           </div>
 
-          {/* ── HUD Indicators — esquerda: SELIC + IPCA ── */}
-          <div className="absolute top-4 left-3 md:left-4 flex flex-col gap-2 md:gap-3 z-20">
+          {/* ── HUD esquerda: SELIC + IPCA ── */}
+          <div className="absolute top-4 left-4 flex flex-col gap-3">
             {[
               { label: 'SELIC', value: v(data.macro.selic?.value, 14.75), suf: '%', dec: 1, delta: v(data.macro.selic?.delta, 0), desc: 'TAXA BÁSICA DE JUROS', min: 2, max: 20, alert: v(data.macro.selic?.value, 14.75) > 12 },
               { label: 'IPCA', value: v(data.macro.ipca?.value, 3.81), suf: '%', dec: 2, delta: v(data.macro.ipca?.delta, 0), desc: 'INFLAÇÃO 12 MESES', min: 0, max: 12, alert: v(data.macro.ipca?.value, 3.81) > 6 },
@@ -488,26 +488,37 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
               const alertColor = ind.alert ? 'rgba(192,57,43,0.7)' : 'rgba(192,192,192,0.4)'
               const ontem = (ind.value - ind.delta).toFixed(ind.dec)
               return (
-                <motion.div key={ind.label} className="relative cursor-pointer group w-[90px] md:w-[148px]"
+                <motion.div key={ind.label} className="relative cursor-pointer group"
+                  style={{ width: 148 }}
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
-                  <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.78)', backdropFilter: 'blur(14px)' }} />
+                  <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(14px)' }} />
                   <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(90deg, transparent, ${alertColor}, transparent)` }} />
-                  <div className="relative px-2 md:px-3 py-1.5 md:py-2.5">
-                    <span className="font-mono text-[7px] md:text-[9px] font-bold tracking-[0.15em] md:tracking-[0.2em]" style={{ color: alertColor }}>{ind.label}</span>
-                    <div className="flex items-baseline gap-1">
-                      <span className="font-mono text-[15px] md:text-[26px] font-bold leading-none text-white/90">
+                  <svg className="absolute top-0 left-0" width="12" height="12"><path d="M0,10 L0,0 L10,0" fill="none" stroke={alertColor} strokeWidth="1.5"/></svg>
+                  <svg className="absolute top-0 right-0" width="12" height="12"><path d="M12,10 L12,0 L2,0" fill="none" stroke={alertColor} strokeWidth="1.5"/></svg>
+                  <svg className="absolute bottom-0 left-0" width="12" height="12"><path d="M0,2 L0,12 L10,12" fill="none" stroke={alertColor} strokeWidth="1.5"/></svg>
+                  <svg className="absolute bottom-0 right-0" width="12" height="12"><path d="M12,2 L12,12 L2,12" fill="none" stroke={alertColor} strokeWidth="1.5"/></svg>
+                  <motion.div className="absolute left-0 right-0 h-px pointer-events-none"
+                    style={{ background: `linear-gradient(90deg, transparent, ${alertColor}, transparent)`, opacity: 0.4 }}
+                    animate={{ top: ['0%', '100%'] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 1.5 }} />
+                  <div className="relative px-3 pt-2.5 pb-2.5">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-mono text-[9px] font-bold tracking-[0.2em]" style={{ color: alertColor }}>{ind.label}</span>
+                      {ind.alert && <motion.span className="font-mono text-[8px] text-red-400/70" animate={{ opacity: [1, 0.3] }} transition={{ duration: 0.8, repeat: Infinity }}>◆ ALERT</motion.span>}
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-mono text-[26px] font-bold leading-none text-white/90">
                         <AnimVal value={ind.value} dec={ind.dec} suf={ind.suf} />
                       </span>
-                      <span className={`hidden md:inline font-mono text-xs font-bold ${ind.delta > 0 ? 'text-red-400/70' : ind.delta < 0 ? 'text-emerald-400/70' : 'text-white/20'}`}>
+                      <span className={`font-mono text-xs font-bold ${ind.delta > 0 ? 'text-red-400/70' : ind.delta < 0 ? 'text-emerald-400/70' : 'text-white/20'}`}>
                         {ind.delta > 0 ? '▲' : ind.delta < 0 ? '▼' : '–'}{Math.abs(ind.delta).toFixed(1)}
                       </span>
                     </div>
-                    <div className="mt-1 md:mt-2 h-[2px] md:h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <div className="mt-2 h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
                       <motion.div className="h-full rounded-full" style={{ background: alertColor }}
                         initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 1.2, ease: 'easeOut' }} />
                     </div>
-                    <div className="hidden md:flex items-center justify-between mt-1">
+                    <div className="flex items-center justify-between mt-1">
                       <span className="font-mono text-[8px] tracking-[0.1em]" style={{ color: 'rgba(255,255,255,0.2)' }}>{ind.desc}</span>
                       <span className="font-mono text-[8px]" style={{ color: 'rgba(255,255,255,0.18)' }}>ONTEM {ontem}{ind.suf}</span>
                     </div>
@@ -517,7 +528,8 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
             })}
           </div>
 
-          <div className="absolute top-4 right-3 md:right-4 flex flex-col gap-2 md:gap-3 items-end z-20">
+          {/* ── HUD direita: PIB + USD ── */}
+          <div className="absolute top-4 right-4 flex flex-col gap-3 items-end">
             {[
               { label: 'PIB', value: v(data.macro.pib?.value, 1.84), suf: '%', dec: 1, delta: v(data.macro.pib?.delta, 0), pre: '', desc: 'CRESCIMENTO ANUAL', min: -3, max: 8, good: v(data.macro.pib?.value, 1.84) > 2 },
               { label: 'USD/BRL', value: v(data.macro.usdBrl?.value, 5.16), pre: 'R$', suf: '', dec: 2, delta: v(data.macro.usdBrl?.delta, 0), desc: 'COTAÇÃO DO DÓLAR', min: 3, max: 8, good: false },
@@ -526,26 +538,36 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
               const color = ind.good ? 'rgba(52,211,153,0.6)' : 'rgba(192,192,192,0.4)'
               const ontem = ((ind.pre ?? '') + (ind.value - ind.delta).toFixed(ind.dec) + ind.suf)
               return (
-                <motion.div key={ind.label} className="relative cursor-pointer group w-[90px] md:w-[148px]"
+                <motion.div key={ind.label} className="relative cursor-pointer group"
+                  style={{ width: 148 }}
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
-                  <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.78)', backdropFilter: 'blur(14px)' }} />
+                  <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(14px)' }} />
                   <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
-                  <div className="relative px-2 md:px-3 py-1.5 md:py-2.5">
-                    <span className="font-mono text-[7px] md:text-[9px] font-bold tracking-[0.15em] md:tracking-[0.2em]" style={{ color }}>{ind.label}</span>
-                    <div className="flex items-baseline gap-1">
-                      <span className="font-mono text-[15px] md:text-[26px] font-bold leading-none text-white/90">
+                  <svg className="absolute top-0 left-0" width="12" height="12"><path d="M0,10 L0,0 L10,0" fill="none" stroke={color} strokeWidth="1.5"/></svg>
+                  <svg className="absolute top-0 right-0" width="12" height="12"><path d="M12,10 L12,0 L2,0" fill="none" stroke={color} strokeWidth="1.5"/></svg>
+                  <svg className="absolute bottom-0 left-0" width="12" height="12"><path d="M0,2 L0,12 L10,12" fill="none" stroke={color} strokeWidth="1.5"/></svg>
+                  <svg className="absolute bottom-0 right-0" width="12" height="12"><path d="M12,2 L12,12 L2,12" fill="none" stroke={color} strokeWidth="1.5"/></svg>
+                  <motion.div className="absolute left-0 right-0 h-px pointer-events-none"
+                    style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)`, opacity: 0.4 }}
+                    animate={{ top: ['0%', '100%'] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 2 }} />
+                  <div className="relative px-3 pt-2.5 pb-2.5">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-mono text-[9px] font-bold tracking-[0.2em]" style={{ color }}>{ind.label}</span>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-mono text-[26px] font-bold leading-none text-white/90">
                         <AnimVal value={ind.value} dec={ind.dec} pre={ind.pre ?? ''} suf={ind.suf} />
                       </span>
-                      <span className={`hidden md:inline font-mono text-xs font-bold ${ind.delta > 0 ? (ind.good ? 'text-emerald-400/70' : 'text-red-400/70') : ind.delta < 0 ? (ind.good ? 'text-red-400/70' : 'text-emerald-400/70') : 'text-white/20'}`}>
+                      <span className={`font-mono text-xs font-bold ${ind.delta > 0 ? (ind.good ? 'text-emerald-400/70' : 'text-red-400/70') : ind.delta < 0 ? (ind.good ? 'text-red-400/70' : 'text-emerald-400/70') : 'text-white/20'}`}>
                         {ind.delta > 0 ? '▲' : ind.delta < 0 ? '▼' : '–'}{Math.abs(ind.delta).toFixed(2)}
                       </span>
                     </div>
-                    <div className="mt-1 md:mt-2 h-[2px] md:h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <div className="mt-2 h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
                       <motion.div className="h-full rounded-full" style={{ background: color }}
                         initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 1.2, ease: 'easeOut' }} />
                     </div>
-                    <div className="hidden md:flex items-center justify-between mt-1">
+                    <div className="flex items-center justify-between mt-1">
                       <span className="font-mono text-[8px] tracking-[0.1em] text-right" style={{ color: 'rgba(255,255,255,0.2)' }}>{ind.desc}</span>
                       <span className="font-mono text-[8px]" style={{ color: 'rgba(255,255,255,0.18)' }}>ONTEM {ontem}</span>
                     </div>
@@ -555,8 +577,8 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
             })}
           </div>
 
-          {/* Commodities inline no rodapé do globo */}
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 md:gap-4 rounded-lg px-3 md:px-4 py-1.5 md:py-2 z-20"
+          {/* Commodities no rodapé do globo */}
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-4 rounded-lg px-4 py-2"
             style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)' }}>
             {Object.entries(commodities).slice(0, 4).map(([key, c]) => (
               <div key={key} className="flex items-center gap-1">
