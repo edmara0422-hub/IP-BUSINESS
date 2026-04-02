@@ -489,7 +489,7 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
               const ontem = (ind.value - ind.delta).toFixed(ind.dec)
               return (
                 <motion.div key={ind.label} className="relative cursor-pointer group"
-                  className="w-[120px] md:w-[148px]"
+                  className="w-[100px] md:w-[148px]"
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
                   <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(14px)' }} />
@@ -507,7 +507,7 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
                       {ind.alert && <motion.span className="font-mono text-[7px] md:text-[8px] text-red-400/70" animate={{ opacity: [1, 0.3] }} transition={{ duration: 0.8, repeat: Infinity }}>◆ ALERT</motion.span>}
                     </div>
                     <div className="flex items-baseline gap-1 md:gap-2">
-                      <span className="font-mono text-[20px] md:text-[26px] font-bold leading-none text-white/90">
+                      <span className="font-mono text-[16px] md:text-[26px] font-bold leading-none text-white/90">
                         <AnimVal value={ind.value} dec={ind.dec} suf={ind.suf} />
                       </span>
                       <span className={`font-mono text-[10px] md:text-xs font-bold ${ind.delta > 0 ? 'text-red-400/70' : ind.delta < 0 ? 'text-emerald-400/70' : 'text-white/20'}`}>
@@ -538,7 +538,7 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
               const ontem = ((ind.pre ?? '') + (ind.value - ind.delta).toFixed(ind.dec) + ind.suf)
               return (
                 <motion.div key={ind.label} className="relative cursor-pointer group"
-                  className="w-[120px] md:w-[148px]"
+                  className="w-[100px] md:w-[148px]"
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
                   <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(14px)' }} />
@@ -555,7 +555,7 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
                       <span className="font-mono text-[8px] md:text-[9px] font-bold tracking-[0.2em]" style={{ color }}>{ind.label}</span>
                     </div>
                     <div className="flex items-baseline gap-1 md:gap-2">
-                      <span className="font-mono text-[20px] md:text-[26px] font-bold leading-none text-white/90">
+                      <span className="font-mono text-[16px] md:text-[26px] font-bold leading-none text-white/90">
                         <AnimVal value={ind.value} dec={ind.dec} pre={ind.pre ?? ''} suf={ind.suf} />
                       </span>
                       <span className={`font-mono text-[10px] md:text-xs font-bold ${ind.delta > 0 ? (ind.good ? 'text-emerald-400/70' : 'text-red-400/70') : ind.delta < 0 ? (ind.good ? 'text-red-400/70' : 'text-emerald-400/70') : 'text-white/20'}`}>
