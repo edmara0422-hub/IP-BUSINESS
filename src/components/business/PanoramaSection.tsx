@@ -488,33 +488,22 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
               const alertColor = ind.alert ? 'rgba(192,57,43,0.7)' : 'rgba(192,192,192,0.4)'
               const ontem = (ind.value - ind.delta).toFixed(ind.dec)
               return (
-                <motion.div key={ind.label} className="relative cursor-pointer group"
-                  className="w-[100px] md:w-[148px]"
+                <motion.div key={ind.label} className="relative cursor-pointer group w-[90px] md:w-[148px]"
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
-                  <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(14px)' }} />
+                  <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.78)', backdropFilter: 'blur(14px)' }} />
                   <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(90deg, transparent, ${alertColor}, transparent)` }} />
-                  <svg className="absolute top-0 left-0" width="12" height="12"><path d="M0,10 L0,0 L10,0" fill="none" stroke={alertColor} strokeWidth="1.5"/></svg>
-                  <svg className="absolute top-0 right-0" width="12" height="12"><path d="M12,10 L12,0 L2,0" fill="none" stroke={alertColor} strokeWidth="1.5"/></svg>
-                  <svg className="absolute bottom-0 left-0" width="12" height="12"><path d="M0,2 L0,12 L10,12" fill="none" stroke={alertColor} strokeWidth="1.5"/></svg>
-                  <svg className="absolute bottom-0 right-0" width="12" height="12"><path d="M12,2 L12,12 L2,12" fill="none" stroke={alertColor} strokeWidth="1.5"/></svg>
-                  <motion.div className="absolute left-0 right-0 h-px pointer-events-none"
-                    style={{ background: `linear-gradient(90deg, transparent, ${alertColor}, transparent)`, opacity: 0.4 }}
-                    animate={{ top: ['0%', '100%'] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 1.5 }} />
-                  <div className="relative px-2 md:px-3 pt-2 md:pt-2.5 pb-2 md:pb-2.5">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-mono text-[8px] md:text-[9px] font-bold tracking-[0.2em]" style={{ color: alertColor }}>{ind.label}</span>
-                      {ind.alert && <motion.span className="font-mono text-[7px] md:text-[8px] text-red-400/70" animate={{ opacity: [1, 0.3] }} transition={{ duration: 0.8, repeat: Infinity }}>◆ ALERT</motion.span>}
-                    </div>
-                    <div className="flex items-baseline gap-1 md:gap-2">
-                      <span className="font-mono text-[16px] md:text-[26px] font-bold leading-none text-white/90">
+                  <div className="relative px-2 md:px-3 py-1.5 md:py-2.5">
+                    <span className="font-mono text-[7px] md:text-[9px] font-bold tracking-[0.15em] md:tracking-[0.2em]" style={{ color: alertColor }}>{ind.label}</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="font-mono text-[15px] md:text-[26px] font-bold leading-none text-white/90">
                         <AnimVal value={ind.value} dec={ind.dec} suf={ind.suf} />
                       </span>
-                      <span className={`font-mono text-[10px] md:text-xs font-bold ${ind.delta > 0 ? 'text-red-400/70' : ind.delta < 0 ? 'text-emerald-400/70' : 'text-white/20'}`}>
+                      <span className={`hidden md:inline font-mono text-xs font-bold ${ind.delta > 0 ? 'text-red-400/70' : ind.delta < 0 ? 'text-emerald-400/70' : 'text-white/20'}`}>
                         {ind.delta > 0 ? '▲' : ind.delta < 0 ? '▼' : '–'}{Math.abs(ind.delta).toFixed(1)}
                       </span>
                     </div>
-                    <div className="mt-1.5 md:mt-2 h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <div className="mt-1 md:mt-2 h-[2px] md:h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
                       <motion.div className="h-full rounded-full" style={{ background: alertColor }}
                         initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 1.2, ease: 'easeOut' }} />
                     </div>
@@ -537,32 +526,22 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
               const color = ind.good ? 'rgba(52,211,153,0.6)' : 'rgba(192,192,192,0.4)'
               const ontem = ((ind.pre ?? '') + (ind.value - ind.delta).toFixed(ind.dec) + ind.suf)
               return (
-                <motion.div key={ind.label} className="relative cursor-pointer group"
-                  className="w-[100px] md:w-[148px]"
+                <motion.div key={ind.label} className="relative cursor-pointer group w-[90px] md:w-[148px]"
                   whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
-                  <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(14px)' }} />
+                  <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.78)', backdropFilter: 'blur(14px)' }} />
                   <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
-                  <svg className="absolute top-0 left-0" width="12" height="12"><path d="M0,10 L0,0 L10,0" fill="none" stroke={color} strokeWidth="1.5"/></svg>
-                  <svg className="absolute top-0 right-0" width="12" height="12"><path d="M12,10 L12,0 L2,0" fill="none" stroke={color} strokeWidth="1.5"/></svg>
-                  <svg className="absolute bottom-0 left-0" width="12" height="12"><path d="M0,2 L0,12 L10,12" fill="none" stroke={color} strokeWidth="1.5"/></svg>
-                  <svg className="absolute bottom-0 right-0" width="12" height="12"><path d="M12,2 L12,12 L2,12" fill="none" stroke={color} strokeWidth="1.5"/></svg>
-                  <motion.div className="absolute left-0 right-0 h-px pointer-events-none"
-                    style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)`, opacity: 0.4 }}
-                    animate={{ top: ['0%', '100%'] }} transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', repeatDelay: 2 }} />
-                  <div className="relative px-2 md:px-3 pt-2 md:pt-2.5 pb-2 md:pb-2.5">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-mono text-[8px] md:text-[9px] font-bold tracking-[0.2em]" style={{ color }}>{ind.label}</span>
-                    </div>
-                    <div className="flex items-baseline gap-1 md:gap-2">
-                      <span className="font-mono text-[16px] md:text-[26px] font-bold leading-none text-white/90">
+                  <div className="relative px-2 md:px-3 py-1.5 md:py-2.5">
+                    <span className="font-mono text-[7px] md:text-[9px] font-bold tracking-[0.15em] md:tracking-[0.2em]" style={{ color }}>{ind.label}</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="font-mono text-[15px] md:text-[26px] font-bold leading-none text-white/90">
                         <AnimVal value={ind.value} dec={ind.dec} pre={ind.pre ?? ''} suf={ind.suf} />
                       </span>
-                      <span className={`font-mono text-[10px] md:text-xs font-bold ${ind.delta > 0 ? (ind.good ? 'text-emerald-400/70' : 'text-red-400/70') : ind.delta < 0 ? (ind.good ? 'text-red-400/70' : 'text-emerald-400/70') : 'text-white/20'}`}>
+                      <span className={`hidden md:inline font-mono text-xs font-bold ${ind.delta > 0 ? (ind.good ? 'text-emerald-400/70' : 'text-red-400/70') : ind.delta < 0 ? (ind.good ? 'text-red-400/70' : 'text-emerald-400/70') : 'text-white/20'}`}>
                         {ind.delta > 0 ? '▲' : ind.delta < 0 ? '▼' : '–'}{Math.abs(ind.delta).toFixed(2)}
                       </span>
                     </div>
-                    <div className="mt-1.5 md:mt-2 h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <div className="mt-1 md:mt-2 h-[2px] md:h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
                       <motion.div className="h-full rounded-full" style={{ background: color }}
                         initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 1.2, ease: 'easeOut' }} />
                     </div>
