@@ -28,11 +28,11 @@ function parseFormatting(text: string): React.ReactNode[] {
 }
 
 // ── Classify paragraph ──
-type BlockType = 'text' | 'header' | 'question' | 'example' | 'list' | 'steps' | 'important' | 'tip' | 'quote' | 'comparison'
+type BlockType = 'text' | 'header' | 'question' | 'example' | 'list' | 'steps' | 'important' | 'tip' | 'quote' | 'comparison' | 'checkpoint'
 
 function classifyParagraph(para: string): { type: BlockType; content: string } {
   const t = para.trim()
-  if (t.startsWith('Pergunta-chave:') || t.startsWith('Pergunta:')) return { type: 'question', content: t }
+  if (t.startsWith('Pergunta-chave:') || t.startsWith('Pergunta:')) return { type: 'checkpoint', content: t }
   if (t.startsWith('Exemplo') || t.startsWith('Caso real') || t.startsWith('Exemplo prático')) return { type: 'example', content: t }
   if (t.startsWith('Erro ') || t.startsWith('Atenção:') || t.startsWith('IMPORTANTE:') || t.startsWith('Cuidado:')) return { type: 'important', content: t }
   if (t.startsWith('Dica:') || t.startsWith('Na prática:') || t.startsWith('Uso prático:') || t.startsWith('Como aplicar')) return { type: 'tip', content: t }
@@ -113,6 +113,52 @@ function QuestionBlock({ content }: { content: string }) {
             </motion.div>
           )}
         </div>
+      </div>
+    </motion.div>
+  )
+}
+
+// ── CHECKPOINT — pare, pense e responda antes de continuar ──
+function CheckpointBlock({ content }: { content: string }) {
+  const [answer, setAnswer] = useState('')
+  const [submitted, setSubmitted] = useState(false)
+  const question = content.replace(/^Pergunta(-chave)?:\s*/i, '')
+
+  return (
+    <motion.div className="rounded-xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${AMBER}20` }}>
+      <div className="px-4 pt-3 pb-1 flex items-center gap-2" style={{ background: `${AMBER}08` }}>
+        <HelpCircle size={16} color={AMBER} className="shrink-0" />
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER }}>Checkpoint — Sua Vez</p>
+      </div>
+      <div className="px-4 py-3">
+        <p className="text-[14px] text-white/65 leading-relaxed mb-3">{parseFormatting(question)}</p>
+        {!submitted ? (
+          <div>
+            <textarea
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              placeholder="Escreva sua reflexão aqui..."
+              className="w-full bg-white/[0.03] rounded-lg px-3 py-2.5 text-[13px] text-white/60 placeholder:text-white/15 outline-none resize-none leading-relaxed"
+              style={{ border: '1px solid rgba(255,255,255,0.06)' }}
+              rows={3}
+            />
+            <button
+              onClick={() => answer.trim() && setSubmitted(true)}
+              disabled={!answer.trim()}
+              className="mt-2 text-[12px] font-medium px-4 py-2 rounded-lg transition-all disabled:opacity-20"
+              style={{ background: `${AMBER}15`, color: AMBER, border: `1px solid ${AMBER}25` }}>
+              Registrar e Continuar →
+            </button>
+          </div>
+        ) : (
+          <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="rounded-lg px-3 py-2.5" style={{ background: 'rgba(255,255,255,0.02)', borderLeft: `3px solid ${AMBER}30` }}>
+              <p className="text-[11px] text-white/25 mb-1">Sua resposta:</p>
+              <p className="text-[13px] text-white/45 italic leading-relaxed">{answer}</p>
+            </div>
+            <p className="text-[11px] text-white/20 mt-2">Compare com o conteúdo a seguir. Volte aqui depois para ver se sua visão mudou.</p>
+          </motion.div>
+        )}
       </div>
     </motion.div>
   )
@@ -524,6 +570,7 @@ export default function SmartContentRenderer({ title, body }: Props) {
                 {block.type === 'steps' && <StepsBlock content={block.content} />}
                 {block.type === 'quote' && <QuoteBlock content={block.content} />}
                 {block.type === 'comparison' && <ComparisonBlock content={block.content} />}
+                {block.type === 'checkpoint' && <CheckpointBlock content={block.content} />}
               </motion.div>
             ))}
           </div>
@@ -571,6 +618,52 @@ export default function SmartContentRenderer({ title, body }: Props) {
           <TopicSummary points={summaryPoints} />
         </div>
       )}
+
+      {/* Eu Aprendi — feedback do aluno */}
+      {(!isMultiSlide || isLast) && <LearningFeedback title={title} />}
+    </div>
+  )
+}
+
+// ── EU APRENDI — feedback ao final de cada conteúdo ──
+function LearningFeedback({ title }: { title: string }) {
+  const [status, setStatus] = useState<'none' | 'got-it' | 'review' | 'lost'>('none')
+
+  if (status !== 'none') {
+    const msgs = {
+      'got-it': { text: 'Registrado! Siga para o próximo conteúdo.', color: GREEN },
+      'review': { text: 'Marcado para revisão. Volte quando quiser.', color: AMBER },
+      'lost': { text: 'Sem problemas. Releia com calma ou peça ajuda ao IA Tutor.', color: RED },
+    }
+    const msg = msgs[status]
+    return (
+      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+        className="mt-6 rounded-xl p-3 text-center" style={{ background: `${msg.color}08`, border: `1px solid ${msg.color}15` }}>
+        <p className="text-[12px]" style={{ color: msg.color }}>{msg.text}</p>
+      </motion.div>
+    )
+  }
+
+  return (
+    <div className="mt-6 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/15 text-center mb-3">Como foi este conteúdo?</p>
+      <div className="flex gap-2">
+        <button onClick={() => setStatus('got-it')}
+          className="flex-1 text-[12px] py-2.5 rounded-lg transition-all font-medium"
+          style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}15`, color: GREEN }}>
+          Entendi
+        </button>
+        <button onClick={() => setStatus('review')}
+          className="flex-1 text-[12px] py-2.5 rounded-lg transition-all font-medium"
+          style={{ background: `${AMBER}08`, border: `1px solid ${AMBER}15`, color: AMBER }}>
+          Preciso revisar
+        </button>
+        <button onClick={() => setStatus('lost')}
+          className="flex-1 text-[12px] py-2.5 rounded-lg transition-all font-medium"
+          style={{ background: `${RED}08`, border: `1px solid ${RED}15`, color: RED }}>
+          Não entendi
+        </button>
+      </div>
     </div>
   )
 }
