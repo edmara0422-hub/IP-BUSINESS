@@ -8,28 +8,40 @@ function getGroq() {
 export const dynamic = 'force-dynamic'
 
 interface TutorRequest {
-  selectedText: string
+  action?: 'explain' | 'evaluate-challenge' | 'evaluate-framework' | 'generate-probe' | 'evaluate-probe'
+  selectedText?: string
   question: string
-  moduleId: string
+  moduleId?: string
   submoduleTitle: string
   history: { role: 'user' | 'assistant'; content: string }[]
+}
+
+const SYSTEM_PROMPTS: Record<string, string> = {
+  explain: `Você é um tutor sênior de negócios, nível MBA.
+Regras: Seja denso e preciso. Use referências reais (Kotler, Drucker, Porter). Exemplos de empresas reais. Máximo 3 parágrafos curtos. Português brasileiro.`,
+
+  'evaluate-challenge': `Você é um avaliador de MBA. O aluno completou um desafio aplicado ao negócio dele.
+Regras: Avalie cada critério de 0 a 100. Seja específico no feedback — diga exatamente o que está bom e o que falta. No final, dê NOTA GERAL: XX/100. Português brasileiro.`,
+
+  'evaluate-framework': `Você é um consultor estratégico sênior avaliando um framework preenchido por um aluno.
+Regras: Avalie (1) Completude (2) Coerência entre campos (3) Profundidade estratégica. Seja direto e prático. Máximo 4 parágrafos. Português brasileiro.`,
+
+  'generate-probe': `Você gera perguntas de compreensão para alunos de negócios.
+Regras: Retorne APENAS a pergunta, sem explicação. A pergunta deve testar compreensão aplicada, não memorização. Português brasileiro.`,
+
+  'evaluate-probe': `Você avalia respostas de alunos sobre conceitos de negócios.
+Regras: Avalie se demonstrou compreensão real. 2-3 frases: o que acertou, o que faltou. No final diga APROVADO ou REVISAR. Português brasileiro.`,
 }
 
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as TutorRequest
-    const { selectedText, question, submoduleTitle, history } = body
+    const { action = 'explain', selectedText, question, submoduleTitle, history } = body
 
-    const systemPrompt = `Você é um tutor sênior de negócios, nível MBA, especializado em "${submoduleTitle}".
-${selectedText ? `O aluno selecionou este trecho: "${selectedText.slice(0, 300)}"` : ''}
+    const basePrompt = SYSTEM_PROMPTS[action] || SYSTEM_PROMPTS.explain
+    const systemPrompt = `${basePrompt}\nTópico: "${submoduleTitle}".${selectedText ? `\nTexto do aluno: "${selectedText.slice(0, 500)}"` : ''}`
 
-Regras de resposta:
-- Seja denso e preciso — vá direto ao núcleo do conceito, sem introduções óbvias
-- Use referências reais e atuais: autores como Kotler, Drucker, Porter, Damodaran, Kahneman, Thaler, Christensen, Osterwalder — cite nomes e obras quando relevante
-- Traga exemplos de empresas reais e recentes (Amazon, Apple, Nubank, Magazine Luiza, Tesla, etc.)
-- Conecte o conceito ao contexto prático de quem está construindo ou gerindo um negócio
-- Máximo 3 parágrafos curtos e densos — sem enrolação
-- Responda sempre em português brasileiro`
+    const maxTokens = action === 'generate-probe' ? 200 : action === 'evaluate-probe' ? 300 : 700
 
     const messages: Groq.Chat.ChatCompletionMessageParam[] = [
       { role: 'system', content: systemPrompt },
@@ -43,8 +55,8 @@ Regras de resposta:
     const completion = await getGroq().chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages,
-      max_tokens: 700,
-      temperature: 0.7,
+      max_tokens: maxTokens,
+      temperature: action === 'generate-probe' ? 0.9 : 0.7,
     })
 
     const text = completion.choices[0]?.message?.content?.trim() ?? ''

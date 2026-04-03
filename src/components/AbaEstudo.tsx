@@ -40,6 +40,7 @@ import { FallacyDetector, EthicsDilemmas, PhilosophyTribunal, ProfitOptimization
 import { ArgumentBuilder, LeanCanvas, MacroScenario, TextReview, PitchEvaluation, ConjunturaAnalysis } from '@/components/intelligence/SimulationsM5'
 import { SIM_ESG } from '@/components/intelligence/SimulationsESG'
 import SmartContentRenderer from '@/components/intelligence/SmartContentRenderer'
+import ContentBlockRenderer from '@/components/intelligence/ContentBlockRenderer'
 
 const SIM_COMPONENTS: Record<string, React.ComponentType> = {
   ...SIM_M3,
@@ -218,6 +219,15 @@ function CadernoBlock({ block }: { block: ContentBlock }) {
           <p className="truncate text-sm font-medium text-white/72">{block.title}</p>
           <p className="text-[10px] uppercase tracking-[0.12em] text-white/28">{block.fileType}</p>
         </div>
+      </div>
+    )
+  }
+
+  // Novos tipos interativos (concept, ai-probe, framework, challenge, number-crunch, decision)
+  if ('type' in block && ['concept', 'ai-probe', 'framework', 'challenge', 'number-crunch', 'decision'].includes(block.type)) {
+    return (
+      <div id={`block-${block.id}`} className="scroll-mt-6">
+        <ContentBlockRenderer block={block} />
       </div>
     )
   }

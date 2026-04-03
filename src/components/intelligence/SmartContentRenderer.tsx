@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Lightbulb, HelpCircle, CheckCircle2, XCircle, BookOpen, Quote, ArrowRight } from 'lucide-react'
+import { ChevronDown, Lightbulb, HelpCircle, XCircle, BookOpen, Quote, ArrowRight } from 'lucide-react'
 
 const GREEN = '#1e8449'
 const RED = '#c0392b'
@@ -28,11 +28,11 @@ function parseFormatting(text: string): React.ReactNode[] {
 }
 
 // ── Classify paragraph ──
-type BlockType = 'text' | 'header' | 'question' | 'example' | 'list' | 'steps' | 'important' | 'tip' | 'quote' | 'comparison' | 'checkpoint'
+type BlockType = 'text' | 'header' | 'question' | 'example' | 'list' | 'steps' | 'important' | 'tip' | 'quote' | 'comparison'
 
 function classifyParagraph(para: string): { type: BlockType; content: string } {
   const t = para.trim()
-  if (t.startsWith('Pergunta-chave:') || t.startsWith('Pergunta:')) return { type: 'checkpoint', content: t }
+  if (t.startsWith('Pergunta-chave:') || t.startsWith('Pergunta:')) return { type: 'question', content: t }
   if (t.startsWith('Exemplo') || t.startsWith('Caso real') || t.startsWith('Exemplo prático')) return { type: 'example', content: t }
   if (t.startsWith('Erro ') || t.startsWith('Atenção:') || t.startsWith('IMPORTANTE:') || t.startsWith('Cuidado:')) return { type: 'important', content: t }
   if (t.startsWith('Dica:') || t.startsWith('Na prática:') || t.startsWith('Uso prático:') || t.startsWith('Como aplicar')) return { type: 'tip', content: t }
@@ -113,52 +113,6 @@ function QuestionBlock({ content }: { content: string }) {
             </motion.div>
           )}
         </div>
-      </div>
-    </motion.div>
-  )
-}
-
-// ── CHECKPOINT — pare, pense e responda antes de continuar ──
-function CheckpointBlock({ content }: { content: string }) {
-  const [answer, setAnswer] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-  const question = content.replace(/^Pergunta(-chave)?:\s*/i, '')
-
-  return (
-    <motion.div className="rounded-xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${AMBER}20` }}>
-      <div className="px-4 pt-3 pb-1 flex items-center gap-2" style={{ background: `${AMBER}08` }}>
-        <HelpCircle size={16} color={AMBER} className="shrink-0" />
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: AMBER }}>Checkpoint — Sua Vez</p>
-      </div>
-      <div className="px-4 py-3">
-        <p className="text-[14px] text-white/65 leading-relaxed mb-3">{parseFormatting(question)}</p>
-        {!submitted ? (
-          <div>
-            <textarea
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value)}
-              placeholder="Escreva sua reflexão aqui..."
-              className="w-full bg-white/[0.03] rounded-lg px-3 py-2.5 text-[13px] text-white/60 placeholder:text-white/15 outline-none resize-none leading-relaxed"
-              style={{ border: '1px solid rgba(255,255,255,0.06)' }}
-              rows={3}
-            />
-            <button
-              onClick={() => answer.trim() && setSubmitted(true)}
-              disabled={!answer.trim()}
-              className="mt-2 text-[12px] font-medium px-4 py-2 rounded-lg transition-all disabled:opacity-20"
-              style={{ background: `${AMBER}15`, color: AMBER, border: `1px solid ${AMBER}25` }}>
-              Registrar e Continuar →
-            </button>
-          </div>
-        ) : (
-          <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="rounded-lg px-3 py-2.5" style={{ background: 'rgba(255,255,255,0.02)', borderLeft: `3px solid ${AMBER}30` }}>
-              <p className="text-[11px] text-white/25 mb-1">Sua resposta:</p>
-              <p className="text-[13px] text-white/45 italic leading-relaxed">{answer}</p>
-            </div>
-            <p className="text-[11px] text-white/20 mt-2">Compare com o conteúdo a seguir. Volte aqui depois para ver se sua visão mudou.</p>
-          </motion.div>
-        )}
       </div>
     </motion.div>
   )
@@ -330,96 +284,6 @@ function MiniQuiz({ question, options, correctIndex }: { question: string; optio
   )
 }
 
-// ── FLASHCARD ──
-function Flashcard({ front, back }: { front: string; back: string }) {
-  const [flipped, setFlipped] = useState(false)
-  return (
-    <motion.button onClick={() => setFlipped(!flipped)} className="w-full rounded-xl p-4 text-left transition-all"
-      style={{ background: flipped ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.06)' }}
-      whileTap={{ scale: 0.98 }}>
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-white/20">{flipped ? 'Definição' : 'Conceito'}</span>
-        <span className="text-[9px] text-white/15">toque para virar</span>
-      </div>
-      <AnimatePresence mode="wait">
-        <motion.p key={flipped ? 'b' : 'f'} initial={{ opacity: 0, rotateX: 10 }} animate={{ opacity: 1, rotateX: 0 }} exit={{ opacity: 0, rotateX: -10 }}
-          className="text-[13px] leading-relaxed" style={{ color: flipped ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.70)' }}>
-          {flipped ? back : front}
-        </motion.p>
-      </AnimatePresence>
-    </motion.button>
-  )
-}
-
-// ── TOPIC SUMMARY ──
-function TopicSummary({ points }: { points: string[] }) {
-  const [open, setOpen] = useState(false)
-  if (points.length === 0) return null
-  return (
-    <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}>
-      <button onClick={() => setOpen(!open)} className="w-full flex items-center gap-2 text-left">
-        <CheckCircle2 size={16} className="text-white/25 shrink-0" />
-        <span className="text-[12px] font-bold uppercase tracking-wider text-white/25 flex-1">O que você aprendeu</span>
-        <motion.div animate={{ rotate: open ? 180 : 0 }}><ChevronDown size={14} className="text-white/15" /></motion.div>
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-            <div className="mt-3 flex flex-col gap-2">
-              {points.map((p, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <span className="text-[11px] text-white/25 shrink-0 mt-0.5">✓</span>
-                  <span className="text-[13px] text-white/45 leading-relaxed text-justify">{p}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
-
-// ── AUTO EXTRACTORS ──
-function extractKeyTerms(text: string): Array<{ front: string; back: string }> {
-  const cards: Array<{ front: string; back: string }> = []
-  const patterns = [
-    /\*\*([^*]{3,40})\*\*\s*[:—–\-]\s*([^.]{20,150}\.)/g,
-    /\*\*([^*]{3,40})\*\*\s*[:—–\-]\s*([^\n]{20,150})/g,
-  ]
-  for (const regex of patterns) {
-    let match
-    while ((match = regex.exec(text)) !== null) {
-      const front = match[1].trim()
-      const back = match[2].trim()
-      if (!cards.find(c => c.front === front)) {
-        cards.push({ front, back })
-      }
-      if (cards.length >= 6) break
-    }
-    if (cards.length >= 6) break
-  }
-  return cards
-}
-
-function extractSummaryPoints(text: string): string[] {
-  const points: string[] = []
-  const sentences = text.split(/[.!]\s/).filter(s => s.length > 30 && s.length < 200)
-  const keywords = ['portanto', 'resume', 'principal', 'fundamental', 'essencial', 'chave', 'central', 'conclus', 'import', 'resultado', 'objetivo']
-  for (const s of sentences) {
-    if (keywords.some(k => s.toLowerCase().includes(k)) && points.length < 3) {
-      points.push(s.replace(/\*\*/g, '').trim() + '.')
-    }
-  }
-  if (points.length < 2) {
-    for (const s of sentences.slice(0, 8)) {
-      if (s.includes('**') && points.length < 3) {
-        points.push(s.replace(/\*\*/g, '').trim() + '.')
-      }
-    }
-  }
-  return points.slice(0, 3)
-}
 
 // ── READING PROGRESS ──
 function ReadingProgress({ total }: { total: number }) {
@@ -494,8 +358,6 @@ export default function SmartContentRenderer({ title, body }: Props) {
   const paragraphs = body.split('\n\n').filter(Boolean)
   const blocks = useMemo(() => paragraphs.map(p => classifyParagraph(p)), [body])
   const slides = useMemo(() => groupIntoSlides(blocks), [blocks])
-  const flashcards = useMemo(() => extractKeyTerms(body), [body])
-  const summaryPoints = useMemo(() => extractSummaryPoints(body), [body])
 
   const [currentSlide, setCurrentSlide] = useState(0)
   const isMultiSlide = slides.length > 1
@@ -570,7 +432,6 @@ export default function SmartContentRenderer({ title, body }: Props) {
                 {block.type === 'steps' && <StepsBlock content={block.content} />}
                 {block.type === 'quote' && <QuoteBlock content={block.content} />}
                 {block.type === 'comparison' && <ComparisonBlock content={block.content} />}
-                {block.type === 'checkpoint' && <CheckpointBlock content={block.content} />}
               </motion.div>
             ))}
           </div>
@@ -601,71 +462,8 @@ export default function SmartContentRenderer({ title, body }: Props) {
         </div>
       )}
 
-      {/* Flashcards — only on last slide */}
-      {(!isMultiSlide || isLast) && flashcards.length > 0 && (
-        <div className="mt-6">
-          <SectionDivider />
-          <p className="text-[11px] font-bold uppercase tracking-wider text-white/20 mb-3 mt-4">Conceitos-chave — toque para virar</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {flashcards.map((card, i) => <Flashcard key={i} front={card.front} back={card.back} />)}
-          </div>
-        </div>
-      )}
-
-      {/* Summary — only on last slide */}
-      {(!isMultiSlide || isLast) && summaryPoints.length > 0 && (
-        <div className="mt-4">
-          <TopicSummary points={summaryPoints} />
-        </div>
-      )}
-
-      {/* Eu Aprendi — feedback do aluno */}
-      {(!isMultiSlide || isLast) && <LearningFeedback title={title} />}
     </div>
   )
 }
 
-// ── EU APRENDI — feedback ao final de cada conteúdo ──
-function LearningFeedback({ title }: { title: string }) {
-  const [status, setStatus] = useState<'none' | 'got-it' | 'review' | 'lost'>('none')
-
-  if (status !== 'none') {
-    const msgs = {
-      'got-it': { text: 'Registrado! Siga para o próximo conteúdo.', color: GREEN },
-      'review': { text: 'Marcado para revisão. Volte quando quiser.', color: AMBER },
-      'lost': { text: 'Sem problemas. Releia com calma ou peça ajuda ao IA Tutor.', color: RED },
-    }
-    const msg = msgs[status]
-    return (
-      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-        className="mt-6 rounded-xl p-3 text-center" style={{ background: `${msg.color}08`, border: `1px solid ${msg.color}15` }}>
-        <p className="text-[12px]" style={{ color: msg.color }}>{msg.text}</p>
-      </motion.div>
-    )
-  }
-
-  return (
-    <div className="mt-6 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/15 text-center mb-3">Como foi este conteúdo?</p>
-      <div className="flex gap-2">
-        <button onClick={() => setStatus('got-it')}
-          className="flex-1 text-[12px] py-2.5 rounded-lg transition-all font-medium"
-          style={{ background: `${GREEN}08`, border: `1px solid ${GREEN}15`, color: GREEN }}>
-          Entendi
-        </button>
-        <button onClick={() => setStatus('review')}
-          className="flex-1 text-[12px] py-2.5 rounded-lg transition-all font-medium"
-          style={{ background: `${AMBER}08`, border: `1px solid ${AMBER}15`, color: AMBER }}>
-          Preciso revisar
-        </button>
-        <button onClick={() => setStatus('lost')}
-          className="flex-1 text-[12px] py-2.5 rounded-lg transition-all font-medium"
-          style={{ background: `${RED}08`, border: `1px solid ${RED}15`, color: RED }}>
-          Não entendi
-        </button>
-      </div>
-    </div>
-  )
-}
-
-export { MiniQuiz, Flashcard, TopicSummary }
+export { MiniQuiz }
