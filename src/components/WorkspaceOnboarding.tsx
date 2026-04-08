@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { createClient } from '@/lib/supabase/client'
+import { useAuth } from '@/hooks/useAuth'
 
 /* ── types ─────────────────────────────────────────────── */
 
@@ -145,8 +147,11 @@ function Title({ children }: { children: React.ReactNode }) {
 /* ── main component ────────────────────────────────────── */
 
 export default function WorkspaceOnboarding({ onComplete }: Props) {
+  const supabase = useMemo(() => createClient(), [])
+  const { user } = useAuth()
   const [step, setStep] = useState(0)
   const [dir, setDir] = useState(1)
+  const [saving, setSaving] = useState(false)
 
   const [profile, setProfile] = useState<WorkspaceProfile>({
     type: 'pf',
@@ -507,10 +512,25 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          onClick={() => onComplete(profile)}
+          disabled={saving}
+          onClick={async () => {
+            if (!user) { onComplete(profile); return }
+            setSaving(true)
+            await supabase.from('workspace_profiles').upsert({
+              user_id: user.id,
+              type: profile.type,
+              subtype: profile.subtype,
+              sectors: profile.sectors,
+              revenue: profile.revenue,
+              product: profile.product,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'user_id' })
+            setSaving(false)
+            onComplete(profile)
+          }}
           className="mx-auto mt-2 rounded-full border border-white/30 bg-white/[0.08] px-10 py-3 text-[15px] font-semibold text-white/90 transition-colors hover:bg-white/[0.14]"
         >
-          Abrir Workspace
+          {saving ? 'Salvando...' : 'Abrir Workspace'}
         </motion.button>
       </div>
     )

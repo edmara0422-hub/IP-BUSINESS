@@ -41,6 +41,7 @@ import { ArgumentBuilder, LeanCanvas, MacroScenario, TextReview, PitchEvaluation
 import { SIM_ESG } from '@/components/intelligence/SimulationsESG'
 import SmartContentRenderer from '@/components/intelligence/SmartContentRenderer'
 import ContentBlockRenderer from '@/components/intelligence/ContentBlockRenderer'
+import IAProfessor from '@/components/intelligence/IAProfessor'
 
 const SIM_COMPONENTS: Record<string, React.ComponentType> = {
   ...SIM_M3,
@@ -152,7 +153,37 @@ const SIDEBAR_TOOLS: { id: SidebarTool; label: string; icon: LucideIcon }[] = [
 
 // ─── Block renderer ───────────────────────────────────────────────────────────
 
-function CadernoBlock({ block }: { block: ContentBlock }) {
+// Helpers para extrair título/conteúdo de qualquer tipo de bloco (usado pelo IA Professor)
+function extractBlockTitle(block: ContentBlock): string | undefined {
+  if ('title' in block && block.title) return block.title
+  if (block.type === 'concept') return block.term
+  if (block.type === 'author-card') return block.name
+  if (block.type === 'method-card') return block.name
+  if (block.type === 'decision') return 'Decisão'
+  if (block.type === 'challenge') return 'Desafio'
+  return undefined
+}
+
+function extractBlockContent(block: ContentBlock): string | undefined {
+  switch (block.type) {
+    case 'text': return block.body
+    case 'layered-text': return `${block.essence}\n\n${block.development}`
+    case 'concept': return `${block.term}: ${block.definition}${block.example ? `\nExemplo: ${block.example}` : ''}`
+    case 'decision': return `Cenário: ${block.scenario}\nOpções: ${block.options.map((o) => o.label).join(' | ')}`
+    case 'challenge': return block.prompt
+    case 'framework': return `${block.title}: ${block.description}`
+    case 'number-crunch': return `${block.title}: ${block.scenario}`
+    case 'ai-probe': return block.context
+    case 'compare': return `${block.title}${block.question ? ` — ${block.question}` : ''}`
+    case 'inline-exercise': return `${block.prompt}${block.context ? `\n${block.context}` : ''}`
+    case 'author-card': return `${block.name} (${block.affiliation}): ${block.contribution}`
+    case 'timeline': return `${block.title}: ${block.events.map((e) => `${e.year} ${e.title}`).join('; ')}`
+    case 'method-card': return `${block.name} (${block.origin}): ${block.whenToUse.join('; ')}`
+    default: return undefined
+  }
+}
+
+function CadernoBlock({ block, moduleId, submoduleTitle }: { block: ContentBlock; moduleId?: string; submoduleTitle?: string }) {
   const [videoOpen, setVideoOpen] = useState(false)
 
   if (block.type === 'text') {
@@ -223,11 +254,16 @@ function CadernoBlock({ block }: { block: ContentBlock }) {
     )
   }
 
-  // Novos tipos interativos (concept, ai-probe, framework, challenge, number-crunch, decision)
-  if ('type' in block && ['concept', 'ai-probe', 'framework', 'challenge', 'number-crunch', 'decision'].includes(block.type)) {
+  // Novos tipos interativos (incluindo blocos do redesign: layered-text, compare, inline-exercise, author-card, timeline, method-card)
+  const interactiveTypes = [
+    'concept', 'ai-probe', 'framework', 'challenge', 'number-crunch', 'decision',
+    'layered-text', 'compare', 'inline-exercise', 'author-card', 'timeline', 'method-card',
+    'guided-lesson',
+  ]
+  if ('type' in block && interactiveTypes.includes(block.type)) {
     return (
       <div id={`block-${block.id}`} className="scroll-mt-6">
-        <ContentBlockRenderer block={block} />
+        <ContentBlockRenderer block={block} moduleId={moduleId} submoduleTitle={submoduleTitle} />
       </div>
     )
   }
@@ -518,9 +554,26 @@ function StudySidebar({
 
               <div className="flex-1 space-y-3 overflow-y-auto">
                 {tutorMessages.length === 0 && (
-                  <p className="text-[12px] leading-relaxed text-white/34">
-                    Selecione um trecho do caderno e clique em <span className="text-white/60">Explicar</span>, ou faça uma pergunta abaixo.
-                  </p>
+                  <div className="space-y-3">
+                    <p className="text-[12px] leading-relaxed text-white/34">
+                      Selecione um trecho do caderno e clique em <span className="text-white/60">Explicar</span>, ou escolha abaixo.
+                    </p>
+                    <div className="space-y-1.5">
+                      <p className="text-[9px] uppercase tracking-[0.22em] text-white/22">Sugestões sobre {submoduleTitle}</p>
+                      {[
+                        `Qual o conceito-chave de ${submoduleTitle}?`,
+                        `Dê um exemplo real aplicado de ${submoduleTitle}.`,
+                        `Quais erros comuns em ${submoduleTitle}?`,
+                        `Como conectar ${submoduleTitle} com outros tópicos?`,
+                      ].map((s, i) => (
+                        <button key={i} onClick={() => onAskTutor(s)}
+                          className="w-full text-left px-3 py-2 rounded-lg text-[11px] leading-relaxed text-white/50 hover:text-white/80 transition-all"
+                          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 )}
                 {tutorMessages.map((msg, i) => (
                   <div
@@ -925,7 +978,7 @@ export default function AbaEstudo() {
                                         transition={{ duration: 0.22 }}
                                         className="space-y-8"
                                       >
-                                        <CadernoBlock block={block} />
+                                        <CadernoBlock block={block} moduleId={current.id} submoduleTitle={theoryItem} />
 
                                         {/* Navegação */}
                                         <div className="flex items-center gap-3 pt-2">
@@ -953,6 +1006,20 @@ export default function AbaEstudo() {
                                             </div>
                                           )}
                                         </div>
+
+                                        {/* IA Professor — direciona estudo do bloco atual (Sumário) */}
+                                        {activeSidebarTool === 'sumario' && (
+                                          <div className="pt-4">
+                                            <IAProfessor
+                                              moduleId={current.id}
+                                              submoduleTitle={theoryItem}
+                                              blockTitle={extractBlockTitle(block)}
+                                              blockContent={extractBlockContent(block)}
+                                              studiedTopics={current.theory}
+                                              currentPosition={{ blockIdx: idx, totalBlocks: cadernoBlocks.length }}
+                                            />
+                                          </div>
+                                        )}
                                       </motion.div>
                                     </AnimatePresence>
                                   )

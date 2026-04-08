@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bell, BookOpen, Briefcase, Globe, Search, LogOut, Shield, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { useAccessibility } from '@/hooks/useAccessibility'
+import { createClient } from '@/lib/supabase/client'
 
 type Tab = 'business' | 'estudo' | 'admin'
 
@@ -39,7 +40,7 @@ function ProfileButton() {
   const displayName = profile?.name ?? user?.user_metadata?.name ?? user?.email?.split('@')[0]
   const email = profile?.email ?? user?.email ?? ''
   const initials = (displayName ?? email ?? 'U').charAt(0).toUpperCase()
-  const isAdmin = true
+  const isAdmin = profile?.role === 'admin'
 
   return (
     <div className="relative" ref={ref}>
@@ -202,18 +203,29 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
 }
 
 export default function MainApp() {
-  useAccessibility() // Applies CSS classes to body based on saved mode
+  useAccessibility()
   const [activeTab, setActiveTab] = useState<Tab>('business')
-  const [workspaceReady, setWorkspaceReady] = useState(() => {
-    if (typeof window !== 'undefined') return localStorage.getItem('ipb-workspace-ready') === 'true'
-    return false
-  })
+  const [workspaceReady, setWorkspaceReady] = useState(false)
+  const [workspaceLoading, setWorkspaceLoading] = useState(true)
+  const { user, profile } = useAuth()
+  const supabase = useMemo(() => createClient(), [])
+
+  useEffect(() => {
+    if (!user) { setWorkspaceLoading(false); return }
+    supabase
+      .from('workspace_profiles')
+      .select('id')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        setWorkspaceReady(!!data)
+        setWorkspaceLoading(false)
+      })
+  }, [user, supabase])
 
   const handleWorkspaceComplete = (_p: unknown) => {
     setWorkspaceReady(true)
-    localStorage.setItem('ipb-workspace-ready', 'true')
   }
-  const { profile } = useAuth()
 
   return (
     <motion.div
@@ -230,7 +242,13 @@ export default function MainApp() {
           <AnimatePresence mode="wait">
             {activeTab === 'business' && <AbaBusiness key="business" />}
             {activeTab === 'estudo'   && <AbaEstudo key="estudo" />}
-            {activeTab === 'admin' && (workspaceReady ? <AbaWorkspace key="workspace" /> : <WorkspaceOnboarding key="onboarding" onComplete={handleWorkspaceComplete} />)}
+            {activeTab === 'admin' && (
+              workspaceLoading
+                ? <div key="ws-loading" className="glass-card min-h-[32rem] p-6 flex items-center justify-center"><span className="text-[0.7rem] uppercase tracking-[0.3em] text-white/30">Carregando workspace...</span></div>
+                : workspaceReady
+                  ? <AbaWorkspace key="workspace" />
+                  : <WorkspaceOnboarding key="onboarding" onComplete={handleWorkspaceComplete} />
+            )}
           </AnimatePresence>
         </div>
       </div>

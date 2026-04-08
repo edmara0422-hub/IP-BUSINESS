@@ -1,4 +1,6 @@
-export default function Custom500() {
+'use client'
+
+export default function Error() {
   return (
     <main
       style={{

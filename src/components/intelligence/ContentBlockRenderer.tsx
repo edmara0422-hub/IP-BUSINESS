@@ -7,14 +7,22 @@ import FrameworkBuilder from './FrameworkBuilder'
 import ChallengeEngine from './ChallengeEngine'
 import NumberCruncher from './NumberCruncher'
 import DecisionSimulator from './DecisionSimulator'
+import LayeredText from './LayeredText'
+import CompareTable from './CompareTable'
+import InlineExercise from './InlineExercise'
+import AuthorCard from './AuthorCard'
+import Timeline from './Timeline'
+import MethodCard from './MethodCard'
+import GuidedLesson from './GuidedLesson'
 import type { ContentBlock } from '@/types/intelligence'
 
 interface Props {
   block: ContentBlock
   moduleId?: string
+  submoduleTitle?: string
 }
 
-export default function ContentBlockRenderer({ block, moduleId }: Props) {
+export default function ContentBlockRenderer({ block, moduleId, submoduleTitle }: Props) {
   switch (block.type) {
     case 'text':
       return <SmartContentRenderer title={block.title ?? ''} body={block.body} />
@@ -36,6 +44,70 @@ export default function ContentBlockRenderer({ block, moduleId }: Props) {
 
     case 'decision':
       return <DecisionSimulator scenario={block.scenario} options={block.options} realWorldAnalog={block.realWorldAnalog} lesson={block.lesson} />
+
+    case 'layered-text':
+      return <LayeredText
+        title={block.title}
+        essence={block.essence}
+        development={block.development}
+        depth={block.depth}
+        mastery={block.mastery}
+        refs={block.refs}
+      />
+
+    case 'compare':
+      return <CompareTable
+        title={block.title}
+        question={block.question}
+        dimensions={block.dimensions}
+        items={block.items}
+        insight={block.insight}
+      />
+
+    case 'inline-exercise':
+      return <InlineExercise
+        prompt={block.prompt}
+        context={block.context}
+        fields={block.fields}
+        evaluationCriteria={block.evaluationCriteria}
+        expectedConcepts={block.expectedConcepts}
+        submoduleTitle={submoduleTitle}
+      />
+
+    case 'author-card':
+      return <AuthorCard
+        name={block.name}
+        role={block.role}
+        affiliation={block.affiliation}
+        years={block.years}
+        keyStudy={block.keyStudy}
+        keyYear={block.keyYear}
+        contribution={block.contribution}
+        book={block.book}
+        quote={block.quote}
+      />
+
+    case 'timeline':
+      return <Timeline title={block.title} events={block.events} />
+
+    case 'method-card':
+      return <MethodCard
+        name={block.name}
+        origin={block.origin}
+        whenToUse={block.whenToUse}
+        whenNotToUse={block.whenNotToUse}
+        cost={block.cost}
+        time={block.time}
+        steps={block.steps}
+        example={block.example}
+      />
+
+    case 'guided-lesson':
+      return <GuidedLesson
+        title={block.title}
+        estimatedMinutes={block.estimatedMinutes}
+        steps={block.steps}
+      />
 
     default:
       return null
