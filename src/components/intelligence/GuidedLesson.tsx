@@ -867,8 +867,7 @@ export default function GuidedLesson({ title, estimatedMinutes, steps, onOpenFul
       {/* Header */}
       <div className="px-5 pt-5 pb-3">
         <div className="flex items-center justify-between mb-3">
-          <p className="text-[9px] uppercase tracking-[0.28em] text-white/26">Li\u00e7\u00e3o Guiada</p>
-          <p className="text-[10px] text-white/20 font-mono">~{estimatedMinutes} min</p>
+          <p className="text-[9px] uppercase tracking-[0.28em] text-white/26">Lição Guiada</p>
         </div>
         <h4 className="text-[1rem] font-semibold text-white/80 leading-snug" style={{ fontFamily: 'Poppins, sans-serif' }}>{title}</h4>
         {/* Progress bar */}

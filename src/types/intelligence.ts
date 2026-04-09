@@ -129,6 +129,72 @@ export type LayeredTextBlock = {
 }
 
 /**
+ * LIVING TEXT — texto vivo com 6 tipos de interação inline.
+ * Substitui leitura passiva por estudo dirigido.
+ *
+ * Marcações no body:
+ *   [[concept:id|texto visível]]    → pílula glossário
+ *   [[author:id|texto visível]]     → pílula autor (abre RefPanel)
+ *   [[pause:id]]                    → bloco "pare e pense" (id ref pause)
+ *   [[calc:id]]                     → mini-cálculo embutido (id ref calc)
+ *   [[anim:id]]                     → animação inline (id ref anim)
+ *   [[quote:id]]                    → citação interativa (id ref quote)
+ */
+export type LivingConcept = {
+  id: string
+  term: string                 // o termo (ex: "SLA")
+  definition: string           // 1-3 frases
+  example?: string
+}
+
+export type LivingPause = {
+  id: string
+  question: string
+  hint?: string                // dica que aparece se aluno pedir
+  expectedKeywords?: string[]  // palavras que IA deve procurar na resposta
+}
+
+export type LivingCalc = {
+  id: string
+  title: string
+  inputs: Array<{ id: string; label: string; min: number; max: number; default: number; unit: string }>
+  formula: string              // JS expression usando ids dos inputs
+  resultLabel: string
+  resultFormat?: 'currency' | 'percent' | 'number'
+  interpretation?: Array<{ max: number; label: string; color: 'green' | 'amber' | 'red' }>
+}
+
+export type LivingAnim = {
+  id: string
+  kind: 'timeline' | 'phases' | 'flow' | 'graph'
+  title?: string
+  data: Record<string, unknown>  // payload específico do tipo de animação
+}
+
+export type LivingQuote = {
+  id: string
+  text: string
+  author: string
+  year?: number
+  source?: string
+  challenge?: string           // pergunta que aluno responde para "discordar"
+}
+
+export type LivingTextBlock = {
+  id: string
+  type: 'living-text'
+  title: string
+  body: string                 // texto principal com marcações [[type:id|label]]
+  refs?: InlineRef[]           // pílulas autor (abrem painel lateral)
+  concepts?: LivingConcept[]   // pílulas glossário
+  pauses?: LivingPause[]       // pare e pense ativos
+  calcs?: LivingCalc[]         // mini-cálculos
+  anims?: LivingAnim[]         // animações inline
+  quotes?: LivingQuote[]       // citações interativas
+  estimatedReading?: string    // "8 min" ou "leitura densa"
+}
+
+/**
  * Comparação lado a lado. Aluno enxerga padrão entre itens.
  * Usado para cases (Havaianas vs Nubank vs Embraer) ou frameworks (GRI vs SASB).
  */
@@ -362,6 +428,7 @@ export type ContentBlock =
   | ConceptBlock | ChallengeBlock | DecisionBlock | FrameworkBlock | NumberCrunchBlock | AIProbeBlock
   | LayeredTextBlock | CompareBlock | InlineExerciseBlock | AuthorCardBlock | TimelineBlock | MethodCardBlock
   | GuidedLessonBlock
+  | LivingTextBlock
 
 export type SubmoduleTopic = {
   id: string

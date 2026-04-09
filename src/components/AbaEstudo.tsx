@@ -189,7 +189,7 @@ function CadernoBlock({ block, moduleId, submoduleTitle }: { block: ContentBlock
   if (block.type === 'text') {
     return (
       <div id={`block-${block.id}`}>
-        <SmartContentRenderer title={block.title} body={block.body} />
+        <SmartContentRenderer title={block.title ?? ''} body={block.body} />
       </div>
     )
   }
@@ -258,7 +258,7 @@ function CadernoBlock({ block, moduleId, submoduleTitle }: { block: ContentBlock
   const interactiveTypes = [
     'concept', 'ai-probe', 'framework', 'challenge', 'number-crunch', 'decision',
     'layered-text', 'compare', 'inline-exercise', 'author-card', 'timeline', 'method-card',
-    'guided-lesson',
+    'guided-lesson', 'living-text',
   ]
   if ('type' in block && interactiveTypes.includes(block.type)) {
     return (

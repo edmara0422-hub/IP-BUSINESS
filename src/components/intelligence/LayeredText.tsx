@@ -27,12 +27,12 @@ export default function LayeredText({ title, essence, development, depth, master
   const [layer, setLayer] = useState<Layer>('essence')
   const [openRef, setOpenRef] = useState<InlineRef | null>(null)
 
-  const layers: Array<{ key: Layer; label: string; hint: string; content: string }> = [
-    { key: 'essence', label: 'Essência', hint: '30s', content: essence },
-    { key: 'development', label: 'Desenvolver', hint: '2min', content: development },
-    { key: 'depth', label: 'Profundidade', hint: '8min', content: depth },
+  const layers: Array<{ key: Layer; label: string; content: string }> = [
+    { key: 'essence', label: 'Essência', content: essence },
+    { key: 'development', label: 'Desenvolver', content: development },
+    { key: 'depth', label: 'Profundidade', content: depth },
   ]
-  if (mastery) layers.push({ key: 'mastery', label: 'Dominar', hint: '20min+', content: mastery })
+  if (mastery) layers.push({ key: 'mastery', label: 'Aprofundar', content: mastery })
 
   const active = layers.find((l) => l.key === layer)!
 
@@ -66,7 +66,6 @@ export default function LayeredText({ title, essence, development, depth, master
                   border: `1px solid ${isActive ? `${BLUE}30` : 'rgba(255,255,255,0.05)'}`,
                 }}>
                 <span>{l.label}</span>
-                <span className="opacity-50 text-[9px]">{l.hint}</span>
               </button>
             )
           })}
@@ -102,9 +101,9 @@ function TextWithRefs({ text, refs, onRefClick }: { text: string; refs: InlineRe
   const paragraphs = text.split('\n\n').filter((p) => p.trim())
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {paragraphs.map((para, idx) => (
-        <p key={idx} className="text-[13px] text-white/55 leading-relaxed">
+        <p key={idx} className="text-[14px] text-white/65 leading-[1.85]" style={{ textAlign: 'justify', fontFamily: 'Inter, system-ui, sans-serif' }}>
           {renderParagraph(para, refMap, onRefClick)}
         </p>
       ))}

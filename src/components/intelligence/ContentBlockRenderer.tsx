@@ -14,6 +14,7 @@ import AuthorCard from './AuthorCard'
 import Timeline from './Timeline'
 import MethodCard from './MethodCard'
 import GuidedLesson from './GuidedLesson'
+import LivingText from './LivingText'
 import type { ContentBlock } from '@/types/intelligence'
 
 interface Props {
@@ -107,6 +108,20 @@ export default function ContentBlockRenderer({ block, moduleId, submoduleTitle }
         title={block.title}
         estimatedMinutes={block.estimatedMinutes}
         steps={block.steps}
+      />
+
+    case 'living-text':
+      return <LivingText
+        blockId={block.id}
+        title={block.title}
+        body={block.body}
+        refs={block.refs}
+        concepts={block.concepts}
+        pauses={block.pauses}
+        calcs={block.calcs}
+        anims={block.anims}
+        quotes={block.quotes}
+        estimatedReading={block.estimatedReading}
       />
 
     default:
