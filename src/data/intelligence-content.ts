@@ -4707,13 +4707,9 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             prompt: 'Desenhe uma pesquisa para resolver um problema real de negócio.',
             context: 'Uma academia de bairro perdeu 30% dos alunos nos últimos 6 meses. O dono acha que é preço. Os professores acham que é concorrência. Ninguém perguntou aos alunos.',
             fields: [
-              { id: 'hipoteses', label: 'Liste 3 hipóteses para a perda de alunos', placeholder: '1. Preço alto em relação aos concorrentes
-2. Horários inconvenientes
-3. ...', multiline: true },
+              { id: 'hipoteses', label: 'Liste 3 hipóteses para a perda de alunos', placeholder: '1. Preço alto em relação aos concorrentes\n2. Horários inconvenientes\n3. ...', multiline: true },
               { id: 'metodo', label: 'Qual método usaria? (Quanti, Quali ou Misto) Justifique.', placeholder: 'Método: ... Justificativa: ...', multiline: true },
-              { id: 'instrumento', label: 'Desenhe o instrumento — 5 perguntas que faria', placeholder: '1. Em escala de 0-10, quanto recomendaria a academia?
-2. O que mais motivou sua saída?
-3. ...', multiline: true },
+              { id: 'instrumento', label: 'Desenhe o instrumento — 5 perguntas que faria', placeholder: '1. Em escala de 0-10, quanto recomendaria a academia?\n2. O que mais motivou sua saída?\n3. ...', multiline: true },
               { id: 'amostra', label: 'Para quem aplicaria e quantas pessoas?', placeholder: 'Ex: 50 ex-alunos que cancelaram + 30 alunos atuais para comparar' },
             ],
             evaluationCriteria: [
