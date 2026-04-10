@@ -11,7 +11,8 @@
  * Regra inviolável: nenhuma interação no meio do corpo. Aplicação só em C.
  */
 
-import { motion } from 'framer-motion'
+import { useState, Fragment } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import type {
   ChapterBlock,
   ChapterBodySection,
@@ -35,6 +36,37 @@ const COLORS = {
   phase1: 'rgba(255, 255, 255, 0.38)',
   phase2: 'rgba(255, 255, 255, 0.7)',
   phase3: '#ffffff',
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Highlight parser — converte {{texto}} em span destacado mono
+// Usa-se para fazer números-chave e termos críticos saltarem do texto.
+// ─────────────────────────────────────────────────────────────────────
+function renderWithHighlights(text: string) {
+  const parts = text.split(/(\{\{[^}]+\}\})/g)
+  return parts.map((part, i) => {
+    if (part.startsWith('{{') && part.endsWith('}}')) {
+      return (
+        <span
+          key={i}
+          style={{
+            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+            fontWeight: 700,
+            color: '#ffffff',
+            fontSize: '0.95em',
+            background: 'rgba(255, 255, 255, 0.06)',
+            padding: '1px 6px',
+            borderRadius: 3,
+            letterSpacing: '0.01em',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {part.slice(2, -2)}
+        </span>
+      )
+    }
+    return <Fragment key={i}>{part}</Fragment>
+  })
 }
 
 export default function Chapter({ block }: Props) {
@@ -79,7 +111,9 @@ export default function Chapter({ block }: Props) {
       <ChapterDivider label="Síntese" />
       <ChapterSynthesis
         closingText={block.synthesis.closingText}
+        keyInsights={block.synthesis.keyInsights}
         nextChapterHint={block.synthesis.nextChapterHint}
+        nextChapterBlurb={block.synthesis.nextChapterBlurb}
       />
     </article>
   )
@@ -183,7 +217,7 @@ function ChapterOpening({
           hyphens: 'auto',
         }}
       >
-        {leadText}
+        {renderWithHighlights(leadText)}
       </motion.p>
     </section>
   )
@@ -281,7 +315,7 @@ function BodySectionRenderer({ section }: { section: ChapterBodySection }) {
           hyphens: 'auto',
         }}
       >
-        {section.text}
+        {renderWithHighlights(section.text)}
       </p>
     )
   }
@@ -307,16 +341,81 @@ function BodySectionRenderer({ section }: { section: ChapterBodySection }) {
     return <PhaseCard data={section.data} />
   }
 
+  if (section.kind === 'phase-group') {
+    return <PhaseGroup cards={section.cards} />
+  }
+
   return null
 }
 
+// ─────────────────────────────────────────────────────────────────────
+// PhaseGroup — 3 phase cards conectados por uma trajetória vertical
+// que evolui de cinza fraco (Fase 1) a branco puro (Fase 3),
+// reforçando visualmente que existe uma evolução, não 3 itens soltos.
+// ─────────────────────────────────────────────────────────────────────
+
+function PhaseGroup({ cards }: { cards: ChapterPhaseCard[] }) {
+  return (
+    <div
+      style={{
+        position: 'relative',
+        paddingLeft: 28,
+        margin: '4px 0 18px 0',
+      }}
+    >
+      {/* trajetória vertical: gradiente que escurece pra clarear */}
+      <div
+        style={{
+          position: 'absolute',
+          left: 11,
+          top: 24,
+          bottom: 24,
+          width: 1,
+          background:
+            'linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,1) 100%)',
+        }}
+      />
+      {cards.map((card, i) => {
+        const dotColor =
+          card.index === 1
+            ? COLORS.phase1
+            : card.index === 2
+              ? COLORS.phase2
+              : COLORS.phase3
+        return (
+          <div key={i} style={{ position: 'relative' }}>
+            {/* nó da trajetória */}
+            <div
+              style={{
+                position: 'absolute',
+                left: -22,
+                top: 22,
+                width: 9,
+                height: 9,
+                borderRadius: '50%',
+                background: dotColor,
+                border: '2px solid #0a0a0a',
+                boxShadow: `0 0 0 1px ${dotColor}`,
+                zIndex: 2,
+              }}
+            />
+            <PhaseCard data={card} />
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function PhaseCard({ data }: { data: ChapterPhaseCard }) {
+  const [expanded, setExpanded] = useState(false)
   const accent =
     data.index === 1
       ? COLORS.phase1
       : data.index === 2
         ? COLORS.phase2
         : COLORS.phase3
+  const hasDeep = !!data.deepDive
 
   return (
     <motion.div
@@ -329,8 +428,8 @@ function PhaseCard({ data }: { data: ChapterPhaseCard }) {
         border: `1px solid ${COLORS.border}`,
         borderLeft: `3px solid ${accent}`,
         borderRadius: 12,
-        padding: '20px 22px',
-        margin: '0 0 18px 0',
+        padding: '18px 20px',
+        margin: '0 0 16px 0',
       }}
     >
       <div
@@ -375,7 +474,7 @@ function PhaseCard({ data }: { data: ChapterPhaseCard }) {
           hyphens: 'auto',
         }}
       >
-        {data.text}
+        {renderWithHighlights(data.text)}
       </p>
       <div
         style={{
@@ -394,8 +493,147 @@ function PhaseCard({ data }: { data: ChapterPhaseCard }) {
           ▸ {data.caseStudy.company} · {data.caseStudy.year}
         </span>
         <br />
-        {data.caseStudy.story}
+        {renderWithHighlights(data.caseStudy.story)}
       </div>
+
+      {/* DEEP DIVE — tap to expand */}
+      {hasDeep && (
+        <>
+          <button
+            onClick={() => setExpanded((v) => !v)}
+            style={{
+              marginTop: 12,
+              background: 'transparent',
+              border: 'none',
+              color: COLORS.textDim,
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              padding: '4px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <span>{expanded ? '−' : '+'}</span>
+            <span>{expanded ? 'Recolher' : 'Aprofundar'}</span>
+          </button>
+          <AnimatePresence initial={false}>
+            {expanded && data.deepDive && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+                style={{ overflow: 'hidden' }}
+              >
+                <div
+                  style={{
+                    marginTop: 12,
+                    paddingTop: 14,
+                    borderTop: `1px solid ${COLORS.border}`,
+                  }}
+                >
+                  {/* Key numbers */}
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns:
+                        'repeat(auto-fit, minmax(110px, 1fr))',
+                      gap: 10,
+                      marginBottom: 14,
+                    }}
+                  >
+                    {data.deepDive.keyNumbers.map((kn, i) => (
+                      <div
+                        key={i}
+                        style={{
+                          padding: '8px 10px',
+                          background: 'rgba(255, 255, 255, 0.035)',
+                          border: `1px solid ${COLORS.border}`,
+                          borderRadius: 5,
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontFamily: 'ui-monospace, monospace',
+                            fontSize: 13,
+                            fontWeight: 700,
+                            color: '#ffffff',
+                            letterSpacing: '0.01em',
+                            marginBottom: 2,
+                          }}
+                        >
+                          {kn.value}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 9,
+                            color: COLORS.textDim,
+                            letterSpacing: '0.05em',
+                            textTransform: 'uppercase',
+                            lineHeight: 1.4,
+                          }}
+                        >
+                          {kn.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Quote */}
+                  {data.deepDive.quote && (
+                    <blockquote
+                      style={{
+                        margin: '0 0 12px 0',
+                        padding: '8px 0 8px 14px',
+                        borderLeft: `2px solid ${accent}`,
+                        fontSize: 11,
+                        lineHeight: 1.6,
+                        color: COLORS.textMuted,
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      &ldquo;{data.deepDive.quote.text}&rdquo;
+                      <div
+                        style={{
+                          marginTop: 6,
+                          fontSize: 9,
+                          fontStyle: 'normal',
+                          color: COLORS.textDim,
+                          letterSpacing: '0.06em',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        — {data.deepDive.quote.author}
+                      </div>
+                    </blockquote>
+                  )}
+
+                  {/* Insight de fechamento */}
+                  <div
+                    style={{
+                      fontSize: 11,
+                      lineHeight: 1.6,
+                      color: '#ffffff',
+                      fontWeight: 500,
+                      padding: '10px 12px',
+                      background: 'rgba(255, 255, 255, 0.04)',
+                      borderRadius: 5,
+                      textAlign: 'justify',
+                      hyphens: 'auto',
+                    }}
+                  >
+                    {renderWithHighlights(data.deepDive.insight)}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      )}
     </motion.div>
   )
 }
@@ -442,43 +680,131 @@ function ChapterDivider({ label }: { label: string }) {
 
 function ChapterSynthesis({
   closingText,
+  keyInsights,
   nextChapterHint,
+  nextChapterBlurb,
 }: {
   closingText: string
+  keyInsights?: string[]
   nextChapterHint?: string
+  nextChapterBlurb?: string
 }) {
   return (
-    <section>
+    <section
+      style={{
+        background: 'rgba(255, 255, 255, 0.025)',
+        border: `1px solid ${COLORS.border}`,
+        borderRadius: 12,
+        padding: '22px 22px',
+      }}
+    >
+      {/* Frase-chave em destaque */}
       <p
         style={{
-          fontSize: 13,
-          lineHeight: 1.7,
-          color: 'rgba(255,255,255,0.85)',
-          margin: '0 0 14px 0',
+          fontSize: 14,
+          lineHeight: 1.55,
+          color: '#ffffff',
+          fontWeight: 500,
+          margin: '0 0 18px 0',
+          letterSpacing: '-0.005em',
           textAlign: 'justify',
           hyphens: 'auto',
         }}
       >
-        {closingText}
+        {renderWithHighlights(closingText)}
       </p>
-      {nextChapterHint && (
-        <div
+
+      {/* Bullets de fechamento */}
+      {keyInsights && keyInsights.length > 0 && (
+        <ul
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            padding: '8px 14px',
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: `1px solid rgba(255, 255, 255, 0.18)`,
-            borderRadius: 6,
-            fontSize: 11,
-            color: COLORS.text,
-            fontWeight: 600,
-            letterSpacing: '0.02em',
+            listStyle: 'none',
+            padding: 0,
+            margin: '0 0 22px 0',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
           }}
         >
-          {nextChapterHint} →
-        </div>
+          {keyInsights.map((insight, i) => (
+            <li
+              key={i}
+              style={{
+                fontSize: 11,
+                lineHeight: 1.6,
+                color: COLORS.textMuted,
+                padding: '6px 0 6px 22px',
+                position: 'relative',
+              }}
+            >
+              <span
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  top: 14,
+                  width: 12,
+                  height: 1,
+                  background: 'rgba(255, 255, 255, 0.35)',
+                }}
+              />
+              {renderWithHighlights(insight)}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* CTA do próximo capítulo */}
+      {nextChapterHint && (
+        <button
+          type="button"
+          style={{
+            width: '100%',
+            background: 'rgba(255, 255, 255, 0.04)',
+            border: `1px solid rgba(255, 255, 255, 0.22)`,
+            borderRadius: 8,
+            padding: '14px 16px',
+            cursor: 'pointer',
+            textAlign: 'left',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+            transition: 'all 0.15s',
+          }}
+        >
+          <div
+            style={{
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: '0.22em',
+              color: COLORS.textDim,
+              textTransform: 'uppercase',
+            }}
+          >
+            Próximo capítulo
+          </div>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: '#ffffff',
+              letterSpacing: '0.01em',
+            }}
+          >
+            {nextChapterHint} →
+          </div>
+          {nextChapterBlurb && (
+            <div
+              style={{
+                fontSize: 11,
+                lineHeight: 1.5,
+                color: COLORS.textMuted,
+                marginTop: 2,
+              }}
+            >
+              {nextChapterBlurb}
+            </div>
+          )}
+        </button>
       )}
     </section>
   )

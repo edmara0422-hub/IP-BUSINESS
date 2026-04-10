@@ -19,9 +19,9 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             number: 1,
             title: 'Era Digital · As 3 Fases da Tecnologia',
             subtitle: 'Como o papel da TI mudou nas empresas — de bastidor operacional a coração do negócio',
-            estimatedMinutes: 5,
+            estimatedMinutes: 6,
             opening: {
-              leadText: 'A evolução da tecnologia nas empresas pode ser segmentada em três fases distintas. Cada fase redefiniu o papel da TI dentro do negócio — de bastidor operacional a coração estratégico. Entender em qual fase sua empresa está hoje é o primeiro passo para qualquer transformação digital real.',
+              leadText: 'A evolução da tecnologia nas empresas pode ser segmentada em três fases distintas. Cada fase redefiniu o papel da TI dentro do negócio — de bastidor operacional a coração estratégico. Entender em qual fase sua empresa está hoje é o {{primeiro passo}} para qualquer transformação digital real.',
               showTimeline: true,
             },
             body: [
@@ -30,62 +30,114 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 text: 'Não existe transformação digital sem antes saber de onde se parte. As três fases abaixo não são degraus de uma escada — são modos de operar. Algumas organizações vivem em mais de uma ao mesmo tempo. O que importa é reconhecer onde está o centro de gravidade da sua TI hoje, porque é a partir dele que qualquer salto se torna possível.',
               },
               {
-                kind: 'phase-card',
-                data: {
-                  index: 1,
-                  title: 'Fase 1 — Infraestrutura',
-                  period: 'Anos 2000',
-                  text: 'Foco na estabilidade de servidores e redes operacionais. A TI era setor de suporte: o sucesso era medido em uptime, não em receita. Manter os sistemas no ar para que o negócio acontecesse era a função inteira. Investir em tecnologia significava comprar hardware, contratar suporte e rezar para nada cair. A pergunta dos diretores era simples: "está funcionando?".',
-                  caseStudy: {
-                    company: 'Banco do Brasil',
-                    year: 2003,
-                    story: 'Bilhões investidos em datacenter para sustentar 5.000 agências em rede. Cada hora de queda custava milhões em transações perdidas. TI era custo necessário, não diferencial competitivo — exatamente o ambiente em que Nicholas Carr publicou seu provocativo "IT Doesn\'t Matter" na Harvard Business Review.',
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Fase 1 — Infraestrutura',
+                    period: 'Anos 2000',
+                    text: 'Foco na estabilidade de servidores e redes operacionais. A TI era setor de suporte: o sucesso era medido em {{uptime}}, não em receita. Manter os sistemas no ar para que o negócio acontecesse era a função inteira. Investir em tecnologia significava comprar hardware, contratar suporte e rezar para nada cair.',
+                    caseStudy: {
+                      company: 'Banco do Brasil',
+                      year: 2003,
+                      story: '{{R$ 2 bilhões}} investidos em datacenter para sustentar {{5.000 agências}} em rede. Cada hora de queda custava {{R$ 40 milhões}} em transações perdidas. TI era custo necessário, não diferencial competitivo.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 2 bi', label: 'Investimento em datacenter' },
+                        { value: '5.000', label: 'Agências conectadas' },
+                        { value: '99,9%', label: 'SLA exigido (uptime)' },
+                      ],
+                      quote: {
+                        text: 'When a resource becomes essential to competition but inconsequential to strategy, the risks it creates become more important than the advantages it provides.',
+                        author: 'Nicholas Carr · IT Doesn\'t Matter · HBR 2003',
+                      },
+                      insight: 'O paradoxo da Fase 1: TI virou {{pré-requisito de existir}}, não diferencial de competir. A consequência inevitável foi a corrida para a Fase 2 — quando estabilidade já era esperada e o jogo passou a ser eficiência.',
+                    },
                   },
-                },
-              },
-              {
-                kind: 'phase-card',
-                data: {
-                  index: 2,
-                  title: 'Fase 2 — Processo',
-                  period: 'Anos 2010',
-                  text: 'Integração de sistemas como ERPs e CRMs no cotidiano da gestão. A informação para de morrer em planilhas isoladas e começa a fluir entre setores. A TI vira ferramenta de organização e padronização — mas ainda a serviço de um modelo de negócio existente. Aqui a pergunta dos diretores muda: "como otimizar?".',
-                  caseStudy: {
-                    company: 'Natura',
-                    year: 2012,
-                    story: 'Integração de 7 países sob um único SAP. Decisões logísticas que levavam semanas viraram horas. Planilhas regionais viraram dashboards globais em tempo real — mas a operação continuava sendo venda direta + varejo, só que mais rápida, mais auditável e mais previsível.',
+                  {
+                    index: 2,
+                    title: 'Fase 2 — Processo',
+                    period: 'Anos 2010',
+                    text: 'Integração de sistemas como {{ERPs}} e CRMs no cotidiano da gestão. A informação para de morrer em planilhas isoladas e começa a fluir entre setores. A TI vira ferramenta de organização e padronização — mas ainda a serviço de um modelo de negócio existente. Aqui a pergunta dos diretores muda: "como otimizar?".',
+                    caseStudy: {
+                      company: 'Natura',
+                      year: 2012,
+                      story: 'Integração de {{7 países}} sob um único SAP. Decisões logísticas que levavam {{semanas viraram horas}}. Planilhas regionais viraram dashboards globais — mas a operação continuava sendo venda direta + varejo, só que mais rápida e auditável.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '7 países', label: 'Integrados sob 1 ERP' },
+                        { value: 'Semanas → horas', label: 'Tempo de decisão logística' },
+                        { value: '~R$ 500M', label: 'Economia projetada em 5 anos' },
+                      ],
+                      quote: {
+                        text: 'You can see the computer age everywhere but in the productivity statistics.',
+                        author: 'Robert Solow · MIT · Paradoxo de Solow 1987',
+                      },
+                      insight: 'A Fase 2 entrega {{eficiência}} mas não cria modelos de negócio novos. O teto da Fase 2 é o quanto o modelo antigo aguenta — quando a digitalização chega no limite, ou se rompe o modelo (Fase 3) ou se estagna.',
+                    },
                   },
-                },
-              },
-              {
-                kind: 'phase-card',
-                data: {
-                  index: 3,
-                  title: 'Fase 3 — Estratégia',
-                  period: 'Anos 2020 →',
-                  text: 'A tecnologia define a criação de produtos, o atendimento ao cliente e a capacidade de inovar — tornando-se pilar de competitividade e reputação. A TI deixa de ser área de apoio e vira o próprio negócio. Dados, algoritmos e efeitos de rede criam vantagens que se auto-reforçam: mais usuários geram mais dados, que melhoram o algoritmo, que atrai mais usuários. A pergunta dos diretores aqui é outra: "qual produto criamos a partir do que sabemos?".',
-                  caseStudy: {
-                    company: 'iFood',
-                    year: 2023,
-                    story: 'R$ 100 bilhões/ano movimentados sem cozinha própria nem motoboy próprio. A plataforma é o produto. Sem o algoritmo de matching e a infraestrutura digital, simplesmente não existe negócio para operar — é a tecnologia que cria valor, não a operação física.',
+                  {
+                    index: 3,
+                    title: 'Fase 3 — Estratégia',
+                    period: 'Anos 2020 →',
+                    text: 'A tecnologia define a criação de produtos, o atendimento ao cliente e a capacidade de inovar — tornando-se pilar de competitividade e reputação. A TI deixa de ser área de apoio e vira o próprio negócio. Dados, algoritmos e {{efeitos de rede}} criam vantagens que se auto-reforçam: mais usuários geram mais dados, que melhoram o algoritmo, que atrai mais usuários.',
+                    caseStudy: {
+                      company: 'iFood',
+                      year: 2023,
+                      story: '{{R$ 100 bilhões/ano}} movimentados {{sem cozinha própria}} nem motoboy próprio. A plataforma é o produto. Sem o algoritmo de matching e a infraestrutura digital, simplesmente não existe negócio para operar.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 100 bi', label: 'GMV anual' },
+                        { value: '0', label: 'Cozinhas próprias' },
+                        { value: '0', label: 'Frota própria' },
+                      ],
+                      quote: {
+                        text: 'The key insight is that digital technologies do their most transformative work in combination with complementary investments in organizational capital.',
+                        author: 'Erik Brynjolfsson · MIT · The Second Machine Age 2014',
+                      },
+                      insight: 'A Fase 3 inverte o jogo: TI deixa de ser {{custo a se controlar}} e vira {{ativo a se multiplicar}}. O investimento se mede em retorno de produto, não em uptime. E quem fica preso em Fase 1 ou 2 perde o jogo sem perceber que ele mudou.',
+                    },
                   },
-                },
+                ],
               },
               {
                 kind: 'paragraph',
-                text: 'A pergunta que separa empresas que sobrevivem das que lideram não é "qual tecnologia adotar?" — é "em qual fase estamos hoje, e em qual fase o mercado ao redor já chegou?". A diferença entre as duas respostas é o gap que precisa ser fechado. E quanto maior o gap, mais doloroso o salto.',
+                text: 'A pergunta que separa empresas que sobrevivem das que lideram não é "qual tecnologia adotar?" — é "em qual fase estamos hoje, e em qual fase o mercado ao redor já chegou?". A diferença entre as duas respostas é o {{gap}} que precisa ser fechado. E quanto maior o gap, mais doloroso o salto.',
               },
             ],
             application: {
               kind: 'compare-and-drag',
-              intro: 'Antes de classificar, veja as três fases lado a lado em quatro dimensões. Depois, arraste cinco empresas conhecidas para a fase em que elas operam hoje.',
+              intro: 'Antes de classificar, veja as três fases lado a lado em quatro dimensões. Repare como a velocidade de decisão e a vantagem competitiva crescem juntas — não por acaso. Depois, arraste cinco empresas conhecidas para a fase em que elas operam hoje.',
               compare: {
-                columnHeaders: ['Fase 1 · Infraestrutura', 'Fase 2 · Processo', 'Fase 3 · Estratégia'],
+                columnHeaders: ['Fase 1 · Infra', 'Fase 2 · Processo', 'Fase 3 · Estratégia'],
                 rows: [
-                  { label: 'Papel da TI', values: ['Suporte operacional', 'Organização e fluxo', 'O próprio negócio'] },
-                  { label: 'Foco do investimento', values: ['Servidores e redes', 'ERP, CRM, BI', 'Dados, IA, plataforma'] },
-                  { label: 'Velocidade de decisão', values: ['Semanas', 'Dias', 'Tempo real'] },
-                  { label: 'Vantagem competitiva', values: ['Nenhuma', 'Eficiência operacional', 'Plataforma e dados'] },
+                  {
+                    label: 'Papel da TI',
+                    values: ['Suporte operacional', 'Organização e fluxo', 'O próprio negócio'],
+                    viz: 'icons',
+                    icons: ['◯', '◑', '●'],
+                  },
+                  {
+                    label: 'Foco do investimento',
+                    values: ['Servidores e redes', 'ERP, CRM, BI', 'Dados, IA, plataforma'],
+                    viz: 'icons',
+                    icons: ['▦', '⊞', '◈'],
+                  },
+                  {
+                    label: 'Velocidade de decisão',
+                    values: ['Semanas', 'Dias', 'Tempo real'],
+                    viz: 'bars',
+                    intensities: [0.18, 0.55, 1.0],
+                  },
+                  {
+                    label: 'Vantagem competitiva',
+                    values: ['Nenhuma', 'Eficiência operacional', 'Plataforma e dados'],
+                    viz: 'bars',
+                    intensities: [0.05, 0.5, 1.0],
+                  },
                 ],
               },
               drag: {
@@ -140,8 +192,14 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
             },
             synthesis: {
-              closingText: 'Mover-se entre fases não é só comprar tecnologia nova — é repensar o papel da TI dentro da empresa. Nem toda empresa precisa estar na Fase 3, mas toda empresa precisa saber em qual fase está e por quê. Esse repensar — essa mudança de identidade da organização — é o que se chama Transformação Digital.',
+              closingText: 'Mover-se entre fases não é só comprar tecnologia nova — é {{repensar o papel da TI}} dentro da empresa. Nem toda empresa precisa estar na Fase 3, mas toda empresa precisa saber em qual fase está e por quê. Esse repensar — essa mudança de identidade da organização — é o que se chama Transformação Digital.',
+              keyInsights: [
+                'TI deixa de ser bastidor quando dados e algoritmos criam vantagens que se {{auto-reforçam}}.',
+                'Não existe atalho entre fases — cada salto exige redesenhar o papel da tecnologia, não só comprar mais dela.',
+                'O risco maior não é estar atrasado, é {{não saber em qual fase você está}} hoje.',
+              ],
               nextChapterHint: 'Capítulo 2 · Transformação Digital',
+              nextChapterBlurb: 'Por que comprar tecnologia não basta — e o que separa digitização de transformação real.',
             },
           },
         ],

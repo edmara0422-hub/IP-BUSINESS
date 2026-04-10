@@ -437,25 +437,45 @@ export type ChapterPhaseCard = {
   index: 1 | 2 | 3
   title: string                // "Fase 1 — Infraestrutura"
   period: string               // "Anos 2000"
-  text: string                 // descrição da fase
+  text: string                 // descrição da fase (suporta {{highlight}})
   caseStudy: {
     company: string
     year: number
-    story: string              // 1-2 frases do caso real
+    story: string              // suporta {{highlight}}
+  }
+  // Tap revela mais profundidade — números, citação, insight de fechamento
+  deepDive?: {
+    keyNumbers: Array<{ value: string; label: string }>
+    quote?: { text: string; author: string }
+    insight: string
   }
 }
 
 export type ChapterBodySection =
-  | { kind: 'paragraph'; text: string }
+  | { kind: 'paragraph'; text: string }                   // suporta {{highlight}}
   | { kind: 'heading'; text: string }
-  | { kind: 'phase-card'; data: ChapterPhaseCard }
+  | { kind: 'phase-card'; data: ChapterPhaseCard }        // standalone
+  | { kind: 'phase-group'; cards: ChapterPhaseCard[] }    // 3 cards conectados por trajetória vertical
+
+// ── Aplicação: compare-and-drag ──
+//
+// Cada linha da tabela comparativa pode ter uma micro-visualização:
+//   viz='icons'  → mostra um símbolo em cada coluna (categoria)
+//   viz='bars'   → mostra uma barra preenchida (intensidade 0-1)
+//   sem viz      → texto puro
 
 export type ChapterApplicationCompareAndDrag = {
   kind: 'compare-and-drag'
   intro: string
   compare: {
-    columnHeaders: string[]      // ['Fase 1', 'Fase 2', 'Fase 3']
-    rows: Array<{ label: string; values: string[] }>
+    columnHeaders: string[]
+    rows: Array<{
+      label: string
+      values: string[]
+      viz?: 'icons' | 'bars'
+      icons?: string[]              // quando viz='icons'
+      intensities?: number[]        // quando viz='bars' (0 a 1)
+    }>
   }
   drag: {
     instruction: string
@@ -472,24 +492,25 @@ export type ChapterApplicationCompareAndDrag = {
 }
 
 export type ChapterApplication = ChapterApplicationCompareAndDrag
-// futuras kinds (Caps 2–11): 'classify' | 'allocate' | 'connect' | 'scenario' | 'dial' | 'diagnostic'
 
 export type ChapterBlock = {
   id: string
   type: 'chapter'
-  number: number               // 1, 2, 3...
+  number: number
   title: string
   subtitle?: string
   estimatedMinutes: number
   opening: {
-    leadText: string
-    showTimeline?: boolean     // anima a linha do tempo 2000 → 2010 → 2020
+    leadText: string                // suporta {{highlight}}
+    showTimeline?: boolean
   }
   body: ChapterBodySection[]
   application: ChapterApplication
   synthesis: {
-    closingText: string
+    closingText: string             // suporta {{highlight}}
+    keyInsights?: string[]          // bullets de fechamento (até 3)
     nextChapterHint?: string
+    nextChapterBlurb?: string       // 1 linha de preview do próximo capítulo
   }
 }
 

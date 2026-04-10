@@ -294,6 +294,7 @@ function CompareTableView({
           width: '100%',
           borderCollapse: 'collapse',
           fontSize: 11,
+          tableLayout: 'fixed',
         }}
       >
         <thead>
@@ -307,6 +308,7 @@ function CompareTableView({
                 fontWeight: 600,
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
+                width: '26%',
               }}
             />
             {compare.columnHeaders.map((h, i) => (
@@ -336,11 +338,12 @@ function CompareTableView({
             >
               <td
                 style={{
-                  padding: '10px 12px',
+                  padding: '12px 12px',
                   color: COLORS.textMuted,
                   fontSize: 10,
                   fontWeight: 600,
                   letterSpacing: '0.02em',
+                  verticalAlign: 'top',
                 }}
               >
                 {row.label}
@@ -349,13 +352,53 @@ function CompareTableView({
                 <td
                   key={vi}
                   style={{
-                    padding: '10px 12px',
+                    padding: '12px 12px',
                     color: 'rgba(255,255,255,0.85)',
                     fontSize: 11,
                     lineHeight: 1.5,
+                    verticalAlign: 'top',
                   }}
                 >
-                  {v}
+                  {/* Visualização opcional */}
+                  {row.viz === 'icons' && row.icons && (
+                    <div
+                      style={{
+                        fontSize: 18,
+                        lineHeight: 1,
+                        color: phaseColors[vi],
+                        marginBottom: 6,
+                        fontFamily: 'ui-sans-serif, system-ui',
+                      }}
+                    >
+                      {row.icons[vi]}
+                    </div>
+                  )}
+                  {row.viz === 'bars' && row.intensities && (
+                    <div
+                      style={{
+                        width: '100%',
+                        height: 4,
+                        background: 'rgba(255,255,255,0.06)',
+                        borderRadius: 2,
+                        overflow: 'hidden',
+                        marginBottom: 8,
+                      }}
+                    >
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{
+                          width: `${(row.intensities[vi] ?? 0) * 100}%`,
+                        }}
+                        viewport={{ once: true, margin: '-40px' }}
+                        transition={{ duration: 0.7, delay: 0.2 + vi * 0.1 }}
+                        style={{
+                          height: '100%',
+                          background: phaseColors[vi],
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div>{v}</div>
                 </td>
               ))}
             </tr>
