@@ -24,16 +24,17 @@ interface Props {
 }
 
 const COLORS = {
-  bg: 'rgba(15, 23, 42, 0.4)',
-  cardBg: 'rgba(30, 41, 59, 0.6)',
-  border: 'rgba(148, 163, 184, 0.18)',
-  text: '#e2e8f0',
-  textMuted: '#94a3b8',
-  textDim: '#64748b',
-  accent: '#38bdf8',
-  phase1: '#94a3b8',
-  phase2: '#38bdf8',
-  phase3: '#22c55e',
+  bg: '#0a0a0a',
+  cardBg: 'rgba(255, 255, 255, 0.03)',
+  border: 'rgba(255, 255, 255, 0.08)',
+  text: '#ffffff',
+  textMuted: 'rgba(255, 255, 255, 0.6)',
+  textDim: 'rgba(255, 255, 255, 0.38)',
+  accent: '#ffffff',
+  // Diferenciação das 3 fases por intensidade (escuro → claro), não por cor
+  phase1: 'rgba(255, 255, 255, 0.38)',
+  phase2: 'rgba(255, 255, 255, 0.7)',
+  phase3: '#ffffff',
 }
 
 export default function Chapter({ block }: Props) {
@@ -111,29 +112,30 @@ function ChapterHeader({
       >
         <span
           style={{
-            fontSize: 11,
+            fontSize: 10,
             fontWeight: 700,
-            letterSpacing: '0.12em',
-            color: COLORS.accent,
+            letterSpacing: '0.2em',
+            color: 'rgba(255,255,255,0.55)',
             textTransform: 'uppercase',
-            padding: '4px 10px',
-            border: `1px solid ${COLORS.accent}`,
+            padding: '3px 9px',
+            border: `1px solid rgba(255,255,255,0.25)`,
             borderRadius: 999,
           }}
         >
           Capítulo {number}
         </span>
-        <span style={{ fontSize: 12, color: COLORS.textDim }}>
-          ⏱ {estimatedMinutes} min
+        <span style={{ fontSize: 10, color: COLORS.textDim, fontFamily: 'ui-monospace, monospace' }}>
+          {estimatedMinutes} min
         </span>
       </div>
       <h1
         style={{
-          fontSize: 26,
-          fontWeight: 700,
+          fontSize: 18,
+          fontWeight: 600,
+          letterSpacing: '0.02em',
           color: COLORS.text,
           margin: 0,
-          lineHeight: 1.2,
+          lineHeight: 1.25,
         }}
       >
         {title}
@@ -141,7 +143,8 @@ function ChapterHeader({
       {subtitle && (
         <p
           style={{
-            fontSize: 14,
+            fontSize: 11,
+            lineHeight: 1.55,
             color: COLORS.textMuted,
             margin: '6px 0 0 0',
           }}
@@ -172,10 +175,12 @@ function ChapterOpening({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: showTimeline ? 0.6 : 0 }}
         style={{
-          fontSize: 16,
-          lineHeight: 1.7,
-          color: COLORS.text,
+          fontSize: 13,
+          lineHeight: 1.625,
+          color: 'rgba(255,255,255,0.85)',
           marginTop: showTimeline ? 20 : 0,
+          textAlign: 'justify',
+          hyphens: 'auto',
         }}
       >
         {leadText}
@@ -268,10 +273,12 @@ function BodySectionRenderer({ section }: { section: ChapterBodySection }) {
     return (
       <p
         style={{
-          fontSize: 15,
-          lineHeight: 1.75,
-          color: COLORS.text,
-          margin: '0 0 18px 0',
+          fontSize: 13,
+          lineHeight: 1.7,
+          color: 'rgba(255,255,255,0.85)',
+          margin: '0 0 16px 0',
+          textAlign: 'justify',
+          hyphens: 'auto',
         }}
       >
         {section.text}
@@ -283,12 +290,12 @@ function BodySectionRenderer({ section }: { section: ChapterBodySection }) {
     return (
       <h2
         style={{
-          fontSize: 13,
+          fontSize: 10,
           fontWeight: 700,
-          letterSpacing: '0.1em',
+          letterSpacing: '0.18em',
           color: COLORS.textMuted,
           textTransform: 'uppercase',
-          margin: '24px 0 12px 0',
+          margin: '22px 0 10px 0',
         }}
       >
         {section.text}
@@ -330,14 +337,16 @@ function PhaseCard({ data }: { data: ChapterPhaseCard }) {
         style={{
           display: 'flex',
           alignItems: 'baseline',
-          gap: 12,
-          marginBottom: 10,
+          gap: 10,
+          marginBottom: 8,
+          flexWrap: 'wrap',
         }}
       >
         <h3
           style={{
-            fontSize: 17,
+            fontSize: 13,
             fontWeight: 700,
+            letterSpacing: '0.02em',
             color: accent,
             margin: 0,
           }}
@@ -346,10 +355,11 @@ function PhaseCard({ data }: { data: ChapterPhaseCard }) {
         </h3>
         <span
           style={{
-            fontSize: 11,
+            fontSize: 10,
             fontWeight: 600,
             color: COLORS.textDim,
-            letterSpacing: '0.06em',
+            letterSpacing: '0.08em',
+            fontFamily: 'ui-monospace, monospace',
           }}
         >
           {data.period}
@@ -357,26 +367,30 @@ function PhaseCard({ data }: { data: ChapterPhaseCard }) {
       </div>
       <p
         style={{
-          fontSize: 14.5,
+          fontSize: 13,
           lineHeight: 1.7,
-          color: COLORS.text,
-          margin: '0 0 14px 0',
+          color: 'rgba(255,255,255,0.85)',
+          margin: '0 0 12px 0',
+          textAlign: 'justify',
+          hyphens: 'auto',
         }}
       >
         {data.text}
       </p>
       <div
         style={{
-          fontSize: 13,
+          fontSize: 11,
           color: COLORS.textMuted,
-          padding: '12px 14px',
-          background: 'rgba(0, 0, 0, 0.25)',
-          borderRadius: 8,
+          padding: '10px 12px',
+          background: 'rgba(255, 255, 255, 0.025)',
+          borderRadius: 6,
           borderLeft: `2px solid ${accent}`,
           lineHeight: 1.6,
+          textAlign: 'justify',
+          hyphens: 'auto',
         }}
       >
-        <span style={{ color: accent, fontWeight: 700 }}>
+        <span style={{ color: accent, fontWeight: 700, letterSpacing: '0.02em' }}>
           ▸ {data.caseStudy.company} · {data.caseStudy.year}
         </span>
         <br />
@@ -402,10 +416,10 @@ function ChapterDivider({ label }: { label: string }) {
     >
       <span
         style={{
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: 700,
-          letterSpacing: '0.14em',
-          color: COLORS.accent,
+          letterSpacing: '0.2em',
+          color: 'rgba(255,255,255,0.55)',
           textTransform: 'uppercase',
         }}
       >
@@ -415,7 +429,7 @@ function ChapterDivider({ label }: { label: string }) {
         style={{
           flex: 1,
           height: 1,
-          background: `linear-gradient(90deg, ${COLORS.accent}40, transparent)`,
+          background: 'linear-gradient(90deg, rgba(255,255,255,0.18), transparent)',
         }}
       />
     </div>
@@ -437,10 +451,12 @@ function ChapterSynthesis({
     <section>
       <p
         style={{
-          fontSize: 15,
-          lineHeight: 1.75,
-          color: COLORS.text,
-          margin: '0 0 16px 0',
+          fontSize: 13,
+          lineHeight: 1.7,
+          color: 'rgba(255,255,255,0.85)',
+          margin: '0 0 14px 0',
+          textAlign: 'justify',
+          hyphens: 'auto',
         }}
       >
         {closingText}
@@ -451,13 +467,14 @@ function ChapterSynthesis({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 8,
-            padding: '10px 16px',
-            background: 'rgba(56, 189, 248, 0.08)',
-            border: `1px solid ${COLORS.accent}40`,
-            borderRadius: 8,
-            fontSize: 13,
-            color: COLORS.accent,
+            padding: '8px 14px',
+            background: 'rgba(255, 255, 255, 0.04)',
+            border: `1px solid rgba(255, 255, 255, 0.18)`,
+            borderRadius: 6,
+            fontSize: 11,
+            color: COLORS.text,
             fontWeight: 600,
+            letterSpacing: '0.02em',
           }}
         >
           {nextChapterHint} →
