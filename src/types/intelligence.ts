@@ -423,12 +423,83 @@ export type GuidedLessonBlock = {
   fullTextBlockId?: string
 }
 
+// ── Chapter — molde unificado A → B → C → D para estudo dirigido ──
+//
+// Cada Capítulo segue 4 partes na mesma ordem, sempre:
+//   A · Abertura     visual ambiente + texto introdutório curto
+//   B · Corpo        texto integral preservado + diagramas inline
+//   C · Aplicação    UMA interação focada, no final, depois do conteúdo
+//   D · Síntese      fechamento + ponte para o próximo capítulo
+//
+// Regra inviolável: nenhuma interação no meio do corpo. Aplicação só em C.
+
+export type ChapterPhaseCard = {
+  index: 1 | 2 | 3
+  title: string                // "Fase 1 — Infraestrutura"
+  period: string               // "Anos 2000"
+  text: string                 // descrição da fase
+  caseStudy: {
+    company: string
+    year: number
+    story: string              // 1-2 frases do caso real
+  }
+}
+
+export type ChapterBodySection =
+  | { kind: 'paragraph'; text: string }
+  | { kind: 'heading'; text: string }
+  | { kind: 'phase-card'; data: ChapterPhaseCard }
+
+export type ChapterApplicationCompareAndDrag = {
+  kind: 'compare-and-drag'
+  intro: string
+  compare: {
+    columnHeaders: string[]      // ['Fase 1', 'Fase 2', 'Fase 3']
+    rows: Array<{ label: string; values: string[] }>
+  }
+  drag: {
+    instruction: string
+    zones: Array<{ id: string; label: string }>
+    items: Array<{
+      id: string
+      label: string
+      sublabel?: string
+      correctZone: string
+      correctFeedback: string
+      wrongFeedback: string
+    }>
+  }
+}
+
+export type ChapterApplication = ChapterApplicationCompareAndDrag
+// futuras kinds (Caps 2–11): 'classify' | 'allocate' | 'connect' | 'scenario' | 'dial' | 'diagnostic'
+
+export type ChapterBlock = {
+  id: string
+  type: 'chapter'
+  number: number               // 1, 2, 3...
+  title: string
+  subtitle?: string
+  estimatedMinutes: number
+  opening: {
+    leadText: string
+    showTimeline?: boolean     // anima a linha do tempo 2000 → 2010 → 2020
+  }
+  body: ChapterBodySection[]
+  application: ChapterApplication
+  synthesis: {
+    closingText: string
+    nextChapterHint?: string
+  }
+}
+
 export type ContentBlock =
   | TextBlock | VideoBlock | SimulationBlock | AttachmentBlock
   | ConceptBlock | ChallengeBlock | DecisionBlock | FrameworkBlock | NumberCrunchBlock | AIProbeBlock
   | LayeredTextBlock | CompareBlock | InlineExerciseBlock | AuthorCardBlock | TimelineBlock | MethodCardBlock
   | GuidedLessonBlock
   | LivingTextBlock
+  | ChapterBlock
 
 export type SubmoduleTopic = {
   id: string

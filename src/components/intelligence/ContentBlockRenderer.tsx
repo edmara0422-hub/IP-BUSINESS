@@ -15,6 +15,7 @@ import Timeline from './Timeline'
 import MethodCard from './MethodCard'
 import GuidedLesson from './GuidedLesson'
 import LivingText from './LivingText'
+import Chapter from './Chapter'
 import type { ContentBlock } from '@/types/intelligence'
 
 interface Props {
@@ -123,6 +124,9 @@ export default function ContentBlockRenderer({ block, moduleId, submoduleTitle }
         quotes={block.quotes}
         estimatedReading={block.estimatedReading}
       />
+
+    case 'chapter':
+      return <Chapter block={block} />
 
     default:
       return null
