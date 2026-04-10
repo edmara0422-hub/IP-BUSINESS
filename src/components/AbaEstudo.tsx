@@ -258,7 +258,7 @@ function CadernoBlock({ block, moduleId, submoduleTitle }: { block: ContentBlock
   const interactiveTypes = [
     'concept', 'ai-probe', 'framework', 'challenge', 'number-crunch', 'decision',
     'layered-text', 'compare', 'inline-exercise', 'author-card', 'timeline', 'method-card',
-    'guided-lesson', 'living-text',
+    'guided-lesson', 'living-text', 'chapter',
   ]
   if ('type' in block && interactiveTypes.includes(block.type)) {
     return (
