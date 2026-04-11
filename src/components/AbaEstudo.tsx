@@ -179,6 +179,30 @@ function extractBlockContent(block: ContentBlock): string | undefined {
     case 'author-card': return `${block.name} (${block.affiliation}): ${block.contribution}`
     case 'timeline': return `${block.title}: ${block.events.map((e) => `${e.year} ${e.title}`).join('; ')}`
     case 'method-card': return `${block.name} (${block.origin}): ${block.whenToUse.join('; ')}`
+    case 'chapter': {
+      // Achata o capítulo num resumo textual para o Professor entender o contexto
+      const stripHl = (s: string) => s.replace(/\{\{([^}]+)\}\}/g, '$1')
+      const parts: string[] = []
+      parts.push(`Capítulo ${block.number}: ${block.title}`)
+      if (block.subtitle) parts.push(block.subtitle)
+      parts.push(stripHl(block.opening.leadText))
+      block.body.forEach((sec) => {
+        if (sec.kind === 'paragraph') parts.push(stripHl(sec.text))
+        else if (sec.kind === 'heading') parts.push(`## ${sec.text}`)
+        else if (sec.kind === 'phase-card') {
+          parts.push(`${sec.data.title} (${sec.data.period}): ${stripHl(sec.data.text)} Caso: ${sec.data.caseStudy.company} ${sec.data.caseStudy.year} — ${stripHl(sec.data.caseStudy.story)}`)
+        } else if (sec.kind === 'phase-group') {
+          sec.cards.forEach((c) => {
+            parts.push(`${c.title} (${c.period}): ${stripHl(c.text)} Caso: ${c.caseStudy.company} ${c.caseStudy.year} — ${stripHl(c.caseStudy.story)}`)
+          })
+        }
+      })
+      parts.push(`Síntese: ${stripHl(block.synthesis.closingText)}`)
+      if (block.synthesis.keyInsights?.length) {
+        parts.push(...block.synthesis.keyInsights.map((k) => `- ${stripHl(k)}`))
+      }
+      return parts.join('\n\n')
+    }
     default: return undefined
   }
 }
