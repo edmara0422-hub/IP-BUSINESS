@@ -1,11 +1,92 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Link2, HelpCircle, RefreshCw, ArrowRight, BookOpen, X } from 'lucide-react'
 
 const BLUE = '#2e86c1'
 const AMBER = '#9a7d0a'
+
+/**
+ * Renderiza markdown leve do Professor:
+ *  - **negrito** vira span branco bold
+ *  - linhas vazias = quebra de parágrafo
+ *  - "**Título**" no inicio de paragrafo vira heading
+ *  - "1. " ou "- " no inicio vira lista
+ */
+function ProfessorMarkdown({ text }: { text: string }) {
+  const blocks = text.trim().split(/\n\n+/)
+  return (
+    <div className="space-y-3">
+      {blocks.map((block, bi) => {
+        const trimmed = block.trim()
+        // Heading: parágrafo inteiro envolvido em **
+        const headingMatch = trimmed.match(/^\*\*([^*]+)\*\*$/)
+        if (headingMatch) {
+          return (
+            <div
+              key={bi}
+              className="text-[10px] font-bold uppercase tracking-[0.18em] mt-2"
+              style={{ color: AMBER }}
+            >
+              {headingMatch[1]}
+            </div>
+          )
+        }
+        // Lista: linhas que começam com "1. " ou "- " ou "• "
+        const lines = trimmed.split('\n')
+        const isList = lines.every((l) => /^(\d+\.|[-•])\s/.test(l.trim()))
+        if (isList && lines.length > 1) {
+          return (
+            <ul key={bi} className="space-y-1.5 pl-1">
+              {lines.map((line, li) => {
+                const cleaned = line.trim().replace(/^(\d+\.|[-•])\s+/, '')
+                return (
+                  <li
+                    key={li}
+                    className="text-[12px] leading-relaxed text-white/72 pl-3 relative"
+                  >
+                    <span
+                      className="absolute left-0 top-[0.5em]"
+                      style={{ color: AMBER, fontSize: 8 }}
+                    >
+                      ▸
+                    </span>
+                    {renderInline(cleaned)}
+                  </li>
+                )
+              })}
+            </ul>
+          )
+        }
+        // Parágrafo normal
+        return (
+          <p
+            key={bi}
+            className="text-[12px] leading-relaxed text-white/72"
+            style={{ textAlign: 'justify', hyphens: 'auto' }}
+          >
+            {renderInline(trimmed)}
+          </p>
+        )
+      })}
+    </div>
+  )
+}
+
+function renderInline(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g)
+  return parts.map((p, i) => {
+    if (p.startsWith('**') && p.endsWith('**')) {
+      return (
+        <span key={i} className="font-bold text-white">
+          {p.slice(2, -2)}
+        </span>
+      )
+    }
+    return <Fragment key={i}>{p}</Fragment>
+  })
+}
 
 type Mode = 'connect' | 'provoke' | 'review' | 'next' | 'summarize'
 
@@ -170,9 +251,9 @@ export default function IAProfessor({
                   <motion.div key={activeMode}
                     initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                     className="px-4 pb-4">
-                    <div className="rounded-lg p-3"
+                    <div className="rounded-lg p-4 max-h-[60vh] overflow-y-auto"
                       style={{ background: `${AMBER}06`, borderLeft: `2px solid ${AMBER}40` }}>
-                      <p className="text-[12px] text-white/70 leading-relaxed whitespace-pre-wrap">{response}</p>
+                      <ProfessorMarkdown text={response} />
                     </div>
                   </motion.div>
                 )}
