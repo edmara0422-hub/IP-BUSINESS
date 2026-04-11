@@ -63,9 +63,18 @@ export default function IAProfessor({
         }),
       })
       const data = await res.json()
-      setResponse(data.response || 'Sem sugestão disponível.')
-    } catch {
-      setResponse('Não foi possível conectar com o Professor agora.')
+      if (data.response && data.response.trim()) {
+        setResponse(data.response)
+      } else if (data.error) {
+        setResponse(`Erro: ${data.error}`)
+      } else if (!blockContent) {
+        setResponse('Este bloco não tem contexto para o Professor analisar. Estamos corrigindo.')
+      } else {
+        setResponse('Resposta vazia da IA. Tente outro modo ou tente novamente em alguns segundos.')
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      setResponse(`Erro de conexão: ${msg}`)
     }
     setLoading(false)
   }

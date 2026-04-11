@@ -496,26 +496,35 @@ function OrganismTarget({
     return <div>{inner}</div>
   }
 
+  // Intensidade do halo proporcional à fase: Fase 1 quase imperceptível,
+  // Fase 3 brilho completo. Reforça a metáfora visual.
+  const haloAlpha =
+    phase === 1 ? 'rgba(255,255,255,0.04)' : phase === 2 ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.18)'
+  const bgAlpha =
+    phase === 1 ? 'rgba(255,255,255,0.015)' : phase === 2 ? 'rgba(255,255,255,0.035)' : 'rgba(255,255,255,0.06)'
+  const scaleMax = phase === 1 ? 1.015 : phase === 2 ? 1.025 : 1.04
+  const duration = phase === 1 ? 2.4 : phase === 2 ? 1.9 : 1.5
+
   return (
     <motion.button
       type="button"
       onClick={onClick}
       animate={{
-        scale: [1, 1.04, 1],
+        scale: [1, scaleMax, 1],
         boxShadow: [
           '0 0 0 0 rgba(255,255,255,0)',
-          '0 0 0 4px rgba(255,255,255,0.12)',
+          `0 0 0 4px ${haloAlpha}`,
           '0 0 0 0 rgba(255,255,255,0)',
         ],
       }}
       transition={{
-        duration: 1.6,
+        duration,
         repeat: Infinity,
         ease: 'easeInOut',
       }}
       whileTap={{ scale: 0.96 }}
       style={{
-        background: 'rgba(255,255,255,0.04)',
+        background: bgAlpha,
         border: `1.5px dashed ${phaseColor}`,
         borderRadius: 12,
         padding: '10px 6px 8px 6px',

@@ -157,12 +157,28 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                     wrongFeedback: 'Repense. A mercearia tradicional opera na Fase 1: usa tecnologia avulsa, sem integração entre estoque, vendas e financeiro. É a realidade da maioria das PMEs brasileiras.',
                   },
                   {
+                    id: 'consultorio',
+                    label: 'Consultório médico tradicional',
+                    sublabel: 'Prontuários em pasta. Agenda numa caderneta. Recepcionista ligando para confirmar. Cada coisa num lugar.',
+                    correctZone: 'fase1',
+                    correctFeedback: 'Certo. Consultórios independentes ainda vivem majoritariamente na Fase 1: tecnologia básica e desconectada. Adotar prontuário eletrônico integrado seria o salto para Fase 2.',
+                    wrongFeedback: 'Repense. Sem prontuário eletrônico integrado, sem agendamento online conectado a faturamento, isso é Fase 1 clássica — tecnologia avulsa, cada parte do consultório opera isolada.',
+                  },
+                  {
                     id: 'natura',
                     label: 'Natura',
                     sublabel: '7 países sob um único SAP. Decisões em horas, não semanas. O modelo é o de sempre — só que mais rápido.',
                     correctZone: 'fase2',
                     correctFeedback: 'Certo. A integração SAP em 7 países foi um marco da Fase 2. A operação é digital, integrada e auditável — mas o modelo de negócio continua sendo venda direta + varejo, só que mais rápido.',
                     wrongFeedback: 'Não exatamente. Natura é referência em Fase 2: digitalizou e integrou processos globalmente, mas o modelo de negócio continua sendo o tradicional venda direta + varejo.',
+                  },
+                  {
+                    id: 'renner',
+                    label: 'Lojas Renner',
+                    sublabel: 'ERP, CRM e BI integrados em todas as lojas. Estoque visível em tempo real. O modelo continua sendo varejo de moda.',
+                    correctZone: 'fase2',
+                    correctFeedback: 'Certo. Renner é Fase 2 madura: dados fluem entre lojas, e-commerce e CDs em tempo real, mas o produto continua sendo o de sempre. Não virou plataforma — virou um varejo eficiente.',
+                    wrongFeedback: 'Não exatamente. Renner digitalizou e integrou tudo (ERP, CRM, BI), mas continua sendo um varejo de moda — não virou plataforma. Isso é Fase 2: eficiência, não reinvenção.',
                   },
                   {
                     id: 'magalu',

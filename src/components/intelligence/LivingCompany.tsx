@@ -93,33 +93,37 @@ export default function LivingCompany({
           </radialGradient>
         </defs>
 
-        {/* ═══════════════ FASE 1 — SILOS ═══════════════ */}
+        {/* ═══════════════ FASE 1 — SILOS ═══════════════
+            Visual deliberadamente apagado: setores quase invisíveis
+            (a empresa "mal acorda"), só a sala de TI tem vida porque
+            é todo o investimento que existe. */}
         {phase === 1 && (
           <>
             {SECTORS.map((s) => {
               const p = polar(s.angle, SECTOR_RADIUS)
               return (
                 <g key={s.id}>
-                  {/* setor: caixa estática, dados parados dentro */}
+                  {/* setor: caixa quase invisível, sem fill, contorno fraco */}
                   <rect
                     x={p.x - 14}
                     y={p.y - 10}
                     width={28}
                     height={20}
                     rx={3}
-                    fill="rgba(255,255,255,0.04)"
-                    stroke="rgba(255,255,255,0.22)"
-                    strokeWidth={0.7}
+                    fill="none"
+                    stroke="rgba(255,255,255,0.12)"
+                    strokeWidth={0.5}
+                    strokeDasharray="1.5 1.5"
                   />
-                  {/* 3 pontos de dados parados, cada setor isolado */}
-                  <circle cx={p.x - 6} cy={p.y} r={1.2} fill="rgba(255,255,255,0.45)" />
-                  <circle cx={p.x}     cy={p.y} r={1.2} fill="rgba(255,255,255,0.45)" />
-                  <circle cx={p.x + 6} cy={p.y} r={1.2} fill="rgba(255,255,255,0.45)" />
+                  {/* 3 pontos de dados muito apagados, parados */}
+                  <circle cx={p.x - 6} cy={p.y} r={0.9} fill="rgba(255,255,255,0.22)" />
+                  <circle cx={p.x}     cy={p.y} r={0.9} fill="rgba(255,255,255,0.22)" />
+                  <circle cx={p.x + 6} cy={p.y} r={0.9} fill="rgba(255,255,255,0.22)" />
                 </g>
               )
             })}
 
-            {/* Sala de TI no canto inferior direito, pulsando levemente */}
+            {/* Sala de TI no canto inferior direito — único elemento vivo */}
             <g>
               <rect
                 x={155}
@@ -141,7 +145,7 @@ export default function LivingCompany({
               >
                 TI
               </text>
-              {/* 3 LEDs piscando */}
+              {/* 3 LEDs piscando lentamente — único pulso da fase */}
               {[0, 1, 2].map((i) => (
                 <motion.circle
                   key={i}
