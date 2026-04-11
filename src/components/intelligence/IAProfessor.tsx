@@ -88,7 +88,7 @@ function renderInline(text: string) {
   })
 }
 
-type Mode = 'connect' | 'provoke' | 'review' | 'next' | 'summarize'
+type Mode = 'connect' | 'deepen' | 'review' | 'apply' | 'summarize'
 
 interface Props {
   moduleId: string
@@ -100,11 +100,11 @@ interface Props {
 }
 
 const MODES: Array<{ id: Mode; label: string; icon: typeof Link2; hint: string }> = [
-  { id: 'connect', label: 'Conectar', icon: Link2, hint: 'Ligar com outros tópicos' },
-  { id: 'provoke', label: 'Provocar', icon: HelpCircle, hint: 'Pergunta desafiadora' },
-  { id: 'review', label: 'Revisar', icon: RefreshCw, hint: 'O que releer antes' },
-  { id: 'summarize', label: 'Resumir', icon: BookOpen, hint: 'Essência em 3 pontos' },
-  { id: 'next', label: 'Próximo', icon: ArrowRight, hint: 'O que fazer agora' },
+  { id: 'connect',   label: 'Conectar',   icon: Link2,      hint: 'Linhagem teórica e pontes com outros temas' },
+  { id: 'deepen',    label: 'Aprofundar', icon: HelpCircle, hint: 'A camada que o bloco não mostrou' },
+  { id: 'review',    label: 'Revisar',    icon: RefreshCw,  hint: 'Pré-requisitos mastigados' },
+  { id: 'apply',     label: 'Aplicar',    icon: ArrowRight, hint: '3 aplicações reais brasileiras' },
+  { id: 'summarize', label: 'Resumir',    icon: BookOpen,   hint: 'Síntese executiva do tema' },
 ]
 
 /**
