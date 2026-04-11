@@ -1,37 +1,38 @@
-import Anthropic from '@anthropic-ai/sdk'
+import Groq from 'groq-sdk'
 import { NextResponse } from 'next/server'
 
-function getClient() {
-  return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+function getGroq() {
+  return new Groq({ apiKey: process.env.GROQ_API_KEY })
 }
 
 export const dynamic = 'force-dynamic'
 
 /**
  * IA Professor — direciona o estudo DURANTE a leitura.
- * Diferente do IA Tutor (que responde pergunta livre), o Professor
- * observa o contexto e sussurra: conexões, provocações, revisões, sugestões.
+ * Diferente do IA Tutor (chat livre), o Professor observa o contexto do
+ * bloco atual e devolve UMA resposta curta e direta em um dos 5 modos:
  *
- * Papéis:
- *  - connect: ligar conteúdo atual com outros módulos/tópicos
- *  - provoke: pergunta desafiadora sobre o bloco atual
- *  - review: detectar se aluno precisa revisar conceito anterior
- *  - next: sugerir próximo passo no estudo
- *  - summarize: resumir o que aluno acabou de estudar
+ *  - connect    → ligar com outros tópicos
+ *  - provoke    → pergunta desafiadora aplicada
+ *  - review     → o que reler antes
+ *  - next       → próximo passo concreto
+ *  - summarize  → essência em 3 bullets
+ *
+ * Usa Groq (mesma stack do Tutor) — gratuito, rápido, já configurado.
  */
 interface ProfessorRequest {
   mode: 'connect' | 'provoke' | 'review' | 'next' | 'summarize'
   moduleId: string
   submoduleTitle: string
   blockTitle?: string
-  blockContent?: string        // conteúdo (ou resumo) do bloco atual
-  studiedTopics?: string[]     // tópicos que o aluno já viu
+  blockContent?: string
+  studiedTopics?: string[]
   currentPosition?: { blockIdx: number; totalBlocks: number }
 }
 
 const MODE_PROMPTS: Record<ProfessorRequest['mode'], string> = {
-  connect: `Você é um professor experiente direcionando o estudo de um aluno de BI em Negócios.
-Seu papel: CONECTAR o que o aluno está estudando agora com OUTROS tópicos que ele já viu.
+  connect: `Você é um professor sênior de BI em Negócios direcionando o estudo de um aluno.
+Seu papel: CONECTAR o que o aluno está estudando agora com OUTROS tópicos relacionados (módulos M1–M8 do curso, ou conceitos clássicos da área).
 Regra: seja BREVE (2-3 frases). Aponte UMA conexão específica e acionável. Não liste múltiplas.
 Formato: "Isso conecta com [tópico]. [por quê é relevante]. Tente pensar: [pergunta provocativa]."
 Português brasileiro, direto, sem preâmbulo.`,
@@ -43,8 +44,8 @@ Formato: "Pergunta: [uma frase]. [por que essa pergunta importa]."
 Máximo 2 frases. Português brasileiro, direto.`,
 
   review: `Você é um professor que detecta lacunas de conhecimento.
-Seu papel: identificar se o conteúdo atual depende de algo que o aluno viu antes e pode ter esquecido.
-Regra: seja BREVE (1-2 frases). Se não houver dependência clara, diga "sem revisão necessária".
+Seu papel: identificar se o conteúdo atual depende de algo que o aluno pode ter esquecido ou que ainda precisa entender.
+Regra: seja BREVE (1-2 frases). Se não houver dependência clara, sugira UMA leitura curta de reforço sobre o tema atual.
 Formato: "Para entender isso a fundo, revise: [tópico]. Motivo: [por quê]."
 Português brasileiro, direto.`,
 
@@ -58,7 +59,7 @@ Máximo 2 frases. Português brasileiro.`,
 Seu papel: resumir O ESSENCIAL do bloco atual em formato memorável.
 Regra: 3 bullets curtos — o QUE, o POR QUÊ e o COMO USAR.
 Formato:
-• O que: [uma frase]
+• O quê: [uma frase]
 • Por quê: [uma frase]
 • Como usar: [uma frase]
 Português brasileiro, direto, sem preâmbulo.`,
@@ -74,25 +75,23 @@ export async function POST(request: Request) {
     const contextParts: string[] = []
     contextParts.push(`Módulo/Tópico atual: "${submoduleTitle}"`)
     if (blockTitle) contextParts.push(`Bloco atual: "${blockTitle}"`)
-    if (blockContent) contextParts.push(`Conteúdo do bloco:\n${blockContent.slice(0, 1500)}`)
+    if (blockContent) contextParts.push(`Conteúdo do bloco:\n${blockContent.slice(0, 2500)}`)
     if (studiedTopics?.length) contextParts.push(`Tópicos já estudados: ${studiedTopics.slice(0, 15).join(', ')}`)
     if (currentPosition) contextParts.push(`Posição: bloco ${currentPosition.blockIdx + 1} de ${currentPosition.totalBlocks}`)
 
     const userMessage = contextParts.join('\n\n')
 
-    const client = getClient()
-    const message = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 250,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userMessage }],
+    const completion = await getGroq().chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userMessage },
+      ],
+      max_tokens: 280,
+      temperature: mode === 'provoke' ? 0.8 : 0.6,
     })
 
-    const text = message.content
-      .filter((b) => b.type === 'text')
-      .map((b) => (b as { text: string }).text)
-      .join('\n')
-      .trim()
+    const text = completion.choices[0]?.message?.content?.trim() ?? ''
 
     return NextResponse.json({ response: text, mode })
   } catch (error) {
