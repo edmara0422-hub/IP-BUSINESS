@@ -120,10 +120,19 @@ export default function ChapterCompareAndDrag({ application }: Props) {
         {intro}
       </p>
 
-      {/* ── ETAPA 1: 3 ORGANISMOS LADO A LADO ───────────────────── */}
-      <ThreeOrganisms compare={compare} placements={itemsByZone} />
+      {/* ── ETAPA 1: 3 ORGANISMOS LADO A LADO ─────────────────────
+           Quando há item selecionado, os organismos viram alvos
+           clicáveis (pulsam e brilham). É a substituição dos
+           botões redundantes "Alimentar Fase X". */}
+      <ThreeOrganisms
+        compare={compare}
+        placements={itemsByZone}
+        zones={drag.zones}
+        selectionActive={!!selectedItemId}
+        onSelectZone={handleSelectZone}
+      />
 
-      {/* ── ETAPA 2: CLASSIFICAÇÃO POR "ALIMENTAR" O ORGANISMO ──── */}
+      {/* ── ETAPA 2: CARDS DE EMPRESAS PARA CLASSIFICAR ──────── */}
       <div style={{ marginTop: 28 }}>
         <div
           style={{
@@ -144,7 +153,9 @@ export default function ChapterCompareAndDrag({ application }: Props) {
               margin: 0,
             }}
           >
-            {drag.instruction}
+            {selectedItemId
+              ? '↑ Toque no organismo da fase em que essa empresa opera hoje'
+              : drag.instruction}
           </p>
           <span
             style={{
@@ -175,6 +186,9 @@ export default function ChapterCompareAndDrag({ application }: Props) {
                 label={item.label}
                 sublabel={item.sublabel}
                 selected={selectedItemId === item.id}
+                anyOtherSelected={
+                  selectedItemId !== null && selectedItemId !== item.id
+                }
                 onClick={() => handleSelectItem(item.id)}
               />
             ))}
@@ -194,49 +208,6 @@ export default function ChapterCompareAndDrag({ application }: Props) {
             </div>
           )}
         </div>
-
-        {/* Zonas de drop = botões abaixo de cada organismo (renderizadas
-            já dentro de ThreeOrganisms via callback abaixo) */}
-        {selectedItemId && (
-          <motion.div
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: 8,
-              marginBottom: 14,
-            }}
-          >
-            {drag.zones.map((zone, i) => {
-              const phaseColor =
-                i === 0 ? COLORS.phase1 : i === 1 ? COLORS.phase2 : COLORS.phase3
-              return (
-                <button
-                  key={zone.id}
-                  onClick={() => handleSelectZone(zone.id)}
-                  style={{
-                    background: 'transparent',
-                    border: `1.5px dashed ${phaseColor}`,
-                    borderRadius: 8,
-                    padding: '10px 8px',
-                    cursor: 'pointer',
-                    color: phaseColor,
-                    fontSize: 9,
-                    fontWeight: 700,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    lineHeight: 1.3,
-                  }}
-                >
-                  Alimentar
-                  <br />
-                  Fase {i + 1}
-                </button>
-              )
-            })}
-          </motion.div>
-        )}
 
         {/* Feedback contextual da última classificação */}
         <AnimatePresence>
@@ -329,15 +300,19 @@ export default function ChapterCompareAndDrag({ application }: Props) {
 function ThreeOrganisms({
   compare,
   placements,
+  zones,
+  selectionActive,
+  onSelectZone,
 }: {
   compare: ChapterApplicationCompareAndDrag['compare']
   placements: Record<string, Array<{ id: string; label: string }>>
+  zones: ChapterApplicationCompareAndDrag['drag']['zones']
+  selectionActive: boolean
+  onSelectZone: (zoneId: string) => void
 }) {
-  const phases: Array<{ idx: 1 | 2 | 3; zoneId: string }> = [
-    { idx: 1, zoneId: 'fase1' },
-    { idx: 2, zoneId: 'fase2' },
-    { idx: 3, zoneId: 'fase3' },
-  ]
+  const phases: Array<{ idx: 1 | 2 | 3; zoneId: string }> = zones.map(
+    (z, i) => ({ idx: (i + 1) as 1 | 2 | 3, zoneId: z.id })
+  )
   const phaseColors = [COLORS.phase1, COLORS.phase2, COLORS.phase3]
 
   return (
@@ -348,12 +323,15 @@ function ThreeOrganisms({
       transition={{ duration: 0.5 }}
       style={{
         background: COLORS.cardBg,
-        border: `1px solid ${COLORS.border}`,
+        border: `1px solid ${
+          selectionActive ? 'rgba(255,255,255,0.22)' : COLORS.border
+        }`,
         borderRadius: 12,
         padding: '20px 14px',
+        transition: 'border-color 0.25s',
       }}
     >
-      {/* 3 organismos lado a lado */}
+      {/* 3 organismos lado a lado — quando selectionActive=true viram alvos */}
       <div
         style={{
           display: 'grid',
@@ -363,34 +341,15 @@ function ThreeOrganisms({
         }}
       >
         {phases.map((p, i) => (
-          <div
+          <OrganismTarget
             key={p.idx}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: 6,
-            }}
-          >
-            <LivingCompany
-              phase={p.idx}
-              size="sm"
-              extras={placements[p.zoneId] ?? []}
-            />
-            <div
-              style={{
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                color: phaseColors[i],
-                textTransform: 'uppercase',
-                textAlign: 'center',
-                lineHeight: 1.35,
-              }}
-            >
-              {compare.columnHeaders[i]}
-            </div>
-          </div>
+            phase={p.idx}
+            label={compare.columnHeaders[i]}
+            phaseColor={phaseColors[i]}
+            extras={placements[p.zoneId] ?? []}
+            active={selectionActive}
+            onClick={() => onSelectZone(p.zoneId)}
+          />
         ))}
       </div>
 
@@ -487,6 +446,89 @@ function ThreeOrganisms({
 }
 
 // ─────────────────────────────────────────────────────────────────────
+// ORGANISM TARGET — organismo clicável (alvo de classificação)
+// Quando active=true (há um card selecionado), pulsa e fica clicável.
+// Quando active=false, é só visualização normal.
+// ─────────────────────────────────────────────────────────────────────
+
+function OrganismTarget({
+  phase,
+  label,
+  phaseColor,
+  extras,
+  active,
+  onClick,
+}: {
+  phase: 1 | 2 | 3
+  label: string
+  phaseColor: string
+  extras: Array<{ id: string; label: string }>
+  active: boolean
+  onClick: () => void
+}) {
+  const inner = (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 6,
+      }}
+    >
+      <LivingCompany phase={phase} size="sm" extras={extras} />
+      <div
+        style={{
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: '0.12em',
+          color: phaseColor,
+          textTransform: 'uppercase',
+          textAlign: 'center',
+          lineHeight: 1.35,
+        }}
+      >
+        {label}
+      </div>
+    </div>
+  )
+
+  if (!active) {
+    return <div>{inner}</div>
+  }
+
+  return (
+    <motion.button
+      type="button"
+      onClick={onClick}
+      animate={{
+        scale: [1, 1.04, 1],
+        boxShadow: [
+          '0 0 0 0 rgba(255,255,255,0)',
+          '0 0 0 4px rgba(255,255,255,0.12)',
+          '0 0 0 0 rgba(255,255,255,0)',
+        ],
+      }}
+      transition={{
+        duration: 1.6,
+        repeat: Infinity,
+        ease: 'easeInOut',
+      }}
+      whileTap={{ scale: 0.96 }}
+      style={{
+        background: 'rgba(255,255,255,0.04)',
+        border: `1.5px dashed ${phaseColor}`,
+        borderRadius: 12,
+        padding: '10px 6px 8px 6px',
+        cursor: 'pointer',
+        width: '100%',
+      }}
+    >
+      {inner}
+    </motion.button>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────
 // COMPANY CARD — card descritivo da empresa a ser classificada
 // ─────────────────────────────────────────────────────────────────────
 
@@ -494,11 +536,13 @@ function CompanyCard({
   label,
   sublabel,
   selected,
+  anyOtherSelected,
   onClick,
 }: {
   label: string
   sublabel?: string
   selected: boolean
+  anyOtherSelected?: boolean
   onClick: () => void
 }) {
   return (
@@ -506,6 +550,7 @@ function CompanyCard({
       onClick={onClick}
       animate={{
         scale: selected ? 1.015 : 1,
+        opacity: anyOtherSelected ? 0.4 : 1,
       }}
       transition={{ duration: 0.15 }}
       style={{
