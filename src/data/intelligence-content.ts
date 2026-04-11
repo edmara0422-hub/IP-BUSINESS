@@ -151,7 +151,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   {
                     id: 'mercearia',
                     label: 'Mercearia de bairro',
-                    sublabel: 'Operação física tradicional',
+                    sublabel: 'Estoque numa planilha. Vendas no caderno. Conta no banco digital. Cada setor opera por conta própria.',
                     correctZone: 'fase1',
                     correctFeedback: 'Certo. A maioria das micro e pequenas empresas brasileiras ainda vive na Fase 1 — usa tecnologia só para o básico (NF-e, conta digital, WhatsApp) sem integração entre estoque, vendas e financeiro.',
                     wrongFeedback: 'Repense. A mercearia tradicional opera na Fase 1: usa tecnologia avulsa, sem integração entre estoque, vendas e financeiro. É a realidade da maioria das PMEs brasileiras.',
@@ -159,7 +159,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   {
                     id: 'natura',
                     label: 'Natura',
-                    sublabel: 'Cosméticos · Brasil',
+                    sublabel: '7 países sob um único SAP. Decisões em horas, não semanas. O modelo é o de sempre — só que mais rápido.',
                     correctZone: 'fase2',
                     correctFeedback: 'Certo. A integração SAP em 7 países foi um marco da Fase 2. A operação é digital, integrada e auditável — mas o modelo de negócio continua sendo venda direta + varejo, só que mais rápido.',
                     wrongFeedback: 'Não exatamente. Natura é referência em Fase 2: digitalizou e integrou processos globalmente, mas o modelo de negócio continua sendo o tradicional venda direta + varejo.',
@@ -167,7 +167,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   {
                     id: 'magalu',
                     label: 'Magazine Luiza',
-                    sublabel: 'Varejo brasileiro',
+                    sublabel: 'Lojas físicas viraram mini-CDs de uma plataforma. O app virou super-app. Marketplace passa de R$ 50 bi/ano.',
                     correctZone: 'fase3',
                     correctFeedback: 'Certo. Magalu é o caso emblemático brasileiro de transição completa para a Fase 3: lojas físicas viraram mini-CDs de uma plataforma digital. Hoje é mais marketplace que varejista tradicional.',
                     wrongFeedback: 'Repense. Desde a chegada de Frederico Trajano, Magalu se transformou numa plataforma digital — lojas viraram mini-CDs, o app virou super-app, e o marketplace passa de R$ 50 bi/ano.',
@@ -175,7 +175,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   {
                     id: 'nubank',
                     label: 'Nubank',
-                    sublabel: 'Banco digital · Brasil',
+                    sublabel: 'Sem agência. Sem fila. Sem papelada. O algoritmo aprova o crédito, o app é o atendimento.',
                     correctZone: 'fase3',
                     correctFeedback: 'Certo. Nubank nasceu na Fase 3 — sem agência, sem papelada, sem fila. O produto inteiro é tecnologia: o algoritmo de crédito, o app, o atendimento. Sem software, não existe banco.',
                     wrongFeedback: 'Não. Nubank é nascido digital — não existe banco sem o software. É Fase 3 pura.',
@@ -183,7 +183,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   {
                     id: 'ifood',
                     label: 'iFood',
-                    sublabel: 'Plataforma de delivery',
+                    sublabel: 'Sem cozinha. Sem frota. O algoritmo casa pedido com restaurante e entregador. R$ 100 bi/ano.',
                     correctZone: 'fase3',
                     correctFeedback: 'Certo. iFood é Fase 3 ao extremo: nem cozinha nem motoboy próprio. O matching algorítmico entre restaurantes, entregadores e clientes É o negócio inteiro.',
                     wrongFeedback: 'Repense. iFood não tem cozinha, não tem frota — só plataforma e algoritmo. É Fase 3 ao extremo.',

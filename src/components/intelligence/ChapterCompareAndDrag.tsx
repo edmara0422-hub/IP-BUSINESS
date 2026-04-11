@@ -1,20 +1,25 @@
 'use client'
 
 /**
- * CHAPTER · COMPARE-AND-DRAG
+ * CHAPTER · COMPARE-AND-DRAG (versão "Empresa Viva")
  *
- * Aplicação do Capítulo 1 (Era Digital — 3 Fases).
- * Duas etapas em sequência:
- *   1. Tabela comparativa (passiva, anima ao entrar)
- *   2. Aluno classifica empresas reais nas 3 fases (tap-to-select → tap-to-zone)
+ * Aplicação do Capítulo 1 — substitui completamente a tabela e o drag
+ * mecânico por uma comparação visual dos 3 organismos da empresa nas
+ * 3 fases (LivingCompany), seguida de uma classificação onde o aluno
+ * "alimenta" cada organismo com empresas reais.
  *
- * Touch-first: sem HTML5 drag (não funciona bem no Capacitor/iOS).
- * Mecânica = tocar no item para selecionar, tocar na zona para soltar.
+ * Etapa 1: 3 organismos lado a lado + dimensões abaixo (não é tabela,
+ *          é a empresa viva nos 3 estados).
+ *
+ * Etapa 2: cards descritivos das 5 empresas. Aluno toca um card → ele
+ *          se eleva → toca o organismo certo → o organismo "engole" o
+ *          card e a empresa vira um nó dentro dele.
  */
 
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { ChapterApplicationCompareAndDrag } from '@/types/intelligence'
+import LivingCompany from './LivingCompany'
 
 const COLORS = {
   bg: '#0a0a0a',
@@ -25,10 +30,8 @@ const COLORS = {
   textMuted: 'rgba(255, 255, 255, 0.6)',
   textDim: 'rgba(255, 255, 255, 0.38)',
   accent: '#ffffff',
-  // Estados de feedback em monocromático
-  correct: '#ffffff',                    // acerto = branco sólido
-  wrong: 'rgba(255, 255, 255, 0.38)',    // erro = branco esmaecido
-  // Diferenciação das 3 fases por intensidade
+  correct: '#ffffff',
+  wrong: 'rgba(255, 255, 255, 0.38)',
   phase1: 'rgba(255, 255, 255, 0.38)',
   phase2: 'rgba(255, 255, 255, 0.7)',
   phase3: '#ffffff',
@@ -49,22 +52,29 @@ export default function ChapterCompareAndDrag({ application }: Props) {
 
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [placements, setPlacements] = useState<Record<string, Placement>>({})
+  const [lastFeedback, setLastFeedback] = useState<{
+    text: string
+    correct: boolean
+  } | null>(null)
 
   const placedCount = Object.keys(placements).length
   const totalCount = drag.items.length
   const completed = placedCount === totalCount
 
   const itemsByZone = useMemo(() => {
-    const map: Record<string, string[]> = {}
+    const map: Record<string, Array<{ id: string; label: string }>> = {}
     drag.zones.forEach((z) => (map[z.id] = []))
     Object.entries(placements).forEach(([itemId, p]) => {
-      map[p.zoneId]?.push(itemId)
+      const item = drag.items.find((i) => i.id === itemId)
+      if (item) {
+        map[p.zoneId]?.push({ id: item.id, label: item.label })
+      }
     })
     return map
-  }, [placements, drag.zones])
+  }, [placements, drag.zones, drag.items])
 
   function handleSelectItem(itemId: string) {
-    if (placements[itemId]) return // já colocado
+    if (placements[itemId]) return
     setSelectedItemId((prev) => (prev === itemId ? null : itemId))
   }
 
@@ -82,12 +92,17 @@ export default function ChapterCompareAndDrag({ application }: Props) {
         feedback: correct ? item.correctFeedback : item.wrongFeedback,
       },
     }))
+    setLastFeedback({
+      text: correct ? item.correctFeedback : item.wrongFeedback,
+      correct,
+    })
     setSelectedItemId(null)
   }
 
   function handleReset() {
     setPlacements({})
     setSelectedItemId(null)
+    setLastFeedback(null)
   }
 
   return (
@@ -97,7 +112,7 @@ export default function ChapterCompareAndDrag({ application }: Props) {
           fontSize: 11,
           lineHeight: 1.65,
           color: COLORS.textMuted,
-          margin: '0 0 16px 0',
+          margin: '0 0 18px 0',
           textAlign: 'justify',
           hyphens: 'auto',
         }}
@@ -105,11 +120,11 @@ export default function ChapterCompareAndDrag({ application }: Props) {
         {intro}
       </p>
 
-      {/* ── ETAPA 1: TABELA COMPARATIVA ───────────────────────── */}
-      <CompareTableView compare={compare} />
+      {/* ── ETAPA 1: 3 ORGANISMOS LADO A LADO ───────────────────── */}
+      <ThreeOrganisms compare={compare} placements={itemsByZone} />
 
-      {/* ── ETAPA 2: DRAG (tap-to-place) ──────────────────────── */}
-      <div style={{ marginTop: 32 }}>
+      {/* ── ETAPA 2: CLASSIFICAÇÃO POR "ALIMENTAR" O ORGANISMO ──── */}
+      <div style={{ marginTop: 28 }}>
         <div
           style={{
             display: 'flex',
@@ -143,35 +158,19 @@ export default function ChapterCompareAndDrag({ application }: Props) {
           </span>
         </div>
 
-        {/* itens disponíveis (não colocados ainda) */}
+        {/* Cards de empresa para classificar */}
         <div
           style={{
             display: 'flex',
-            flexWrap: 'wrap',
-            gap: 10,
-            marginBottom: 18,
-            minHeight: 48,
-            padding: 14,
-            background: 'rgba(0, 0, 0, 0.2)',
-            border: `1px dashed ${COLORS.border}`,
-            borderRadius: 10,
+            flexDirection: 'column',
+            gap: 8,
+            marginBottom: 14,
           }}
         >
-          {drag.items.filter((i) => !placements[i.id]).length === 0 && (
-            <span
-              style={{
-                fontSize: 10,
-                color: COLORS.textDim,
-                fontStyle: 'italic',
-              }}
-            >
-              Todas as empresas foram classificadas.
-            </span>
-          )}
           {drag.items
             .filter((i) => !placements[i.id])
             .map((item) => (
-              <ItemChip
+              <CompanyCard
                 key={item.id}
                 label={item.label}
                 sublabel={item.sublabel}
@@ -179,47 +178,104 @@ export default function ChapterCompareAndDrag({ application }: Props) {
                 onClick={() => handleSelectItem(item.id)}
               />
             ))}
+          {drag.items.filter((i) => !placements[i.id]).length === 0 && (
+            <div
+              style={{
+                fontSize: 10,
+                color: COLORS.textDim,
+                fontStyle: 'italic',
+                padding: '14px 0',
+                textAlign: 'center',
+                border: `1px dashed ${COLORS.border}`,
+                borderRadius: 8,
+              }}
+            >
+              Todas as empresas foram alimentadas aos organismos.
+            </div>
+          )}
         </div>
 
-        {/* zonas */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-            gap: 12,
-          }}
-        >
-          {drag.zones.map((zone, i) => {
-            const phaseColor =
-              i === 0 ? COLORS.phase1 : i === 1 ? COLORS.phase2 : COLORS.phase3
-            const isActive = selectedItemId !== null
-            return (
-              <DropZone
-                key={zone.id}
-                label={zone.label}
-                accent={phaseColor}
-                active={isActive}
-                onClick={() => handleSelectZone(zone.id)}
+        {/* Zonas de drop = botões abaixo de cada organismo (renderizadas
+            já dentro de ThreeOrganisms via callback abaixo) */}
+        {selectedItemId && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: 8,
+              marginBottom: 14,
+            }}
+          >
+            {drag.zones.map((zone, i) => {
+              const phaseColor =
+                i === 0 ? COLORS.phase1 : i === 1 ? COLORS.phase2 : COLORS.phase3
+              return (
+                <button
+                  key={zone.id}
+                  onClick={() => handleSelectZone(zone.id)}
+                  style={{
+                    background: 'transparent',
+                    border: `1.5px dashed ${phaseColor}`,
+                    borderRadius: 8,
+                    padding: '10px 8px',
+                    cursor: 'pointer',
+                    color: phaseColor,
+                    fontSize: 9,
+                    fontWeight: 700,
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    lineHeight: 1.3,
+                  }}
+                >
+                  Alimentar
+                  <br />
+                  Fase {i + 1}
+                </button>
+              )
+            })}
+          </motion.div>
+        )}
+
+        {/* Feedback contextual da última classificação */}
+        <AnimatePresence>
+          {lastFeedback && (
+            <motion.div
+              key={lastFeedback.text}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              style={{
+                fontSize: 11,
+                lineHeight: 1.6,
+                color: lastFeedback.correct ? COLORS.text : COLORS.textMuted,
+                padding: '12px 14px',
+                background: 'rgba(255, 255, 255, 0.025)',
+                border: `1px ${lastFeedback.correct ? 'solid' : 'dashed'} ${
+                  lastFeedback.correct ? COLORS.text : COLORS.textDim
+                }`,
+                borderRadius: 8,
+                marginBottom: 12,
+                textAlign: 'justify',
+                hyphens: 'auto',
+              }}
+            >
+              <span
+                style={{
+                  fontWeight: 700,
+                  letterSpacing: '0.06em',
+                  marginRight: 6,
+                }}
               >
-                {itemsByZone[zone.id]?.map((itemId) => {
-                  const item = drag.items.find((i) => i.id === itemId)
-                  const placement = placements[itemId]
-                  if (!item || !placement) return null
-                  return (
-                    <PlacedChip
-                      key={itemId}
-                      label={item.label}
-                      correct={placement.correct}
-                      feedback={placement.feedback}
-                    />
-                  )
-                })}
-              </DropZone>
-            )
-          })}
-        </div>
+                {lastFeedback.correct ? '✓' : '!'}
+              </span>
+              {lastFeedback.text}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* fechamento */}
+        {/* Fechamento da etapa */}
         <AnimatePresence>
           {completed && (
             <motion.div
@@ -227,7 +283,7 @@ export default function ChapterCompareAndDrag({ application }: Props) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               style={{
-                marginTop: 20,
+                marginTop: 8,
                 padding: '14px 18px',
                 background: 'rgba(255, 255, 255, 0.04)',
                 border: `1px solid rgba(255, 255, 255, 0.18)`,
@@ -240,7 +296,8 @@ export default function ChapterCompareAndDrag({ application }: Props) {
               }}
             >
               <span style={{ fontSize: 11, color: COLORS.text, fontWeight: 600 }}>
-                ✓ Classificação completa. Veja os feedbacks em cada zona.
+                ✓ Os 3 organismos estão completos. Você acabou de mapear o
+                tecido digital do Brasil.
               </span>
               <button
                 onClick={handleReset}
@@ -266,15 +323,23 @@ export default function ChapterCompareAndDrag({ application }: Props) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Sub-componentes
+// THREE ORGANISMS — substitui a tabela
 // ─────────────────────────────────────────────────────────────────────
 
-function CompareTableView({
+function ThreeOrganisms({
   compare,
+  placements,
 }: {
   compare: ChapterApplicationCompareAndDrag['compare']
+  placements: Record<string, Array<{ id: string; label: string }>>
 }) {
+  const phases: Array<{ idx: 1 | 2 | 3; zoneId: string }> = [
+    { idx: 1, zoneId: 'fase1' },
+    { idx: 2, zoneId: 'fase2' },
+    { idx: 3, zoneId: 'fase3' },
+  ]
   const phaseColors = [COLORS.phase1, COLORS.phase2, COLORS.phase3]
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -285,131 +350,147 @@ function CompareTableView({
         background: COLORS.cardBg,
         border: `1px solid ${COLORS.border}`,
         borderRadius: 12,
-        padding: '18px 4px 10px 4px',
-        overflowX: 'auto',
+        padding: '20px 14px',
       }}
     >
-      <table
+      {/* 3 organismos lado a lado */}
+      <div
         style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          fontSize: 11,
-          tableLayout: 'fixed',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 8,
+          marginBottom: 18,
         }}
       >
-        <thead>
-          <tr>
-            <th
-              style={{
-                textAlign: 'left',
-                padding: '6px 12px',
-                color: COLORS.textDim,
-                fontSize: 9,
-                fontWeight: 600,
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                width: '26%',
-              }}
+        {phases.map((p, i) => (
+          <div
+            key={p.idx}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <LivingCompany
+              phase={p.idx}
+              size="sm"
+              extras={placements[p.zoneId] ?? []}
             />
-            {compare.columnHeaders.map((h, i) => (
-              <th
-                key={i}
-                style={{
-                  textAlign: 'left',
-                  padding: '6px 12px',
-                  color: phaseColors[i],
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: '0.06em',
-                }}
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {compare.rows.map((row, ri) => (
-            <tr
-              key={ri}
+            <div
               style={{
-                borderTop: `1px solid ${COLORS.border}`,
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: '0.12em',
+                color: phaseColors[i],
+                textTransform: 'uppercase',
+                textAlign: 'center',
+                lineHeight: 1.35,
               }}
             >
-              <td
+              {compare.columnHeaders[i]}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* dimensões abaixo (legendas das 3 colunas) */}
+      <div
+        style={{
+          borderTop: `1px solid ${COLORS.border}`,
+          paddingTop: 14,
+        }}
+      >
+        {compare.rows.map((row, ri) => (
+          <div
+            key={ri}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '90px 1fr 1fr 1fr',
+              gap: 8,
+              padding: '8px 0',
+              borderBottom:
+                ri === compare.rows.length - 1
+                  ? 'none'
+                  : `1px solid ${COLORS.border}`,
+              alignItems: 'center',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 9,
+                fontWeight: 600,
+                color: COLORS.textDim,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+              }}
+            >
+              {row.label}
+            </div>
+            {row.values.map((v, vi) => (
+              <div
+                key={vi}
                 style={{
-                  padding: '12px 12px',
-                  color: COLORS.textMuted,
                   fontSize: 10,
-                  fontWeight: 600,
-                  letterSpacing: '0.02em',
-                  verticalAlign: 'top',
+                  lineHeight: 1.4,
+                  color: 'rgba(255,255,255,0.78)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
                 }}
               >
-                {row.label}
-              </td>
-              {row.values.map((v, vi) => (
-                <td
-                  key={vi}
-                  style={{
-                    padding: '12px 12px',
-                    color: 'rgba(255,255,255,0.85)',
-                    fontSize: 11,
-                    lineHeight: 1.5,
-                    verticalAlign: 'top',
-                  }}
-                >
-                  {/* Visualização opcional */}
-                  {row.viz === 'icons' && row.icons && (
-                    <div
-                      style={{
-                        fontSize: 18,
-                        lineHeight: 1,
-                        color: phaseColors[vi],
-                        marginBottom: 6,
-                        fontFamily: 'ui-sans-serif, system-ui',
+                {/* indicador visual de intensidade quando viz=bars */}
+                {row.viz === 'bars' && row.intensities && (
+                  <div
+                    style={{
+                      width: 18,
+                      height: 3,
+                      background: 'rgba(255,255,255,0.06)',
+                      borderRadius: 1.5,
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{
+                        width: `${(row.intensities[vi] ?? 0) * 100}%`,
                       }}
-                    >
-                      {row.icons[vi]}
-                    </div>
-                  )}
-                  {row.viz === 'bars' && row.intensities && (
-                    <div
+                      viewport={{ once: true, margin: '-40px' }}
+                      transition={{ duration: 0.6, delay: 0.2 + vi * 0.1 }}
                       style={{
-                        width: '100%',
-                        height: 4,
-                        background: 'rgba(255,255,255,0.06)',
-                        borderRadius: 2,
-                        overflow: 'hidden',
-                        marginBottom: 8,
+                        height: '100%',
+                        background: phaseColors[vi],
                       }}
-                    >
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{
-                          width: `${(row.intensities[vi] ?? 0) * 100}%`,
-                        }}
-                        viewport={{ once: true, margin: '-40px' }}
-                        transition={{ duration: 0.7, delay: 0.2 + vi * 0.1 }}
-                        style={{
-                          height: '100%',
-                          background: phaseColors[vi],
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div>{v}</div>
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                    />
+                  </div>
+                )}
+                {row.viz === 'icons' && row.icons && (
+                  <span
+                    style={{
+                      color: phaseColors[vi],
+                      fontSize: 12,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {row.icons[vi]}
+                  </span>
+                )}
+                <span>{v}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
     </motion.div>
   )
 }
 
-function ItemChip({
+// ─────────────────────────────────────────────────────────────────────
+// COMPANY CARD — card descritivo da empresa a ser classificada
+// ─────────────────────────────────────────────────────────────────────
+
+function CompanyCard({
   label,
   sublabel,
   selected,
@@ -421,139 +502,49 @@ function ItemChip({
   onClick: () => void
 }) {
   return (
-    <button
+    <motion.button
       onClick={onClick}
-      style={{
-        background: selected ? '#ffffff' : COLORS.cardBg,
-        color: selected ? '#000000' : COLORS.text,
-        border: `1px solid ${selected ? '#ffffff' : COLORS.borderStrong}`,
-        borderRadius: 6,
-        padding: '8px 12px',
-        fontSize: 11,
-        fontWeight: 600,
-        cursor: 'pointer',
-        transition: 'all 0.15s',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
-        textAlign: 'left',
+      animate={{
+        scale: selected ? 1.015 : 1,
       }}
-    >
-      <span>{label}</span>
-      {sublabel && (
-        <span
-          style={{
-            fontSize: 9,
-            fontWeight: 500,
-            opacity: 0.7,
-          }}
-        >
-          {sublabel}
-        </span>
-      )}
-    </button>
-  )
-}
-
-function DropZone({
-  label,
-  accent,
-  active,
-  onClick,
-  children,
-}: {
-  label: string
-  accent: string
-  active: boolean
-  onClick: () => void
-  children?: React.ReactNode
-}) {
-  return (
-    <button
-      onClick={onClick}
+      transition={{ duration: 0.15 }}
       style={{
-        background: active ? `${accent}10` : 'rgba(0, 0, 0, 0.2)',
-        border: active
-          ? `2px dashed ${accent}`
-          : `1px solid ${COLORS.border}`,
-        borderRadius: 10,
-        padding: 14,
-        minHeight: 120,
-        cursor: active ? 'pointer' : 'default',
+        background: selected ? 'rgba(255,255,255,0.08)' : COLORS.cardBg,
+        color: COLORS.text,
+        border: `1px solid ${selected ? '#ffffff' : COLORS.borderStrong}`,
+        borderLeft: `3px solid ${selected ? '#ffffff' : 'rgba(255,255,255,0.35)'}`,
+        borderRadius: 8,
+        padding: '12px 14px',
+        cursor: 'pointer',
         textAlign: 'left',
         display: 'flex',
         flexDirection: 'column',
-        gap: 8,
-        transition: 'all 0.15s',
+        gap: 4,
+        width: '100%',
       }}
     >
       <div
         style={{
-          fontSize: 10,
+          fontSize: 12,
           fontWeight: 700,
-          letterSpacing: '0.12em',
-          color: accent,
-          textTransform: 'uppercase',
+          letterSpacing: '0.01em',
+          color: COLORS.text,
         }}
       >
         {label}
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {children}
-      </div>
-    </button>
-  )
-}
-
-function PlacedChip({
-  label,
-  correct,
-  feedback,
-}: {
-  label: string
-  correct: boolean
-  feedback: string
-}) {
-  const accent = correct ? COLORS.correct : COLORS.wrong
-  const bgAlpha = correct ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.02)'
-  const borderStyle = correct ? `1px solid ${accent}` : `1px dashed ${accent}`
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.25 }}
-      style={{
-        background: bgAlpha,
-        border: borderStyle,
-        borderRadius: 6,
-        padding: '8px 10px',
-      }}
-    >
-      <div
-        style={{
-          fontSize: 10,
-          fontWeight: 700,
-          color: accent,
-          marginBottom: 4,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-        }}
-      >
-        <span>{correct ? '✓' : '!'}</span>
-        <span>{label}</span>
-      </div>
-      <div
-        style={{
-          fontSize: 10,
-          lineHeight: 1.55,
-          color: COLORS.textMuted,
-          textAlign: 'justify',
-          hyphens: 'auto',
-        }}
-      >
-        {feedback}
-      </div>
-    </motion.div>
+      {sublabel && (
+        <div
+          style={{
+            fontSize: 10,
+            lineHeight: 1.5,
+            color: COLORS.textMuted,
+            fontWeight: 500,
+          }}
+        >
+          {sublabel}
+        </div>
+      )}
+    </motion.button>
   )
 }

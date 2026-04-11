@@ -19,6 +19,7 @@ import type {
   ChapterPhaseCard,
 } from '@/types/intelligence'
 import ChapterCompareAndDrag from './ChapterCompareAndDrag'
+import LivingCompany from './LivingCompany'
 
 interface Props {
   block: ChapterBlock
@@ -203,16 +204,29 @@ function ChapterOpening({
 }) {
   return (
     <section>
-      {showTimeline && <Timeline3Phases />}
+      {showTimeline && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            padding: '8px 0 18px 0',
+          }}
+        >
+          <LivingCompany phase={1} size="md" label="A empresa antes do salto" />
+        </motion.div>
+      )}
       <motion.p
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: showTimeline ? 0.6 : 0 }}
+        transition={{ duration: 0.5, delay: showTimeline ? 0.5 : 0 }}
         style={{
           fontSize: 13,
-          lineHeight: 1.625,
+          lineHeight: 1.7,
           color: 'rgba(255,255,255,0.85)',
-          marginTop: showTimeline ? 20 : 0,
+          marginTop: showTimeline ? 4 : 0,
           textAlign: 'justify',
           hyphens: 'auto',
         }}
@@ -220,81 +234,6 @@ function ChapterOpening({
         {renderWithHighlights(leadText)}
       </motion.p>
     </section>
-  )
-}
-
-function Timeline3Phases() {
-  const points = [
-    { x: 8, label: '2000', color: COLORS.phase1 },
-    { x: 50, label: '2010', color: COLORS.phase2 },
-    { x: 92, label: '2020 →', color: COLORS.phase3 },
-  ]
-  return (
-    <div
-      style={{
-        position: 'relative',
-        height: 64,
-        marginBottom: 8,
-      }}
-    >
-      <svg
-        viewBox="0 0 100 30"
-        style={{ width: '100%', height: '100%' }}
-        preserveAspectRatio="none"
-      >
-        <motion.line
-          x1="8"
-          y1="15"
-          x2="92"
-          y2="15"
-          stroke={COLORS.border}
-          strokeWidth="0.4"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-        />
-        {points.map((p, i) => (
-          <motion.circle
-            key={p.label}
-            cx={p.x}
-            cy="15"
-            r="1.6"
-            fill={p.color}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.3 + i * 0.18 }}
-          />
-        ))}
-      </svg>
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          justifyContent: 'space-between',
-          paddingInline: '4%',
-          alignItems: 'flex-end',
-          pointerEvents: 'none',
-        }}
-      >
-        {points.map((p, i) => (
-          <motion.span
-            key={p.label}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.4 + i * 0.18 }}
-            style={{
-              fontSize: 11,
-              fontWeight: 600,
-              color: p.color,
-              letterSpacing: '0.04em',
-            }}
-          >
-            {p.label}
-          </motion.span>
-        ))}
-      </div>
-    </div>
   )
 }
 
@@ -432,6 +371,21 @@ function PhaseCard({ data }: { data: ChapterPhaseCard }) {
         margin: '0 0 16px 0',
       }}
     >
+      {/* Organismo vivo desta fase, no topo do card */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, margin: '-40px' }}
+        transition={{ duration: 0.6 }}
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          padding: '4px 0 14px 0',
+        }}
+      >
+        <LivingCompany phase={data.index} size="md" />
+      </motion.div>
+
       <div
         style={{
           display: 'flex',
