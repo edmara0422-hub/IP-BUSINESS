@@ -3,6 +3,7 @@
 import { useState, Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Link2, HelpCircle, RefreshCw, ArrowRight, BookOpen, X } from 'lucide-react'
+import { getReviewData, getModuleMemory, retentionColor, retentionLabel } from '@/store/study-memory-store'
 
 const BLUE = '#2e86c1'
 const AMBER = '#9a7d0a'
@@ -14,6 +15,70 @@ const AMBER = '#9a7d0a'
  *  - "**Título**" no inicio de paragrafo vira heading
  *  - "1. " ou "- " no inicio vira lista
  */
+/**
+ * Barra de memória Ebbinghaus — mostra a retenção de cada conceito
+ * como pontos coloridos: branco (fresco) → âmbar → vermelho (esquecendo).
+ * Aparece no topo do Professor quando aberto.
+ */
+function MemoryBar({ moduleId }: { moduleId: string }) {
+  const entries = getModuleMemory(moduleId)
+  if (entries.length === 0) return null
+
+  return (
+    <div
+      className="px-4 py-2"
+      style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+    >
+      <div className="flex items-center gap-2 mb-1.5">
+        <span
+          className="text-[8px] font-bold uppercase tracking-[0.16em]"
+          style={{ color: 'rgba(255,255,255,0.35)' }}
+        >
+          Memória
+        </span>
+      </div>
+      <div className="flex gap-1.5 flex-wrap">
+        {entries.map((e) => (
+          <div
+            key={e.conceptId}
+            title={`${e.label} — ${Math.round(e.retention * 100)}% retido`}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '3px 7px',
+              borderRadius: 4,
+              background: 'rgba(255,255,255,0.03)',
+              border: `1px solid ${retentionColor(e.retention)}25`,
+            }}
+          >
+            <div
+              style={{
+                width: 5,
+                height: 5,
+                borderRadius: '50%',
+                background: retentionColor(e.retention),
+              }}
+            />
+            <span
+              className="text-[8px] font-medium truncate max-w-[90px]"
+              style={{ color: retentionColor(e.retention) }}
+            >
+              {e.label.replace(/—.*/, '').trim()}
+            </span>
+            <span
+              className="text-[7px] font-mono"
+              style={{ color: retentionColor(e.retention), opacity: 0.7 }}
+            >
+              {Math.round(e.retention * 100)}%
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function ProfessorMarkdown({ text }: { text: string }) {
   const blocks = text.trim().split(/\n\n+/)
   return (
@@ -130,6 +195,9 @@ export default function IAProfessor({
     setLoading(true)
     setResponse(null)
     try {
+      // Para "review", inclui o mapa de memória Ebbinghaus do aluno
+      const memoryData = mode === 'review' ? getReviewData(moduleId) : undefined
+
       const res = await fetch('/api/professor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -138,7 +206,9 @@ export default function IAProfessor({
           moduleId,
           submoduleTitle,
           blockTitle,
-          blockContent,
+          blockContent: mode === 'review' && memoryData
+            ? `${blockContent ?? ''}\n\n--- DADOS DE MEMÓRIA DO ALUNO (Ebbinghaus) ---\n${memoryData}`
+            : blockContent,
           studiedTopics,
           currentPosition,
         }),
@@ -213,6 +283,9 @@ export default function IAProfessor({
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
+
+              {/* Barra de memória Ebbinghaus */}
+              <MemoryBar moduleId={moduleId} />
 
               {/* Seletor de modo */}
               <div className="px-3 py-3 flex flex-wrap gap-1.5">

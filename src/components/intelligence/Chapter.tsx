@@ -11,7 +11,7 @@
  * Regra inviolável: nenhuma interação no meio do corpo. Aplicação só em C.
  */
 
-import { useState, Fragment } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type {
   ChapterBlock,
@@ -20,6 +20,7 @@ import type {
 } from '@/types/intelligence'
 import ChapterCompareAndDrag from './ChapterCompareAndDrag'
 import LivingCompany from './LivingCompany'
+import { recordExposure } from '@/store/study-memory-store'
 
 interface Props {
   block: ChapterBlock
@@ -71,6 +72,17 @@ function renderWithHighlights(text: string) {
 }
 
 export default function Chapter({ block }: Props) {
+  // Registra que o aluno viu este capítulo (memória Ebbinghaus)
+  useEffect(() => {
+    recordExposure(
+      block.id,
+      block.title,
+      block.id.split('-')[0] ?? 'M1',
+      block.id,
+      'read',
+    )
+  }, [block.id, block.title])
+
   return (
     <article
       style={{
@@ -98,7 +110,7 @@ export default function Chapter({ block }: Props) {
       {/* B — CORPO */}
       <section style={{ marginTop: 32 }}>
         {block.body.map((section, i) => (
-          <BodySectionRenderer key={i} section={section} />
+          <BodySectionRenderer key={i} section={section} chapterId={block.id} />
         ))}
       </section>
 
@@ -241,7 +253,7 @@ function ChapterOpening({
 // B — Body sections
 // ─────────────────────────────────────────────────────────────────────
 
-function BodySectionRenderer({ section }: { section: ChapterBodySection }) {
+function BodySectionRenderer({ section, chapterId }: { section: ChapterBodySection; chapterId?: string }) {
   if (section.kind === 'paragraph') {
     return (
       <p
@@ -277,11 +289,11 @@ function BodySectionRenderer({ section }: { section: ChapterBodySection }) {
   }
 
   if (section.kind === 'phase-card') {
-    return <PhaseCard data={section.data} />
+    return <PhaseCard data={section.data} chapterId={chapterId} />
   }
 
   if (section.kind === 'phase-group') {
-    return <PhaseGroup cards={section.cards} />
+    return <PhaseGroup cards={section.cards} chapterId={chapterId} />
   }
 
   return null
@@ -293,7 +305,7 @@ function BodySectionRenderer({ section }: { section: ChapterBodySection }) {
 // reforçando visualmente que existe uma evolução, não 3 itens soltos.
 // ─────────────────────────────────────────────────────────────────────
 
-function PhaseGroup({ cards }: { cards: ChapterPhaseCard[] }) {
+function PhaseGroup({ cards, chapterId }: { cards: ChapterPhaseCard[]; chapterId?: string }) {
   return (
     <div
       style={{
@@ -338,7 +350,7 @@ function PhaseGroup({ cards }: { cards: ChapterPhaseCard[] }) {
                 zIndex: 2,
               }}
             />
-            <PhaseCard data={card} />
+            <PhaseCard data={card} chapterId={chapterId} />
           </div>
         )
       })}
@@ -346,7 +358,7 @@ function PhaseGroup({ cards }: { cards: ChapterPhaseCard[] }) {
   )
 }
 
-function PhaseCard({ data }: { data: ChapterPhaseCard }) {
+function PhaseCard({ data, chapterId }: { data: ChapterPhaseCard; chapterId?: string }) {
   const [expanded, setExpanded] = useState(false)
   const accent =
     data.index === 1
@@ -454,7 +466,19 @@ function PhaseCard({ data }: { data: ChapterPhaseCard }) {
       {hasDeep && (
         <>
           <button
-            onClick={() => setExpanded((v) => !v)}
+            onClick={() => {
+              const next = !expanded
+              setExpanded(next)
+              if (next && chapterId) {
+                recordExposure(
+                  `${chapterId}-deepdive-fase${data.index}`,
+                  `${data.title} — DeepDive`,
+                  chapterId.split('-')[0] ?? 'M1',
+                  chapterId,
+                  'deepdive',
+                )
+              }
+            }}
             style={{
               marginTop: 12,
               background: 'transparent',
