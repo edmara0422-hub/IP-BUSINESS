@@ -1030,7 +1030,7 @@ export default function AbaEstudo() {
                               </div>
 
                               {/* Caderno — 1 bloco por vez */}
-                              <div className={(activeSidebarTool === 'sumario' || activeSidebarTool === 'intelligence') ? 'order-2 xl:order-1 min-w-0' : 'hidden'}>
+                              <div className={activeSidebarTool === 'sumario' ? 'order-2 xl:order-1 min-w-0' : 'hidden'}>
                                 {(() => {
                                   const blocks = topic?.blocks ?? []
                                   if (blocks.length === 0) {
