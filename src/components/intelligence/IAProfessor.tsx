@@ -1,18 +1,12 @@
 'use client'
 
 /**
- * IA PROFESSOR — direcionador de estudo limpo e compacto.
+ * IA PROFESSOR — direcionador de estudo.
  *
- * Layout: botão flutuante → abre painel com:
- *   1. Header com indicadores inline (profundidade + memória como dots)
- *   2. 5 botões de modo
- *   3. Resposta em texto limpo com scroll
+ * CONECTAR = mapa mental visual (grafo SVG) — SEM TEXTO.
+ * APROFUNDAR / REVISAR / APLICAR / RESUMIR = texto puro da IA — SEM visuais.
  *
- * O grafo e a calculadora aparecem sob demanda via abas/toggle, nunca
- * empilhados em cima do texto. A regra é: TEXTO LEGÍVEL PRIMEIRO.
- *
- * Componentes visuais (grafo, calc) movidos para abas secundárias
- * acessíveis por toggle dentro da resposta — não empilham.
+ * Layout limpo: header + botões + conteúdo (ou mapa OU texto, nunca os dois).
  */
 
 import { useState, Fragment } from 'react'
@@ -20,9 +14,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Link2, HelpCircle, RefreshCw, ArrowRight, BookOpen, X } from 'lucide-react'
 import { getReviewData, getModuleMemory, retentionColor, getChapterDepth, getDepthData } from '@/store/study-memory-store'
 import ConceptGraph, { getChapter1Graph } from './ConceptGraph'
-import ProfessorCalc from './ProfessorCalc'
-
-const BLUE = '#2e86c1'
 
 type Mode = 'connect' | 'deepen' | 'review' | 'apply' | 'summarize'
 
@@ -50,13 +41,19 @@ export default function IAProfessor({
   const [loading, setLoading] = useState(false)
   const [activeMode, setActiveMode] = useState<Mode | null>(null)
   const [response, setResponse] = useState<string | null>(null)
-  const [showVisual, setShowVisual] = useState(false)
 
   const ask = async (mode: Mode) => {
     setActiveMode(mode)
+
+    // Conectar = só mapa, sem chamar IA
+    if (mode === 'connect') {
+      setResponse(null)
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     setResponse(null)
-    setShowVisual(false)
     try {
       const memoryData = mode === 'review' ? getReviewData(moduleId) : undefined
       const chapterId = blockTitle ? 'M1-0-cap1' : undefined
@@ -86,11 +83,8 @@ export default function IAProfessor({
     setLoading(false)
   }
 
-  // Indicadores compactos
   const memEntries = getModuleMemory(moduleId)
   const { score: depthScore } = getChapterDepth('M1-0-cap1')
-
-  const hasVisual = activeMode === 'connect' || activeMode === 'apply'
 
   return (
     <div className="sticky bottom-0 z-20 pointer-events-none">
@@ -109,7 +103,6 @@ export default function IAProfessor({
             }}>
             <Sparkles className="w-3 h-3" style={{ opacity: 0.6 }} />
             <span className="text-[10px] font-semibold tracking-wide">Professor</span>
-            {/* Mini dots de memória no botão */}
             {memEntries.length > 0 && (
               <div className="flex gap-0.5 ml-1">
                 {memEntries.slice(0, 5).map((e) => (
@@ -123,7 +116,7 @@ export default function IAProfessor({
           </motion.button>
         )}
 
-        {/* ── Painel expandido ��─ */}
+        {/* ── Painel expandido ── */}
         <AnimatePresence>
           {open && (
             <motion.div
@@ -135,19 +128,18 @@ export default function IAProfessor({
               style={{
                 background: 'rgba(10,10,10,0.96)',
                 border: '1px solid rgba(255,255,255,0.08)',
-                maxHeight: '80vh',
+                maxHeight: '85vh',
                 display: 'flex',
                 flexDirection: 'column',
               }}>
 
-              {/* ── Header: título + indicadores inline + fechar ── */}
+              {/* ── Header ── */}
               <div className="flex items-center justify-between px-4 py-2.5 shrink-0"
                 style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="flex items-center gap-3">
                   <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-white/50">
                     Professor
                   </span>
-                  {/* Profundidade inline */}
                   {depthScore > 0 && (
                     <div className="flex items-center gap-1.5">
                       <div style={{
@@ -156,13 +148,12 @@ export default function IAProfessor({
                       }}>
                         <div style={{
                           width: `${depthScore}%`, height: '100%', borderRadius: 2,
-                          background: depthScore >= 60 ? '#ffffff' : 'rgba(255,255,255,0.4)',
+                          background: depthScore >= 60 ? '#fff' : 'rgba(255,255,255,0.4)',
                         }} />
                       </div>
                       <span className="text-[8px] font-mono text-white/30">{depthScore}%</span>
                     </div>
                   )}
-                  {/* Memória dots inline */}
                   {memEntries.length > 0 && (
                     <div className="flex gap-0.5">
                       {memEntries.slice(0, 6).map((e) => (
@@ -180,7 +171,7 @@ export default function IAProfessor({
                 </button>
               </div>
 
-              {/* ── 5 botões de modo ── */}
+              {/* ── 5 botões ── */}
               <div className="px-3 py-2.5 flex flex-wrap gap-1.5 shrink-0">
                 {MODES.map((m) => {
                   const Icon = m.icon
@@ -190,7 +181,7 @@ export default function IAProfessor({
                       className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[9px] font-semibold transition-all disabled:opacity-30"
                       style={{
                         background: isActive ? 'rgba(255,255,255,0.08)' : 'transparent',
-                        color: isActive ? '#ffffff' : 'rgba(255,255,255,0.45)',
+                        color: isActive ? '#fff' : 'rgba(255,255,255,0.45)',
                         border: `1px solid ${isActive ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)'}`,
                       }}>
                       <Icon className="w-2.5 h-2.5" />
@@ -200,83 +191,52 @@ export default function IAProfessor({
                 })}
               </div>
 
-              {/* ���─ Resposta (scrollável) ── */}
-              <div className="flex-1 overflow-y-auto px-4 pb-4" style={{ minHeight: 60 }}>
+              {/* ── Conteúdo: mapa OU texto, nunca os dois ── */}
+              <div className="flex-1 overflow-y-auto" style={{ minHeight: 60 }}>
                 <AnimatePresence mode="wait">
-                  {loading && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                      className="py-4">
+                  {/* CONECTAR = mapa mental grande, sem texto */}
+                  {activeMode === 'connect' && (
+                    <motion.div key="graph"
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                      className="p-3">
+                      {(() => {
+                        const g = getChapter1Graph()
+                        return <ConceptGraph nodes={g.nodes} edges={g.edges} height={320} />
+                      })()}
+                    </motion.div>
+                  )}
+
+                  {/* LOADING */}
+                  {activeMode !== 'connect' && loading && (
+                    <motion.div key="loading"
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                      className="px-4 py-6">
                       <div className="flex items-center gap-2 text-[10px] text-white/35">
-                        <motion.div
-                          className="w-1 h-1 rounded-full bg-white/50"
+                        <motion.div className="w-1 h-1 rounded-full bg-white/50"
                           animate={{ scale: [1, 1.5, 1] }}
-                          transition={{ duration: 1, repeat: Infinity }}
-                        />
-                        <span>Analisando o capítulo...</span>
+                          transition={{ duration: 1, repeat: Infinity }} />
+                        <span>Analisando...</span>
                       </div>
                     </motion.div>
                   )}
-                  {response && !loading && (
-                    <motion.div key={activeMode}
-                      initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
 
-                      {/* Toggle visual (grafo/calc) — só aparece se disponível */}
-                      {hasVisual && (
-                        <button
-                          onClick={() => setShowVisual((v) => !v)}
-                          className="flex items-center gap-1.5 mb-3 text-[8px] font-bold uppercase tracking-[0.18em] text-white/30 hover:text-white/55 transition-colors"
-                        >
-                          <span>{showVisual ? '−' : '+'}</span>
-                          <span>{activeMode === 'connect' ? 'Mapa de conexões' : 'Calculadora'}</span>
-                        </button>
-                      )}
-
-                      {/* Visual colapsável */}
-                      <AnimatePresence>
-                        {showVisual && activeMode === 'connect' && (
-                          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }} style={{ overflow: 'hidden' }}>
-                            {(() => {
-                              const g = getChapter1Graph()
-                              return <ConceptGraph nodes={g.nodes} edges={g.edges} height={180} />
-                            })()}
-                          </motion.div>
-                        )}
-                        {showVisual && activeMode === 'apply' && (
-                          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }} style={{ overflow: 'hidden' }}>
-                            <ProfessorCalc
-                              title="Gap de Digitalização"
-                              description="Custo de não avançar entre fases."
-                              sliders={[
-                                { id: 'receita', label: 'Receita anual', min: 500000, max: 50000000, default: 5000000, unit: 'R$', step: 500000 },
-                                { id: 'perda', label: 'Perda por ineficiência', min: 1, max: 15, default: 5, unit: '%' },
-                                { id: 'mercado', label: 'Crescimento digital', min: 5, max: 30, default: 12, unit: '%/ano' },
-                                { id: 'anos', label: 'Anos parado', min: 1, max: 10, default: 5, unit: ' anos' },
-                              ]}
-                              formula="receita * (Math.pow(1 + mercado/100, anos) - Math.pow(1 - perda/100, anos))"
-                              resultLabel="Gap acumulado"
-                              resultFormat="currency"
-                              interpretation={[
-                                { max: 2000000, label: 'Gerenciável', color: '#ffffff' },
-                                { max: 10000000, label: 'Crítico', color: 'rgba(255,180,60,0.95)' },
-                                { max: 999999999999, label: 'Irreversível', color: 'rgba(255,80,80,0.95)' },
-                              ]}
-                            />
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-
-                      {/* Texto da resposta — SEMPRE visível, limpo */}
+                  {/* TEXTO — aprofundar, revisar, aplicar, resumir */}
+                  {activeMode !== 'connect' && response && !loading && (
+                    <motion.div key="text"
+                      initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                      className="px-4 pb-4">
                       <div className="rounded-lg p-3"
                         style={{ background: 'rgba(255,255,255,0.02)', borderLeft: '2px solid rgba(255,255,255,0.12)' }}>
                         <ProfessorMarkdown text={response} />
                       </div>
                     </motion.div>
                   )}
-                  {!response && !loading && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                      className="py-4">
+
+                  {/* ESTADO INICIAL — nenhum modo selecionado */}
+                  {!activeMode && (
+                    <motion.div key="empty"
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                      className="px-4 py-6">
                       <p className="text-[9px] text-white/22">Escolha um modo acima.</p>
                     </motion.div>
                   )}
@@ -291,9 +251,8 @@ export default function IAProfessor({
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Markdown renderer — limpo, sem cards pesados
-// Headings viram labels sutis. Texto é a prioridade.
-// ──────────────────────────���───────────────────────���──────────────────
+// Markdown limpo — texto legível, sem decoração pesada
+// ─────────────���──────────────────────────────��────────────────────��───
 
 function ProfessorMarkdown({ text }: { text: string }) {
   const blocks = text.trim().split(/\n\n+/)
@@ -301,7 +260,6 @@ function ProfessorMarkdown({ text }: { text: string }) {
     <div className="space-y-2.5">
       {blocks.map((block, bi) => {
         const trimmed = block.trim()
-        // Heading standalone: **Título**
         const headingMatch = trimmed.match(/^\*\*([^*]+)\*\*$/)
         if (headingMatch) {
           return (
@@ -312,7 +270,6 @@ function ProfessorMarkdown({ text }: { text: string }) {
             </div>
           )
         }
-        // Lista
         const lines = trimmed.split('\n')
         const isList = lines.length > 1 && lines.every((l) => /^(\d+\.|[-•▸])\s/.test(l.trim()))
         if (isList) {
@@ -330,7 +287,6 @@ function ProfessorMarkdown({ text }: { text: string }) {
             </div>
           )
         }
-        // Parágrafo
         return (
           <p key={bi} className="text-[11px] leading-[1.7] text-white/65"
             style={{ textAlign: 'justify', hyphens: 'auto' }}>
