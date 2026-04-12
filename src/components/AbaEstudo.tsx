@@ -1031,19 +1031,7 @@ export default function AbaEstudo() {
                                           )}
                                         </div>
 
-                                        {/* IA Professor — direciona estudo do bloco atual (Sumário) */}
-                                        {activeSidebarTool === 'sumario' && (
-                                          <div className="pt-4">
-                                            <IAProfessor
-                                              moduleId={current.id}
-                                              submoduleTitle={theoryItem}
-                                              blockTitle={extractBlockTitle(block)}
-                                              blockContent={extractBlockContent(block)}
-                                              studiedTopics={current.theory}
-                                              currentPosition={{ blockIdx: idx, totalBlocks: cadernoBlocks.length }}
-                                            />
-                                          </div>
-                                        )}
+                                        {/* IA Professor removido — poluía a experiência */}
                                       </motion.div>
                                     </AnimatePresence>
                                   )
