@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Link2, HelpCircle, RefreshCw, ArrowRight, BookOpen, X } from 'lucide-react'
 import { getReviewData, getModuleMemory, retentionColor, retentionLabel } from '@/store/study-memory-store'
 import ConceptGraph, { getChapter1Graph } from './ConceptGraph'
+import ProfessorCalc from './ProfessorCalc'
 
 const BLUE = '#2e86c1'
 const AMBER = '#9a7d0a'
@@ -330,6 +331,27 @@ export default function IAProfessor({
                       const graphData = getChapter1Graph()
                       return <ConceptGraph nodes={graphData.nodes} edges={graphData.edges} />
                     })()}
+                    {/* Calculadora embutida no modo Aplicar */}
+                    {activeMode === 'apply' && (
+                      <ProfessorCalc
+                        title="Gap de Digitalização — Custo de Estar na Fase Errada"
+                        description="Simule quanto sua empresa perde por não avançar entre as fases da Era Digital. O gap cresce exponencialmente porque o mercado ao redor acelera enquanto você estagna."
+                        sliders={[
+                          { id: 'receita', label: 'Receita anual', min: 500000, max: 50000000, default: 5000000, unit: 'R$', step: 500000 },
+                          { id: 'perda', label: 'Perda anual por ineficiência', min: 1, max: 15, default: 5, unit: '%' },
+                          { id: 'mercado', label: 'Crescimento do mercado digital', min: 5, max: 30, default: 12, unit: '%/ano' },
+                          { id: 'anos', label: 'Anos sem avançar de fase', min: 1, max: 10, default: 5, unit: ' anos' },
+                        ]}
+                        formula="receita * (Math.pow(1 + mercado/100, anos) - Math.pow(1 - perda/100, anos))"
+                        resultLabel="Gap acumulado em relação ao mercado"
+                        resultFormat="currency"
+                        interpretation={[
+                          { max: 2000000, label: 'Gap gerenciável — mas crescendo rápido', color: '#ffffff' },
+                          { max: 10000000, label: 'Gap crítico — concorrentes distanciando', color: 'rgba(255,180,60,0.95)' },
+                          { max: 999999999999, label: 'Gap irreversível — risco existencial', color: 'rgba(255,80,80,0.95)' },
+                        ]}
+                      />
+                    )}
                     <div className="rounded-lg p-4 max-h-[60vh] overflow-y-auto"
                       style={{ background: `${AMBER}06`, borderLeft: `2px solid ${AMBER}40` }}>
                       <ProfessorMarkdown text={response} />
