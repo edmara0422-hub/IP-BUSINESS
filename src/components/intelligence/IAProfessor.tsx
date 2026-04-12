@@ -4,6 +4,7 @@ import { useState, Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Link2, HelpCircle, RefreshCw, ArrowRight, BookOpen, X } from 'lucide-react'
 import { getReviewData, getModuleMemory, retentionColor, retentionLabel } from '@/store/study-memory-store'
+import ConceptGraph, { getChapter1Graph } from './ConceptGraph'
 
 const BLUE = '#2e86c1'
 const AMBER = '#9a7d0a'
@@ -324,6 +325,11 @@ export default function IAProfessor({
                   <motion.div key={activeMode}
                     initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                     className="px-4 pb-4">
+                    {/* Grafo visual no modo Conectar */}
+                    {activeMode === 'connect' && (() => {
+                      const graphData = getChapter1Graph()
+                      return <ConceptGraph nodes={graphData.nodes} edges={graphData.edges} />
+                    })()}
                     <div className="rounded-lg p-4 max-h-[60vh] overflow-y-auto"
                       style={{ background: `${AMBER}06`, borderLeft: `2px solid ${AMBER}40` }}>
                       <ProfessorMarkdown text={response} />
