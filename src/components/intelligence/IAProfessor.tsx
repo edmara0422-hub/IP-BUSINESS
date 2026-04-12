@@ -141,63 +141,172 @@ function DepthMeter({ chapterId }: { chapterId: string }) {
   )
 }
 
+/**
+ * ProfessorMarkdown — renderiza respostas do Professor como CARDS ESTRUTURADOS.
+ *
+ * Parser: detecta seções que começam com **Título** e agrupa o conteúdo
+ * abaixo de cada título num card visual com borda, ícone e background.
+ * Texto fora de seções vira parágrafo normal. Listas virm bullets.
+ *
+ * Resultado: mesmo conteúdo textual, 3x mais legível e memorável.
+ */
+
+const CARD_ICONS: Record<string, string> = {
+  'linhagem': '◈',
+  'teórica': '◈',
+  'conexão': '◈',
+  'ponte': '⊞',
+  'aparece': '⊞',
+  'camada': '▦',
+  'profund': '▦',
+  'caso': '▸',
+  'brasileiro': '▸',
+  'aplicação': '●',
+  'aplicar': '●',
+  'padrão': '◑',
+  'tese': '◉',
+  'pilar': '▣',
+  'mecanismo': '⚙',
+  'frase': '✦',
+  'claro': '✓',
+  'pré-requisito': '⊘',
+  'mini-revisão': '↻',
+  'insight': '✦',
+  'nuance': '◇',
+  'leitura': '📖',
+}
+
+function getCardIcon(title: string): string {
+  const lower = title.toLowerCase()
+  for (const [key, icon] of Object.entries(CARD_ICONS)) {
+    if (lower.includes(key)) return icon
+  }
+  return '·'
+}
+
 function ProfessorMarkdown({ text }: { text: string }) {
-  const blocks = text.trim().split(/\n\n+/)
+  // Divide em blocos por dupla quebra de linha
+  const rawBlocks = text.trim().split(/\n\n+/)
+
+  // Agrupa em seções: cada seção começa com um heading (**Título**)
+  // e inclui todos os blocos até o próximo heading
+  type Section = { heading: string | null; content: string[] }
+  const sections: Section[] = []
+  let currentSection: Section = { heading: null, content: [] }
+
+  for (const block of rawBlocks) {
+    const trimmed = block.trim()
+    const headingMatch = trimmed.match(/^\*\*([^*]+)\*\*$/)
+    if (headingMatch) {
+      // Salva a seção anterior se tem conteúdo
+      if (currentSection.heading || currentSection.content.length > 0) {
+        sections.push(currentSection)
+      }
+      currentSection = { heading: headingMatch[1], content: [] }
+    } else {
+      currentSection.content.push(trimmed)
+    }
+  }
+  if (currentSection.heading || currentSection.content.length > 0) {
+    sections.push(currentSection)
+  }
+
   return (
     <div className="space-y-3">
-      {blocks.map((block, bi) => {
-        const trimmed = block.trim()
-        // Heading: parágrafo inteiro envolvido em **
-        const headingMatch = trimmed.match(/^\*\*([^*]+)\*\*$/)
-        if (headingMatch) {
-          return (
-            <div
-              key={bi}
-              className="text-[10px] font-bold uppercase tracking-[0.18em] mt-2"
-              style={{ color: AMBER }}
-            >
-              {headingMatch[1]}
-            </div>
-          )
+      {sections.map((section, si) => {
+        if (!section.heading) {
+          // Seção sem heading = parágrafos soltos
+          return section.content.map((c, ci) => (
+            <ParagraphOrList key={`${si}-${ci}`} text={c} />
+          ))
         }
-        // Lista: linhas que começam com "1. " ou "- " ou "• "
-        const lines = trimmed.split('\n')
-        const isList = lines.every((l) => /^(\d+\.|[-•])\s/.test(l.trim()))
-        if (isList && lines.length > 1) {
-          return (
-            <ul key={bi} className="space-y-1.5 pl-1">
-              {lines.map((line, li) => {
-                const cleaned = line.trim().replace(/^(\d+\.|[-•])\s+/, '')
-                return (
-                  <li
-                    key={li}
-                    className="text-[12px] leading-relaxed text-white/72 pl-3 relative"
-                  >
-                    <span
-                      className="absolute left-0 top-[0.5em]"
-                      style={{ color: AMBER, fontSize: 8 }}
-                    >
-                      ▸
-                    </span>
-                    {renderInline(cleaned)}
-                  </li>
-                )
-              })}
-            </ul>
-          )
-        }
-        // Parágrafo normal
+
+        // Seção com heading = card estruturado
+        const icon = getCardIcon(section.heading)
         return (
-          <p
-            key={bi}
-            className="text-[12px] leading-relaxed text-white/72"
-            style={{ textAlign: 'justify', hyphens: 'auto' }}
+          <div
+            key={si}
+            style={{
+              background: 'rgba(255,255,255,0.025)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 8,
+              padding: '12px 14px',
+              borderLeft: `3px solid rgba(255,255,255,0.25)`,
+            }}
           >
-            {renderInline(trimmed)}
-          </p>
+            {/* Card header */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                marginBottom: 8,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 12,
+                  color: 'rgba(255,255,255,0.55)',
+                  lineHeight: 1,
+                }}
+              >
+                {icon}
+              </span>
+              <span
+                className="text-[10px] font-bold uppercase tracking-[0.14em]"
+                style={{ color: AMBER }}
+              >
+                {section.heading}
+              </span>
+            </div>
+            {/* Card body */}
+            <div className="space-y-2">
+              {section.content.map((c, ci) => (
+                <ParagraphOrList key={ci} text={c} />
+              ))}
+            </div>
+          </div>
         )
       })}
     </div>
+  )
+}
+
+function ParagraphOrList({ text }: { text: string }) {
+  const lines = text.split('\n')
+  const isList = lines.length > 1 && lines.every((l) => /^(\d+\.|[-•▸])\s/.test(l.trim()))
+
+  if (isList) {
+    return (
+      <ul className="space-y-1 pl-1">
+        {lines.map((line, li) => {
+          const cleaned = line.trim().replace(/^(\d+\.|[-•▸])\s+/, '')
+          return (
+            <li
+              key={li}
+              className="text-[11px] leading-relaxed text-white/72 pl-3 relative"
+            >
+              <span
+                className="absolute left-0 top-[0.5em]"
+                style={{ color: AMBER, fontSize: 7 }}
+              >
+                ▸
+              </span>
+              {renderInline(cleaned)}
+            </li>
+          )
+        })}
+      </ul>
+    )
+  }
+
+  return (
+    <p
+      className="text-[11px] leading-relaxed text-white/72"
+      style={{ textAlign: 'justify', hyphens: 'auto' }}
+    >
+      {renderInline(text)}
+    </p>
   )
 }
 
