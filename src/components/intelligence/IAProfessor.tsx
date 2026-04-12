@@ -3,7 +3,7 @@
 import { useState, Fragment } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Link2, HelpCircle, RefreshCw, ArrowRight, BookOpen, X } from 'lucide-react'
-import { getReviewData, getModuleMemory, retentionColor, retentionLabel } from '@/store/study-memory-store'
+import { getReviewData, getModuleMemory, retentionColor, retentionLabel, getChapterDepth, getDepthData } from '@/store/study-memory-store'
 import ConceptGraph, { getChapter1Graph } from './ConceptGraph'
 import ProfessorCalc from './ProfessorCalc'
 
@@ -77,6 +77,66 @@ function MemoryBar({ moduleId }: { moduleId: string }) {
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+/**
+ * Medidor visual de profundidade — barra 0-100% que mostra
+ * quanto o aluno explorou do capítulo (leitura + deepDive + aplicação).
+ */
+function DepthMeter({ chapterId }: { chapterId: string }) {
+  const { score, label } = getChapterDepth(chapterId)
+  if (score === 0) return null
+
+  const barColor =
+    score >= 80 ? '#ffffff' : score >= 50 ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.38)'
+
+  return (
+    <div
+      className="px-4 py-2"
+      style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+    >
+      <div className="flex items-center justify-between mb-1.5">
+        <span
+          className="text-[8px] font-bold uppercase tracking-[0.16em]"
+          style={{ color: 'rgba(255,255,255,0.35)' }}
+        >
+          Profundidade
+        </span>
+        <span
+          className="text-[9px] font-mono font-bold"
+          style={{ color: barColor }}
+        >
+          {score}%
+        </span>
+      </div>
+      <div
+        style={{
+          width: '100%',
+          height: 3,
+          background: 'rgba(255,255,255,0.06)',
+          borderRadius: 2,
+          overflow: 'hidden',
+          marginBottom: 4,
+        }}
+      >
+        <div
+          style={{
+            width: `${score}%`,
+            height: '100%',
+            background: barColor,
+            borderRadius: 2,
+            transition: 'width 0.5s ease-out',
+          }}
+        />
+      </div>
+      <span
+        className="text-[8px]"
+        style={{ color: 'rgba(255,255,255,0.35)' }}
+      >
+        {label}
+      </span>
     </div>
   )
 }
@@ -197,8 +257,17 @@ export default function IAProfessor({
     setLoading(true)
     setResponse(null)
     try {
-      // Para "review", inclui o mapa de memória Ebbinghaus do aluno
+      // Dados adaptativos do aluno
       const memoryData = mode === 'review' ? getReviewData(moduleId) : undefined
+      // Profundidade enviada em TODOS os modos — calibra a resposta
+      const chapterId = blockTitle ? `M1-0-cap1` : undefined // TODO: derivar do contexto real
+      const depthInfo = chapterId ? getDepthData(chapterId) : undefined
+
+      const enrichedContent = [
+        blockContent ?? '',
+        depthInfo ? `\n\n--- PROFUNDIDADE DO ALUNO ---\n${depthInfo}` : '',
+        memoryData ? `\n\n--- DADOS DE MEMÓRIA DO ALUNO (Ebbinghaus) ---\n${memoryData}` : '',
+      ].join('')
 
       const res = await fetch('/api/professor', {
         method: 'POST',
@@ -208,9 +277,7 @@ export default function IAProfessor({
           moduleId,
           submoduleTitle,
           blockTitle,
-          blockContent: mode === 'review' && memoryData
-            ? `${blockContent ?? ''}\n\n--- DADOS DE MEMÓRIA DO ALUNO (Ebbinghaus) ---\n${memoryData}`
-            : blockContent,
+          blockContent: enrichedContent,
           studiedTopics,
           currentPosition,
         }),
@@ -286,8 +353,9 @@ export default function IAProfessor({
                 </button>
               </div>
 
-              {/* Barra de memória Ebbinghaus */}
+              {/* Barra de memória Ebbinghaus + Medidor de profundidade */}
               <MemoryBar moduleId={moduleId} />
+              <DepthMeter chapterId="M1-0-cap1" />
 
               {/* Seletor de modo */}
               <div className="px-3 py-3 flex flex-wrap gap-1.5">

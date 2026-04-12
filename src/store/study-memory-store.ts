@@ -165,6 +165,53 @@ export function getMostUrgent(n: number = 5): Array<MemoryEntry & { retention: n
 }
 
 /**
+ * Calcula profundidade de estudo de um capítulo específico (0 a 100).
+ * Leva em conta: leitura do capítulo, abertura de deepDives, e classificações corretas.
+ */
+export function getChapterDepth(chapterId: string): {
+  score: number          // 0-100
+  label: string
+  details: { read: boolean; deepDives: number; applied: number; total: number }
+} {
+  const state = load()
+  const entries = Object.values(state.entries).filter((e) => e.chapterId === chapterId)
+
+  const readMain = entries.some((e) => e.conceptId === chapterId && e.depth !== undefined)
+  const deepDives = entries.filter((e) => e.depth === 'deepdive' || e.depth === 'applied').length
+  const applied = entries.filter((e) => e.depth === 'applied').length
+  const total = entries.length
+
+  // Score: leitura base (20) + deepDives (até 40) + aplicação (até 40)
+  let score = 0
+  if (readMain) score += 20
+  score += Math.min(deepDives * 13, 40)
+  score += Math.min(applied * 20, 40)
+  score = Math.min(100, score)
+
+  const label =
+    score >= 80 ? 'Domínio profundo — nível avançado'
+    : score >= 50 ? 'Nível intermediário — falta aprofundar'
+    : score >= 20 ? 'Nível básico — leu mas não explorou'
+    : 'Superficial — apenas passou pelo bloco'
+
+  return { score, label, details: { read: readMain, deepDives, applied, total } }
+}
+
+/**
+ * Retorna dados de profundidade formatados para o Professor usar.
+ */
+export function getDepthData(chapterId: string): string {
+  const { score, label, details } = getChapterDepth(chapterId)
+  return `PROFUNDIDADE DO ALUNO NESTE CAPÍTULO: ${score}/100 (${label})
+Detalhes: leu o capítulo=${details.read} · deepDives abertos=${details.deepDives} · aplicações corretas=${details.applied} · conceitos registrados=${details.total}
+
+CALIBRE SUA RESPOSTA à profundidade:
+- Se score < 30: comece do básico, defina termos, não assuma conhecimento prévio.
+- Se score 30–60: assuma que o aluno entendeu o básico, vá direto pra nuances e casos.
+- Se score > 60: vá pra fronteira do tema — pesquisas recentes, debates abertos, exceções.`
+}
+
+/**
  * Retorna dados formatados para o Professor usar no modo "review".
  */
 export function getReviewData(moduleId: string): string {
