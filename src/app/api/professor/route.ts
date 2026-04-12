@@ -152,11 +152,13 @@ export async function POST(request: Request) {
     const contextParts: string[] = []
     contextParts.push(`Módulo/Tópico atual: "${submoduleTitle}"`)
     if (blockTitle) contextParts.push(`Bloco atual: "${blockTitle}"`)
-    if (blockContent) contextParts.push(`Conteúdo do bloco:\n${blockContent.slice(0, 2500)}`)
-    if (studiedTopics?.length) contextParts.push(`Tópicos já estudados: ${studiedTopics.slice(0, 15).join(', ')}`)
+    if (blockContent) contextParts.push(`Conteúdo do bloco (LEIA COM ATENÇÃO — sua resposta DEVE citar dados, números, empresas e conceitos DESTE conteúdo):\n\n${blockContent.slice(0, 4000)}`)
+    if (studiedTopics?.length) contextParts.push(`Tópicos já estudados pelo aluno: ${studiedTopics.slice(0, 15).join(', ')}`)
     if (currentPosition) contextParts.push(`Posição: bloco ${currentPosition.blockIdx + 1} de ${currentPosition.totalBlocks}`)
 
-    const userMessage = contextParts.join('\n\n')
+    const anchorInstruction = `\n\nIMPORTANTE: Sua resposta DEVE referenciar dados específicos do conteúdo acima — empresas citadas (Banco do Brasil, Natura, iFood, Magazine Luiza, Nubank), números concretos (R$ 2 bi, 5.000 agências, 7 países, R$ 100 bi/ano), conceitos específicos (as 3 fases: Infraestrutura → Processo → Estratégia, ERP, uptime, efeitos de rede, matching algorítmico). Se sua resposta puder trocar "tecnologia" por "qualquer tema genérico" e ainda fazer sentido, ela está ERRADA — reescreva com os dados concretos do bloco.`
+
+    const userMessage = contextParts.join('\n\n') + anchorInstruction
 
     const completion = await getGroq().chat.completions.create({
       model: 'llama-3.3-70b-versatile',
@@ -165,7 +167,7 @@ export async function POST(request: Request) {
         { role: 'user', content: userMessage },
       ],
       max_tokens: 1100,
-      temperature: mode === 'apply' || mode === 'deepen' ? 0.65 : 0.5,
+      temperature: mode === 'apply' || mode === 'deepen' ? 0.55 : 0.4,
     })
 
     const text = completion.choices[0]?.message?.content?.trim() ?? ''
