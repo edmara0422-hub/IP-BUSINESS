@@ -41,7 +41,7 @@ import { ArgumentBuilder, LeanCanvas, MacroScenario, TextReview, PitchEvaluation
 import { SIM_ESG } from '@/components/intelligence/SimulationsESG'
 import SmartContentRenderer from '@/components/intelligence/SmartContentRenderer'
 import ContentBlockRenderer from '@/components/intelligence/ContentBlockRenderer'
-import IAProfessor from '@/components/intelligence/IAProfessor'
+// IAProfessor removido — poluía a experiência
 
 const SIM_COMPONENTS: Record<string, React.ComponentType> = {
   ...SIM_M3,
@@ -153,7 +153,41 @@ const SIDEBAR_TOOLS: { id: SidebarTool; label: string; icon: LucideIcon }[] = [
 
 // ─── Block renderer ───────────────────────────────────────────────────────────
 
-// Helpers para extrair título/conteúdo de qualquer tipo de bloco (usado pelo IA Professor)
+/**
+ * Renderiza markdown básico do Tutor: **bold**, _italic_, listas com —, parágrafos.
+ */
+function TutorMarkdown({ text }: { text: string }) {
+  const paragraphs = text.split('\n\n').filter((p) => p.trim())
+  return (
+    <div className="space-y-2">
+      {paragraphs.map((para, i) => {
+        const lines = para.split('\n')
+        const isList = lines.length > 1 && lines.every((l) => l.trim().startsWith('—') || l.trim().startsWith('-') || l.trim().startsWith('•') || !!l.trim().match(/^\d+\./))
+        if (isList) {
+          return (
+            <ul key={i} className="space-y-1 pl-1">
+              {lines.map((l, j) => (
+                <li key={j} className="flex gap-2 text-[12px] text-white/60 leading-relaxed">
+                  <span className="text-white/30 shrink-0">—</span>
+                  <span dangerouslySetInnerHTML={{ __html: inlineMarkdown(l.replace(/^[—\-•]\s*|\d+\.\s*/, '')) }} />
+                </li>
+              ))}
+            </ul>
+          )
+        }
+        return <p key={i} className="text-[12px] text-white/62 leading-[1.75]" dangerouslySetInnerHTML={{ __html: inlineMarkdown(para.replace(/\n/g, ' ')) }} />
+      })}
+    </div>
+  )
+}
+
+function inlineMarkdown(text: string): string {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, '<strong style="color:rgba(255,255,255,0.85);font-weight:600">$1</strong>')
+    .replace(/_([^_]+)_/g, '<em style="color:rgba(255,255,255,0.7)">$1</em>')
+}
+
+// Helpers para extrair título/conteúdo de qualquer tipo de bloco
 function extractBlockTitle(block: ContentBlock): string | undefined {
   if ('title' in block && block.title) return block.title
   if (block.type === 'concept') return block.term
@@ -556,21 +590,13 @@ function StudySidebar({
                 <p className="text-[9px] uppercase tracking-[0.32em] text-white/28">IA Tutor · {submoduleTitle}</p>
                 {tutorMessages.length > 0 && (
                   <div className="flex items-center gap-1">
-                    <button
-                      onClick={onSaveToNotes}
-                      title="Salvar em Notas"
-                      className="flex items-center gap-1 rounded-[0.6rem] px-2 py-1 text-[9px] uppercase tracking-[0.14em] text-white/32 transition hover:bg-white/[0.05] hover:text-white/62"
-                    >
-                      <BookmarkPlus className="h-3 w-3" />
-                      Notas
+                    <button onClick={onSaveToNotes} title="Salvar em Notas"
+                      className="flex items-center gap-1 rounded-[0.6rem] px-2 py-1 text-[9px] uppercase tracking-[0.14em] text-white/32 transition hover:bg-white/[0.05] hover:text-white/62">
+                      <BookmarkPlus className="h-3 w-3" /> Notas
                     </button>
-                    <button
-                      onClick={onClearTutor}
-                      title="Limpar conversa"
-                      className="flex items-center gap-1 rounded-[0.6rem] px-2 py-1 text-[9px] uppercase tracking-[0.14em] text-white/32 transition hover:bg-white/[0.05] hover:text-white/62"
-                    >
-                      <Eraser className="h-3 w-3" />
-                      Limpar
+                    <button onClick={onClearTutor} title="Limpar conversa"
+                      className="flex items-center gap-1 rounded-[0.6rem] px-2 py-1 text-[9px] uppercase tracking-[0.14em] text-white/32 transition hover:bg-white/[0.05] hover:text-white/62">
+                      <Eraser className="h-3 w-3" /> Limpar
                     </button>
                   </div>
                 )}
@@ -578,42 +604,76 @@ function StudySidebar({
 
               <div className="flex-1 space-y-3 overflow-y-auto">
                 {tutorMessages.length === 0 && (
-                  <div className="space-y-3">
-                    <p className="text-[12px] leading-relaxed text-white/34">
-                      Selecione um trecho do caderno e clique em <span className="text-white/60">Explicar</span>, ou escolha abaixo.
+                  <div className="space-y-4">
+                    <p className="text-[12px] leading-relaxed text-white/40">
+                      Pesquise, aprofunde ou peça exemplos reais. Selecione um trecho do texto e clique <span className="text-white/70">Explicar</span>, ou escolha abaixo.
                     </p>
-                    <div className="space-y-1.5">
-                      <p className="text-[9px] uppercase tracking-[0.22em] text-white/22">Sugestões sobre {submoduleTitle}</p>
-                      {[
-                        `Qual o conceito-chave de ${submoduleTitle}?`,
-                        `Dê um exemplo real aplicado de ${submoduleTitle}.`,
-                        `Quais erros comuns em ${submoduleTitle}?`,
-                        `Como conectar ${submoduleTitle} com outros tópicos?`,
-                      ].map((s, i) => (
-                        <button key={i} onClick={() => onAskTutor(s)}
-                          className="w-full text-left px-3 py-2 rounded-lg text-[11px] leading-relaxed text-white/50 hover:text-white/80 transition-all"
-                          style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                          {s}
-                        </button>
-                      ))}
+
+                    {/* Categorias de ação */}
+                    <div className="space-y-2.5">
+                      <div>
+                        <p className="text-[8px] uppercase tracking-[0.22em] text-white/20 mb-1.5">Explicar</p>
+                        <div className="space-y-1">
+                          <button onClick={() => onAskTutor(`O que é ${submoduleTitle}? Explique o conceito central e por que importa para negócios.`)}
+                            className="w-full text-left px-3 py-2 rounded-lg text-[11px] leading-relaxed text-white/55 hover:text-white/85 transition-all"
+                            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                            O que é {submoduleTitle}? Conceito central.
+                          </button>
+                          <button onClick={() => onAskTutor(`Quais são os principais autores e referências acadêmicas sobre ${submoduleTitle}? Cite autor, ano, universidade e contribuição principal.`)}
+                            className="w-full text-left px-3 py-2 rounded-lg text-[11px] leading-relaxed text-white/55 hover:text-white/85 transition-all"
+                            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                            Principais autores e referências acadêmicas
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-[8px] uppercase tracking-[0.22em] text-white/20 mb-1.5">Aprofundar</p>
+                        <div className="space-y-1">
+                          <button onClick={() => onAskTutor(`Aprofunde ${submoduleTitle}: o que o material básico não cobre? Debates acadêmicos, controvérsias, dados que surpreendem.`)}
+                            className="w-full text-left px-3 py-2 rounded-lg text-[11px] leading-relaxed text-white/55 hover:text-white/85 transition-all"
+                            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                            O que o material básico não cobre?
+                          </button>
+                          <button onClick={() => onAskTutor(`Quais os erros mais comuns que gestores cometem em ${submoduleTitle}? Dê exemplos reais de empresas que erraram.`)}
+                            className="w-full text-left px-3 py-2 rounded-lg text-[11px] leading-relaxed text-white/55 hover:text-white/85 transition-all"
+                            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                            Erros que gestores cometem nessa área
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-[8px] uppercase tracking-[0.22em] text-white/20 mb-1.5">Caso Real</p>
+                        <div className="space-y-1">
+                          <button onClick={() => onAskTutor(`Conte um caso real brasileiro de sucesso em ${submoduleTitle}. Empresa, ano, contexto, decisão, resultado com números.`)}
+                            className="w-full text-left px-3 py-2 rounded-lg text-[11px] leading-relaxed text-white/55 hover:text-white/85 transition-all"
+                            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                            Caso real brasileiro de sucesso
+                          </button>
+                          <button onClick={() => onAskTutor(`Conte um caso real de FRACASSO em ${submoduleTitle}. O que deu errado e o que a empresa deveria ter feito diferente?`)}
+                            className="w-full text-left px-3 py-2 rounded-lg text-[11px] leading-relaxed text-white/55 hover:text-white/85 transition-all"
+                            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+                            Caso real de fracasso — o que deu errado?
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
                 {tutorMessages.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`rounded-[1rem] px-3 py-2.5 text-[12px] leading-relaxed ${
-                      msg.role === 'user' ? 'bg-white/[0.06] text-white/72' : 'text-white/62'
-                    }`}
-                  >
-                    {msg.role === 'assistant' && <p className="mb-1 text-[9px] uppercase tracking-[0.2em] text-white/28">Tutor</p>}
-                    {msg.content}
+                  <div key={i}
+                    className={`rounded-[1rem] px-3 py-2.5 text-[12px] leading-[1.75] ${
+                      msg.role === 'user' ? 'bg-white/[0.06] text-white/72' : 'text-white/65'
+                    }`}>
+                    {msg.role === 'assistant' && <p className="mb-1.5 text-[9px] uppercase tracking-[0.2em] text-white/28">Tutor</p>}
+                    {msg.role === 'assistant' ? <TutorMarkdown text={msg.content} /> : msg.content}
                   </div>
                 ))}
                 {isTutorLoading && (
                   <div className="flex items-center gap-2 text-white/36">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    <span className="text-[11px]">Pensando...</span>
+                    <span className="text-[11px]">Pesquisando...</span>
                   </div>
                 )}
               </div>
@@ -625,7 +685,7 @@ function StudySidebar({
                 <input
                   value={tutorInput}
                   onChange={(e) => onTutorInputChange(e.target.value)}
-                  placeholder="Pergunta..."
+                  placeholder="Pergunte qualquer coisa sobre o tema..."
                   className="flex-1 bg-transparent text-[12px] text-white/72 outline-none placeholder:text-white/24"
                 />
                 <button type="submit" disabled={!tutorInput.trim() || isTutorLoading} className="text-white/42 transition hover:text-white/82 disabled:opacity-30">
