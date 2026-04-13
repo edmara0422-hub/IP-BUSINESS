@@ -35,7 +35,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               leadText: 'A evolução da tecnologia nas empresas pode ser segmentada em três fases distintas. Cada fase redefiniu o papel da TI dentro do negócio — de bastidor operacional a coração estratégico. Entender em qual fase sua empresa está hoje é o {{primeiro passo}} para qualquer transformação digital real.',
               showTimeline: true,
             },
-            body: 
+            body: [
               {
                 kind: 'paragraph',
                 text: 'A evolução histórica da tecnologia nas empresas pode ser segmentada em três fases distintas. Não são degraus de uma escada — são modos de operar. Algumas organizações vivem em mais de uma ao mesmo tempo. O que importa é reconhecer onde está o {{centro de gravidade}} da sua TI hoje, porque é a partir dele que qualquer salto se torna possível.',
@@ -242,7 +242,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             opening: {
               leadText: 'A transformação digital é o processo de integração de tecnologias digitais em {{todas as áreas}} de uma organização, mudando a forma como ela opera e entrega valor aos seus clientes. Não se trata apenas de implementar novas tecnologias, mas de uma {{mudança cultural}} que exige que as organizações desafiem continuamente o status quo, experimentem e se sintam confortáveis com o fracasso.',
             },
-            body: 
+            body: [
               {
                 kind: 'paragraph',
                 text: 'A transformação digital é o processo de integração de tecnologias digitais em todas as áreas de uma organização, mudando a forma como ela opera e entrega valor aos seus clientes. Não se trata apenas de implementar novas tecnologias, mas de uma {{mudança cultural}} que exige que as organizações desafiem continuamente o status quo, experimentem e se sintam confortáveis com o fracasso.',
@@ -332,7 +332,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             opening: {
               leadText: 'A governança digital é o conjunto de práticas que garantem que a tecnologia seja usada de maneira eficiente e alinhada às estratégias organizacionais. Em um ambiente em que os dados são o principal ativo, não dar o devido valor à governança pode colocar em risco a {{sustentabilidade}} de uma organização. Pilares são estruturas que mantêm algo em pé — se um falha, a casa desaba.',
             },
-            body: 
+            body: [
               {
                 kind: 'paragraph',
                 text: 'A governança digital é o conjunto de práticas e de processos que garantem que a tecnologia seja usada de maneira eficiente e alinhada às estratégias organizacionais. Ela envolve a gestão de recursos tecnológicos, a segurança da informação, a conformidade com regulamentações e a garantia de que os investimentos em tecnologia estejam gerando valor para a organização.',
@@ -438,7 +438,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             opening: {
               leadText: 'Empresas líderes estão adotando práticas que exploram dados em {{larga escala}} para otimizar portfólio e decisões. Mas ferramentas sozinhas não bastam — é necessário uma cultura que estimule {{pensamento crítico}} em todos os níveis. E o marco regulatório brasileiro define os limites dentro dos quais a inovação deve operar.',
             },
-            body: 
+            body: [
               {
                 kind: 'paragraph',
                 text: 'Empresas líderes estão adotando o Analytics-to-Value (AtV), um conjunto de práticas que utiliza digital e analytics para otimizar o portfólio e reduzir custos de produtos. Enquanto os métodos tradicionais (Design-to-Value) focam em componentes isolados, o AtV explora dados internos e externos em {{larga escala}}, gerando insights em poucos dias para todo o portfólio da empresa.',
