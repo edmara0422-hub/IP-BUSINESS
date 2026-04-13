@@ -327,7 +327,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: 'Em um ambiente em que os dados são o principal ativo, não dar o devido valor à governança digital pode colocar em risco a {{sustentabilidade}} de uma organização ao longo do tempo. Pilares são estruturas que permitem a algo se manter firme. Para a governança digital manter-se sólida, é fundamental que alguns pilares sejam bem construídos e funcionem conjuntamente. Caso contrário, a "casa pode desabar".',
+                text: 'Em um ambiente em que os dados são o principal ativo, não dar o devido valor à governança digital pode colocar em risco a {{sustentabilidade}} de uma organização ao longo do tempo. As principais atribuições da governança digital incluem: {{Segurança da informação}} — proteger as informações sensíveis contra ameaças internas e externas. {{Alinhamento estratégico}} — garantir que o uso da tecnologia esteja alinhado à estratégia de longo prazo da organização. {{Melhoria da eficiência}} — processos automatizados e bem gerenciados reduzem desperdícios, melhoram a produtividade e promovem a inovação. {{Conformidade legal}} — regulamentações como a LGPD no Brasil e o GDPR na Europa tornaram a governança digital essencial para garantir que as empresas estejam em conformidade com as leis de proteção de dados. Para a governança digital manter-se sólida, é fundamental que seus pilares sejam bem construídos e funcionem conjuntamente. Caso contrário, a "casa pode desabar".',
               },
               {
                 kind: 'pillar-grid',
