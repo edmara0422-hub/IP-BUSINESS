@@ -394,68 +394,57 @@ function DeepTextSection({ section }: { section: ChapterDeepText }) {
         })}
       </div>
 
-      {/* Concept popover */}
+      {/* Concept popover — inline, não fixed */}
       <AnimatePresence>
         {openConcept && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setOpenConcept(null)}
-              style={{ position: 'fixed', inset: 0, zIndex: 40, background: 'rgba(0,0,0,0.5)' }} />
-            <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }}
-              style={{
-                position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%,-50%)',
-                zIndex: 50, width: '90%', maxWidth: 380, padding: 20, borderRadius: 16,
-                background: '#0a0a0a', border: '1px solid rgba(154,125,10,0.3)',
-              }}>
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+            style={{ overflow: 'hidden', margin: '8px 0' }}>
+            <div style={{
+              padding: '14px 16px', borderRadius: 14,
+              background: 'rgba(154,125,10,0.06)', border: '1px solid rgba(154,125,10,0.2)',
+            }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: '#9a7d0a', textTransform: 'uppercase' }}>Conceito</span>
                 <button onClick={() => setOpenConcept(null)} style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
               </div>
-              <h4 style={{ fontSize: 17, fontWeight: 600, color: 'rgba(255,255,255,0.9)', margin: '0 0 8px', fontFamily: 'Poppins, system-ui, sans-serif' }}>{openConcept.term}</h4>
+              <h4 style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.9)', margin: '0 0 6px', fontFamily: 'Poppins, system-ui, sans-serif' }}>{openConcept.term}</h4>
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, margin: 0 }}>{openConcept.definition}</p>
               {openConcept.example && (
-                <div style={{ marginTop: 12, padding: '8px 12px', background: 'rgba(255,255,255,0.02)', borderLeft: '2px solid rgba(30,132,73,0.4)', borderRadius: 6 }}>
+                <div style={{ marginTop: 10, padding: '8px 12px', background: 'rgba(255,255,255,0.02)', borderLeft: '2px solid rgba(30,132,73,0.4)', borderRadius: 6 }}>
                   <p style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.15em', margin: '0 0 4px', textTransform: 'uppercase' }}>Exemplo</p>
                   <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, margin: 0 }}>{openConcept.example}</p>
                 </div>
               )}
-            </motion.div>
-          </>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Author ref panel */}
+      {/* Author ref — inline */}
       <AnimatePresence>
         {openRef && (
-          <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setOpenRef(null)}
-              style={{ position: 'fixed', inset: 0, zIndex: 40, background: 'rgba(0,0,0,0.5)' }} />
-            <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              style={{
-                position: 'fixed', right: 0, top: 0, bottom: 0, zIndex: 50,
-                width: '100%', maxWidth: 380, overflowY: 'auto',
-                background: '#0a0a0a', borderLeft: '1px solid rgba(255,255,255,0.08)',
-              }}>
-              <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between' }}>
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+            style={{ overflow: 'hidden', margin: '8px 0' }}>
+            <div style={{
+              padding: '14px 16px', borderRadius: 14,
+              background: 'rgba(46,134,193,0.06)', border: '1px solid rgba(46,134,193,0.2)',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: '#2e86c1', textTransform: 'uppercase' }}>Pesquisador</span>
                 <button onClick={() => setOpenRef(null)} style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
               </div>
-              <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <h4 style={{ fontSize: 17, fontWeight: 600, color: 'rgba(255,255,255,0.9)', margin: 0, fontFamily: 'Poppins, system-ui, sans-serif' }}>{openRef.label}</h4>
-                {(openRef.year || openRef.affiliation) && (
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', margin: 0 }}>{[openRef.affiliation, openRef.year].filter(Boolean).join(' · ')}</p>
-                )}
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, margin: 0 }}>{openRef.summary}</p>
-                {openRef.details && (
-                  <div style={{ padding: 12, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 8 }}>
-                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, margin: 0 }}>{openRef.details}</p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </>
+              <h4 style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.9)', margin: '0 0 4px', fontFamily: 'Poppins, system-ui, sans-serif' }}>{openRef.label}</h4>
+              {(openRef.year || openRef.affiliation) && (
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', margin: '0 0 6px' }}>{[openRef.affiliation, openRef.year].filter(Boolean).join(' · ')}</p>
+              )}
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, margin: 0 }}>{openRef.summary}</p>
+              {openRef.details && (
+                <div style={{ marginTop: 10, padding: '8px 12px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 8 }}>
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, margin: 0 }}>{openRef.details}</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
