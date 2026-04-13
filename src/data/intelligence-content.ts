@@ -14,6 +14,18 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Gestao da Inovacao, Transformacao e Ferramentas Digitais',
         blocks: [
           {
+            id: 'M1-0-v1',
+            type: 'video',
+            title: 'M1-01 Inovação, Transformação e Ferramentas Digitais',
+            url: 'https://qvvqbngiwqfuxsbgcxtc.supabase.co/storage/v1/object/public/videos/IPB/Inovacao.mp4',
+          },
+          {
+            id: 'M1-0-v2',
+            type: 'video',
+            title: 'M1-01 A Dupla Face da IA',
+            url: 'https://qvvqbngiwqfuxsbgcxtc.supabase.co/storage/v1/object/public/videos/IPB/A_Dupla_Face_da_IA.mp4',
+          },
+          {
             id: 'M1-0-cap1',
             type: 'chapter',
             number: 1,
