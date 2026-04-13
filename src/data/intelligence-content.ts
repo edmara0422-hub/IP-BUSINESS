@@ -38,19 +38,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             body: [
               {
                 kind: 'paragraph',
-                text: 'A evolução histórica da tecnologia nas empresas pode ser segmentada em três fases distintas. Não são degraus de uma escada — são modos de operar. Algumas organizações vivem em mais de uma ao mesmo tempo. O que importa é reconhecer onde está o {{centro de gravidade}} da sua TI hoje, porque é a partir dele que qualquer salto se torna possível.',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Na **Fase 1 — Infraestrutura** (anos 2000), o foco era na estabilidade de servidores e redes operacionais. O problema central era técnico: manter sistemas funcionando. Empresas investiam em data centers, backups e conexão de internet. O departamento de TI era visto como "suporte" — consertava computadores e instalava programas. O sucesso era medido em {{uptime}}, não em receita.',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Na **Fase 2 — Processo** (anos 2010), a integração de sistemas como ERPs e CRMs entrou no cotidiano da gestão. A tecnologia passou a organizar fluxos de trabalho — não apenas suportar, mas integrar. A informação parou de morrer em planilhas isoladas e começou a fluir entre setores. Empresas como Magazine Luiza começaram a integrar lojas físicas e canais digitais. A TOTVS cresceu vendendo ERP para PMEs brasileiras, automatizando desde estoque até folha de pagamento.',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Na **Fase 3 — Estratégia** (anos 2020 em diante), a tecnologia define a criação de produtos, o atendimento ao cliente e a capacidade de inovar — tornando-se pilar de competitividade e reputação. Dados são o novo petróleo. IA generativa redefine produtividade. Empresas nativas digitais (Nubank, iFood, Mercado Livre) ditam o ritmo. O iFood não é uma empresa de comida — é uma empresa de tecnologia que conecta restaurantes a consumidores via dados, algoritmos de logística e IA de recomendação. {{Sem a tecnologia, o negócio não existe}}.',
+                text: 'A evolução da tecnologia nas empresas pode ser segmentada em três fases distintas. Não são degraus de uma escada — são modos de operar. O que importa é reconhecer onde está o {{centro de gravidade}} da sua TI hoje.',
               },
               {
                 kind: 'phase-group',
