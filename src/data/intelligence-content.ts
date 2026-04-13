@@ -217,99 +217,20 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             id: 'M1-0-cap2',
             type: 'chapter',
             number: 2,
-            title: 'Transformação Digital, Governança e Cultura',
-            subtitle: 'Da definição ao marco regulatório — como transformar sem destruir',
+            title: 'Transformação Digital',
+            subtitle: 'Não é comprar tecnologia — é repensar como a empresa cria e entrega valor',
             opening: {
               leadText: 'A transformação digital é o processo de integração de tecnologias digitais em {{todas as áreas}} de uma organização, mudando a forma como ela opera e entrega valor aos seus clientes. Não se trata apenas de implementar novas tecnologias, mas de uma {{mudança cultural}} que exige que as organizações desafiem continuamente o status quo, experimentem e se sintam confortáveis com o fracasso.',
             },
             body: [
               {
-                kind: 'paragraph',
-                text: 'A governança digital é o conjunto de práticas e de processos que garantem que a tecnologia seja usada de maneira eficiente e alinhada às estratégias organizacionais. Ela envolve a gestão de recursos tecnológicos, a segurança da informação, a conformidade com regulamentações e a garantia de que os investimentos em tecnologia estejam gerando valor. Em um ambiente em que os dados são o principal ativo, não dar o devido valor à governança digital pode colocar em risco a {{sustentabilidade}} de uma organização ao longo do tempo.',
-              },
-              {
-                kind: 'phase-group',
-                cards: [
-                  {
-                    index: 1,
-                    title: 'Pilar 1 — Estratégia',
-                    period: 'Direção',
-                    text: 'A governança digital estabelece como a tecnologia será usada para atingir os objetivos estratégicos da organização. Isso inclui a definição de prioridades, o planejamento de investimentos e a criação de indicadores para medir resultados. Não faz absolutamente nenhum sentido investir na adoção de tecnologias para alavancar a inteligência da empresa se essa inteligência não estiver alinhada ao que a empresa {{almeja atingir}} no futuro.',
-                    caseStudy: {
-                      company: 'Ambev',
-                      year: 2019,
-                      story: 'Criou o BEES, plataforma B2B que conecta {{1 milhão+}} de pontos de venda. Alinhamento estratégico: TI a serviço de capilaridade comercial. Resultado: {{30% de aumento}} em pedidos digitais no primeiro ano.',
-                    },
-                    deepDive: {
-                      keyNumbers: [
-                        { value: '1M+', label: 'Pontos de venda conectados' },
-                        { value: '+30%', label: 'Pedidos digitais (ano 1)' },
-                        { value: 'R$ 0', label: 'Custo para o varejista' },
-                      ],
-                      insight: 'Estratégia digital sem KPIs é desejo, não plano. A Ambev definiu métricas antes de escrever código — cada investimento em TI tinha um número para bater.',
-                    },
-                  },
-                  {
-                    index: 2,
-                    title: 'Pilar 2 — Riscos e Segurança',
-                    period: 'Proteção',
-                    text: 'A gestão de riscos é essencial para identificar, avaliar e mitigar ameaças potenciais ao negócio. A governança digital deve incluir políticas de segurança, como o uso de {{criptografia}}, a {{autenticação de dois fatores}} e outras tecnologias de segurança. Além disso, é fundamental investir no treinamento dos colaboradores — a maior vulnerabilidade não é técnica, é humana.',
-                    caseStudy: {
-                      company: 'Renner',
-                      year: 2021,
-                      story: 'Ataque ransomware derrubou sistemas por {{3 dias}}. Prejuízo estimado: {{R$ 20 milhões}}. Causa raiz: falha em governança básica — sem plano de resposta a incidentes, backup demorou para ser acionado.',
-                    },
-                    deepDive: {
-                      keyNumbers: [
-                        { value: 'R$ 20M', label: 'Prejuízo Renner (2021)' },
-                        { value: '$11M', label: 'Resgate pago pela JBS (2021)' },
-                        { value: '$4.88M', label: 'Custo médio global de breach (IBM 2024)' },
-                      ],
-                      quote: {
-                        text: 'The average cost of a data breach reached $4.88 million in 2024 — the highest ever recorded.',
-                        author: 'IBM · Cost of a Data Breach Report 2024',
-                      },
-                      insight: 'Governança de segurança para PME custa R$ 0-50/mês (backup + 2FA + política de senhas). O custo de NÃO ter: potencialmente o negócio inteiro. O ROI é infinito.',
-                    },
-                  },
-                  {
-                    index: 3,
-                    title: 'Pilar 3 — Políticas e Procedimentos',
-                    period: 'Padronização',
-                    text: 'Regras claras sobre o uso da tecnologia ajudam a padronizar processos e a evitar problemas. Quanto mais padronizados estiverem os processos de uma organização, melhores e mais {{fidedignos}} serão os dados gerados por eles. Consequentemente, eleva-se o grau de confiança dos gestores em relação a esses dados, permitindo tomadas de decisão mais seguras. Essas políticas podem incluir diretrizes para o uso de dispositivos móveis, acesso a dados sensíveis e escolha de fornecedores de TI.',
-                    caseStudy: {
-                      company: 'Itaú Unibanco',
-                      year: 2020,
-                      story: 'Implementou política de {{dados abertos internos}} — qualquer área acessa qualquer dado (com governança). Resultado: tempo de geração de relatórios caiu de {{5 dias para 2 horas}}. Decisões passaram a ser baseadas em dados, não em achismo.',
-                    },
-                    deepDive: {
-                      keyNumbers: [
-                        { value: '5 dias → 2h', label: 'Tempo de relatório' },
-                        { value: '100%', label: 'Dados acessíveis entre áreas' },
-                        { value: 'R$ 0', label: 'Custo da política (só decisão)' },
-                      ],
-                      insight: 'Política não é burocracia — é o que transforma dados em decisões confiáveis. Sem padronização, cada área gera seu número e ninguém concorda.',
-                    },
-                  },
-                  {
-                    index: 4,
-                    title: 'Pilar 4 — Monitoramento Contínuo',
-                    period: 'Evolução',
-                    text: 'Não faz sentido construir uma casa linda e não fazer nenhum esforço para mantê-la atualizada, limpa, funcional e em constante evolução. A tecnologia avança constantemente. Por isso, as práticas de governança digital precisam acompanhar esse ritmo. O {{monitoramento contínuo}} garante que sistemas e processos da empresa sejam ajustados conforme necessário, sempre acompanhando o que há de mais moderno.',
-                    caseStudy: {
-                      company: 'Mercado Livre',
-                      year: 2023,
-                      story: 'Monitora {{+2 bilhões}} de eventos por dia em tempo real. Cada anomalia dispara alerta automático. Infraestrutura é ajustada {{sem intervenção humana}} — auto-scaling baseado em demanda.',
-                    },
-                    deepDive: {
-                      keyNumbers: [
-                        { value: '2B+', label: 'Eventos monitorados por dia' },
-                        { value: '0', label: 'Intervenção humana para scaling' },
-                        { value: '99.99%', label: 'Uptime da plataforma' },
-                      ],
-                      insight: 'Monitoramento não é verificar se está tudo ok uma vez por mês. É ter o sistema avisando ANTES de quebrar. PMEs podem usar uptime monitors gratuitos como ponto de partida.',
-                    },
-                  },
+                kind: 'pillar-grid',
+                title: 'Os 4 domínios da transformação (Rogers, Columbia 2016)',
+                pillars: [
+                  { icon: '👥', title: 'Clientes', description: 'De audiência passiva a {{rede ativa}} que co-cria valor. Não pergunte o que querem — observe o que fazem.', metric: { value: '80M', label: 'clientes Nubank (sem agência)' }, caseCompany: 'Nubank', caseResult: 'CAC R$30-50 vs R$800+ bancário tradicional' },
+                  { icon: '⚔️', title: 'Competição', description: 'Não vem mais só do setor. {{Plataformas}} redefinem fronteiras — iFood compete com restaurantes E com supermercados.', metric: { value: 'R$100B', label: 'GMV iFood (sem cozinha)' }, caseCompany: 'iFood', caseResult: 'Zero ativos físicos, 100% plataforma' },
+                  { icon: '📊', title: 'Dados', description: 'De subproduto caro a {{ativo estratégico}} sempre ligado. Quem não decide por dados decide por opinião.', metric: { value: '2B+', label: 'eventos/dia (Mercado Livre)' }, caseCompany: 'Mercado Livre', caseResult: 'Personalização em tempo real para 200M+ usuários' },
+                  { icon: '💡', title: 'Inovação', description: 'De produto acabado a {{MVP contínuo}}. Lançar rápido, medir, iterar. Falhar barato e cedo.', metric: { value: '5 dias', label: 'ciclo Design Sprint (Google)' }, caseCompany: 'Google', caseResult: 'Gmail nasceu de experimentação livre' },
                 ],
               },
               {
@@ -321,185 +242,214 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 text: 'Os Sistemas de Gestão da Inovação (SGI) e a Transformação Digital (TD) frequentemente evoluem de forma paralela, embora ambos visem a dinâmica inovadora. A integração desses domínios permite que o SGI oriente as iniciativas de TD ao estruturar processos para lidar com projetos de alta incerteza, enquanto a TD oferece as ferramentas tecnológicas para potencializar a eficácia desses sistemas.',
               },
               {
-                kind: 'paragraph',
-                text: 'A integração gera benefícios mútuos em quatro elementos centrais: {{Estrutura de Projetos}} — SGI gerencia incertezas com metodologias; TD fornece ferramentas de colaboração em tempo real. {{Processos}} — SGI organiza o fluxo de ideação; TD automatiza o funil e a coleta de feedbacks. {{Cultura}} — SGI estimula a experimentação e aceitação do erro; TD democratiza dados para decisões ágeis e seguras. {{Resultados}} — SGI mantém o foco estratégico no ROI; TD entrega analytics para medir o impacto em larga escala.',
-              },
-              {
-                kind: 'heading',
-                text: 'Cultura Organizacional e Gestão da Mudança',
-              },
-              {
-                kind: 'paragraph',
-                text: 'A tecnologia é apenas um dos componentes da transformação digital; o fator humano e a cultura organizacional representam os maiores desafios e, simultaneamente, os maiores facilitadores do sucesso. A resistência à mudança é um fenômeno natural em organizações com identidades culturais fortes e processos tradicionais.',
-              },
-              {
-                kind: 'paragraph',
-                text: 'As barreiras mais comuns incluem o {{medo do erro}}, resistência à mudança e a punição ao fracasso, que inibem a experimentação necessária para inovar. Culturas centralizadoras que inibem o protagonismo dos colaboradores e o desalinhamento entre o discurso da liderança e as práticas diárias também enfraquecem o engajamento. A falta de uma visão integrada, onde a transformação é vista apenas como responsabilidade do setor de TI, compromete o esforço coletivo.',
-              },
-              {
-                kind: 'phase-group',
-                cards: [
-                  {
-                    index: 1,
-                    title: 'Passo 1 — Diagnóstico e Alinhamento',
-                    period: 'Fundação',
-                    text: 'Compreender o cenário atual e definir a visão estratégica. A governança digital garante que as iniciativas de transformação estejam alinhadas aos objetivos estratégicos. Cada investimento em tecnologia deve contribuir para o alcance das {{metas organizacionais}}.',
-                    caseStudy: {
-                      company: 'Magazine Luiza',
-                      year: 2015,
-                      story: 'Frederico Trajano fez diagnóstico completo antes de qualquer investimento em tech. Resultado: identificou que lojas físicas eram {{ativo subutilizado}}, não passivo a cortar. A transformação nasceu do diagnóstico, não de consultoria externa.',
-                    },
-                    deepDive: {
-                      keyNumbers: [
-                        { value: '1.400', label: 'Lojas diagnosticadas' },
-                        { value: '6 meses', label: 'Período de diagnóstico' },
-                        { value: '100x', label: 'Valorização em 5 anos' },
-                      ],
-                      insight: 'Diagnóstico não é planilha de consultoria. É o CEO entendendo onde está o valor escondido na operação atual antes de gastar um centavo em tecnologia.',
-                    },
-                  },
-                  {
-                    index: 2,
-                    title: 'Passo 2 — Liderança Ativa',
-                    period: 'Exemplo',
-                    text: 'Líderes devem ser os {{primeiros}} a incorporar comportamentos digitais e valores de inovação. Se o diretor não usa o CRM, a equipe também não vai. Mudança começa no topo — não por discurso, mas por ação visível.',
-                    caseStudy: {
-                      company: 'Natura',
-                      year: 2012,
-                      story: 'CEO Roberto Lima liderou pessoalmente a migração para SAP. Participou de treinamentos com a equipe. Mensagem: {{se o CEO está aprendendo, eu também posso}}. Adoção acelerou 40% vs cronograma.',
-                    },
-                    deepDive: {
-                      keyNumbers: [
-                        { value: '40%', label: 'Aceleração vs cronograma' },
-                        { value: 'CEO', label: 'Participou dos treinamentos' },
-                        { value: '7 países', label: 'Rollout simultâneo' },
-                      ],
-                      insight: 'John Kotter (Harvard, 1996): 70% das transformações falham. O motivo #1 é falta de urgência no topo — não falta de tecnologia.',
-                    },
-                  },
-                  {
-                    index: 3,
-                    title: 'Passo 3 — Comunicação Transparente',
-                    period: 'Engajamento',
-                    text: 'Explicar o "porquê" da mudança para gerar engajamento. A governança digital assegura que decisões relacionadas à tecnologia sejam baseadas em {{informações e dados precisos}}. Isso é essencial para a transformação digital, que depende de insights baseados em dados para inovar.',
-                    caseStudy: {
-                      company: 'Nubank',
-                      year: 2018,
-                      story: 'Quando implementou novo sistema de crédito baseado em IA, explicou a {{TODOS}} os funcionários como funcionava e por que era melhor. Resultado: zero sabotagem interna, adoção imediata.',
-                    },
-                    deepDive: {
-                      keyNumbers: [
-                        { value: '100%', label: 'Equipe comunicada' },
-                        { value: '0', label: 'Resistência interna' },
-                        { value: '3x', label: 'Velocidade de aprovação de crédito' },
-                      ],
-                      insight: 'Comunicar não é mandar e-mail. É mostrar o dado, explicar a decisão e abrir espaço para perguntas — antes de implementar, não depois.',
-                    },
-                  },
-                  {
-                    index: 4,
-                    title: 'Passo 4 — Treinamento e Capacitação',
-                    period: 'Habilidade',
-                    text: 'Desenvolver habilidades técnicas e comportamentais ({{soft skills}}) para o novo ambiente. A governança digital promove a eficiência no uso de recursos tecnológicos, evitando desperdícios e garantindo que as tecnologias adotadas sejam utilizadas de maneira otimizada.',
-                    caseStudy: {
-                      company: 'TOTVS',
-                      year: 2021,
-                      story: 'Criou universidade corporativa com {{+500 cursos}}. Todo novo ERP implementado inclui 40h de treinamento obrigatório. Clientes que treinam retêm {{85% do investimento}} em 1 ano vs 40% sem treinamento.',
-                    },
-                    deepDive: {
-                      keyNumbers: [
-                        { value: '500+', label: 'Cursos na universidade TOTVS' },
-                        { value: '85%', label: 'Retenção com treinamento' },
-                        { value: '40%', label: 'Retenção sem treinamento' },
-                      ],
-                      insight: 'Brynjolfsson (MIT, 2003): investimentos complementares em treinamento e reorganização são 5-10x maiores que o investimento em tecnologia — e levam 5-7 anos para gerar resultado.',
-                    },
-                  },
-                  {
-                    index: 5,
-                    title: 'Passo 5 — Espaços Seguros para Experimentar',
-                    period: 'Inovação',
-                    text: 'Criar ambientes onde ideias possam ser testadas sem medo de punição severa em caso de erro. Estudos indicam que práticas de gestão da mudança impactam positivamente a atitude dos funcionários, reduzindo o {{ceticismo}} e o temor frente às novas ferramentas.',
-                    caseStudy: {
-                      company: 'Google',
-                      year: 2015,
-                      story: 'Projeto Aristotle estudou {{180 equipes}}. Descoberta: o fator #1 de equipes de alta performance é {{segurança psicológica}} — poder errar sem medo. Gmail, Google Maps e AdSense nasceram do "20% time" — tempo livre para experimentar.',
-                    },
-                    deepDive: {
-                      keyNumbers: [
-                        { value: '180', label: 'Equipes estudadas' },
-                        { value: '#1', label: 'Segurança psicológica como fator' },
-                        { value: 'Gmail', label: 'Nasceu de tempo livre para experimentar' },
-                      ],
-                      quote: {
-                        text: 'There is no innovation without experimentation, and there is no experimentation without the freedom to fail.',
-                        author: 'Amy Edmondson · Harvard · The Fearless Organization 2018',
-                      },
-                      insight: 'Espaço seguro não é anarquia. É ter orçamento, prazo e permissão para testar — com a obrigação de documentar o que aprendeu, mesmo quando falha.',
-                    },
-                  },
+                kind: 'pillar-grid',
+                title: '4 elementos da integração SGI + TD',
+                pillars: [
+                  { icon: '🏗️', title: 'Estrutura de Projetos', description: 'SGI gerencia incertezas com metodologias; TD fornece ferramentas de {{colaboração em tempo real}}.' },
+                  { icon: '⚙️', title: 'Processos', description: 'SGI organiza o fluxo de ideação; TD {{automatiza}} o funil e a coleta de feedbacks.' },
+                  { icon: '🧬', title: 'Cultura', description: 'SGI estimula experimentação e {{aceitação do erro}}; TD democratiza dados para decisões ágeis.' },
+                  { icon: '📈', title: 'Resultados', description: 'SGI mantém foco estratégico no {{ROI}}; TD entrega analytics para medir impacto em larga escala.' },
                 ],
-              },
-              {
-                kind: 'heading',
-                text: 'Frameworks de Governança e Ferramentas Digitais',
-              },
-              {
-                kind: 'paragraph',
-                text: 'A implementação da governança digital não requer criar processos do zero — exige adaptar {{frameworks reconhecidos}} que equilibram controle e agilidade. O **COBIT** (ISACA, 1996/2019) é referência global no nível estratégico, conectando objetivos de negócio às metas de TI. A **ISO/IEC 38500** (2008/2015) orienta dirigentes com três princípios: avaliar, direcionar, monitorar. O **ITIL 4** (2019) foca na operação, organizando fluxos de entrega de serviços de TI integrando IA e cloud.',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Ferramentas como **Analytics-to-Value (AtV)** exploram dados internos e externos em larga escala, gerando insights para o portfólio inteiro. A **Tomada de Decisão Baseada em Dados (DDDM)** depende de quatro pilares: capacidade de coleta e armazenamento, análise e processamento (modelos estatísticos e ML), visualização e comunicação (para não-especialistas agirem), e integração estratégica (uso nos processos decisórios diários).',
-              },
-              {
-                kind: 'heading',
-                text: 'LGPD, Sandbox Regulatório e Tendências 2025-2026',
-              },
-              {
-                kind: 'paragraph',
-                text: 'A transformação digital no Brasil ocorre sob arcabouço legal rigoroso. A {{LGPD}} (Lei 13.709/2018) e a Lei do Governo Digital (14.129/2021) são os pilares. O sandbox regulatório (LC 182/21) permite testagem de modelos inovadores com flexibilidade temporária. A ANPD lançou sandbox focado em IA e Proteção de Dados: transparência algorítmica, mitigação de vieses e segurança de dados pessoais em modelos generativos.',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Diferente da automação robótica tradicional (RPA), os agentes de IA possuem capacidades de percepção, raciocínio adaptativo e {{ação autônoma}}. Isso redefine a governança: empresas agora gerenciam agentes que tomam decisões independentes e acessam dados sensíveis. A observabilidade torna-se prioridade: não se pode gerenciar ou proteger o que não se vê. As RegTechs automatizam KYC e AML; em 2025, compliance deixa de evitar multas e vira motor de {{confiança e reputação}}.',
               },
             ],
             application: {
               kind: 'compare-and-drag',
-              intro: 'A governança digital sustenta a transformação. Veja os 4 pilares lado a lado — depois classifique práticas reais em cada pilar.',
+              intro: 'Três conceitos são confundidos constantemente. Veja a diferença — depois classifique ações reais.',
               compare: {
-                columnHeaders: ['Estratégia', 'Riscos', 'Políticas', 'Monitoramento'],
+                columnHeaders: ['Digitização', 'Digitalização', 'Transformação'],
                 rows: [
-                  { label: 'Foco', values: ['Direção e KPIs', 'Proteção e defesa', 'Padronização', 'Evolução contínua'], viz: 'icons', icons: ['🎯', '🛡️', '📋', '🔄'] },
-                  { label: 'Pergunta-chave', values: ['Pra onde?', 'Contra o quê?', 'Como?', 'Ainda funciona?'], viz: 'icons', icons: ['→', '⚠️', '✓', '?'] },
-                  { label: 'Custo de falhar', values: ['Investimento perdido', 'Dados vazados', 'Decisões erradas', 'Obsolescência'], viz: 'bars', intensities: [0.6, 1.0, 0.7, 0.5] },
+                  { label: 'O que faz', values: ['Converte formato', 'Automatiza processo', 'Repensa modelo'], viz: 'icons', icons: ['📄', '⚙️', '🔄'] },
+                  { label: 'Nível de mudança', values: ['Formato', 'Processo', 'Identidade'], viz: 'bars', intensities: [0.2, 0.55, 1.0] },
                 ],
               },
               drag: {
-                instruction: 'Classifique cada prática no pilar correto da governança digital:',
+                instruction: 'Classifique: digitização, digitalização ou transformação?',
                 zones: [
-                  { id: 'estrategia', label: 'Estratégia' },
-                  { id: 'riscos', label: 'Riscos e Segurança' },
-                  { id: 'politicas', label: 'Políticas' },
-                  { id: 'monitoramento', label: 'Monitoramento' },
+                  { id: 'dz', label: 'Digitização' },
+                  { id: 'dl', label: 'Digitalização' },
+                  { id: 'td', label: 'Transformação' },
                 ],
                 items: [
-                  { id: 'kpi', label: 'Definir KPIs de resultado da tecnologia', correctZone: 'estrategia', correctFeedback: 'Certo. Medir resultado é estratégia — sem KPI, investimento em TI é aposta.', wrongFeedback: 'KPIs de resultado são Estratégia — definem se o investimento valeu.' },
-                  { id: '2fa', label: 'Autenticação em dois fatores obrigatória', correctZone: 'riscos', correctFeedback: 'Certo. 2FA bloqueia 99.9% dos ataques por senha vazada. Custo: R$ 0.', wrongFeedback: '2FA é proteção contra acesso indevido — pilar de Riscos e Segurança.' },
-                  { id: 'senhas', label: 'Política de senhas: mínimo 12 caracteres', correctZone: 'politicas', correctFeedback: 'Certo. Padronizar senhas é política que eleva segurança de todos.', wrongFeedback: 'Política de senhas é regra padronizada — pilar de Políticas e Procedimentos.' },
-                  { id: 'revisao', label: 'Revisão trimestral de ferramentas e custos', correctZone: 'monitoramento', correctFeedback: 'Certo. Revisar periodicamente é monitoramento — ajusta conforme evolui.', wrongFeedback: 'Revisão periódica é acompanhamento contínuo — pilar de Monitoramento.' },
-                  { id: 'prioridades', label: 'Definir prioridades de investimento em TI', correctZone: 'estrategia', correctFeedback: 'Certo. Priorizar é decisão estratégica — onde colocar o dinheiro.', wrongFeedback: 'Priorização de investimento é decisão de direção — Estratégia.' },
-                  { id: 'incidente', label: 'Plano de resposta a incidentes cibernéticos', correctZone: 'riscos', correctFeedback: 'Certo. Plano de incidentes é defesa — saber o que fazer quando o ataque acontece.', wrongFeedback: 'Plano de resposta protege contra ameaças — Riscos e Segurança.' },
+                  { id: 'pdf', label: 'Escanear contratos na nuvem', correctZone: 'dz', correctFeedback: 'Certo. Mudar formato é digitização.', wrongFeedback: 'Escanear é só mudar formato — digitização.' },
+                  { id: 'erp', label: 'Natura integra 7 países com SAP', correctZone: 'dl', correctFeedback: 'Certo. Automatizou processos, modelo continua.', wrongFeedback: 'SAP automatiza processos existentes — digitalização.' },
+                  { id: 'magalu', label: 'Magalu: lojas viram plataforma', correctZone: 'td', correctFeedback: 'Certo. Mudou o que a empresa É.', wrongFeedback: 'Magalu mudou o modelo inteiro — transformação.' },
+                  { id: 'pix', label: 'PIX substitui TED/DOC', correctZone: 'td', correctFeedback: 'Certo. Sistema novo que tornou antigo obsoleto.', wrongFeedback: 'PIX redesenhou pagamentos — transformação.' },
                 ],
               },
             },
             synthesis: {
-              closingText: 'Transformação digital sem governança é construir sobre areia. Os 4 pilares (Estratégia, Riscos, Políticas, Monitoramento) sustentam qualquer iniciativa — da PME à multinacional. A cultura organizacional decide se a tecnologia {{gera valor ou acumula pó}}. E os 5 passos da mudança (Diagnóstico, Liderança, Comunicação, Capacitação, Experimentação) são o caminho comprovado.',
+              closingText: 'Transformação digital não é sobre comprar tecnologia — é sobre {{repensar como a empresa cria e entrega valor}}. Rogers (Columbia, 2016): os 4 domínios devem ser transformados simultaneamente, não sequencialmente.',
               keyInsights: [
-                'Governança digital para PME custa {{R$ 0-50/mês}}. Não ter custa potencialmente o negócio inteiro.',
-                'Kotter (Harvard, 1996): {{70% das transformações falham}} — o motivo #1 é falta de urgência na liderança, não falta de tecnologia.',
-                'A integração SGI + TD gera benefícios mútuos em 4 frentes: projetos, processos, cultura e {{resultados mensuráveis}}.',
+                'Digitização ≠ Digitalização ≠ Transformação — a confusão custa {{bilhões}} em investimentos mal direcionados.',
+                'SGI + TD integrados geram benefícios em 4 frentes: projetos, processos, cultura e {{resultados mensuráveis}}.',
+              ],
+              nextChapterHint: 'Capítulo 3 · Governança, Cultura e Mudança',
+              nextChapterBlurb: 'Os 4 pilares que sustentam qualquer transformação — e os 5 passos para não fracassar.',
+            },
+          },
+          {
+            id: 'M1-0-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Governança Digital, Cultura e Gestão da Mudança',
+            subtitle: 'Os 4 pilares que sustentam — e os 5 passos que executam',
+            opening: {
+              leadText: 'A governança digital é o conjunto de práticas que garantem que a tecnologia seja usada de maneira eficiente e alinhada às estratégias organizacionais. Em um ambiente em que os dados são o principal ativo, não dar o devido valor à governança pode colocar em risco a {{sustentabilidade}} de uma organização. Pilares são estruturas que mantêm algo em pé — se um falha, a casa desaba.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Os 4 pilares da governança digital',
+                pillars: [
+                  { icon: '🎯', title: 'Estratégia', description: 'Como a tecnologia será usada para atingir objetivos. Prioridades, investimentos e {{indicadores}}. Não faz sentido investir em tech desalinhada do futuro da empresa.', metric: { value: '+30%', label: 'pedidos digitais (Ambev BEES)' }, caseCompany: 'Ambev', caseResult: '1M+ PDVs conectados via BEES' },
+                  { icon: '🛡️', title: 'Riscos e Segurança', description: 'Criptografia, {{2FA}}, treinamento. A maior vulnerabilidade é humana. Políticas de segurança são a primeira linha de defesa.', metric: { value: '$4.88M', label: 'custo médio breach (IBM 2024)' }, caseCompany: 'Renner', caseResult: 'R$ 20M perdidos por ransomware (2021)' },
+                  { icon: '📋', title: 'Políticas e Procedimentos', description: 'Regras claras padronizam processos. Quanto mais padronizado, mais {{fidedignos}} os dados — e mais seguras as decisões.', metric: { value: '5d → 2h', label: 'relatórios (Itaú open data)' }, caseCompany: 'Itaú', caseResult: 'Dados abertos entre áreas com governança' },
+                  { icon: '🔄', title: 'Monitoramento Contínuo', description: 'Não faz sentido construir e não manter. O monitoramento garante que sistemas sejam {{ajustados}} conforme a tecnologia avança.', metric: { value: '2B+', label: 'eventos/dia (Mercado Livre)' }, caseCompany: 'Mercado Livre', caseResult: 'Auto-scaling sem intervenção humana' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Cultura organizacional e barreiras à inovação digital',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A tecnologia é apenas um dos componentes da transformação digital; o fator humano e a cultura organizacional representam os maiores desafios e, simultaneamente, os maiores facilitadores do sucesso. As barreiras mais comuns incluem o {{medo do erro}}, a punição ao fracasso (que inibe experimentação), culturas centralizadoras que inibem protagonismo, o desalinhamento entre discurso da liderança e práticas diárias, e a falta de visão integrada onde a transformação é vista apenas como responsabilidade do TI.',
+              },
+              {
+                kind: 'step-flow',
+                title: '5 passos para a mudança bem-sucedida',
+                steps: [
+                  { number: 1, title: 'Diagnóstico e Alinhamento', description: 'Compreender o cenário atual e definir a visão. Cada investimento em tecnologia deve contribuir para as {{metas organizacionais}}.', caseSnippet: 'Magalu: Trajano fez 6 meses de diagnóstico → identificou lojas como ativo, não passivo → 100x valorização.' },
+                  { number: 2, title: 'Liderança Ativa', description: 'Líderes devem ser os {{primeiros}} a incorporar comportamentos digitais. Se o diretor não usa o CRM, a equipe não vai.', author: 'Kotter, Harvard, 1996: 70% das transformações falham por falta de urgência no topo', caseSnippet: 'Natura: CEO nos treinamentos SAP → adoção acelerou 40%.' },
+                  { number: 3, title: 'Comunicação Transparente', description: 'Explicar o "porquê" da mudança. Decisões baseadas em {{dados precisos}}, não em hierarquia.', caseSnippet: 'Nubank: explicou novo sistema IA a todos → zero sabotagem, adoção imediata.' },
+                  { number: 4, title: 'Treinamento e Capacitação', description: 'Habilidades técnicas + {{soft skills}}. Investimentos complementares em treinamento são 5-10x maiores que o investimento em tech.', author: 'Brynjolfsson, MIT, 2003: ganhos de TI levam 5-7 anos', caseSnippet: 'TOTVS: 500+ cursos. Com treinamento: 85% retenção. Sem: 40%.' },
+                  { number: 5, title: 'Espaços Seguros para Experimentar', description: 'Ambientes onde ideias podem ser testadas {{sem medo}} de punição. Práticas de gestão da mudança reduzem ceticismo.', author: 'Edmondson, Harvard, 2018: segurança psicológica = fator #1', caseSnippet: 'Google Aristotle (180 equipes): Gmail nasceu de tempo livre para experimentar.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Estruturas e frameworks de governança',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Comitês de governança reúnem gestores de diferentes áreas para decisões colaborativas. Modelos descentralizados dão autonomia a cada departamento seguindo diretrizes gerais — estruturas centralizadoras comprometem velocidade de decisão. **COBIT** (ISACA, 1996/2019) conecta objetivos de negócio a metas de TI. **ISO/IEC 38500** (2008/2015) orienta dirigentes: avaliar, direcionar, monitorar. **ITIL 4** (2019) organiza fluxos de entrega integrando IA e cloud.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Para PMEs: backup automático diário, 2FA em todas as contas, um responsável por TI (mesmo acumulando função), política de senhas com gerenciador, revisão trimestral. Custo: {{R$ 0 a R$ 50/mês}}. Custo de não fazer: potencialmente o negócio inteiro.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Os 4 pilares sustentam a governança. Classifique cada prática no pilar correto.',
+              compare: {
+                columnHeaders: ['Estratégia', 'Riscos', 'Políticas', 'Monitoramento'],
+                rows: [
+                  { label: 'Foco', values: ['Direção e KPIs', 'Proteção', 'Padronização', 'Evolução'], viz: 'icons', icons: ['🎯', '🛡️', '📋', '🔄'] },
+                  { label: 'Custo de falhar', values: ['Investimento perdido', 'Dados vazados', 'Decisões erradas', 'Obsolescência'], viz: 'bars', intensities: [0.6, 1.0, 0.7, 0.5] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada prática no pilar correto:',
+                zones: [
+                  { id: 'est', label: 'Estratégia' },
+                  { id: 'ris', label: 'Riscos' },
+                  { id: 'pol', label: 'Políticas' },
+                  { id: 'mon', label: 'Monitoramento' },
+                ],
+                items: [
+                  { id: 'kpi', label: 'Definir KPIs de resultado da tecnologia', correctZone: 'est', correctFeedback: 'Certo. Medir resultado é Estratégia.', wrongFeedback: 'KPIs são Estratégia.' },
+                  { id: '2fa', label: '2FA obrigatório em todas as contas', correctZone: 'ris', correctFeedback: 'Certo. Proteção de acesso = Riscos.', wrongFeedback: '2FA é proteção — Riscos.' },
+                  { id: 'senhas', label: 'Política de senhas de 12+ caracteres', correctZone: 'pol', correctFeedback: 'Certo. Padronização = Políticas.', wrongFeedback: 'Senhas padronizadas = Políticas.' },
+                  { id: 'rev', label: 'Revisão trimestral de ferramentas', correctZone: 'mon', correctFeedback: 'Certo. Revisão periódica = Monitoramento.', wrongFeedback: 'Revisão é Monitoramento.' },
+                  { id: 'inc', label: 'Plano de resposta a ataques', correctZone: 'ris', correctFeedback: 'Certo. Resposta a incidente = Riscos.', wrongFeedback: 'Plano de resposta = Riscos.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Governança não é burocracia — é o que impede que um ransomware apague seus dados, que um ex-funcionário acesse seu CRM, ou que você pague 5 ferramentas para fazer o trabalho de 2. Os 5 passos da mudança são o caminho comprovado: de {{Kotter}} (Harvard) a {{Edmondson}} (Harvard).',
+              keyInsights: [
+                'Kotter (1996): {{70% das transformações falham}} — motivo #1 é liderança, não tecnologia.',
+                'Governança para PME: R$ 0-50/mês. Renner perdeu {{R$ 20M}} sem ela.',
+                'Segurança psicológica (Edmondson, Harvard 2018) é o fator {{#1}} de equipes de alta performance.',
+              ],
+              nextChapterHint: 'Capítulo 4 · Ferramentas Digitais e Marco Regulatório',
+              nextChapterBlurb: 'De Analytics-to-Value à LGPD — as ferramentas que operacionalizam a transformação.',
+            },
+          },
+          {
+            id: 'M1-0-cap4',
+            type: 'chapter',
+            number: 4,
+            title: 'Ferramentas Digitais, LGPD e Tendências',
+            subtitle: 'De Analytics-to-Value à era dos agentes autônomos',
+            opening: {
+              leadText: 'Empresas líderes estão adotando práticas que exploram dados em {{larga escala}} para otimizar portfólio e decisões. Mas ferramentas sozinhas não bastam — é necessário uma cultura que estimule {{pensamento crítico}} em todos os níveis. E o marco regulatório brasileiro define os limites dentro dos quais a inovação deve operar.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Ferramentas digitais para gestão da inovação',
+                pillars: [
+                  { icon: '📊', title: 'Analytics-to-Value (AtV)', description: 'Usa digital e analytics para otimizar portfólio e reduzir custos. Enquanto métodos tradicionais focam em componentes isolados, o AtV explora dados internos e externos em {{larga escala}}, gerando insights em poucos dias.' },
+                  { icon: '🧠', title: 'DDDM', description: 'Data-Driven Decision Making — uso de fatos, métricas e dados para orientar decisões estratégicas. A tecnologia sozinha não basta: é necessário criar {{cultura}} de pensamento crítico.' },
+                  { icon: '💾', title: 'Coleta e Análise', description: 'Capturar dados eficientemente + extrair informações via modelos estatísticos e {{machine learning}}. O dado bruto não vale nada — o insight vale tudo.' },
+                  { icon: '📈', title: 'Visualização e Integração', description: 'Apresentação clara para que {{não-especialistas}} ajam. Uso dos insights nos processos decisórios diários da liderança — não num relatório que ninguém lê.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Governança de dados e o marco regulatório brasileiro',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A transformação digital no Brasil ocorre sob um rigoroso arcabouço legal. A {{LGPD}} (Lei 13.709/2018) e a Lei do Governo Digital (14.129/2021) são os pilares desse ecossistema. O sandbox regulatório (LC 182/21) permite a testagem de modelos de negócios inovadores com flexibilidade temporária em normas e penalidades. A ANPD lançou sandbox focado em IA e Proteção de Dados: transparência algorítmica, mitigação de vieses e segurança de dados pessoais em modelos generativos.',
+              },
+              {
+                kind: 'heading',
+                text: 'Tendências 2025-2026: IA, agentes autônomos e RegTech',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Diferente da automação robótica tradicional (RPA), os agentes de IA possuem capacidades de percepção, raciocínio adaptativo e {{ação autônoma}}. Isso redefine a governança: empresas agora gerenciam agentes que tomam decisões independentes e acessam dados sensíveis. A observabilidade torna-se prioridade número um — não se pode gerenciar ou proteger o que não se vê.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'As {{RegTechs}} (Regulatory Technology) estão em plena expansão, utilizando IA para automatizar verificações de KYC (Know Your Customer) e triagens de AML (Anti-Money Laundering). Em 2025, o compliance deixa de ser focado apenas em evitar multas para se tornar um motor de {{confiança e reputação}}. A detecção preditiva de anomalias permite que as empresas respondam a riscos em tempo real, reduzindo drasticamente os erros humanos e o custo operacional.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Os 4 pilares da decisão baseada em dados. Classifique cada atividade no pilar correto.',
+              compare: {
+                columnHeaders: ['Coleta', 'Análise', 'Visualização', 'Integração'],
+                rows: [
+                  { label: 'O que faz', values: ['Captura dados', 'Extrai insights', 'Comunica resultados', 'Usa nas decisões'], viz: 'icons', icons: ['💾', '🧠', '📈', '🎯'] },
+                  { label: 'Ferramenta', values: ['APIs, IoT, formulários', 'ML, estatística, BI', 'Dashboards, relatórios', 'Processos diários'], viz: 'icons', icons: ['⚙️', '🔬', '📊', '🔗'] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada atividade no pilar correto da DDDM:',
+                zones: [
+                  { id: 'col', label: 'Coleta' },
+                  { id: 'ana', label: 'Análise' },
+                  { id: 'vis', label: 'Visualização' },
+                  { id: 'int', label: 'Integração' },
+                ],
+                items: [
+                  { id: 'api', label: 'Conectar API de vendas ao banco de dados', correctZone: 'col', correctFeedback: 'Certo. Capturar dados automaticamente é Coleta.', wrongFeedback: 'Conectar API para capturar dados é Coleta.' },
+                  { id: 'ml', label: 'Treinar modelo preditivo de churn', correctZone: 'ana', correctFeedback: 'Certo. ML para extrair insight é Análise.', wrongFeedback: 'Modelo preditivo é Análise.' },
+                  { id: 'dash', label: 'Dashboard de KPIs para o board', correctZone: 'vis', correctFeedback: 'Certo. Dashboard para decisores é Visualização.', wrongFeedback: 'Dashboard é Visualização.' },
+                  { id: 'reuniao', label: 'Usar dados na reunião semanal de vendas', correctZone: 'int', correctFeedback: 'Certo. Usar no dia a dia é Integração.', wrongFeedback: 'Usar dados na rotina é Integração.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Ferramentas digitais sem cultura data-driven são como Ferrari na garagem. A LGPD não é obstáculo — é framework de confiança. E os agentes de IA estão redefinindo o que significa {{governar}} tecnologia: não basta controlar ferramentas, agora é preciso gerenciar entidades que decidem sozinhas.',
+              keyInsights: [
+                'DDDM depende de 4 pilares: Coleta → Análise → Visualização → {{Integração}} nos processos diários.',
+                'LGPD + sandbox regulatório = inovação {{dentro da lei}}, não apesar dela.',
+                'Agentes de IA + RegTech transformam compliance de custo em {{motor de confiança}}.',
               ],
             },
           },

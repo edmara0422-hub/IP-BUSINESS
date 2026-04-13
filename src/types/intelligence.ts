@@ -451,11 +451,30 @@ export type ChapterPhaseCard = {
   }
 }
 
+export type ChapterPillarCard = {
+  icon: string                 // emoji
+  title: string
+  description: string          // suporta {{highlight}}
+  metric?: { value: string; label: string }
+  caseCompany?: string
+  caseResult?: string
+}
+
+export type ChapterStepCard = {
+  number: number
+  title: string
+  description: string          // suporta {{highlight}}
+  author?: string              // "Kotter, Harvard, 1996"
+  caseSnippet?: string         // 1 frase de case
+}
+
 export type ChapterBodySection =
   | { kind: 'paragraph'; text: string }                   // suporta {{highlight}}
   | { kind: 'heading'; text: string }
   | { kind: 'phase-card'; data: ChapterPhaseCard }        // standalone
-  | { kind: 'phase-group'; cards: ChapterPhaseCard[] }    // 3 cards conectados por trajetória vertical
+  | { kind: 'phase-group'; cards: ChapterPhaseCard[] }    // cards conectados por trajetória vertical
+  | { kind: 'pillar-grid'; title?: string; pillars: ChapterPillarCard[] }  // grid de pilares (2x2 ou 1x4)
+  | { kind: 'step-flow'; title?: string; steps: ChapterStepCard[] }        // fluxo horizontal de passos numerados
 
 // ── Aplicação: compare-and-drag ──
 //

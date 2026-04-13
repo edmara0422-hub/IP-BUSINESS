@@ -17,6 +17,8 @@ import type {
   ChapterBlock,
   ChapterBodySection,
   ChapterPhaseCard,
+  ChapterPillarCard,
+  ChapterStepCard,
 } from '@/types/intelligence'
 import ChapterCompareAndDrag from './ChapterCompareAndDrag'
 import LivingCompany from './LivingCompany'
@@ -290,7 +292,194 @@ function BodySectionRenderer({ section, chapterId }: { section: ChapterBodySecti
     return <PhaseGroup cards={section.cards} chapterId={chapterId} />
   }
 
+  if (section.kind === 'pillar-grid') {
+    return <PillarGrid title={section.title} pillars={section.pillars} />
+  }
+
+  if (section.kind === 'step-flow') {
+    return <StepFlow title={section.title} steps={section.steps} />
+  }
+
   return null
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// PillarGrid — grid 2×2 de pilares (visual de "fundação")
+// Cada pilar é um bloco com ícone, título, descrição, métrica e case.
+// ─────────────────────────────────────────────────────────────────────
+
+function PillarGrid({ title, pillars }: { title?: string; pillars: ChapterPillarCard[] }) {
+  return (
+    <div style={{ margin: '20px 0' }}>
+      {title && (
+        <p style={{
+          fontSize: 10, fontWeight: 700, letterSpacing: '0.18em',
+          color: COLORS.textMuted, textTransform: 'uppercase', marginBottom: 12,
+        }}>
+          {title}
+        </p>
+      )}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: 10,
+      }}>
+        {pillars.map((p, i) => (
+          <motion.div key={i}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.12, duration: 0.4 }}
+            style={{
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: 14,
+              padding: '14px 14px 16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
+            }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 20 }}>{p.icon}</span>
+              <span style={{
+                fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
+                fontFamily: 'Poppins, system-ui, sans-serif',
+              }}>
+                {p.title}
+              </span>
+            </div>
+            <p style={{
+              fontSize: 11, lineHeight: 1.6, color: 'rgba(255,255,255,0.55)',
+              margin: 0,
+            }}>
+              {renderWithHighlights(p.description)}
+            </p>
+            {p.metric && (
+              <div style={{
+                display: 'flex', alignItems: 'baseline', gap: 6,
+                marginTop: 4,
+              }}>
+                <span style={{
+                  fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.9)',
+                  fontFamily: 'Poppins, system-ui, sans-serif',
+                }}>
+                  {p.metric.value}
+                </span>
+                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.05em' }}>
+                  {p.metric.label}
+                </span>
+              </div>
+            )}
+            {p.caseCompany && (
+              <div style={{
+                marginTop: 2, padding: '6px 10px',
+                background: 'rgba(255,255,255,0.02)',
+                borderLeft: '2px solid rgba(255,255,255,0.1)',
+                borderRadius: 6,
+              }}>
+                <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>
+                  {p.caseCompany}
+                </span>
+                {p.caseResult && (
+                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', margin: '2px 0 0', lineHeight: 1.5 }}>
+                    {p.caseResult}
+                  </p>
+                )}
+              </div>
+            )}
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// StepFlow — fluxo horizontal/vertical de passos numerados
+// Visual de "jornada" com números circulares e setas entre passos.
+// ─────────────────────────────────────────────────────────────────────
+
+function StepFlow({ title, steps }: { title?: string; steps: ChapterStepCard[] }) {
+  return (
+    <div style={{ margin: '20px 0' }}>
+      {title && (
+        <p style={{
+          fontSize: 10, fontWeight: 700, letterSpacing: '0.18em',
+          color: COLORS.textMuted, textTransform: 'uppercase', marginBottom: 14,
+        }}>
+          {title}
+        </p>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+        {steps.map((s, i) => (
+          <Fragment key={i}>
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.35 }}
+              style={{
+                display: 'flex',
+                gap: 14,
+                alignItems: 'flex-start',
+                padding: '12px 0',
+              }}>
+              {/* Número circular */}
+              <div style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+                fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.7)',
+                fontFamily: 'Poppins, system-ui, sans-serif',
+              }}>
+                {s.number}
+              </div>
+              {/* Conteúdo */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{
+                  fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
+                  margin: 0, fontFamily: 'Poppins, system-ui, sans-serif',
+                }}>
+                  {s.title}
+                </p>
+                <p style={{
+                  fontSize: 11, lineHeight: 1.65, color: 'rgba(255,255,255,0.55)',
+                  margin: '4px 0 0',
+                }}>
+                  {renderWithHighlights(s.description)}
+                </p>
+                {s.author && (
+                  <p style={{
+                    fontSize: 9, color: 'rgba(255,255,255,0.3)', marginTop: 4,
+                    fontStyle: 'italic',
+                  }}>
+                    {s.author}
+                  </p>
+                )}
+                {s.caseSnippet && (
+                  <p style={{
+                    fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 4,
+                    paddingLeft: 8, borderLeft: '2px solid rgba(255,255,255,0.08)',
+                  }}>
+                    {s.caseSnippet}
+                  </p>
+                )}
+              </div>
+            </motion.div>
+            {/* Linha entre passos */}
+            {i < steps.length - 1 && (
+              <div style={{
+                width: 1, height: 12, marginLeft: 15,
+                background: 'rgba(255,255,255,0.08)',
+              }} />
+            )}
+          </Fragment>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 // ─────────────────────────────────────────────────────────────────────
