@@ -241,7 +241,7 @@ function ChapterOpening({
           lineHeight: 1.7,
           color: 'rgba(255,255,255,0.85)',
           marginTop: showTimeline ? 4 : 0,
-          textAlign: 'justify',
+          textAlign: 'left',
           hyphens: 'auto',
         }}
       >
@@ -264,7 +264,7 @@ function BodySectionRenderer({ section, chapterId }: { section: ChapterBodySecti
           lineHeight: 1.7,
           color: 'rgba(255,255,255,0.85)',
           margin: '0 0 16px 0',
-          textAlign: 'justify',
+          textAlign: 'left',
           hyphens: 'auto',
         }}
       >
@@ -386,7 +386,7 @@ function DeepTextSection({ section }: { section: ChapterDeepText }) {
           return (
             <p key={idx} style={{
               fontSize: 13, lineHeight: 1.75, color: 'rgba(255,255,255,0.85)',
-              margin: 0, textAlign: 'justify', hyphens: 'auto',
+              margin: 0, textAlign: 'left', hyphens: 'auto',
             }}>
               {renderDeepInline(para, conceptMap, refMap, setOpenConcept, setOpenRef)}
             </p>
@@ -1056,7 +1056,7 @@ function PhaseCard({ data, chapterId }: { data: ChapterPhaseCard; chapterId?: st
           lineHeight: 1.7,
           color: 'rgba(255,255,255,0.85)',
           margin: '0 0 12px 0',
-          textAlign: 'justify',
+          textAlign: 'left',
           hyphens: 'auto',
         }}
       >
@@ -1071,7 +1071,7 @@ function PhaseCard({ data, chapterId }: { data: ChapterPhaseCard; chapterId?: st
           borderRadius: 6,
           borderLeft: `2px solid ${accent}`,
           lineHeight: 1.6,
-          textAlign: 'justify',
+          textAlign: 'left',
           hyphens: 'auto',
         }}
       >
@@ -1220,7 +1220,7 @@ function PhaseCard({ data, chapterId }: { data: ChapterPhaseCard; chapterId?: st
                       padding: '10px 12px',
                       background: 'rgba(255, 255, 255, 0.04)',
                       borderRadius: 5,
-                      textAlign: 'justify',
+                      textAlign: 'left',
                       hyphens: 'auto',
                     }}
                   >
@@ -1305,7 +1305,7 @@ function ChapterSynthesis({
           fontWeight: 500,
           margin: '0 0 18px 0',
           letterSpacing: '-0.005em',
-          textAlign: 'justify',
+          textAlign: 'left',
           hyphens: 'auto',
         }}
       >
