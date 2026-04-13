@@ -564,7 +564,7 @@ function StudySidebar({
                 if (cadernoBlocks.length === 0) return <p className="text-[12px] text-white/28">Nenhum bloco ainda.</p>
                 return cadernoBlocks.map((block, i) => {
                   const title = 'title' in block ? block.title : block.id
-                  const icon = block.type === 'simulation' ? '◈' : block.type === 'attachment' ? '⊕' : '·'
+                  const icon = block.type === 'simulation' ? '◈' : block.type === 'attachment' ? '⊕' : block.type === 'chapter' ? '▣' : '·'
                   const isActive = i === activeBlockIdx
                   return (
                     <button

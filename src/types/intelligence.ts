@@ -499,7 +499,7 @@ export type ChapterBlock = {
   number: number
   title: string
   subtitle?: string
-  estimatedMinutes: number
+  estimatedMinutes?: number
   opening: {
     leadText: string                // suporta {{highlight}}
     showTimeline?: boolean

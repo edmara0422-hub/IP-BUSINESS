@@ -19,7 +19,6 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             number: 1,
             title: 'Era Digital · As 3 Fases da Tecnologia',
             subtitle: 'Como o papel da TI mudou nas empresas — de bastidor operacional a coração do negócio',
-            estimatedMinutes: 6,
             opening: {
               leadText: 'A evolução da tecnologia nas empresas pode ser segmentada em três fases distintas. Cada fase redefiniu o papel da TI dentro do negócio — de bastidor operacional a coração estratégico. Entender em qual fase sua empresa está hoje é o {{primeiro passo}} para qualquer transformação digital real.',
               showTimeline: true,
@@ -200,6 +199,114 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               ],
               nextChapterHint: 'Capítulo 2 · Transformação Digital',
               nextChapterBlurb: 'Por que comprar tecnologia não basta — e o que separa digitização de transformação real.',
+            },
+          },
+          {
+            id: 'M1-0-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Transformação Digital · Além da Tecnologia',
+            subtitle: 'Por que comprar tecnologia não basta — e o que separa digitização de transformação real',
+            opening: {
+              leadText: 'Transformação digital não é implementar novas tecnologias — é uma {{mudança cultural}} que exige que organizações desafiem o status quo, experimentem e se sintam confortáveis com o fracasso. A maioria das empresas brasileiras confunde {{digitização}} com transformação. A diferença custa caro.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'Três conceitos são confundidos constantemente por gestores. {{Digitização}} é converter papel em PDF — o nível mais básico. {{Digitalização}} é automatizar fluxos usando tecnologia — o processo continua o mesmo, só fica mais rápido. {{Transformação Digital}} é fundamentalmente repensar o modelo de negócio e a proposta de valor usando capacidades digitais. A Gartner define como "o processo de explorar tecnologias digitais para criar novos — ou modificar existentes — processos de negócio, cultura e experiências do cliente". Apenas 23% das PMEs brasileiras usam algum sistema integrado, e menos de 5% usam dados para decisão (CETIC.br, TIC Empresas 2022).',
+              },
+              {
+                kind: 'heading',
+                text: 'Os 4 Domínios da Transformação (Rogers, Columbia 2016)',
+              },
+              {
+                kind: 'paragraph',
+                text: 'David Rogers (Columbia Business School, 2016) propôs que transformação digital acontece em 4 domínios simultâneos — não sequenciais. {{Clientes}} deixam de ser audiência passiva e viram rede ativa que co-cria valor. {{Competição}} deixa de vir só do setor e passa a vir de qualquer lugar — plataformas redefinem fronteiras. {{Dados}} deixam de ser subproduto caro e viram ativo estratégico sempre ligado. {{Inovação}} deixa de lançar produto acabado e passa a testar MVPs continuamente. O insight central de Rogers: transformação não é sobre tecnologia — é sobre estratégia.',
+              },
+              {
+                kind: 'heading',
+                text: 'Governança Digital — Os 4 Pilares',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Governança digital é o conjunto de práticas que garantem que a tecnologia seja usada de maneira eficiente e alinhada às estratégias organizacionais. Em um ambiente onde dados são o principal ativo, negligenciar a governança pode comprometer a sustentabilidade da organização.',
+              },
+              {
+                kind: 'paragraph',
+                text: '**Estratégia** — define como a tecnologia será usada para atingir objetivos. Inclui prioridades, investimentos e indicadores. Não faz sentido investir em TI se não estiver alinhada ao que a empresa almeja. **Riscos e Segurança** — identifica, avalia e mitiga ameaças. Criptografia, autenticação 2FA, treinamento contínuo. A maior vulnerabilidade é humana, não técnica. **Políticas e Procedimentos** — regras claras padronizam processos e elevam a confiança nos dados. Quanto mais padronizado, mais fidedigno. **Monitoramento Contínuo** — a tecnologia avança constantemente. Sistemas e processos precisam acompanhar.',
+              },
+              {
+                kind: 'heading',
+                text: 'Cultura Organizacional e Gestão da Mudança',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A tecnologia é apenas um dos componentes. O fator humano e a cultura organizacional representam os maiores desafios — e os maiores facilitadores. Barreiras comuns: medo do erro, punição ao fracasso (inibe experimentação), culturas centralizadoras que inibem protagonismo, desalinhamento entre discurso da liderança e prática diária, e tratar transformação como responsabilidade exclusiva do TI.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Gestão da mudança bem-sucedida combina cinco passos: {{diagnóstico e alinhamento}} (compreender cenário atual + visão), {{liderança ativa}} (líderes incorporando comportamentos digitais primeiro), {{comunicação transparente}} (explicar o porquê), {{treinamento e capacitação}} (técnicas + soft skills), e {{espaços seguros}} para experimentar sem medo de punição.',
+              },
+              {
+                kind: 'heading',
+                text: 'Frameworks: COBIT, ISO 38500, ITIL 4',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A implementação não exige criar do zero — exige adaptar frameworks reconhecidos. **COBIT** (ISACA, 1996/2019) é referência global para governança de TI no nível estratégico — conecta objetivos de negócio às metas de tecnologia. **ISO/IEC 38500** (2008/2015) fornece princípios para dirigentes: avaliar, direcionar, monitorar. **ITIL 4** (2019) foca na operação — organiza fluxos de entrega de serviços, integrando IA e cloud.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Para PMEs, governança simplificada: backup automático diário (R$ 0-50/mês), 2FA em todas as contas (R$ 0), um responsável por tecnologia (mesmo acumulando função), política de senhas com gerenciador, revisão trimestral de ferramentas. O custo de não fazer é potencialmente o negócio inteiro — a Renner perdeu R$ 20 milhões em 2021 por falha de governança básica.',
+              },
+              {
+                kind: 'heading',
+                text: 'LGPD, Sandbox Regulatório e Tendências',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A transformação digital no Brasil ocorre sob arcabouço legal rigoroso. A LGPD (Lei 13.709/2018) e a Lei do Governo Digital (14.129/2021) são os pilares. O sandbox regulatório (LC 182/21) permite testagem de modelos inovadores com flexibilidade temporária. A ANPD lançou sandbox focado em IA e proteção de dados — transparência algorítmica, mitigação de vieses, segurança de dados para treinar modelos generativos.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Agentes de IA possuem percepção, raciocínio adaptativo e ação autônoma — redefinem governança. Empresas agora gerenciam agentes que tomam decisões independentes. A observabilidade torna-se prioridade: não se pode gerenciar o que não se vê. RegTechs automatizam KYC e AML; compliance deixa de evitar multas e vira motor de confiança.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Três conceitos costumam ser confundidos. Veja a diferença lado a lado — depois classifique exemplos reais de empresas brasileiras.',
+              compare: {
+                columnHeaders: ['Digitização', 'Digitalização', 'Transformação Digital'],
+                rows: [
+                  { label: 'O que faz', values: ['Converte papel em digital', 'Automatiza processos existentes', 'Repensa o modelo de negócio'], viz: 'icons', icons: ['📄', '⚙️', '🔄'] },
+                  { label: 'Exemplo', values: ['Escanear notas fiscais', 'ERP integra estoque+vendas', 'Loja vira plataforma digital'], viz: 'icons', icons: ['📋', '🔗', '🌐'] },
+                  { label: 'Nível de mudança', values: ['Formato', 'Processo', 'Identidade'], viz: 'bars', intensities: [0.2, 0.55, 1.0] },
+                  { label: 'Risco se parar aqui', values: ['Dados digitais mas isolados', 'Eficiente mas no modelo antigo', 'Nenhum — é o destino'], viz: 'bars', intensities: [0.8, 0.5, 0.05] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada ação: é digitização, digitalização ou transformação digital?',
+                zones: [
+                  { id: 'digitizacao', label: 'Digitização' },
+                  { id: 'digitalizacao', label: 'Digitalização' },
+                  { id: 'transformacao', label: 'Transformação Digital' },
+                ],
+                items: [
+                  { id: 'pdf', label: 'Escanear contratos e guardar na nuvem', correctZone: 'digitizacao', correctFeedback: 'Certo. Converter papel em PDF é digitização — o nível mais básico. Necessário, mas insuficiente.', wrongFeedback: 'Escanear documentos é apenas converter formato — não muda processo nem modelo. É digitização.' },
+                  { id: 'erp', label: 'Natura integra 7 países com SAP', correctZone: 'digitalizacao', correctFeedback: 'Certo. SAP automatizou e integrou processos, mas o modelo de negócio (venda direta) continuou o mesmo. É digitalização de processos.', wrongFeedback: 'A Natura integrou operações com ERP — isso é automatizar processos existentes, não repensar o modelo.' },
+                  { id: 'magalu', label: 'Magazine Luiza transforma lojas em mini-CDs de plataforma', correctZone: 'transformacao', correctFeedback: 'Certo. Magalu não digitalizou lojas — mudou o que a empresa É. Lojas servem o app, não o contrário. Modelo inteiro reescrito.', wrongFeedback: 'Magalu não só digitalizou — mudou o modelo de negócio inteiro. Lojas viraram infraestrutura de uma plataforma digital.' },
+                  { id: 'pix', label: 'PIX substitui TED/DOC como forma de pagamento', correctZone: 'transformacao', correctFeedback: 'Certo. PIX não digitalizou o TED — criou um sistema inteiramente novo que tornou o antigo obsoleto. Mudou o ecossistema de pagamentos.', wrongFeedback: 'PIX não é melhoria do TED — é um sistema novo que redesenhou como pagamentos funcionam no Brasil.' },
+                  { id: 'planilha', label: 'Substituir caderno de estoque por planilha Excel', correctZone: 'digitizacao', correctFeedback: 'Certo. Trocar caderno por planilha é converter formato — digitização. O processo de controle de estoque continua manual.', wrongFeedback: 'Trocar caderno por planilha é mudar o formato, não o processo. É digitização básica.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Transformação digital não é sobre comprar tecnologia — é sobre {{repensar como a empresa cria e entrega valor}}. Digitização é pré-requisito. Digitalização é eficiência. Transformação é sobrevivência. E governança é o que impede que tudo desmorone no caminho.',
+              keyInsights: [
+                'Digitização ≠ Digitalização ≠ Transformação Digital — a confusão entre os três custa bilhões em investimentos mal direcionados.',
+                'Os 4 domínios de Rogers (Clientes, Competição, Dados, Inovação) devem ser {{transformados simultaneamente}}, não sequencialmente.',
+                'Governança para PME custa R$ 0-50/mês. Não ter governança pode custar o negócio inteiro.',
+              ],
             },
           },
         ],

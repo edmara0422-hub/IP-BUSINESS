@@ -98,7 +98,6 @@ export default function Chapter({ block }: Props) {
         number={block.number}
         title={block.title}
         subtitle={block.subtitle}
-        estimatedMinutes={block.estimatedMinutes}
       />
 
       {/* A — ABERTURA */}
@@ -140,12 +139,10 @@ function ChapterHeader({
   number,
   title,
   subtitle,
-  estimatedMinutes,
 }: {
   number: number
   title: string
   subtitle?: string
-  estimatedMinutes: number
 }) {
   return (
     <header style={{ marginBottom: 24 }}>
@@ -170,9 +167,6 @@ function ChapterHeader({
           }}
         >
           Capítulo {number}
-        </span>
-        <span style={{ fontSize: 10, color: COLORS.textDim, fontFamily: 'ui-monospace, monospace' }}>
-          {estimatedMinutes} min
         </span>
       </div>
       <h1
