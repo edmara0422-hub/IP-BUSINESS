@@ -35,10 +35,22 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               leadText: 'A evolução da tecnologia nas empresas pode ser segmentada em três fases distintas. Cada fase redefiniu o papel da TI dentro do negócio — de bastidor operacional a coração estratégico. Entender em qual fase sua empresa está hoje é o {{primeiro passo}} para qualquer transformação digital real.',
               showTimeline: true,
             },
-            body: [
+            body: 
               {
                 kind: 'paragraph',
-                text: 'Não existe transformação digital sem antes saber de onde se parte. As três fases abaixo não são degraus de uma escada — são modos de operar. Algumas organizações vivem em mais de uma ao mesmo tempo. O que importa é reconhecer onde está o centro de gravidade da sua TI hoje, porque é a partir dele que qualquer salto se torna possível.',
+                text: 'A evolução histórica da tecnologia nas empresas pode ser segmentada em três fases distintas. Não são degraus de uma escada — são modos de operar. Algumas organizações vivem em mais de uma ao mesmo tempo. O que importa é reconhecer onde está o {{centro de gravidade}} da sua TI hoje, porque é a partir dele que qualquer salto se torna possível.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Na **Fase 1 — Infraestrutura** (anos 2000), o foco era na estabilidade de servidores e redes operacionais. O problema central era técnico: manter sistemas funcionando. Empresas investiam em data centers, backups e conexão de internet. O departamento de TI era visto como "suporte" — consertava computadores e instalava programas. O sucesso era medido em {{uptime}}, não em receita.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Na **Fase 2 — Processo** (anos 2010), a integração de sistemas como ERPs e CRMs entrou no cotidiano da gestão. A tecnologia passou a organizar fluxos de trabalho — não apenas suportar, mas integrar. A informação parou de morrer em planilhas isoladas e começou a fluir entre setores. Empresas como Magazine Luiza começaram a integrar lojas físicas e canais digitais. A TOTVS cresceu vendendo ERP para PMEs brasileiras, automatizando desde estoque até folha de pagamento.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Na **Fase 3 — Estratégia** (anos 2020 em diante), a tecnologia define a criação de produtos, o atendimento ao cliente e a capacidade de inovar — tornando-se pilar de competitividade e reputação. Dados são o novo petróleo. IA generativa redefine produtividade. Empresas nativas digitais (Nubank, iFood, Mercado Livre) ditam o ritmo. O iFood não é uma empresa de comida — é uma empresa de tecnologia que conecta restaurantes a consumidores via dados, algoritmos de logística e IA de recomendação. {{Sem a tecnologia, o negócio não existe}}.',
               },
               {
                 kind: 'phase-group',
@@ -118,7 +130,15 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 kind: 'paragraph',
                 text: 'A pergunta que separa empresas que sobrevivem das que lideram não é "qual tecnologia adotar?" — é "em qual fase estamos hoje, e em qual fase o mercado ao redor já chegou?". A diferença entre as duas respostas é o {{gap}} que precisa ser fechado. E quanto maior o gap, mais doloroso o salto.',
               },
-            ],
+              {
+                kind: 'paragraph',
+                text: 'Empresas que operam em fase de Processo enquanto o mercado está em fase de Estratégia perdem competitividade de forma sistemática e silenciosa. O problema é que essa perda é {{invisível}} até que um concorrente digital capture seus clientes. Quando percebe, o gap já é grande demais para fechar com investimento incremental.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O custo de ficar parado é composto. Enquanto uma empresa estagnada perde eficiência linearmente (5-8% ao ano em custos evitáveis), seus concorrentes digitalizados crescem exponencialmente via efeitos de rede e dados acumulados. Em 5 anos, uma empresa de R$ 10 milhões de receita com 5% de perda anual e mercado crescendo 12% pode acumular um gap de mais de {{R$ 9 milhões}} — quase sua receita inteira.',
+              },
+],
             application: {
               kind: 'compare-and-drag',
               intro: 'Antes de classificar, veja as três fases lado a lado em quatro dimensões. Repare como a velocidade de decisão e a vantagem competitiva crescem juntas — não por acaso. Depois, arraste cinco empresas conhecidas para a fase em que elas operam hoje.',
@@ -222,7 +242,15 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             opening: {
               leadText: 'A transformação digital é o processo de integração de tecnologias digitais em {{todas as áreas}} de uma organização, mudando a forma como ela opera e entrega valor aos seus clientes. Não se trata apenas de implementar novas tecnologias, mas de uma {{mudança cultural}} que exige que as organizações desafiem continuamente o status quo, experimentem e se sintam confortáveis com o fracasso.',
             },
-            body: [
+            body: 
+              {
+                kind: 'paragraph',
+                text: 'A transformação digital é o processo de integração de tecnologias digitais em todas as áreas de uma organização, mudando a forma como ela opera e entrega valor aos seus clientes. Não se trata apenas de implementar novas tecnologias, mas de uma {{mudança cultural}} que exige que as organizações desafiem continuamente o status quo, experimentem e se sintam confortáveis com o fracasso.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Aqui é fundamental distinguir três conceitos que costumam ser confundidos — e a confusão custa bilhões em investimentos mal direcionados. **Digitização** é converter papel em PDF — é condição necessária mas insuficiente. **Digitalização** é automatizar fluxos usando tecnologia — o processo continua o mesmo, só fica mais rápido. **Transformação Digital** é fundamentalmente repensar o modelo de negócio e a proposta de valor usando capacidades digitais. Segundo IBGE (PINTEC 2020) e pesquisas do Sebrae, apenas {{23%}} das PMEs brasileiras utilizam algum sistema integrado, e menos de 5% utilizam dados para decisão (CETIC.br, TIC Empresas 2022).',
+              },
               {
                 kind: 'pillar-grid',
                 title: 'Os 4 domínios da transformação (Rogers, Columbia 2016)',
@@ -234,8 +262,12 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 ],
               },
               {
+                kind: 'paragraph',
+                text: 'David Rogers (Columbia Business School, 2016) propôs que a transformação digital acontece nesses 4 domínios simultaneamente — não sequencialmente. O insight central: {{transformação não é sobre tecnologia — é sobre estratégia}}. George Westerman (MIT Sloan, 2014) pesquisou 391 empresas em 30 países e classificou-as em 4 quadrantes. Apenas os "Digirati" (alta capacidade digital + alta liderança) superam consistentemente os pares — 26% mais lucrativos, 9% maior receita, 12% maior valorização de mercado.',
+              },
+              {
                 kind: 'heading',
-                text: 'Sinergia entre Gestão da Inovação e Transformação Digital',
+                text: 'Sinergia entre gestão da inovação e transformação digital',
               },
               {
                 kind: 'paragraph',
@@ -251,8 +283,11 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   { icon: '📈', title: 'Resultados', description: 'SGI mantém foco estratégico no {{ROI}}; TD entrega analytics para medir impacto em larga escala.' },
                 ],
               },
-              
-            ],
+              {
+                kind: 'paragraph',
+                text: 'A integração entre SGI e TD gera benefícios mútuos que podem ser compreendidos nesses quatro elementos centrais. Na prática, empresas que integram os dois domínios reportam ciclos de inovação {{40% mais curtos}} e taxa de sucesso de novos projetos 2x maior do que empresas que tratam inovação e tecnologia como silos separados.',
+              },
+],
             application: {
               kind: 'compare-and-drag',
               intro: 'Três conceitos são confundidos constantemente. Veja a diferença — depois classifique ações reais.',
@@ -297,34 +332,46 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             opening: {
               leadText: 'A governança digital é o conjunto de práticas que garantem que a tecnologia seja usada de maneira eficiente e alinhada às estratégias organizacionais. Em um ambiente em que os dados são o principal ativo, não dar o devido valor à governança pode colocar em risco a {{sustentabilidade}} de uma organização. Pilares são estruturas que mantêm algo em pé — se um falha, a casa desaba.',
             },
-            body: [
+            body: 
+              {
+                kind: 'paragraph',
+                text: 'A governança digital é o conjunto de práticas e de processos que garantem que a tecnologia seja usada de maneira eficiente e alinhada às estratégias organizacionais. Ela envolve a gestão de recursos tecnológicos, a segurança da informação, a conformidade com regulamentações e a garantia de que os investimentos em tecnologia estejam gerando valor para a organização.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Em um ambiente em que os dados são o principal ativo, não dar o devido valor à governança digital pode colocar em risco a {{sustentabilidade}} de uma organização ao longo do tempo. Pilares são estruturas que permitem a algo se manter firme. Para a governança digital manter-se sólida, é fundamental que alguns pilares sejam bem construídos e funcionem conjuntamente. Caso contrário, a "casa pode desabar".',
+              },
               {
                 kind: 'pillar-grid',
                 title: 'Os 4 pilares da governança digital',
                 pillars: [
-                  { icon: '🎯', title: 'Estratégia', description: 'Como a tecnologia será usada para atingir objetivos. Prioridades, investimentos e {{indicadores}}. Não faz sentido investir em tech desalinhada do futuro da empresa.', metric: { value: '+30%', label: 'pedidos digitais (Ambev BEES)' }, caseCompany: 'Ambev', caseResult: '1M+ PDVs conectados via BEES' },
-                  { icon: '🛡️', title: 'Riscos e Segurança', description: 'Criptografia, {{2FA}}, treinamento. A maior vulnerabilidade é humana. Políticas de segurança são a primeira linha de defesa.', metric: { value: '$4.88M', label: 'custo médio breach (IBM 2024)' }, caseCompany: 'Renner', caseResult: 'R$ 20M perdidos por ransomware (2021)' },
-                  { icon: '📋', title: 'Políticas e Procedimentos', description: 'Regras claras padronizam processos. Quanto mais padronizado, mais {{fidedignos}} os dados — e mais seguras as decisões.', metric: { value: '5d → 2h', label: 'relatórios (Itaú open data)' }, caseCompany: 'Itaú', caseResult: 'Dados abertos entre áreas com governança' },
+                  { icon: '🎯', title: 'Estratégia', description: 'Estabelece como a tecnologia será usada para atingir objetivos. Prioridades, investimentos e {{indicadores}}. Não faz sentido investir em tech desalinhada do futuro da empresa.', metric: { value: '+30%', label: 'pedidos digitais (Ambev BEES)' }, caseCompany: 'Ambev', caseResult: '1M+ PDVs conectados via BEES' },
+                  { icon: '🛡️', title: 'Riscos e Segurança', description: 'Identificar, avaliar e mitigar ameaças. Criptografia, {{2FA}}, treinamento contínuo. A maior vulnerabilidade não é técnica — é humana.', metric: { value: '$4.88M', label: 'custo médio breach (IBM 2024)' }, caseCompany: 'Renner', caseResult: 'R$ 20M perdidos por ransomware (2021)' },
+                  { icon: '📋', title: 'Políticas e Procedimentos', description: 'Regras claras padronizam processos. Quanto mais padronizado, mais {{fidedignos}} os dados — e mais seguras as decisões. Inclui uso de dispositivos, acesso a dados sensíveis, escolha de fornecedores.', metric: { value: '5d → 2h', label: 'relatórios (Itaú open data)' }, caseCompany: 'Itaú', caseResult: 'Dados abertos entre áreas com governança' },
                   { icon: '🔄', title: 'Monitoramento Contínuo', description: 'Não faz sentido construir e não manter. O monitoramento garante que sistemas sejam {{ajustados}} conforme a tecnologia avança.', metric: { value: '2B+', label: 'eventos/dia (Mercado Livre)' }, caseCompany: 'Mercado Livre', caseResult: 'Auto-scaling sem intervenção humana' },
                 ],
               },
               {
                 kind: 'heading',
-                text: 'Cultura organizacional e barreiras à inovação digital',
+                text: 'Cultura organizacional e gestão da mudança',
               },
               {
                 kind: 'paragraph',
-                text: 'A tecnologia é apenas um dos componentes da transformação digital; o fator humano e a cultura organizacional representam os maiores desafios e, simultaneamente, os maiores facilitadores do sucesso. As barreiras mais comuns incluem o {{medo do erro}}, a punição ao fracasso (que inibe experimentação), culturas centralizadoras que inibem protagonismo, o desalinhamento entre discurso da liderança e práticas diárias, e a falta de visão integrada onde a transformação é vista apenas como responsabilidade do TI.',
+                text: 'A tecnologia é apenas um dos componentes da transformação digital; o fator humano e a cultura organizacional representam os maiores desafios e, simultaneamente, os maiores facilitadores do sucesso. A resistência à mudança é um fenômeno natural em organizações com identidades culturais fortes e processos tradicionais.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'As barreiras mais comuns incluem o {{medo do erro}}, a resistência à mudança e a punição ao fracasso, que inibem a experimentação necessária para inovar. Culturas centralizadoras que inibem o protagonismo dos colaboradores e o desalinhamento entre o discurso da liderança e as práticas diárias também enfraquecem o engajamento. Além disso, a falta de uma visão integrada, onde a transformação é vista apenas como responsabilidade do setor de TI, compromete o esforço coletivo necessário.',
               },
               {
                 kind: 'step-flow',
                 title: '5 passos para a mudança bem-sucedida',
                 steps: [
-                  { number: 1, title: 'Diagnóstico e Alinhamento', description: 'Compreender o cenário atual e definir a visão. Cada investimento em tecnologia deve contribuir para as {{metas organizacionais}}.', caseSnippet: 'Magalu: Trajano fez 6 meses de diagnóstico → identificou lojas como ativo, não passivo → 100x valorização.' },
-                  { number: 2, title: 'Liderança Ativa', description: 'Líderes devem ser os {{primeiros}} a incorporar comportamentos digitais. Se o diretor não usa o CRM, a equipe não vai.', author: 'Kotter, Harvard, 1996: 70% das transformações falham por falta de urgência no topo', caseSnippet: 'Natura: CEO nos treinamentos SAP → adoção acelerou 40%.' },
-                  { number: 3, title: 'Comunicação Transparente', description: 'Explicar o "porquê" da mudança. Decisões baseadas em {{dados precisos}}, não em hierarquia.', caseSnippet: 'Nubank: explicou novo sistema IA a todos → zero sabotagem, adoção imediata.' },
-                  { number: 4, title: 'Treinamento e Capacitação', description: 'Habilidades técnicas + {{soft skills}}. Investimentos complementares em treinamento são 5-10x maiores que o investimento em tech.', author: 'Brynjolfsson, MIT, 2003: ganhos de TI levam 5-7 anos', caseSnippet: 'TOTVS: 500+ cursos. Com treinamento: 85% retenção. Sem: 40%.' },
-                  { number: 5, title: 'Espaços Seguros para Experimentar', description: 'Ambientes onde ideias podem ser testadas {{sem medo}} de punição. Práticas de gestão da mudança reduzem ceticismo.', author: 'Edmondson, Harvard, 2018: segurança psicológica = fator #1', caseSnippet: 'Google Aristotle (180 equipes): Gmail nasceu de tempo livre para experimentar.' },
+                  { number: 1, title: 'Diagnóstico e Alinhamento Estratégico', description: 'Compreender o cenário atual e definir a visão estratégica. A governança digital garante que as iniciativas estejam alinhadas aos {{objetivos estratégicos}}. Cada investimento em tecnologia deve contribuir para o alcance das metas organizacionais.', caseSnippet: 'Magalu: Trajano fez diagnóstico antes de investir — identificou lojas como ativo, não passivo.' },
+                  { number: 2, title: 'Liderança Ativa', description: 'Líderes devem ser os {{primeiros}} a incorporar comportamentos digitais e valores de inovação. Se o diretor não usa o CRM, a equipe também não vai.', author: 'Kotter, Harvard, 1996: 70% das transformações falham por falta de urgência no topo', caseSnippet: 'Natura: CEO nos treinamentos SAP — adoção acelerou 40% vs cronograma.' },
+                  { number: 3, title: 'Comunicação Transparente', description: 'Explicar o "porquê" da mudança para gerar engajamento. A governança digital assegura que as decisões sejam baseadas em {{informações e dados precisos}}, não em hierarquia ou intuição.', caseSnippet: 'Nubank: explicou novo sistema IA a todos — zero sabotagem interna.' },
+                  { number: 4, title: 'Treinamento e Capacitação', description: 'Desenvolver habilidades técnicas e comportamentais ({{soft skills}}) para o novo ambiente. A governança promove eficiência no uso de recursos tecnológicos, evitando desperdícios.', author: 'Brynjolfsson, MIT, 2003: investimentos complementares em treinamento são 5-10x maiores que em tech', caseSnippet: 'TOTVS: 500+ cursos. Com treinamento: 85% retenção. Sem: 40%.' },
+                  { number: 5, title: 'Espaços Seguros para Experimentar', description: 'Criar ambientes onde ideias possam ser testadas {{sem medo}} de punição severa em caso de erro. Estudos indicam que práticas de gestão da mudança impactam positivamente a atitude dos funcionários.', author: 'Edmondson, Harvard, 2018: segurança psicológica = fator #1 de alta performance', caseSnippet: 'Google Aristotle (180 equipes): segurança psicológica é o fator #1.' },
                 ],
               },
               {
@@ -333,14 +380,17 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: 'Comitês de governança reúnem gestores de diferentes áreas para decisões colaborativas. Modelos descentralizados dão autonomia a cada departamento seguindo diretrizes gerais — estruturas centralizadoras comprometem velocidade de decisão. **COBIT** (ISACA, 1996/2019) conecta objetivos de negócio a metas de TI. **ISO/IEC 38500** (2008/2015) orienta dirigentes: avaliar, direcionar, monitorar. **ITIL 4** (2019) organiza fluxos de entrega integrando IA e cloud.',
+                text: 'A implementação da governança digital não requer a criação de processos do zero, mas sim a adaptação de frameworks reconhecidos que equilibram controle e agilidade. Comitês de governança reúnem gestores de diferentes áreas para decisões colaborativas. Modelos descentralizados dão autonomia a cada departamento seguindo diretrizes gerais — estruturas centralizadoras comprometem velocidade de decisão.',
               },
               {
                 kind: 'paragraph',
-                text: 'Para PMEs: backup automático diário, 2FA em todas as contas, um responsável por TI (mesmo acumulando função), política de senhas com gerenciador, revisão trimestral. Custo: {{R$ 0 a R$ 50/mês}}. Custo de não fazer: potencialmente o negócio inteiro.',
+                text: '**COBIT** (ISACA, 1996/2019) é a referência global para governança de TI no nível estratégico — conecta objetivos de negócio às metas de tecnologia, definindo papéis, responsabilidades e métricas de controle. **ISO/IEC 38500** (2008/2015) fornece princípios para dirigentes: avaliação do uso atual e futuro da TI, direção para implementação de planos e políticas, e monitoramento de conformidade. **ITIL 4** (2019) foca na parte tática e operacional, organizando fluxos de entrega integrando IA e cloud.',
               },
-              
-            ],
+              {
+                kind: 'paragraph',
+                text: 'Para PMEs, governança simplificada: backup automático diário (R$ 0-50/mês), autenticação em dois fatores em todas as contas (R$ 0), um responsável por tecnologia (mesmo acumulando função), política de senhas com gerenciador, e revisão trimestral de ferramentas e custos. Governança digital para PME não é burocracia — é evitar que um ransomware apague seus dados, que um ex-funcionário acesse seu CRM, ou que você pague {{5 ferramentas}} para fazer o trabalho de 2.',
+              },
+],
             application: {
               kind: 'compare-and-drag',
               intro: 'Os 4 pilares sustentam a governança. Classifique cada prática no pilar correto.',
@@ -388,15 +438,23 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             opening: {
               leadText: 'Empresas líderes estão adotando práticas que exploram dados em {{larga escala}} para otimizar portfólio e decisões. Mas ferramentas sozinhas não bastam — é necessário uma cultura que estimule {{pensamento crítico}} em todos os níveis. E o marco regulatório brasileiro define os limites dentro dos quais a inovação deve operar.',
             },
-            body: [
+            body: 
+              {
+                kind: 'paragraph',
+                text: 'Empresas líderes estão adotando o Analytics-to-Value (AtV), um conjunto de práticas que utiliza digital e analytics para otimizar o portfólio e reduzir custos de produtos. Enquanto os métodos tradicionais (Design-to-Value) focam em componentes isolados, o AtV explora dados internos e externos em {{larga escala}}, gerando insights em poucos dias para todo o portfólio da empresa.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A Tomada de Decisão Baseada em Dados (Data-Driven Decision Making — DDDM) é definida como o uso de fatos, métricas e dados para orientar decisões comerciais estratégicas. No entanto, a tecnologia de análise sozinha não é suficiente; é necessário criar uma cultura que estimule o {{pensamento crítico}} e a curiosidade em todos os níveis da organização.',
+              },
               {
                 kind: 'pillar-grid',
-                title: 'Ferramentas digitais para gestão da inovação',
+                title: 'Os 4 pilares da decisão baseada em dados',
                 pillars: [
-                  { icon: '📊', title: 'Analytics-to-Value (AtV)', description: 'Usa digital e analytics para otimizar portfólio e reduzir custos. Enquanto métodos tradicionais focam em componentes isolados, o AtV explora dados internos e externos em {{larga escala}}, gerando insights em poucos dias.' },
-                  { icon: '🧠', title: 'DDDM', description: 'Data-Driven Decision Making — uso de fatos, métricas e dados para orientar decisões estratégicas. A tecnologia sozinha não basta: é necessário criar {{cultura}} de pensamento crítico.' },
-                  { icon: '💾', title: 'Coleta e Análise', description: 'Capturar dados eficientemente + extrair informações via modelos estatísticos e {{machine learning}}. O dado bruto não vale nada — o insight vale tudo.' },
-                  { icon: '📈', title: 'Visualização e Integração', description: 'Apresentação clara para que {{não-especialistas}} ajam. Uso dos insights nos processos decisórios diários da liderança — não num relatório que ninguém lê.' },
+                  { icon: '💾', title: 'Coleta e Armazenamento', description: 'Habilidade de capturar dados de forma eficiente. APIs, IoT, formulários, {{integrações automáticas}}.' },
+                  { icon: '🧠', title: 'Análise e Processamento', description: 'Extração de informações relevantes através de modelos estatísticos e {{machine learning}}.' },
+                  { icon: '📈', title: 'Visualização e Comunicação', description: 'Apresentação clara de resultados para que {{não-especialistas}} possam agir sobre eles.' },
+                  { icon: '🎯', title: 'Integração Estratégica', description: 'Uso dos insights nos processos decisórios {{diários}} da liderança — não num relatório que ninguém lê.' },
                 ],
               },
               {
@@ -405,7 +463,11 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: 'A transformação digital no Brasil ocorre sob um rigoroso arcabouço legal. A {{LGPD}} (Lei 13.709/2018) e a Lei do Governo Digital (14.129/2021) são os pilares desse ecossistema. O sandbox regulatório (LC 182/21) permite a testagem de modelos de negócios inovadores com flexibilidade temporária em normas e penalidades. A ANPD lançou sandbox focado em IA e Proteção de Dados: transparência algorítmica, mitigação de vieses e segurança de dados pessoais em modelos generativos.',
+                text: 'A transformação digital no Brasil ocorre sob um rigoroso arcabouço legal que visa proteger o cidadão e incentivar a inovação responsável. A Lei Geral de Proteção de Dados ({{LGPD}}, Lei 13.709/2018) e a Lei do Governo Digital (14.129/2021) são os pilares desse ecossistema.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O sandbox regulatório é um ambiente experimental que permite a testagem de modelos de negócios inovadores com flexibilidade temporária em normas e penalidades. O Marco Civil das Startups (LC 182/21) institucionalizou essa prática, permitindo que órgãos reguladores como a ANPD explorem tecnologias emergentes. Recentemente, a ANPD lançou um sandbox focado em Inteligência Artificial e Proteção de Dados, com ênfase em {{transparência algorítmica}}, mitigação de vieses e segurança de dados pessoais em modelos generativos.',
               },
               {
                 kind: 'heading',
@@ -413,14 +475,22 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: 'Diferente da automação robótica tradicional (RPA), os agentes de IA possuem capacidades de percepção, raciocínio adaptativo e {{ação autônoma}}. Isso redefine a governança: empresas agora gerenciam agentes que tomam decisões independentes e acessam dados sensíveis. A observabilidade torna-se prioridade número um — não se pode gerenciar ou proteger o que não se vê.',
+                text: 'O futuro da gestão da inovação está intrinsecamente ligado à evolução da Inteligência Artificial. Em 2025, os profissionais de compliance e governança veem a IA não apenas como uma ferramenta de automação, mas como um vetor de aculturamento ético.',
+              },
+              {
+                kind: 'step-flow',
+                title: '3 tendências que redefinem governança',
+                steps: [
+                  { number: 1, title: 'Agentes de IA Autônomos', description: 'Diferente da automação robótica tradicional (RPA), os agentes de IA possuem capacidades de percepção, raciocínio adaptativo e {{ação autônoma}}. Isso redefine a governança: empresas agora gerenciam agentes que tomam decisões independentes e acessam dados sensíveis. A observabilidade torna-se prioridade número um — não se pode gerenciar ou proteger o que não se vê.' },
+                  { number: 2, title: 'RegTech e Compliance Automatizado', description: 'As RegTechs (Regulatory Technology) utilizam IA para automatizar verificações de KYC (Know Your Customer) e triagens de AML (Anti-Money Laundering). Em 2025, o compliance deixa de ser focado apenas em evitar multas para se tornar um motor de {{confiança e reputação}}. A detecção preditiva de anomalias permite responder a riscos em tempo real.' },
+                  { number: 3, title: 'Inovação Ambidestra', description: 'Manter a eficiência operacional (exploração do modelo atual) enquanto se explora novas fronteiras (experimentação com modelos novos). O maior desafio organizacional da próxima década: fazer os dois ao mesmo tempo sem que um {{sabote}} o outro.' },
+                ],
               },
               {
                 kind: 'paragraph',
-                text: 'As {{RegTechs}} (Regulatory Technology) estão em plena expansão, utilizando IA para automatizar verificações de KYC (Know Your Customer) e triagens de AML (Anti-Money Laundering). Em 2025, o compliance deixa de ser focado apenas em evitar multas para se tornar um motor de {{confiança e reputação}}. A detecção preditiva de anomalias permite que as empresas respondam a riscos em tempo real, reduzindo drasticamente os erros humanos e o custo operacional.',
+                text: 'Em 2025, governança de modelos de IA (políticas para uso ético e responsável de sistemas generativos), infraestrutura de dados em nuvem (base para escalabilidade e segurança) e cultura de dados (o maior diferencial não será a tecnologia, mas a {{capacidade humana}} de interpretá-la e agir sobre ela) são as três frentes que definem quem lidera e quem segue.',
               },
-              
-            ],
+],
             application: {
               kind: 'compare-and-drag',
               intro: 'Os 4 pilares da decisão baseada em dados. Classifique cada atividade no pilar correto.',
