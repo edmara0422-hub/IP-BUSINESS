@@ -468,6 +468,50 @@ export type ChapterStepCard = {
   caseSnippet?: string         // 1 frase de case
 }
 
+export type ChapterDeepTextPause = {
+  id: string
+  question: string
+  hint?: string
+  expectedKeywords?: string[]
+}
+
+export type ChapterDeepTextCalc = {
+  id: string
+  title: string
+  inputs: Array<{ id: string; label: string; min: number; max: number; default: number; unit: string }>
+  formula: string
+  resultLabel: string
+  resultFormat?: 'currency' | 'percent' | 'number'
+  interpretation?: Array<{ max: number; label: string; color: 'green' | 'amber' | 'red' }>
+}
+
+export type ChapterDeepTextQuote = {
+  id: string
+  text: string
+  author: string
+  year?: number
+  source?: string
+  challenge?: string
+}
+
+export type ChapterDeepTextConcept = {
+  id: string
+  term: string
+  definition: string
+  example?: string
+}
+
+export type ChapterDeepText = {
+  kind: 'deep-text'
+  title?: string
+  body: string                              // suporta {{highlight}}, [[concept:id|label]], [[author:id|label]], [[pause:id]], [[calc:id]], [[quote:id]]
+  concepts?: ChapterDeepTextConcept[]
+  pauses?: ChapterDeepTextPause[]
+  calcs?: ChapterDeepTextCalc[]
+  quotes?: ChapterDeepTextQuote[]
+  refs?: InlineRef[]
+}
+
 export type ChapterBodySection =
   | { kind: 'paragraph'; text: string }                   // suporta {{highlight}}
   | { kind: 'heading'; text: string }
@@ -475,6 +519,7 @@ export type ChapterBodySection =
   | { kind: 'phase-group'; cards: ChapterPhaseCard[] }    // cards conectados por trajetória vertical
   | { kind: 'pillar-grid'; title?: string; pillars: ChapterPillarCard[] }  // grid de pilares (2x2 ou 1x4)
   | { kind: 'step-flow'; title?: string; steps: ChapterStepCard[] }        // fluxo horizontal de passos numerados
+  | ChapterDeepText                                        // texto profundo com interações inline
 
 // ── Aplicação: compare-and-drag ──
 //

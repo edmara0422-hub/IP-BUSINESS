@@ -19,6 +19,12 @@ import type {
   ChapterPhaseCard,
   ChapterPillarCard,
   ChapterStepCard,
+  ChapterDeepText,
+  ChapterDeepTextConcept,
+  ChapterDeepTextPause,
+  ChapterDeepTextCalc,
+  ChapterDeepTextQuote,
+  InlineRef,
 } from '@/types/intelligence'
 import ChapterCompareAndDrag from './ChapterCompareAndDrag'
 import LivingCompany from './LivingCompany'
@@ -300,7 +306,449 @@ function BodySectionRenderer({ section, chapterId }: { section: ChapterBodySecti
     return <StepFlow title={section.title} steps={section.steps} />
   }
 
+  if (section.kind === 'deep-text') {
+    return <DeepTextSection section={section} />
+  }
+
   return null
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// DeepTextSection — texto profundo com interações inline
+// Pílulas conceito, pílulas autor, pare-e-pense, calculadoras, citações
+// ─────────────────────────────────────────────────────────────────────
+
+function DeepTextSection({ section }: { section: ChapterDeepText }) {
+  const [openConcept, setOpenConcept] = useState<ChapterDeepTextConcept | null>(null)
+  const [openRef, setOpenRef] = useState<InlineRef | null>(null)
+
+  const conceptMap = new Map((section.concepts ?? []).map((c) => [c.id, c]))
+  const pauseMap = new Map((section.pauses ?? []).map((p) => [p.id, p]))
+  const calcMap = new Map((section.calcs ?? []).map((c) => [c.id, c]))
+  const quoteMap = new Map((section.quotes ?? []).map((q) => [q.id, q]))
+  const refMap = new Map((section.refs ?? []).map((r) => [r.id, r]))
+
+  const paragraphs = section.body.split('\\n\\n').filter((p) => p.trim())
+
+  return (
+    <div style={{ margin: '20px 0' }}>
+      {section.title && (
+        <p style={{
+          fontSize: 10, fontWeight: 700, letterSpacing: '0.18em',
+          color: COLORS.textMuted, textTransform: 'uppercase', marginBottom: 14,
+        }}>
+          {section.title}
+        </p>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {paragraphs.map((para, idx) => {
+          const trimmed = para.trim()
+
+          // Block-level: [[pause:id]]
+          if (trimmed.match(/^\[\[pause:([^\]]+)\]\]$/)) {
+            const id = trimmed.slice(8, -2)
+            const p = pauseMap.get(id)
+            if (p) return <DeepPause key={idx} pause={p} />
+            return null
+          }
+
+          // Block-level: [[calc:id]]
+          if (trimmed.match(/^\[\[calc:([^\]]+)\]\]$/)) {
+            const id = trimmed.slice(7, -2)
+            const c = calcMap.get(id)
+            if (c) return <DeepCalc key={idx} calc={c} />
+            return null
+          }
+
+          // Block-level: [[quote:id]]
+          if (trimmed.match(/^\[\[quote:([^\]]+)\]\]$/)) {
+            const id = trimmed.slice(8, -2)
+            const q = quoteMap.get(id)
+            if (q) return <DeepQuote key={idx} quote={q} />
+            return null
+          }
+
+          // Heading: **ALL CAPS**
+          if (trimmed.startsWith('**') && trimmed.endsWith('**') && !trimmed.slice(2, -2).includes('**')) {
+            return (
+              <h3 key={idx} style={{
+                fontSize: 10, fontWeight: 700, letterSpacing: '0.15em',
+                color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase',
+                margin: '16px 0 4px', paddingTop: 8,
+                borderTop: '1px solid rgba(255,255,255,0.05)',
+              }}>
+                {trimmed.slice(2, -2)}
+              </h3>
+            )
+          }
+
+          // Regular paragraph with inline markup
+          return (
+            <p key={idx} style={{
+              fontSize: 13, lineHeight: 1.75, color: 'rgba(255,255,255,0.85)',
+              margin: 0, textAlign: 'justify', hyphens: 'auto',
+            }}>
+              {renderDeepInline(para, conceptMap, refMap, setOpenConcept, setOpenRef)}
+            </p>
+          )
+        })}
+      </div>
+
+      {/* Concept popover */}
+      <AnimatePresence>
+        {openConcept && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setOpenConcept(null)}
+              style={{ position: 'fixed', inset: 0, zIndex: 40, background: 'rgba(0,0,0,0.5)' }} />
+            <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }}
+              style={{
+                position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%,-50%)',
+                zIndex: 50, width: '90%', maxWidth: 380, padding: 20, borderRadius: 16,
+                background: '#0a0a0a', border: '1px solid rgba(154,125,10,0.3)',
+              }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: '#9a7d0a', textTransform: 'uppercase' }}>Conceito</span>
+                <button onClick={() => setOpenConcept(null)} style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
+              </div>
+              <h4 style={{ fontSize: 17, fontWeight: 600, color: 'rgba(255,255,255,0.9)', margin: '0 0 8px', fontFamily: 'Poppins, system-ui, sans-serif' }}>{openConcept.term}</h4>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, margin: 0 }}>{openConcept.definition}</p>
+              {openConcept.example && (
+                <div style={{ marginTop: 12, padding: '8px 12px', background: 'rgba(255,255,255,0.02)', borderLeft: '2px solid rgba(30,132,73,0.4)', borderRadius: 6 }}>
+                  <p style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.15em', margin: '0 0 4px', textTransform: 'uppercase' }}>Exemplo</p>
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, margin: 0 }}>{openConcept.example}</p>
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Author ref panel */}
+      <AnimatePresence>
+        {openRef && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setOpenRef(null)}
+              style={{ position: 'fixed', inset: 0, zIndex: 40, background: 'rgba(0,0,0,0.5)' }} />
+            <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              style={{
+                position: 'fixed', right: 0, top: 0, bottom: 0, zIndex: 50,
+                width: '100%', maxWidth: 380, overflowY: 'auto',
+                background: '#0a0a0a', borderLeft: '1px solid rgba(255,255,255,0.08)',
+              }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: '#2e86c1', textTransform: 'uppercase' }}>Pesquisador</span>
+                <button onClick={() => setOpenRef(null)} style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14, background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
+              </div>
+              <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <h4 style={{ fontSize: 17, fontWeight: 600, color: 'rgba(255,255,255,0.9)', margin: 0, fontFamily: 'Poppins, system-ui, sans-serif' }}>{openRef.label}</h4>
+                {(openRef.year || openRef.affiliation) && (
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', margin: 0 }}>{[openRef.affiliation, openRef.year].filter(Boolean).join(' · ')}</p>
+                )}
+                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, margin: 0 }}>{openRef.summary}</p>
+                {openRef.details && (
+                  <div style={{ padding: 12, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 8 }}>
+                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, margin: 0 }}>{openRef.details}</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+function renderDeepInline(
+  text: string,
+  concepts: Map<string, ChapterDeepTextConcept>,
+  refs: Map<string, InlineRef>,
+  onConcept: (c: ChapterDeepTextConcept) => void,
+  onRef: (r: InlineRef) => void,
+) {
+  // Parse: {{highlight}}, [[concept:id|label]], [[author:id|label]], **bold**
+  const regex = /(\{\{[^}]+\}\}|\[\[(?:concept|author):[^\]]+\]\]|\*\*[^*]+\*\*)/g
+  const parts: Array<string | { kind: string; id?: string; label?: string; value?: string }> = []
+  let last = 0
+  let m: RegExpExecArray | null
+  while ((m = regex.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index))
+    const tok = m[0]
+    if (tok.startsWith('{{')) {
+      parts.push({ kind: 'highlight', value: tok.slice(2, -2) })
+    } else if (tok.startsWith('[[concept:')) {
+      const inner = tok.slice(10, -2)
+      const pipe = inner.indexOf('|')
+      parts.push({ kind: 'concept', id: pipe === -1 ? inner : inner.slice(0, pipe), label: pipe === -1 ? inner : inner.slice(pipe + 1) })
+    } else if (tok.startsWith('[[author:')) {
+      const inner = tok.slice(9, -2)
+      const pipe = inner.indexOf('|')
+      parts.push({ kind: 'author', id: pipe === -1 ? inner : inner.slice(0, pipe), label: pipe === -1 ? inner : inner.slice(pipe + 1) })
+    } else if (tok.startsWith('**')) {
+      parts.push({ kind: 'bold', value: tok.slice(2, -2) })
+    }
+    last = m.index + tok.length
+  }
+  if (last < text.length) parts.push(text.slice(last))
+
+  return parts.map((p, i) => {
+    if (typeof p === 'string') return <Fragment key={i}>{p}</Fragment>
+    if (p.kind === 'highlight') return <span key={i} style={{ color: '#fff', fontWeight: 600 }}>{p.value}</span>
+    if (p.kind === 'bold') return <strong key={i} style={{ color: 'rgba(255,255,255,0.95)', fontWeight: 600 }}>{p.value}</strong>
+    if (p.kind === 'concept') {
+      const c = concepts.get(p.id!)
+      return (
+        <button key={i} onClick={() => c && onConcept(c)}
+          style={{
+            display: 'inline', padding: '0 4px', margin: '0 1px', borderRadius: 4,
+            background: 'rgba(154,125,10,0.1)', color: '#9a7d0a',
+            borderBottom: '1px dashed rgba(154,125,10,0.5)',
+            fontSize: 'inherit', fontFamily: 'inherit', cursor: 'pointer',
+            border: 'none', lineHeight: 'inherit',
+          }}>
+          {p.label}
+        </button>
+      )
+    }
+    if (p.kind === 'author') {
+      const r = refs.get(p.id!)
+      return (
+        <button key={i} onClick={() => r && onRef(r)}
+          style={{
+            display: 'inline', padding: '0 5px', margin: '0 1px', borderRadius: 4,
+            background: 'rgba(46,134,193,0.1)', color: '#2e86c1',
+            border: '1px solid rgba(46,134,193,0.25)',
+            fontSize: 'inherit', fontFamily: 'inherit', cursor: 'pointer',
+            lineHeight: 'inherit',
+          }}>
+          {p.label}
+        </button>
+      )
+    }
+    return null
+  })
+}
+
+function DeepPause({ pause }: { pause: ChapterDeepTextPause }) {
+  const [answer, setAnswer] = useState('')
+  const [feedback, setFeedback] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const submit = async () => {
+    if (!answer.trim()) return
+    setLoading(true)
+    try {
+      const res = await fetch('/api/tutor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'evaluate-probe',
+          question: `Pergunta de reflexão: "${pause.question}". Avalie em 2-3 frases.${pause.expectedKeywords?.length ? ` Conceitos esperados: ${pause.expectedKeywords.join(', ')}.` : ''} Termine com APROVADO ou REVISAR.`,
+          selectedText: answer,
+          submoduleTitle: 'Reflexão',
+          history: [],
+        }),
+      })
+      const data = await res.json()
+      setFeedback(data.response || 'Resposta recebida.')
+    } catch {
+      setFeedback('Erro ao conectar.')
+    }
+    setLoading(false)
+  }
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+      style={{
+        background: 'rgba(154,125,10,0.06)', border: '1px solid rgba(154,125,10,0.25)',
+        borderRadius: 14, overflow: 'hidden',
+      }}>
+      <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(154,125,10,0.15)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 14 }}>🛑</span>
+        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: '#9a7d0a', textTransform: 'uppercase' }}>Pare — responda antes de continuar</span>
+      </div>
+      <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <p style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.8)', lineHeight: 1.5, margin: 0, fontFamily: 'Poppins, system-ui, sans-serif' }}>
+          {pause.question}
+        </p>
+        <textarea
+          value={answer} onChange={(e) => setAnswer(e.target.value)}
+          disabled={!!feedback || loading}
+          placeholder="Sua reflexão..."
+          rows={3}
+          style={{
+            width: '100%', background: 'rgba(255,255,255,0.03)', borderRadius: 10,
+            padding: '10px 12px', fontSize: 13, color: 'rgba(255,255,255,0.75)',
+            border: '1px solid rgba(255,255,255,0.06)', outline: 'none', resize: 'none',
+            lineHeight: 1.6, fontFamily: 'inherit', opacity: feedback ? 0.6 : 1,
+          }}
+        />
+        {!feedback && (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <button onClick={submit} disabled={!answer.trim() || loading}
+              style={{
+                fontSize: 11, fontWeight: 500, padding: '8px 14px', borderRadius: 8,
+                background: 'rgba(30,132,73,0.15)', color: '#1e8449',
+                border: '1px solid rgba(30,132,73,0.3)', cursor: 'pointer',
+                opacity: !answer.trim() || loading ? 0.3 : 1,
+              }}>
+              {loading ? 'IA avaliando...' : 'Receber feedback'}
+            </button>
+            {pause.hint && (
+              <HintButton hint={pause.hint} />
+            )}
+          </div>
+        )}
+        {feedback && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            style={{ padding: 12, background: 'rgba(255,255,255,0.03)', borderLeft: '2px solid rgba(30,132,73,0.5)', borderRadius: 6 }}>
+            <p style={{ fontSize: 9, fontWeight: 700, color: '#1e8449', letterSpacing: '0.15em', margin: '0 0 4px', textTransform: 'uppercase' }}>Feedback</p>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, margin: 0, whiteSpace: 'pre-wrap' }}>{feedback}</p>
+          </motion.div>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+function HintButton({ hint }: { hint: string }) {
+  const [show, setShow] = useState(false)
+  return (
+    <>
+      <button onClick={() => setShow(!show)}
+        style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer' }}>
+        {show ? 'Ocultar dica' : 'Ver dica'}
+      </button>
+      {show && <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontStyle: 'italic', margin: 0 }}>{hint}</p>}
+    </>
+  )
+}
+
+function DeepCalc({ calc }: { calc: ChapterDeepTextCalc }) {
+  const initial: Record<string, number> = {}
+  calc.inputs.forEach((i) => { initial[i.id] = i.default })
+  const [values, setValues] = useState(initial)
+
+  let result = 0
+  try {
+    const fn = new Function(...Object.keys(values), `return ${calc.formula}`)
+    result = fn(...Object.values(values)) as number
+  } catch { /* */ }
+
+  const formatted = calc.resultFormat === 'currency'
+    ? `R$ ${Math.round(result).toLocaleString('pt-BR')}`
+    : calc.resultFormat === 'percent'
+    ? `${result.toFixed(1)}%`
+    : Math.round(result).toLocaleString('pt-BR')
+
+  const interp = calc.interpretation?.find((i) => result <= i.max)
+  const interpColor = interp ? (interp.color === 'green' ? '#1e8449' : interp.color === 'amber' ? '#9a7d0a' : '#c0392b') : '#2e86c1'
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+      style={{ background: 'rgba(46,134,193,0.06)', border: '1px solid rgba(46,134,193,0.25)', borderRadius: 14, overflow: 'hidden' }}>
+      <div style={{ padding: '10px 16px', borderBottom: '1px solid rgba(46,134,193,0.15)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 14 }}>🎚️</span>
+        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: '#2e86c1', textTransform: 'uppercase' }}>Calcule ao vivo</span>
+      </div>
+      <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <p style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.8)', margin: 0, fontFamily: 'Poppins, system-ui, sans-serif' }}>{calc.title}</p>
+        {calc.inputs.map((input) => (
+          <div key={input.id}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: 500, letterSpacing: '0.05em' }}>{input.label}</span>
+              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', fontFamily: 'ui-monospace, monospace' }}>{values[input.id]} {input.unit}</span>
+            </div>
+            <input type="range" min={input.min} max={input.max} value={values[input.id]}
+              onChange={(e) => setValues({ ...values, [input.id]: Number(e.target.value) })}
+              style={{ width: '100%', height: 4, borderRadius: 2, appearance: 'none', cursor: 'pointer',
+                background: `linear-gradient(to right, #2e86c1 0%, #2e86c1 ${((values[input.id] - input.min) / (input.max - input.min)) * 100}%, rgba(255,255,255,0.08) ${((values[input.id] - input.min) / (input.max - input.min)) * 100}%, rgba(255,255,255,0.08) 100%)`,
+              }}
+            />
+          </div>
+        ))}
+        <div style={{ paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', margin: '0 0 4px', textTransform: 'uppercase' }}>{calc.resultLabel}</p>
+          <p style={{ fontSize: 22, fontWeight: 700, color: interpColor, margin: 0, fontFamily: 'Poppins, system-ui, sans-serif' }}>{formatted}</p>
+          {interp && <p style={{ fontSize: 11, color: interpColor, margin: '4px 0 0' }}>{interp.label}</p>}
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+function DeepQuote({ quote }: { quote: ChapterDeepTextQuote }) {
+  const [arguing, setArguing] = useState(false)
+  const [argument, setArgument] = useState('')
+  const [counter, setCounter] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const submit = async () => {
+    if (!argument.trim()) return
+    setLoading(true)
+    try {
+      const res = await fetch('/api/tutor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'explain',
+          question: `Você é ${quote.author}${quote.year ? ` (${quote.year})` : ''}. Defendeu: "${quote.text}". Aluno discorda: "${argument}". Responda DEFENDENDO sua posição em 3-4 frases no estilo do autor. Não concorde facilmente.`,
+          submoduleTitle: 'Citação interativa',
+          history: [],
+        }),
+      })
+      const data = await res.json()
+      setCounter(data.response || '')
+    } catch {
+      setCounter('Erro ao conectar.')
+    }
+    setLoading(false)
+  }
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+      style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <span style={{ fontSize: 14 }}>⚡</span>
+        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase' }}>Escrito pelo autor</span>
+      </div>
+      <blockquote style={{ paddingLeft: 12, borderLeft: '2px solid rgba(46,134,193,0.5)', margin: 0 }}>
+        <p style={{ fontSize: 14, fontStyle: 'italic', color: 'rgba(255,255,255,0.75)', lineHeight: 1.6, margin: 0, fontFamily: 'Georgia, serif' }}>
+          &ldquo;{quote.text}&rdquo;
+        </p>
+        <footer style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 8 }}>
+          — {quote.author}{quote.year ? `, ${quote.year}` : ''}{quote.source ? ` · ${quote.source}` : ''}
+        </footer>
+      </blockquote>
+      {!arguing && !counter && quote.challenge && (
+        <button onClick={() => setArguing(true)}
+          style={{ marginTop: 12, fontSize: 11, fontWeight: 500, padding: '6px 12px', borderRadius: 8, background: 'rgba(192,57,43,0.1)', color: '#c0392b', border: '1px solid rgba(192,57,43,0.25)', cursor: 'pointer' }}>
+          Discordar do autor →
+        </button>
+      )}
+      {arguing && !counter && (
+        <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', margin: 0 }}>{quote.challenge}</p>
+          <textarea value={argument} onChange={(e) => setArgument(e.target.value)} placeholder="Por que você discorda?" rows={3}
+            style={{ width: '100%', background: 'rgba(255,255,255,0.03)', borderRadius: 10, padding: '10px 12px', fontSize: 12, color: 'rgba(255,255,255,0.75)', border: '1px solid rgba(255,255,255,0.06)', outline: 'none', resize: 'none', lineHeight: 1.6, fontFamily: 'inherit' }} />
+          <button onClick={submit} disabled={!argument.trim() || loading}
+            style={{ fontSize: 11, fontWeight: 500, padding: '8px 14px', borderRadius: 8, background: 'rgba(46,134,193,0.15)', color: '#2e86c1', border: '1px solid rgba(46,134,193,0.3)', cursor: 'pointer', opacity: !argument.trim() || loading ? 0.3 : 1 }}>
+            {loading ? `${quote.author.split(' ')[0]} pensando...` : `Enviar para ${quote.author.split(' ')[0]}`}
+          </button>
+        </div>
+      )}
+      {counter && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          style={{ marginTop: 12, padding: 12, background: 'rgba(46,134,193,0.06)', borderLeft: '2px solid rgba(46,134,193,0.4)', borderRadius: 6 }}>
+          <p style={{ fontSize: 9, fontWeight: 700, color: '#2e86c1', letterSpacing: '0.15em', margin: '0 0 4px', textTransform: 'uppercase' }}>Resposta de {quote.author}</p>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, margin: 0, fontStyle: 'italic' }}>{counter}</p>
+        </motion.div>
+      )}
+    </motion.div>
+  )
 }
 
 // ─────────────────────────────────────────────────────────────────────
