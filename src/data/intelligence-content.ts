@@ -362,13 +362,17 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   { number: 5, title: 'Espaços Seguros para Experimentar', description: 'Criar ambientes onde ideias possam ser testadas {{sem medo}} de punição severa em caso de erro. Estudos indicam que práticas de gestão da mudança impactam positivamente a atitude dos funcionários.', author: 'Edmondson, Harvard, 2018: segurança psicológica = fator #1 de alta performance', caseSnippet: 'Google Aristotle (180 equipes): segurança psicológica é o fator #1.' },
                 ],
               },
-              {
+                            {
+                kind: 'paragraph',
+                text: 'A gestão de riscos na transformação digital envolve a adoção de novas tecnologias que podem introduzir vulnerabilidades de segurança. A governança digital ajuda a identificar, avaliar e mitigar esses riscos, garantindo que a organização esteja protegida. A gestão da mudança é uma metodologia que planeja, comunica, implementa e avalia as transformações para garantir que {{todos os colaboradores}} adotem as novas tecnologias.',
+              },
+{
                 kind: 'heading',
                 text: 'Estruturas e frameworks de governança',
               },
               {
                 kind: 'paragraph',
-                text: 'A implementação da governança digital não requer a criação de processos do zero, mas sim a adaptação de frameworks reconhecidos que equilibram controle e agilidade. Comitês de governança reúnem gestores de diferentes áreas para decisões colaborativas. Modelos descentralizados dão autonomia a cada departamento seguindo diretrizes gerais — estruturas centralizadoras comprometem velocidade de decisão.',
+                text: 'A implementação da governança digital não requer a criação de processos do zero, mas sim a adaptação de frameworks reconhecidos que equilibram controle e agilidade. Comitês de governança devem reunir gestores de diferentes áreas para discutir e aprovar decisões relacionadas à tecnologia. Garantem que as decisões sejam tomadas de forma colaborativa e estratégica. Decisões individualizadas devem ser evitadas quando se trata de governança digital, pois o nível de complexidade das informações tende a ser maior quando construída com {{apoio tecnológico}}. Organizações menores ou mais ágeis podem optar por um modelo descentralizado, em que cada departamento tem autonomia para gerenciar suas próprias tecnologias, seguindo diretrizes gerais. Estruturas excessivamente centralizadoras, em que o gestor exige assumir todas as decisões, comprometem a velocidade de decisão — e velocidade é diferencial competitivo.',
               },
               {
                 kind: 'paragraph',
