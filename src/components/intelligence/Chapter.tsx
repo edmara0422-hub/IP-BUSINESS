@@ -35,12 +35,12 @@ interface Props {
 }
 
 const COLORS = {
-  bg: '#0a0a0a',
-  cardBg: 'rgba(255, 255, 255, 0.03)',
-  border: 'rgba(255, 255, 255, 0.08)',
-  text: '#ffffff',
-  textMuted: 'rgba(255, 255, 255, 0.6)',
-  textDim: 'rgba(255, 255, 255, 0.38)',
+  bg: 'rgba(0, 0, 0, 0.15)',
+  cardBg: 'rgba(255, 255, 255, 0.025)',
+  border: 'rgba(255, 255, 255, 0.06)',
+  text: 'rgba(255, 255, 255, 0.92)',
+  textMuted: 'rgba(255, 255, 255, 0.5)',
+  textDim: 'rgba(255, 255, 255, 0.35)',
   accent: '#ffffff',
   // Diferenciação das 3 fases por intensidade (escuro → claro), não por cor
   phase1: 'rgba(255, 255, 255, 0.38)',
@@ -60,15 +60,8 @@ function renderWithHighlights(text: string) {
         <span
           key={i}
           style={{
-            fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-            fontWeight: 700,
-            color: '#ffffff',
-            fontSize: '0.95em',
-            background: 'rgba(255, 255, 255, 0.06)',
-            padding: '1px 6px',
-            borderRadius: 3,
-            letterSpacing: '0.01em',
-            whiteSpace: 'nowrap',
+            fontWeight: 600,
+            color: 'rgba(255, 255, 255, 0.95)',
           }}
         >
           {part.slice(2, -2)}
@@ -96,10 +89,13 @@ export default function Chapter({ block }: Props) {
       style={{
         background: COLORS.bg,
         border: `1px solid ${COLORS.border}`,
-        borderRadius: 16,
-        padding: '32px 28px',
+        borderRadius: 20,
+        padding: '28px 22px',
         color: COLORS.text,
-        marginBottom: 24,
+        marginBottom: 20,
+        maxWidth: 680,
+        marginLeft: 'auto',
+        marginRight: 'auto',
       }}
     >
       <ChapterHeader
@@ -153,38 +149,29 @@ function ChapterHeader({
   subtitle?: string
 }) {
   return (
-    <header style={{ marginBottom: 24 }}>
-      <div
+    <header style={{ marginBottom: 28 }}>
+      <span
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-          marginBottom: 12,
+          display: 'inline-block',
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: '0.22em',
+          color: 'rgba(255,255,255,0.4)',
+          textTransform: 'uppercase',
+          marginBottom: 10,
         }}
       >
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.2em',
-            color: 'rgba(255,255,255,0.55)',
-            textTransform: 'uppercase',
-            padding: '3px 9px',
-            border: `1px solid rgba(255,255,255,0.25)`,
-            borderRadius: 999,
-          }}
-        >
-          Capítulo {number}
-        </span>
-      </div>
+        Capítulo {number}
+      </span>
       <h1
         style={{
-          fontSize: 18,
-          fontWeight: 600,
-          letterSpacing: '0.02em',
-          color: COLORS.text,
+          fontSize: 20,
+          fontWeight: 700,
+          letterSpacing: '-0.01em',
+          color: 'rgba(255,255,255,0.95)',
           margin: 0,
-          lineHeight: 1.25,
+          lineHeight: 1.3,
+          fontFamily: 'Poppins, system-ui, sans-serif',
         }}
       >
         {title}
@@ -192,10 +179,10 @@ function ChapterHeader({
       {subtitle && (
         <p
           style={{
-            fontSize: 11,
-            lineHeight: 1.55,
-            color: COLORS.textMuted,
-            margin: '6px 0 0 0',
+            fontSize: 13,
+            lineHeight: 1.6,
+            color: 'rgba(255,255,255,0.45)',
+            margin: '8px 0 0 0',
           }}
         >
           {subtitle}
@@ -237,12 +224,11 @@ function ChapterOpening({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: showTimeline ? 0.5 : 0 }}
         style={{
-          fontSize: 13,
-          lineHeight: 1.7,
-          color: 'rgba(255,255,255,0.85)',
-          marginTop: showTimeline ? 4 : 0,
+          fontSize: 15,
+          lineHeight: 1.8,
+          color: 'rgba(255,255,255,0.8)',
+          marginTop: showTimeline ? 8 : 0,
           textAlign: 'left',
-          hyphens: 'auto',
         }}
       >
         {renderWithHighlights(leadText)}
@@ -260,12 +246,11 @@ function BodySectionRenderer({ section, chapterId }: { section: ChapterBodySecti
     return (
       <p
         style={{
-          fontSize: 13,
-          lineHeight: 1.7,
-          color: 'rgba(255,255,255,0.85)',
-          margin: '0 0 16px 0',
+          fontSize: 14,
+          lineHeight: 1.8,
+          color: 'rgba(255,255,255,0.75)',
+          margin: '0 0 18px 0',
           textAlign: 'left',
-          hyphens: 'auto',
         }}
       >
         {renderWithHighlights(section.text)}
@@ -275,18 +260,20 @@ function BodySectionRenderer({ section, chapterId }: { section: ChapterBodySecti
 
   if (section.kind === 'heading') {
     return (
-      <h2
-        style={{
-          fontSize: 10,
-          fontWeight: 700,
-          letterSpacing: '0.18em',
-          color: COLORS.textMuted,
-          textTransform: 'uppercase',
-          margin: '22px 0 10px 0',
-        }}
-      >
-        {section.text}
-      </h2>
+      <div style={{ margin: '28px 0 14px', paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <h2
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            letterSpacing: '0.08em',
+            color: 'rgba(255,255,255,0.65)',
+            textTransform: 'uppercase',
+            margin: 0,
+          }}
+        >
+          {section.text}
+        </h2>
+      </div>
     )
   }
 
@@ -747,11 +734,11 @@ function DeepQuote({ quote }: { quote: ChapterDeepTextQuote }) {
 
 function PillarGrid({ title, pillars }: { title?: string; pillars: ChapterPillarCard[] }) {
   return (
-    <div style={{ margin: '20px 0' }}>
+    <div style={{ margin: '24px 0' }}>
       {title && (
         <p style={{
-          fontSize: 10, fontWeight: 700, letterSpacing: '0.18em',
-          color: COLORS.textMuted, textTransform: 'uppercase', marginBottom: 12,
+          fontSize: 12, fontWeight: 700, letterSpacing: '0.08em',
+          color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', marginBottom: 14,
         }}>
           {title}
         </p>
@@ -759,7 +746,7 @@ function PillarGrid({ title, pillars }: { title?: string; pillars: ChapterPillar
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: 10,
+        gap: 12,
       }}>
         {pillars.map((p, i) => (
           <motion.div key={i}
@@ -838,11 +825,11 @@ function PillarGrid({ title, pillars }: { title?: string; pillars: ChapterPillar
 
 function StepFlow({ title, steps }: { title?: string; steps: ChapterStepCard[] }) {
   return (
-    <div style={{ margin: '20px 0' }}>
+    <div style={{ margin: '24px 0' }}>
       {title && (
         <p style={{
-          fontSize: 10, fontWeight: 700, letterSpacing: '0.18em',
-          color: COLORS.textMuted, textTransform: 'uppercase', marginBottom: 14,
+          fontSize: 12, fontWeight: 700, letterSpacing: '0.08em',
+          color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', marginBottom: 16,
         }}>
           {title}
         </p>
