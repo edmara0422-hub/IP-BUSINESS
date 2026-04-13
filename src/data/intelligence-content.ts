@@ -627,6 +627,16 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 text: '**Os 4 Ps da Criatividade ([[author:rhodes|Mel Rhodes]], 1961):**\nAs quatro dimensões da criatividade também são chamadas de quatro Ps da criatividade, porque as palavras escolhidas por Rhodes em inglês foram: Person, Process, Product e Press (pressão do ambiente).\n— **Person:** traços cognitivos e de personalidade (abertura a experiências, tolerância à ambiguidade)\n— **Process:** etapas do pensamento criativo (preparação, incubação, iluminação, verificação — modelo de Wallas)\n— **Product:** o resultado tangível que pode ser avaliado por originalidade e utilidade\n— **Press:** o ambiente que facilita ou bloqueia a criatividade (cultura organizacional, pressão, recursos)',
               },
               {
+                kind: 'pillar-grid',
+                title: 'Os 4 Ps da Criatividade (Rhodes, 1961)',
+                pillars: [
+                  { icon: '🧠', title: 'Person', description: 'Traços cognitivos e de personalidade: abertura a experiências, {{tolerância à ambiguidade}}, curiosidade, perseverança.' },
+                  { icon: '⚙️', title: 'Process', description: 'Etapas do pensamento criativo: preparação, incubação, iluminação, verificação (modelo de {{Wallas}}, 1926).' },
+                  { icon: '📦', title: 'Product', description: 'O resultado tangível que pode ser avaliado por {{originalidade}} e utilidade. Sem produto, criatividade é devaneio.' },
+                  { icon: '🌍', title: 'Press', description: 'O ambiente que facilita ou bloqueia: cultura organizacional, {{pressão}}, recursos, liberdade para errar.' },
+                ],
+              },
+              {
                 kind: 'paragraph',
                 text: '**Mitos que Precisam Morrer:**\n— "Criatividade é inata" — FALSO. Estudos longitudinais de [[author:land|George Land]] (NASA) mostraram que 98% das crianças de 5 anos são "gênios criativos", mas apenas 2% dos adultos mantêm esse nível. A criatividade é desaprendida, não ausente.\n— "Brainstorming sempre funciona" — PARCIALMENTE FALSO. Sem estrutura adequada, grupos produzem menos e piores ideias que indivíduos trabalhando sozinhos ([[author:diehl|Diehl & Stroebe]], 1987).\n— "Drogas e álcool aumentam criatividade" — FALSO. Podem reduzir inibição temporariamente, mas comprometem a rede ECN necessária para refinar ideias.\n— "Pressão mata criatividade" — PARCIALMENTE VERDADEIRO. [[author:amabile|Teresa Amabile]] (Harvard) mostrou que pressão moderada com propósito claro pode aumentar criatividade, mas pressão por controle a destrói.',
               },
@@ -723,6 +733,18 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 text: '**1ª Etapa — Reconhecimento de Insights**\nRelacionada à habilidade de análise, abertura a novas ideias e sensibilidade para problemas. Reconhecer insights significa perceber oportunidades de inovar um processo ou resolver um problema por meio de uma nova solução.',
               },
               {
+                kind: 'step-flow',
+                title: 'As 6 etapas do processo criativo',
+                steps: [
+                  { number: 1, title: 'Reconhecimento de Insights', description: 'Habilidade de análise, abertura a novas ideias e sensibilidade para problemas. Perceber {{oportunidades}} de inovar.' },
+                  { number: 2, title: 'Geração de Alternativas', description: 'Fluência e flexibilidade (Guilford). Produzir muitas alternativas em categorias distintas. {{Quantidade}} antes de qualidade.' },
+                  { number: 3, title: 'Seleção de Alternativas', description: 'Bom-senso e capacidade de ouvir críticas. Estilo analítico (planejadores, críticos) indica pontos a {{aprimorar}}.' },
+                  { number: 4, title: 'Iteração', description: 'Repetir etapas 2 e 3. O processo criativo é lento e trabalhoso. {{Não desista}} na primeira rodada.' },
+                  { number: 5, title: 'Transferência ao Mundo Real', description: 'Nasce o produto: mercadoria, serviço, estratégia, processo ou nova maneira de ver as coisas.' },
+                  { number: 6, title: 'Aprendizado', description: 'O processo criativo {{nunca acaba}}. Se acabou, é porque o produto não interessa mais. Recomeça em busca de aperfeiçoamentos.' },
+                ],
+              },
+              {
                 kind: 'paragraph',
                 text: 'Na prática: Mantenha um "caderno de insights" — anote toda vez que pensar "isso poderia ser melhor" ou "por que ninguém faz isso?" Esses são sinais de oportunidade criativa.',
               },
@@ -805,6 +827,17 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               {
                 kind: 'paragraph',
                 text: '**Fase 1 — Empatizar:**\nO objetivo não é perguntar ao cliente o que ele quer, mas observar o que ele faz. Técnicas:\n— Entrevistas em profundidade (perguntar "por quê?" 5 vezes — técnica dos 5 Porquês da Toyota)\n— Observação etnográfica (shadowing — seguir o usuário em seu contexto real)\n— Mapa de empatia (o que o usuário diz, pensa, faz e sente)',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Design Thinking — 5 fases',
+                pillars: [
+                  { icon: '👁️', title: 'Empatizar', description: 'Observar o usuário em contexto real. Entrevistas, {{shadowing}}, mapa de empatia. Não pergunte o que quer — observe o que faz.' },
+                  { icon: '🎯', title: 'Definir', description: 'Sintetizar observações em POV acionável: "[Usuário] precisa de [Necessidade] porque [{{Insight}}]".' },
+                  { icon: '💡', title: 'Idear', description: 'Geração volumétrica. Regras: adiar julgamento, buscar {{quantidade}}, construir sobre ideias dos outros.' },
+                  { icon: '🔨', title: 'Prototipar', description: 'Versão mais simples possível. {{Rápido, barato, descartável}}. Protótipo de papel, role-playing, Mágico de Oz.' },
+                  { icon: '🧪', title: 'Testar', description: 'Não é validação — é {{aprendizado}}. Observar uso real, iterar. Falhar rápido e barato é o objetivo.' },
+                ],
               },
               {
                 kind: 'paragraph',
@@ -899,6 +932,19 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 text: 'SCAMPER é um acrônimo criado por Bob Eberle (1971), baseado nas listas de verificação de Alex Osborn. É a ferramenta mais sistemática para inovação incremental — força o cérebro a examinar um produto, serviço ou processo sob 7 ângulos diferentes.',
               },
               {
+                kind: 'pillar-grid',
+                title: 'SCAMPER — 7 operadores',
+                pillars: [
+                  { icon: '🔄', title: 'S — Substituir', description: 'Material, pessoa, processo, componente. O que pode ser {{trocado}} por algo melhor?' },
+                  { icon: '🤝', title: 'C — Combinar', description: 'Funções, ideias, produtos. O que pode ser {{unido}} para criar algo novo?' },
+                  { icon: '🔧', title: 'A — Adaptar', description: 'O que de outro setor/contexto pode ser {{adaptado}} ao seu problema?' },
+                  { icon: '📐', title: 'M — Modificar', description: 'O que acontece se {{aumentar, diminuir, mudar}} forma, cor, significado?' },
+                  { icon: '♻️', title: 'P — Outros usos', description: 'Que {{outro uso}} esse produto/processo tem que ninguém pensou?' },
+                  { icon: '✂️', title: 'E — Eliminar', description: 'O que pode ser {{removido}} sem perder a função essencial?' },
+                  { icon: '↩️', title: 'R — Reverter', description: 'O que acontece se {{inverter}} a ordem, o fluxo, a hierarquia?' },
+                ],
+              },
+              {
                 kind: 'paragraph',
                 text: '**S — Substituir (Substitute):**\nO que pode ser substituído? Materiais, pessoas, processos, ingredientes, local, tecnologia.\n— Exemplo: a Beyond Meat substituiu proteína animal por proteína vegetal — mesmo produto (hambúrguer), ingrediente diferente, mercado bilionário.\n— Pergunta-chave: "E se eu substituísse [componente X] por [alternativa Y]?"',
               },
@@ -978,6 +1024,16 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               leadText: 'Design Thinking e SCAMPER resolvem a maioria dos problemas. Mas quando o impasse é profundo, quando as ideias convencionais já se esgotaram, ou quando há {contradição técnica} que parece impossível — ferramentas avançadas entram em jogo.',
             },
             body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Ferramentas avançadas de criatividade',
+                pillars: [
+                  { icon: '🔀', title: 'Pensamento Lateral', description: 'De Bono (1967). Pensar fora do caminho lógico. {{Provocação}}, Analogia, Inversão. 6 Chapéus para trocar perspectiva.' },
+                  { icon: '⚡', title: 'TRIZ', description: 'Altshuller (1946). 40 princípios de {{200.000 patentes}}. Resolve contradições: melhorar A sem piorar B.' },
+                  { icon: '🗺️', title: 'Mapas Mentais', description: 'Buzan (1970s). Ideação visual radial. Conceito central + ramificações. Boeing usa mapas de {{7+ metros}}.' },
+                  { icon: '🔒', title: 'Restrição Criativa', description: 'Limites {{geram}} inovação. Google: melhores interfaces nasceram de restrições de velocidade.' },
+                ],
+              },
               {
                 kind: 'paragraph',
                 text: 'Os conceitos de pensamento convergente e divergente elaborados por Guilford nos anos 1950 foram retomados e desenvolvidos por [[author:debono|Edward de Bono]] nos anos 1970 e 1980. De Bono, considerado hoje a maior autoridade mundial em criatividade e inovação, criou o conceito de pensamento lateral, em oposição ao pensamento vertical.',
@@ -1186,7 +1242,18 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 kind: 'paragraph',
                 text: '**Regras de Ouro da Prototipagem:**\n1. Se você não tem vergonha do seu protótipo, lançou tarde demais (Reid Hoffman, LinkedIn)\n2. O objetivo é aprender, não impressionar\n3. Teste com 5 usuários — Nielsen demonstrou que 5 usuários revelam 85% dos problemas de usabilidade\n4. Pergunte "o que você faria?" — não "o que você acha?"\n5. Protótipo que ninguém testa é desperdício — agende testes ANTES de construir',
               },
-            ],
+                          {
+                kind: 'step-flow',
+                title: 'Os 5 tipos de bloqueio criativo',
+                steps: [
+                  { number: 1, title: 'Perceptivo', description: 'Não {{ver}} o problema. Solução: saia do ambiente, ouça cliente, benchmark fora do setor.' },
+                  { number: 2, title: 'Cultural', description: 'Hierarquia e tradição travam. Solução: citar cases de fora, dar {{permissão social}} para questionar.' },
+                  { number: 3, title: 'Emocional', description: 'Medo de julgamento — o mais comum. Solução: pior ideia possível, {{segurança psicológica}}.' },
+                  { number: 4, title: 'Cognitivo', description: 'Mente presa num padrão. Solução: técnicas {{estruturadas}} (SCAMPER, TRIZ, 6 Chapéus).' },
+                  { number: 5, title: 'Ambiental', description: 'Sem tempo, sobrecarga. Solução: bloco de tempo {{protegido}} — 2h/semana sem interrupção.' },
+                ],
+              },
+],
             application: {
               kind: 'compare-and-drag',
               intro: 'Cada ferramenta avançada ataca um tipo diferente de desafio criativo.',
