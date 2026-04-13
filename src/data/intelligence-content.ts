@@ -251,28 +251,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   { icon: '📈', title: 'Resultados', description: 'SGI mantém foco estratégico no {{ROI}}; TD entrega analytics para medir impacto em larga escala.' },
                 ],
               },
-              {
-                kind: 'deep-text',
-                title: 'Aprofundamento: Digitização vs Transformação e o Framework MIT',
-                body: '**A DISTINÇÃO QUE CUSTA BILHÕES**\n\nA maioria das PMEs brasileiras confunde três conceitos: [[concept:dz|digitização]] (converter papel em PDF), [[concept:dl|digitalização]] (automatizar fluxos) e [[concept:td|transformação digital]] (repensar o modelo de negócio). Segundo IBGE (PINTEC 2020) e Sebrae, apenas {{23%}} das PMEs usam sistema integrado e menos de 5% usam dados para decisão (CETIC.br, TIC Empresas 2022).\n\n[[pause:td-nivel]]\n\n**FRAMEWORK MIT/CAPGEMINI — OS DIGIRATI**\n\n[[author:westerman|George Westerman]] (MIT Sloan, 2014) pesquisou {{391 empresas em 30 países}}. Classificou em 4 quadrantes: **Beginners** (baixa capacidade + baixa liderança), **Conservatives** (forte liderança sem tech), **Fashionistas** (muita tech sem governança) e **Digirati** (alta capacidade + alta liderança). Apenas Digirati superam: {{26% mais lucrativos}}, 9% maior receita, 12% maior valorização.\n\n[[quote:westerman-q]]\n\n**O CUSTO DO GAP**\n\n[[calc:gap-digital]]',
-                concepts: [
-                  { id: 'dz', term: 'Digitização', definition: 'Converter informação física em digital. Escanear documentos, trocar caderno por planilha. Nível mais básico.', example: 'Loja que guarda NFs em PDF na nuvem mas controla estoque à mão.' },
-                  { id: 'dl', term: 'Digitalização', definition: 'Automatizar fluxos usando tecnologia. O processo é o mesmo, executado por software.', example: 'Pedido manual vira formulário online integrado ao estoque.' },
-                  { id: 'td', term: 'Transformação Digital', definition: 'Repensar modelo de negócio usando capacidades digitais. Não é melhorar — é redesenhar.', example: 'Magazine Luiza: lojas viraram mini-CDs de plataforma digital.' },
-                ],
-                refs: [
-                  { id: 'westerman', label: 'George Westerman (2014)', kind: 'author', summary: 'Pesquisou 391 empresas em 30 países. Criou framework Digirati.', year: 2014, affiliation: 'MIT Sloan', details: 'Leading Digital (2014). Só Digirati superam pares: 26% mais lucrativos, 9% mais receita, 12% mais valorização.' },
-                ],
-                pauses: [
-                  { id: 'td-nivel', question: 'Sua empresa fez digitização, digitalização ou transformação? Onde está a maior parte do investimento hoje?', hint: 'Se discute "qual software comprar", provavelmente está em digitização/digitalização. Transformação começa com "como o modelo deveria funcionar?"', expectedKeywords: ['digitização', 'digitalização', 'transformação', 'modelo'] },
-                ],
-                calcs: [
-                  { id: 'gap-digital', title: 'Custo do gap de maturidade digital', inputs: [{ id: 'score', label: 'Seu score (1-5)', min: 1, max: 5, default: 2, unit: '' }, { id: 'mercado', label: 'Média do setor (1-5)', min: 1, max: 5, default: 3, unit: '' }, { id: 'receita', label: 'Receita anual', min: 500000, max: 50000000, default: 5000000, unit: 'R$' }], formula: '(mercado - score) * receita * 0.05', resultLabel: 'Custo estimado do gap (5% receita por ponto)', resultFormat: 'currency', interpretation: [{ max: 250000, label: 'Gap gerenciável', color: 'amber' }, { max: 1000000, label: 'Gap significativo', color: 'red' }, { max: 999999999, label: 'Gap crítico', color: 'red' }] },
-                ],
-                quotes: [
-                  { id: 'westerman-q', text: 'Digital transformation is not about technology — it is about strategy and new ways of thinking.', author: 'George Westerman', year: 2014, source: 'Leading Digital, Harvard Business Press', challenge: 'Se transformação é estratégia, por que a maioria começa comprando software?' },
-                ],
-              },
+              
             ],
             application: {
               kind: 'compare-and-drag',
@@ -360,22 +339,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 kind: 'paragraph',
                 text: 'Para PMEs: backup automático diário, 2FA em todas as contas, um responsável por TI (mesmo acumulando função), política de senhas com gerenciador, revisão trimestral. Custo: {{R$ 0 a R$ 50/mês}}. Custo de não fazer: potencialmente o negócio inteiro.',
               },
-              {
-                kind: 'deep-text',
-                title: 'Aprofundamento: Frameworks e Governança para PMEs',
-                body: '**ESTRUTURAS DE GOVERNANÇA**\n\nComitês de governança reúnem gestores de diferentes áreas para decisões colaborativas. Decisões individualizadas devem ser evitadas — complexidade exige {{apoio coletivo}}.\n\nModelos descentralizados dão autonomia a cada departamento seguindo diretrizes gerais. Estruturas centralizadoras comprometem velocidade.\n\n**COBIT, ISO 38500 E ITIL 4**\n\n[[concept:cobit|COBIT]] (ISACA, 1996/2019) — referência global, nível estratégico. [[concept:iso|ISO/IEC 38500]] (2008/2015) — orienta dirigentes: avaliar, direcionar, monitorar. [[concept:itil|ITIL 4]] (2019) — operação, integrando IA e cloud.\n\n[[pause:gov-pme]]\n\n**PARA PMEs**\n\nBackup diário (R$ 0-50/mês). 2FA em tudo (R$ 0). Responsável por TI. Política de senhas. Revisão trimestral. Custo: {{R$ 0-50/mês}}. Custo de não fazer: potencialmente tudo.\n\n[[quote:kotter-q]]',
-                concepts: [
-                  { id: 'cobit', term: 'COBIT', definition: 'Framework global de governança de TI (ISACA, 1996/2019). Nível estratégico — conecta negócio a TI.', example: 'Bancos usam para auditoria e conexão de decisões TI ao negócio.' },
-                  { id: 'iso', term: 'ISO/IEC 38500', definition: 'Norma para governança corporativa de TI (2008/2015). Avaliar, Direcionar, Monitorar.', example: 'Conselhos discutem TI sem entender tecnicamente.' },
-                  { id: 'itil', term: 'ITIL 4', definition: 'Gerenciamento de serviços de TI focado em operação (2019). Integra IA e cloud.', example: 'Service desk, SLAs, atendimento padronizado.' },
-                ],
-                pauses: [
-                  { id: 'gov-pme', question: 'Dos 4 itens (backup, 2FA, responsável TI, revisão trimestral), quantos sua empresa tem?', hint: 'Cada item faltando é risco aberto. Renner perdeu R$ 20M sem o básico.', expectedKeywords: ['backup', '2FA', 'responsável', 'revisão'] },
-                ],
-                quotes: [
-                  { id: 'kotter-q', text: 'Most major change initiatives generate only lukewarm results. Many fail miserably.', author: 'John Kotter', year: 1996, source: 'Leading Change, Harvard Business School Press', challenge: 'Se 70% das transformações falham, o que faz os 30% darem certo?' },
-                ],
-              },
+              
             ],
             application: {
               kind: 'compare-and-drag',
@@ -455,17 +419,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 kind: 'paragraph',
                 text: 'As {{RegTechs}} (Regulatory Technology) estão em plena expansão, utilizando IA para automatizar verificações de KYC (Know Your Customer) e triagens de AML (Anti-Money Laundering). Em 2025, o compliance deixa de ser focado apenas em evitar multas para se tornar um motor de {{confiança e reputação}}. A detecção preditiva de anomalias permite que as empresas respondam a riscos em tempo real, reduzindo drasticamente os erros humanos e o custo operacional.',
               },
-              {
-                kind: 'deep-text',
-                title: 'Aprofundamento: LGPD, Agentes de IA e RegTech',
-                body: '**GOVERNANÇA DE DADOS E MARCO REGULATÓRIO**\n\nA transformação digital no Brasil ocorre sob arcabouço legal rigoroso. A {{LGPD}} (Lei 13.709/2018) e a Lei do Governo Digital (14.129/2021) são os pilares. O sandbox regulatório (LC 182/21) permite testagem de modelos inovadores com flexibilidade temporária.\n\nA ANPD lançou sandbox focado em IA e Proteção de Dados: {{transparência algorítmica}} (titulares compreendam decisões automatizadas), {{mitigação de vieses}} (reduzir discriminação em modelos de ML) e {{segurança de dados pessoais}} em modelos generativos.\n\n[[pause:lgpd-empresa]]\n\n**AGENTES DE IA E GOVERNANÇA**\n\nDiferente da automação robótica (RPA), agentes de IA possuem percepção, raciocínio adaptativo e ação autônoma. Empresas agora gerenciam entidades que tomam decisões independentes. A {{observabilidade}} é prioridade — cada ação deve ser rastreável, auditável e reversível.\n\n**REGTECH E COMPLIANCE**\n\nRegTechs automatizam KYC e AML. Em 2025, compliance vira motor de {{confiança e reputação}}. Detecção preditiva de anomalias permite responder a riscos em tempo real.\n\n[[calc:custo-lgpd]]',
-                pauses: [
-                  { id: 'lgpd-empresa', question: 'Sua empresa coleta dados pessoais? Tem política de consentimento? Se a ANPD fiscalizasse amanhã, estaria em conformidade?', hint: 'Multa LGPD: até 2% do faturamento (máx R$50M por infração). Custo de adequação é sempre menor.', expectedKeywords: ['LGPD', 'consentimento', 'dados', 'conformidade'] },
-                ],
-                calcs: [
-                  { id: 'custo-lgpd', title: 'LGPD: adequação vs risco de multa', inputs: [{ id: 'receita', label: 'Receita anual', min: 500000, max: 50000000, default: 5000000, unit: 'R$' }, { id: 'prob', label: 'Probabilidade de incidente (%/ano)', min: 1, max: 50, default: 10, unit: '%' }, { id: 'adequacao', label: 'Custo de adequação', min: 5000, max: 500000, default: 30000, unit: 'R$' }], formula: '(receita * 0.02 * prob / 100) - adequacao', resultLabel: 'Risco esperado menos custo adequação', resultFormat: 'currency', interpretation: [{ max: 0, label: 'Adequação custa MENOS que o risco — invista', color: 'green' }, { max: 500000, label: 'Risco significativo sem adequação', color: 'red' }, { max: 999999999, label: 'Risco altíssimo', color: 'red' }] },
-                ],
-              },
+              
             ],
             application: {
               kind: 'compare-and-drag',
