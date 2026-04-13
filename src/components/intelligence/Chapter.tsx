@@ -93,9 +93,6 @@ export default function Chapter({ block }: Props) {
         padding: '28px 22px',
         color: COLORS.text,
         marginBottom: 20,
-        maxWidth: 680,
-        marginLeft: 'auto',
-        marginRight: 'auto',
       }}
     >
       <ChapterHeader
@@ -228,7 +225,7 @@ function ChapterOpening({
           lineHeight: 1.8,
           color: 'rgba(255,255,255,0.8)',
           marginTop: showTimeline ? 8 : 0,
-          textAlign: 'left',
+          textAlign: 'justify',
         }}
       >
         {renderWithHighlights(leadText)}
@@ -250,7 +247,7 @@ function BodySectionRenderer({ section, chapterId }: { section: ChapterBodySecti
           lineHeight: 1.8,
           color: 'rgba(255,255,255,0.75)',
           margin: '0 0 18px 0',
-          textAlign: 'left',
+          textAlign: 'justify',
         }}
       >
         {renderWithHighlights(section.text)}
@@ -373,7 +370,7 @@ function DeepTextSection({ section }: { section: ChapterDeepText }) {
           return (
             <p key={idx} style={{
               fontSize: 13, lineHeight: 1.75, color: 'rgba(255,255,255,0.85)',
-              margin: 0, textAlign: 'left', hyphens: 'auto',
+              margin: 0, textAlign: 'justify', hyphens: 'auto',
             }}>
               {renderDeepInline(para, conceptMap, refMap, setOpenConcept, setOpenRef)}
             </p>
@@ -1043,7 +1040,7 @@ function PhaseCard({ data, chapterId }: { data: ChapterPhaseCard; chapterId?: st
           lineHeight: 1.7,
           color: 'rgba(255,255,255,0.85)',
           margin: '0 0 12px 0',
-          textAlign: 'left',
+          textAlign: 'justify',
           hyphens: 'auto',
         }}
       >
@@ -1058,7 +1055,7 @@ function PhaseCard({ data, chapterId }: { data: ChapterPhaseCard; chapterId?: st
           borderRadius: 6,
           borderLeft: `2px solid ${accent}`,
           lineHeight: 1.6,
-          textAlign: 'left',
+          textAlign: 'justify',
           hyphens: 'auto',
         }}
       >
@@ -1207,7 +1204,7 @@ function PhaseCard({ data, chapterId }: { data: ChapterPhaseCard; chapterId?: st
                       padding: '10px 12px',
                       background: 'rgba(255, 255, 255, 0.04)',
                       borderRadius: 5,
-                      textAlign: 'left',
+                      textAlign: 'justify',
                       hyphens: 'auto',
                     }}
                   >
@@ -1292,7 +1289,7 @@ function ChapterSynthesis({
           fontWeight: 500,
           margin: '0 0 18px 0',
           letterSpacing: '-0.005em',
-          textAlign: 'left',
+          textAlign: 'justify',
           hyphens: 'auto',
         }}
       >
@@ -1349,7 +1346,7 @@ function ChapterSynthesis({
             borderRadius: 8,
             padding: '14px 16px',
             cursor: 'pointer',
-            textAlign: 'left',
+            textAlign: 'justify',
             display: 'flex',
             flexDirection: 'column',
             gap: 4,
