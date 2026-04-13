@@ -253,7 +253,39 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 kind: 'paragraph',
                 text: 'David Rogers (Columbia Business School, 2016) propôs que a transformação digital acontece nesses 4 domínios simultaneamente — não sequencialmente. O insight central: {{transformação não é sobre tecnologia — é sobre estratégia}}. George Westerman (MIT Sloan, 2014) pesquisou 391 empresas em 30 países e classificou-as em 4 quadrantes. Apenas os "Digirati" (alta capacidade digital + alta liderança) superam consistentemente os pares — 26% mais lucrativos, 9% maior receita, 12% maior valorização de mercado.',
               },
+                            {
+                kind: 'heading',
+                text: 'Teoria da inovação aplicada a negócios',
+              },
               {
+                kind: 'paragraph',
+                text: 'Joseph Schumpeter (1942) cunhou o conceito de {{destruição criativa}} — a inovação como motor do capitalismo que destrói o velho para criar o novo. Toda empresa que inova canibaliza algo que existia antes. A Kodak inventou a câmera digital mas não canibalizou o filme — e faliu. O Nubank canibalizou a agência bancária — e virou o maior banco digital do mundo fora da China.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Clayton Christensen (Harvard, 1997) separou inovação em tipos: {{incremental}} (melhorar o que existe — Havaianas reinventando design), {{radical}} (criar categoria nova — PIX substituindo TED/DOC) e {{disruptiva}} (começar por baixo e dominar — Nubank atendendo quem bancos tradicionais ignoravam). Distinção crítica: iPhone NÃO é disruptivo por Christensen — nasceu premium. Disruptiva começa simples e barata.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Eric Ries (2011) propôs o {{Lean Startup}}: construir-medir-aprender. Em vez de planejar 2 anos e lançar produto acabado, lançar o MVP (Minimum Viable Product) em semanas, medir o que funciona e iterar. Chan Kim e Renée Mauborgne (INSEAD, 2005) propuseram a {{Estratégia do Oceano Azul}}: em vez de competir no mercado existente (oceano vermelho), criar mercado novo onde não há concorrência. O iFood não competiu com restaurantes — criou uma nova categoria de consumo.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Henry Chesbrough (Berkeley, 2003) introduziu a {{inovação aberta}}: empresas não precisam inovar sozinhas. Podem importar ideias de fora (universidades, startups, fornecedores) e exportar tecnologias que não usam. A Natura faz isso com comunidades da Amazônia; a Embraer com centros de pesquisa internacionais. O oposto — inovação fechada — é o modelo que matou a Kodak.',
+              },
+              {
+                kind: 'heading',
+                text: 'Frameworks prescritivos: como executar',
+              },
+              {
+                kind: 'paragraph',
+                text: '**OKRs** (Objectives and Key Results) — framework usado por Google, Nubank e iFood para alinhar inovação com resultado. Objetivo = o que quero alcançar. Key Results = como vou medir. Diferente de KPIs tradicionais, OKRs são ambiciosos por definição — atingir 70% já é sucesso. **Design Sprint** (Google Ventures, 2016) — método de 5 dias para validar uma ideia sem construir produto: mapear o problema (segunda), desenhar soluções (terça), decidir a melhor (quarta), prototipar (quinta), testar com usuários (sexta).',
+              },
+              {
+                kind: 'paragraph',
+                text: '**Agile/Scrum** não é metodologia de TI — é cultura organizacional. Ciclos curtos (sprints de 2 semanas), entrega contínua, feedback do cliente a cada ciclo. Empresas como Spotify organizaram equipes em {{squads}} (times autônomos de 6-8 pessoas) que combinam velocidade de startup com escala de corporação. No Brasil, a Magazine Luiza adotou squads para transformar lojas em plataforma — cada squad era responsável por uma funcionalidade do super-app.',
+              },
+{
                 kind: 'heading',
                 text: 'Sinergia entre gestão da inovação e transformação digital',
               },
@@ -478,7 +510,43 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   { number: 3, title: 'Inovação Ambidestra', description: 'Manter a eficiência operacional (exploração do modelo atual) enquanto se explora novas fronteiras (experimentação com modelos novos). O maior desafio organizacional da próxima década: fazer os dois ao mesmo tempo sem que um {{sabote}} o outro.' },
                 ],
               },
+                            {
+                kind: 'heading',
+                text: 'Cases brasileiros de transformação',
+              },
               {
+                kind: 'paragraph',
+                text: 'A **B3** (Bolsa de Valores) se transformou de pregão viva-voz em hub fintech — hoje processa {{13 milhões}} de ordens por dia com latência de microssegundos. A **Stone** provou que dá para competir com Cielo e Rede começando por microempreendedores que ninguém atendia — modelo disruptivo clássico de Christensen. A **Embraer** inova em indústria pesada: compete com Boeing e Airbus criando aviões para nichos que as gigantes ignoram — jatos regionais onde nenhuma grande quer investir.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O **Mercado Pago** (braço financeiro do Mercado Livre) virou o maior banco digital da América Latina por volume de transações — sem pedir licença bancária tradicional. Começou como meio de pagamento do marketplace e expandiu para crédito, investimento e seguros. Exemplo perfeito de como {{plataforma cria ecossistema financeiro}} sem precisar ser banco.',
+              },
+              {
+                kind: 'heading',
+                text: 'IA generativa na prática: ROI, riscos e responsabilidade',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O maior desafio da IA generativa em 2025 não é técnico — é de {{ROI}}. A maioria das empresas que adotou ChatGPT/Copilot ainda não consegue medir retorno concreto (McKinsey, 2024). O problema: IA generativa é excelente para tarefas pontuais (rascunho de e-mail, resumo de documento) mas difícil de escalar para processos críticos sem governança de dados.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Quem é responsável quando um agente de IA nega um empréstimo injustamente? Quando um chatbot dá informação errada que causa prejuízo? A {{liability}} da IA corporativa é o maior buraco jurídico de 2025. Empresas que implementam IA sem trilha de auditoria (observabilidade) estão criando risco legal que pode superar o benefício operacional. Prompt engineering — a habilidade de instruir modelos de linguagem — está se tornando disciplina formal, não gambiarra.',
+              },
+              {
+                kind: 'heading',
+                text: 'Sustentabilidade digital e ESG',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A transformação digital tem um custo ambiental invisível. Data centers globais consomem {{1-2% da eletricidade mundial}} — equivalente à aviação comercial. Cada consulta a um modelo de IA gasta 10x mais energia que uma busca no Google. Empresas como Microsoft se comprometeram a ser {{carbono negativo}} até 2030, mas a explosão de IA generativa está dificultando a meta.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A conexão entre digital e ESG é dupla: tecnologia pode {{habilitar}} sustentabilidade (IoT para eficiência energética, IA para otimização logística, blockchain para rastreabilidade de cadeia) mas também pode {{mascarar}} greenwashing (relatórios automatizados que selecionam dados favoráveis). Empresas digitalmente maduras têm responsabilidade de usar tecnologia para sustentabilidade real — não só para marketing.',
+              },
+{
                 kind: 'paragraph',
                 text: 'Em 2025, governança de modelos de IA (políticas para uso ético e responsável de sistemas generativos), infraestrutura de dados em nuvem (base para escalabilidade e segurança) e cultura de dados (o maior diferencial não será a tecnologia, mas a {{capacidade humana}} de interpretá-la e agir sobre ela) são as três frentes que definem quem lidera e quem segue.',
               },
