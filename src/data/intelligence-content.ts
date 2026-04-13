@@ -251,7 +251,6 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   { icon: '📈', title: 'Resultados', description: 'SGI mantém foco estratégico no {{ROI}}; TD entrega analytics para medir impacto em larga escala.' },
                 ],
               },
-            ],
               {
                 kind: 'deep-text',
                 title: 'Aprofundamento: Digitização vs Transformação e o Framework MIT',
@@ -274,6 +273,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   { id: 'westerman-q', text: 'Digital transformation is not about technology — it is about strategy and new ways of thinking.', author: 'George Westerman', year: 2014, source: 'Leading Digital, Harvard Business Press', challenge: 'Se transformação é estratégia, por que a maioria começa comprando software?' },
                 ],
               },
+            ],
             application: {
               kind: 'compare-and-drag',
               intro: 'Três conceitos são confundidos constantemente. Veja a diferença — depois classifique ações reais.',
@@ -360,7 +360,6 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 kind: 'paragraph',
                 text: 'Para PMEs: backup automático diário, 2FA em todas as contas, um responsável por TI (mesmo acumulando função), política de senhas com gerenciador, revisão trimestral. Custo: {{R$ 0 a R$ 50/mês}}. Custo de não fazer: potencialmente o negócio inteiro.',
               },
-            ],
               {
                 kind: 'deep-text',
                 title: 'Aprofundamento: Frameworks e Governança para PMEs',
@@ -377,6 +376,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   { id: 'kotter-q', text: 'Most major change initiatives generate only lukewarm results. Many fail miserably.', author: 'John Kotter', year: 1996, source: 'Leading Change, Harvard Business School Press', challenge: 'Se 70% das transformações falham, o que faz os 30% darem certo?' },
                 ],
               },
+            ],
             application: {
               kind: 'compare-and-drag',
               intro: 'Os 4 pilares sustentam a governança. Classifique cada prática no pilar correto.',
@@ -455,7 +455,6 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 kind: 'paragraph',
                 text: 'As {{RegTechs}} (Regulatory Technology) estão em plena expansão, utilizando IA para automatizar verificações de KYC (Know Your Customer) e triagens de AML (Anti-Money Laundering). Em 2025, o compliance deixa de ser focado apenas em evitar multas para se tornar um motor de {{confiança e reputação}}. A detecção preditiva de anomalias permite que as empresas respondam a riscos em tempo real, reduzindo drasticamente os erros humanos e o custo operacional.',
               },
-            ],
               {
                 kind: 'deep-text',
                 title: 'Aprofundamento: LGPD, Agentes de IA e RegTech',
@@ -467,6 +466,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   { id: 'custo-lgpd', title: 'LGPD: adequação vs risco de multa', inputs: [{ id: 'receita', label: 'Receita anual', min: 500000, max: 50000000, default: 5000000, unit: 'R$' }, { id: 'prob', label: 'Probabilidade de incidente (%/ano)', min: 1, max: 50, default: 10, unit: '%' }, { id: 'adequacao', label: 'Custo de adequação', min: 5000, max: 500000, default: 30000, unit: 'R$' }], formula: '(receita * 0.02 * prob / 100) - adequacao', resultLabel: 'Risco esperado menos custo adequação', resultFormat: 'currency', interpretation: [{ max: 0, label: 'Adequação custa MENOS que o risco — invista', color: 'green' }, { max: 500000, label: 'Risco significativo sem adequação', color: 'red' }, { max: 999999999, label: 'Risco altíssimo', color: 'red' }] },
                 ],
               },
+            ],
             application: {
               kind: 'compare-and-drag',
               intro: 'Os 4 pilares da decisão baseada em dados. Classifique cada atividade no pilar correto.',
