@@ -601,7 +601,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             opening: {
               leadText: 'Pensamento criativo é a capacidade cognitiva de gerar ideias, soluções ou conexões que são simultaneamente {originais e úteis}. Diferente do senso comum, criatividade não é um dom exclusivo de artistas — é uma competência treinável, mensurável e essencial para a sobrevivência empresarial.',
             },
-            body: 
+            body: [
               {
                 kind: 'paragraph',
                 text: 'Pensamento criativo é a capacidade cognitiva de gerar ideias, soluções ou conexões que são simultaneamente originais e úteis. Diferente do senso comum, criatividade não é um "dom" exclusivo de artistas — é uma competência {{treinável}}, mensurável e essencial para a sobrevivência empresarial.',
@@ -864,7 +864,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             opening: {
               leadText: 'Conhecer a teoria da criatividade sem dominar os métodos é como saber que precisa inovar mas não saber {como começar}. Os três métodos abaixo cobrem 80% dos cenários de inovação em empresas — de startups a multinacionais.',
             },
-            body: 
+            body: [
               {
                 kind: 'paragraph',
                 text: 'Design Thinking é uma abordagem de resolução de problemas centrada no ser humano, popularizada pela IDEO e pela d.school de Stanford. Não é um processo linear — é iterativo e profundamente empático. O objetivo não é perguntar ao cliente o que ele quer, mas {{observar o que ele faz}}.',
@@ -1109,7 +1109,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             opening: {
               leadText: 'Design Thinking e SCAMPER resolvem a maioria dos problemas. Mas quando o impasse é profundo, quando as ideias convencionais já se esgotaram, ou quando há {contradição técnica} que parece impossível — ferramentas avançadas entram em jogo.',
             },
-            body: 
+            body: [
               {
                 kind: 'pillar-grid',
                 title: 'Ferramentas avançadas de criatividade',
