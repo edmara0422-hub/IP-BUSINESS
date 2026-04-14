@@ -586,7 +586,362 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               ],
             },
           },
-        ],
+                  {
+            id: 'M1-0-cap5',
+            type: 'chapter',
+            number: 5,
+            title: 'Tipos e Intensidade da Inovação',
+            subtitle: 'De produto a modelo de negócio — e de rotina a arquitetônica',
+            opening: {
+              leadText: 'Uma inovação necessariamente precisa ser {{implementada}} e proporcionar impactos econômicos e sociais mensuráveis para empresas, indivíduos, governos e a sociedade. Do contrário, trata-se apenas de mera ideia ou invenção.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'A inovação pode ser classificada de acordo com seu tipo. São consideradas inovações as modificações que resultem em melhor desempenho, usabilidade, eficiência, redução de custos e acessibilidade. Com o crescimento da pauta de sustentabilidade, responsabilidade social e economia circular, o design de produto vem ganhando maior relevância e ampliando o {{conceito de inovação}}.',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Inovação de Produto/Serviço',
+                    period: 'O mais comum',
+                    text: 'Mudança de produtos e serviços através de melhoria em design, usabilidade, desempenho, funcionalidade. É a forma mais {{palpável}} de inovar — impacta diretamente no faturamento. Pode ser algo que concorrentes já praticam (refrigerante zero açúcar) ou inédito (refrigerante com café).',
+                    caseStudy: {
+                      company: 'Havaianas',
+                      year: 1994,
+                      story: 'Mesmo produto desde 1962, reinventado por {{design e posicionamento}}. De R$ 2 a produto global em 100+ países. Criatividade no marketing, não na borracha.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'Menor risco', label: 'Investimento geralmente menor' },
+                        { value: 'Direto', label: 'Impacto no faturamento' },
+                      ],
+                      insight: 'Essencial para toda empresa manter ou expandir seu {{mercado}}. Não precisa ser revolucionário — precisa gerar valor.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Inovação Organizacional',
+                    period: 'Estrutural e abrangente',
+                    text: 'Mudanças na cultura, equipes, hierarquia, processos internos. Pode afetar contratação, treinamento, gerenciamento, espaço físico, plano de carreiras. Maior investimento financeiro e de {{esforço organizacional}}.',
+                    caseStudy: {
+                      company: 'Spotify',
+                      year: 2012,
+                      story: 'Organizou equipes em {{squads}} autônomos de 6-8 pessoas. Combinou velocidade de startup com escala corporativa. Magazine Luiza adotou modelo similar para transformar lojas em plataforma.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'Squads', label: 'Times autônomos multidisciplinares' },
+                        { value: 'Várias áreas', label: 'RH, TI, espaço, cultura' },
+                      ],
+                      insight: 'Equipes ágeis não são só TI — são {{cultura organizacional}}. Requer mudança em contratação, avaliação e incentivos.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Inovação de Processo',
+                    period: 'Eficiência e fluxo',
+                    text: 'Mudanças significativas em fluxos organizacionais: gestão da inovação, marketing, vendas, qualidade, logística, TI. Objetivo: maior eficiência, menor custo, mais engajamento, menor impacto {{ambiental}}.',
+                    caseStudy: {
+                      company: 'Natura',
+                      year: 2012,
+                      story: 'SAP integrou {{7 países}}. Decisões logísticas que levavam semanas viraram horas. Economia projetada de ~R$ 500M. O processo mudou — o modelo de negócio não.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 500M', label: 'Economia projetada' },
+                        { value: '7 países', label: 'Integrados' },
+                      ],
+                      insight: 'Pode ser pontual (uma área) ou impactar {{todos os processos}}. A maioria das inovações de processo é incremental.',
+                    },
+                  },
+                  {
+                    index: 4,
+                    title: 'Inovação de Modelo de Negócio',
+                    period: 'Mudança no core',
+                    text: 'Mudança significativa nas atividades core. Altera o valor agregado ao cliente e a forma de conduzir o negócio. Maior risco, mas pode garantir {{sobrevivência}} ou levar a outro patamar.',
+                    caseStudy: {
+                      company: 'Xerox',
+                      year: 2000,
+                      story: 'Mudou de {{venda de impressoras}} para prestação de serviços de impressão. Garantiu negócio mais sustentável e receita recorrente. Mesmo hardware, modelo completamente diferente.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'Maior risco', label: 'Mas maior potencial' },
+                        { value: 'Recorrência', label: 'De venda única a serviço' },
+                      ],
+                      insight: 'Pode ou não impactar o propósito/missão, mas altera {{significativamente}} como o valor é entregue ao cliente.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Intensidade da inovação',
+              },
+              {
+                kind: 'pillar-grid',
+                title: '4 níveis de intensidade',
+                pillars: [
+                  { icon: '🔄', title: 'Rotina', description: 'Renovação natural para atender à dinâmica de mercado. {{Baixo impacto}} no modelo e nas capacidades técnicas. A política interna de incentivo é capaz de promovê-la.' },
+                  { icon: '🚀', title: 'Radical', description: 'Mantém bases do modelo de negócio mas exige {{novas competências tecnológicas}}. Investimentos elevados e alto impacto no perfil dos colaboradores.' },
+                  { icon: '💥', title: 'Disruptiva', description: 'Requer reavaliação e mudança no {{modelo de negócio}}. Foco nas escolhas estratégicas. Maior enfoque na mudança cultural.' },
+                  { icon: '🏗️', title: 'Arquitetônica', description: 'Maior impacto e risco — afeta tanto o modelo de negócio quanto a tecnologia. Muitas vezes em {{continuidade}} a uma inovação disruptiva ou radical.' },
+                ],
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada tipo de inovação tem características distintas. Classifique corretamente.',
+              compare: {
+                columnHeaders: ['Produto', 'Processo', 'Organizacional', 'Modelo'],
+                rows: [
+                  { label: 'Foco', values: ['O que se vende', 'Como se faz', 'Como se organiza', 'Como se captura valor'] },
+                  { label: 'Risco', values: ['Baixo-médio', 'Baixo', 'Médio', 'Alto'], viz: 'bars', intensities: [0.35, 0.2, 0.5, 0.9] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada exemplo no tipo de inovação:',
+                zones: [
+                  { id: 'prod', label: 'Produto' },
+                  { id: 'proc', label: 'Processo' },
+                  { id: 'org', label: 'Organizacional' },
+                  { id: 'modelo', label: 'Modelo' },
+                ],
+                items: [
+                  { id: 'hav', label: 'Havaianas: chinelo com design premium', correctZone: 'prod', correctFeedback: 'Certo. Mesmo produto, novo design = produto.', wrongFeedback: 'Design e posicionamento = inovação de produto.' },
+                  { id: 'nat', label: 'Natura: SAP integrando 7 países', correctZone: 'proc', correctFeedback: 'Certo. Integração de operações = processo.', wrongFeedback: 'ERP integrando operações = processo.' },
+                  { id: 'spo', label: 'Spotify: squads autônomos', correctZone: 'org', correctFeedback: 'Certo. Mudança na estrutura = organizacional.', wrongFeedback: 'Squads mudam a estrutura = organizacional.' },
+                  { id: 'xer', label: 'Xerox: venda → serviço de impressão', correctZone: 'modelo', correctFeedback: 'Certo. Mudança na forma de capturar valor = modelo.', wrongFeedback: 'De venda para serviço = modelo de negócio.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Inovação não é sinônimo de tecnologia. Pode ser no {{produto}}, no {{processo}}, na {{organização}} ou no {{modelo de negócio}}. A intensidade vai de rotina (incremental) a arquitetônica (tudo muda). O tipo e a intensidade determinam o risco, o investimento e o impacto.',
+              keyInsights: [
+                'Inovação sem implementação é apenas {{ideia}}. Precisa gerar impacto mensurável.',
+                'Inovação de modelo de negócio tem maior risco mas pode garantir a {{sobrevivência}} da empresa.',
+                'Inovação arquitetônica afeta modelo de negócio E tecnologia — é a mais {{transformadora}}.',
+              ],
+              nextChapterHint: 'Capítulo 6 · Gestão da Inovação',
+              nextChapterBlurb: 'Canvas CIE, funil de inovação, stage gates, horizontes e corporate ventures.',
+            },
+          },
+          {
+            id: 'M1-0-cap6',
+            type: 'chapter',
+            number: 6,
+            title: 'Gestão da Inovação na Prática',
+            subtitle: 'Canvas CIE, funil, stage gates, horizontes e corporate ventures',
+            opening: {
+              leadText: 'Inovar não consiste somente em ter ideias disruptivas. É um processo que exige {{planejamento}}, disciplina e recursos. O Canvas da Inovação Estratégica responde 5 perguntas: O que inovar? Como? Onde? Com quais recursos? Qual estrutura?',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: '4Ps da Inovação — Como inovar',
+                pillars: [
+                  { icon: '🎯', title: 'Propósito', description: 'O {{porquê}} de inovar. Toda decisão liga-se a resultados: receita, custos, sustentabilidade. Deve dar suporte à missão e visão da empresa.' },
+                  { icon: '⚙️', title: 'Processos', description: 'O {{como}} será desenvolvida. O funil de inovação é o método mais conhecido: geração de ideias → triagem → desenvolvimento → lançamento.' },
+                  { icon: '👥', title: 'Pessoas', description: 'Profissionais com espírito empreendedor, gestores ágeis com mentalidade {{Lean}}. Eventos e congressos desenvolvem pensamento amplo.' },
+                  { icon: '📋', title: 'Políticas', description: 'Criar ambiente propício dando ênfase ao {{aprendizado}}, não só ao erro. Definir formas de mensurar sucesso e recompensar resultados.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Os três horizontes da inovação',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Steve Blank (2015) destaca que o primeiro horizonte é o nível do {{conhecido}}: o modelo de negócio atual. Inovação incremental, quick wins, eficiência. O segundo horizonte cria novos produtos/serviços dentro do mesmo modelo — terreno parcialmente conhecido. O terceiro é disruptivo: distancia-se da operação tradicional.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Três horizontes — distribuição de esforço',
+                pillars: [
+                  { icon: '🎯', title: 'H1 — Core (70%)', description: 'Principais produtos e serviços. Inovações incrementais, domínio total. {{Quick wins}} e eficiência.', metric: { value: '70%', label: 'dos esforços' } },
+                  { icon: '🔭', title: 'H2 — Adjacente (20%)', description: 'Áreas próximas ao core. Novos canais, novos clientes, mesma tecnologia. Risco {{moderado}}.', metric: { value: '20%', label: 'dos esforços' } },
+                  { icon: '🚀', title: 'H3 — Disruptivo (10%)', description: 'Projetos que se distanciam da operação tradicional. Novos mercados. Risco alto, retorno {{exponencial}}.', metric: { value: '10%', label: 'dos esforços' } },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Funil de inovação e stage gates',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O funil de inovação e os estágios de decisão ({{stage gates}}, Robert Cooper 2001) são as ferramentas mais utilizadas para representar o fluxo criativo. Cada fase é demarcada por um estágio de decisão que analisa se a ideia avança. O equilíbrio entre inovação e mercado é ponto fundamental.',
+              },
+              {
+                kind: 'step-flow',
+                title: 'Funil de inovação — do Fuzzy Front-End ao mercado',
+                steps: [
+                  { number: 1, title: 'Fuzzy Front-End (FFE)', description: 'Conjunto difuso de ideias. Incertezas sobre mercado, tecnologia e gestão. Quanto mais ideias nessa fase, {{melhor}}. Divergir é necessário.', caseSnippet: 'A saída é um conceito sobre o produto ou solução a ser desenvolvida.' },
+                  { number: 2, title: 'Stage Gate 1 — Triagem', description: 'Avaliação inicial: alinhamento estratégico, viabilidade técnica, potencial de mercado. {{Go/no-go}} — a ideia segue ou vai para o banco de ideias.', caseSnippet: 'Cooper (2001): banco de ideias permite revisitar projetos estacionados no futuro.' },
+                  { number: 3, title: 'Desenvolvimento', description: 'Prototipagem, testes, validação técnica e de mercado. Investimento cresce — o stage gate aqui avalia {{progresso}} real.', caseSnippet: 'TRL (NASA, 1974): mede maturidade da tecnologia em 9 níveis.' },
+                  { number: 4, title: 'Stage Gate 2 — Decisão Final', description: 'Produto/serviço está pronto? Mercado validado? ROI projetado atende? {{Lançar ou pivotar}}.', caseSnippet: 'Hype Cycle (Gartner): acompanha a maturidade e potencial futuro das tecnologias.' },
+                  { number: 5, title: 'Lançamento e Escala', description: 'Go-to-market. Métricas de adoção, receita, satisfação. O ciclo reinicia com {{aprendizados}} do mercado.', caseSnippet: 'Lean Startup: construir-medir-aprender em ciclos contínuos.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Corporate ventures e ecossistema',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Corporate ventures são grandes organizações que investem capital em startups ou em ideias inovadoras dos colaboradores internos. Classificações: {{CVC}} (Corporate Venture Capital — compra ações de startup), {{CVE}} (Externo — cede ajuda como espaço, marca, canais), {{CVI}} (Interno — investe em ideias dos colaboradores).',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A inovação se materializa em dois movimentos: {{spin-in}} (integração da startup ao negócio da investidora, via aquisição total) e {{spin-off}} (quando o investimento interno se torna independente, geralmente com criação de nova empresa). Hubs de inovação aberta das grandes organizações abrem portas para incubar startups com potencial de spin-in.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O Business Model Canvas (Osterwalder & Pigneur, 2011) permite definir e visualizar modelos de negócio de forma sistêmica e visual em uma única página. Pode ser usado em 3 momentos: o {{atual}} (como a empresa opera hoje), o de {{inovação}} (ampliação do escopo) e o de {{disrupção}} (negócios não existentes).',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada horizonte tem características e nível de risco diferentes. Classifique.',
+              compare: {
+                columnHeaders: ['H1 Core', 'H2 Adjacente', 'H3 Disruptivo'],
+                rows: [
+                  { label: 'Risco', values: ['Baixo', 'Moderado', 'Alto'], viz: 'bars', intensities: [0.2, 0.5, 0.9] },
+                  { label: 'Esforço', values: ['70%', '20%', '10%'] },
+                  { label: 'Retorno', values: ['Previsível', 'Médio prazo', 'Exponencial'] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada ação no horizonte correto:',
+                zones: [
+                  { id: 'h1', label: 'H1 Core' },
+                  { id: 'h2', label: 'H2 Adjacente' },
+                  { id: 'h3', label: 'H3 Disruptivo' },
+                ],
+                items: [
+                  { id: 'opt', label: 'Otimizar processo de entrega existente', correctZone: 'h1', correctFeedback: 'Certo. Melhoria incremental no core = H1.', wrongFeedback: 'Otimizar o que existe = Horizonte 1.' },
+                  { id: 'canal', label: 'Vender produto existente em novo canal', correctZone: 'h2', correctFeedback: 'Certo. Mesmo produto, novo canal = adjacente.', wrongFeedback: 'Novo canal para produto existente = H2.' },
+                  { id: 'novo', label: 'Criar negócio em mercado totalmente novo', correctZone: 'h3', correctFeedback: 'Certo. Mercado novo = disruptivo.', wrongFeedback: 'Mercado inexplorado = H3 disruptivo.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Gestão da inovação não é improviso — é {{processo}}. O Canvas CIE responde 5 perguntas essenciais. Os 3 horizontes distribuem risco (70/20/10). O funil com stage gates filtra ideias. E corporate ventures conectam grandes empresas com o ecossistema de startups.',
+              keyInsights: [
+                'Funil de inovação: quanto mais ideias no {{topo}}, melhor. A maioria DEVE morrer na triagem — isso é positivo.',
+                'Stage gates (Cooper, 2001): decisões {{go/no-go}} em cada fase previnem investimento em projetos fadados ao fracasso.',
+                'Spin-in e spin-off são os dois movimentos que materializam a inovação no {{mercado}}.',
+              ],
+              nextChapterHint: 'Capítulo 7 · Cultura de Inovação',
+              nextChapterBlurb: 'Cultura interna e externa, liderança inovadora, TRL e Hype Cycle.',
+            },
+          },
+          {
+            id: 'M1-0-cap7',
+            type: 'chapter',
+            number: 7,
+            title: 'Cultura de Inovação',
+            subtitle: 'Dimensão interna, externa, liderança e maturidade tecnológica',
+            opening: {
+              leadText: 'Cultura de inovação é um conjunto de práticas e valores compartilhados que favorecem atitudes inovadoras. Tem duas dimensões: a {{interna}} (a própria organização) e a {{externa}} (o setor e a sociedade). Sem cultura, ferramentas e processos viram burocracia.',
+            },
+            body: [
+              {
+                kind: 'heading',
+                text: 'Cultura interna',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Cada empresa possui uma cultura corporativa: um conjunto de regras, tácitas e explícitas, que condiciona as atitudes de todos que a compõem. Os elementos básicos incluem: padrões de linguagem e formação de grupos, normas do grupo de trabalho, valores organizacionais (confiança, responsabilidade), filosofia das políticas (funcionários, clientes, acionistas), regras de comportamento e promoção, e o {{clima organizacional}}.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Elementos da cultura organizacional',
+                pillars: [
+                  { icon: '💬', title: 'Linguagem e Grupos', description: 'Padrões de tratamento e interação entre pessoas. Como se formam {{grupos informais}}.' },
+                  { icon: '📏', title: 'Normas', description: 'Regras do grupo: dias de pagamento, dress code, rituais. O que é aceito e o que {{não é}}.' },
+                  { icon: '💎', title: 'Valores', description: 'Confiança, responsabilidade, transparência. O que a empresa diz que valoriza vs o que {{pratica}}.' },
+                  { icon: '🌡️', title: 'Clima', description: 'Percepção do ambiente físico e psicológico. Como as pessoas {{sentem}} o local de trabalho.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: '**Liderança inovadora, mas não centralizadora:** A inovação precisa começar na alta administração. Mas o problema em organizações comandadas por um "gênio criativo" é que as novas ideias costumam vir apenas dele. Cria-se a regra tácita de "o chefe tem ideias e nós as {{executamos}}" — prejudicial porque torna a empresa dependente de uma única pessoa.',
+              },
+              {
+                kind: 'heading',
+                text: 'Cultura externa',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Um profissional inovador precisa de sólida formação na área em que atua — criação tem tudo a ver com conhecimento. Mas e se a oferta de profissionais qualificados é baixa? Se não existe sistema de patentes? Se não há acesso a bancos de dados públicos? Se a transferência de tecnologia é difícil? Esses são problemas da segunda dimensão da cultura de inovação: o contexto {{setorial e social}}.',
+              },
+              {
+                kind: 'heading',
+                text: 'Nível de Maturidade Tecnológica (TRL)',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O TRL (Technology Readiness Level) é uma metodologia desenvolvida pela {{NASA}} em 1974 para mensurar e comparar a evolução da maturidade de novas tecnologias. Muito utilizada por empresas e agentes de fomento na tomada de decisão da alocação de recursos conforme milestones são superados. Quanto mais recente a tecnologia, maiores as incertezas e chances de fracasso.',
+              },
+              {
+                kind: 'heading',
+                text: 'Hype Cycle (Curva Gartner)',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Hype Cycle é uma curva de padrões que tendem a se repetir no ciclo de vida de uma tecnologia, desenvolvida pela {{Gartner}} em 2018. Desde então, a consultoria divulga anualmente mais de 100 Hype Cycles em vários setores para acompanhar a maturidade da inovação e o potencial futuro das tecnologias.',
+              },
+              {
+                kind: 'step-flow',
+                title: 'As 5 fases do Hype Cycle',
+                steps: [
+                  { number: 1, title: 'Gatilho Tecnológico', description: 'Nova tecnologia surge. Primeiras provas de conceito geram {{interesse}} da mídia e investidores.' },
+                  { number: 2, title: 'Pico de Expectativas Infladas', description: 'Publicidade gera entusiasmo excessivo. Expectativas {{irrealistas}}. Muitas startups surgem.' },
+                  { number: 3, title: 'Vale da Desilusão', description: 'Implementações falham. Interesse diminui. Empresas mais fracas {{morrem}}. Mídia perde interesse.' },
+                  { number: 4, title: 'Encosta da Iluminação', description: 'Casos de uso reais começam a funcionar. Benefícios ficam mais {{claros}} e práticos.' },
+                  { number: 5, title: 'Platô de Produtividade', description: 'Tecnologia madura, amplamente adotada. Critérios de viabilidade {{comprovados}}. Mercado consolidado.' },
+                ],
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'TRL e Hype Cycle medem maturidade de formas diferentes. Classifique.',
+              compare: {
+                columnHeaders: ['TRL', 'Hype Cycle'],
+                rows: [
+                  { label: 'Origem', values: ['NASA (1974)', 'Gartner (2018)'] },
+                  { label: 'Mede', values: ['Maturidade técnica', 'Maturidade de mercado'] },
+                  { label: 'Uso', values: ['Decisão de investimento', 'Expectativa vs realidade'] },
+                ],
+              },
+              drag: {
+                instruction: 'Em qual fase do Hype Cycle está cada tecnologia (2025)?',
+                zones: [
+                  { id: 'pico', label: 'Pico de Expectativas' },
+                  { id: 'vale', label: 'Vale da Desilusão' },
+                  { id: 'plato', label: 'Platô de Produtividade' },
+                ],
+                items: [
+                  { id: 'genai', label: 'IA Generativa (ChatGPT, Claude)', correctZone: 'pico', correctFeedback: 'Certo. Expectativas altíssimas, ROI real ainda incerto.', wrongFeedback: 'IA generativa está no pico — muito hype, pouco ROI comprovado.' },
+                  { id: 'block', label: 'Blockchain/Crypto', correctZone: 'vale', correctFeedback: 'Certo. Após boom de 2021, agora busca casos de uso reais.', wrongFeedback: 'Blockchain passou do hype — está no vale buscando aplicações reais.' },
+                  { id: 'cloud', label: 'Cloud Computing', correctZone: 'plato', correctFeedback: 'Certo. Madura, amplamente adotada, critérios claros.', wrongFeedback: 'Cloud já é madura e produtiva — platô.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Cultura de inovação tem duas dimensões: {{interna}} (valores, liderança, clima) e {{externa}} (profissionais, patentes, ecossistema). TRL mede maturidade técnica. Hype Cycle mede expectativa de mercado. Sem cultura, as melhores ferramentas viram burocracia.',
+              keyInsights: [
+                'Liderança inovadora não é centralizadora. "O chefe tem ideias e nós executamos" = {{dependência}} perigosa.',
+                'TRL (NASA, 1974): 9 níveis de maturidade. Quanto mais recente, mais {{incerteza}} e risco.',
+                'Hype Cycle: toda tecnologia passa por expectativa inflada → desilusão → {{produtividade real}}.',
+              ],
+            },
+          },
+
+],
       },
       {
         id: 'M1-1',
