@@ -601,147 +601,158 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             opening: {
               leadText: 'Pensamento criativo é a capacidade cognitiva de gerar ideias, soluções ou conexões que são simultaneamente {originais e úteis}. Diferente do senso comum, criatividade não é um dom exclusivo de artistas — é uma competência treinável, mensurável e essencial para a sobrevivência empresarial.',
             },
-            body: [
+            body: 
               {
                 kind: 'paragraph',
-                text: 'Pensamento criativo é a capacidade cognitiva de gerar ideias, soluções ou conexões que são simultaneamente originais e úteis. Diferente do senso comum, criatividade não é um "dom" exclusivo de artistas — é uma competência treinável, mensurável e essencial para a sobrevivência empresarial no século XXI.',
+                text: 'Pensamento criativo é a capacidade cognitiva de gerar ideias, soluções ou conexões que são simultaneamente originais e úteis. Diferente do senso comum, criatividade não é um "dom" exclusivo de artistas — é uma competência {{treinável}}, mensurável e essencial para a sobrevivência empresarial.',
               },
               {
                 kind: 'paragraph',
-                text: '**A Neurociência da Criatividade:**\nPesquisas com fMRI (ressonância magnética funcional) revelam que a criatividade não reside em um hemisfério específico. O neurocientista {{Rex Jung}} (Universidade do Novo México) demonstrou que o processo criativo envolve três redes cerebrais simultâneas:\n— **{{Default Mode Network}} (DMN):** ativa durante devaneios e associações livres — é a rede da imaginação\n— **{{Executive Control Network}} (ECN):** avalia, refina e seleciona ideias — é o "editor interno"\n— **{{Salience Network}} (SN):** alterna entre DMN e ECN, detectando quando uma ideia merece atenção',
-              },
-              {
-                kind: 'paragraph',
-                text: 'O insight criativo (momento "eureka") ocorre quando a Salience Network detecta uma conexão inesperada gerada pela DMN e a passa para validação pela ECN. Isso explica por que muitas ideias brilhantes surgem no chuveiro ou durante caminhadas — momentos em que a DMN opera livremente.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**O que define uma pessoa criativa?**\nA criatividade é uma característica que reconhecemos em algumas pessoas e não reconhecemos em outras. Podemos dizer que a "criatividade" de alguém é a soma de vários fatores:\n— Curiosidade\n— Capacidade de ver as coisas sob um ângulo inusitado\n— Perseverança\n— Autoconfiança\n— Humildade para perceber os próprios limites e pedir ajuda\n— Capacidade de perceber que uma ideia nova pode ser útil',
-              },
-              {
-                kind: 'paragraph',
-                text: 'As características que definem a criatividade podem ser treinadas. Em outras palavras, criatividade é algo que pode ser aprendido.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Os 4 Ps da Criatividade ({{Mel Rhodes}}, 1961):**\nAs quatro dimensões da criatividade também são chamadas de quatro Ps da criatividade, porque as palavras escolhidas por Rhodes em inglês foram: Person, Process, Product e Press (pressão do ambiente).\n— **Person:** traços cognitivos e de personalidade (abertura a experiências, tolerância à ambiguidade)\n— **Process:** etapas do pensamento criativo (preparação, incubação, iluminação, verificação — modelo de Wallas)\n— **Product:** o resultado tangível que pode ser avaliado por originalidade e utilidade\n— **Press:** o ambiente que facilita ou bloqueia a criatividade (cultura organizacional, pressão, recursos)',
+                text: 'Pesquisas com fMRI (ressonância magnética funcional) revelam que a criatividade não reside em um hemisfério específico. O neurocientista Rex Jung (Universidade do Novo México) demonstrou que o processo criativo envolve três redes cerebrais simultâneas que trabalham em {{colaboração}}.',
               },
               {
                 kind: 'pillar-grid',
-                title: 'Os 4 Ps da Criatividade (Rhodes, 1961)',
+                title: '3 redes cerebrais da criatividade (Rex Jung, 2013)',
                 pillars: [
-                  { icon: '🧠', title: 'Person', description: 'Traços cognitivos e de personalidade: abertura a experiências, {{tolerância à ambiguidade}}, curiosidade, perseverança.' },
-                  { icon: '⚙️', title: 'Process', description: 'Etapas do pensamento criativo: preparação, incubação, iluminação, verificação (modelo de {{Wallas}}, 1926).' },
-                  { icon: '📦', title: 'Product', description: 'O resultado tangível que pode ser avaliado por {{originalidade}} e utilidade. Sem produto, criatividade é devaneio.' },
-                  { icon: '🌍', title: 'Press', description: 'O ambiente que facilita ou bloqueia: cultura organizacional, {{pressão}}, recursos, liberdade para errar.' },
+                  { icon: '💭', title: 'DMN — Default Mode', description: 'Ativa durante devaneios e associações livres. É a rede da {{imaginação}} — gera conexões inesperadas quando a mente vagueia.' },
+                  { icon: '📋', title: 'ECN — Executive Control', description: 'Avalia, refina e seleciona ideias. É o {{editor interno}} que filtra o que a DMN produz.' },
+                  { icon: '⚡', title: 'SN — Salience Network', description: 'Alterna entre DMN e ECN. Detecta quando uma ideia merece atenção — é o {{detector de eureka}}.' },
                 ],
               },
               {
                 kind: 'paragraph',
-                text: '**Mitos que Precisam Morrer:**\n— "Criatividade é inata" — FALSO. Estudos longitudinais de {{George Land}} (NASA) mostraram que 98% das crianças de 5 anos são "gênios criativos", mas apenas 2% dos adultos mantêm esse nível. A criatividade é desaprendida, não ausente.\n— "Brainstorming sempre funciona" — PARCIALMENTE FALSO. Sem estrutura adequada, grupos produzem menos e piores ideias que indivíduos trabalhando sozinhos ({{Diehl & Stroebe}}, 1987).\n— "Drogas e álcool aumentam criatividade" — FALSO. Podem reduzir inibição temporariamente, mas comprometem a rede ECN necessária para refinar ideias.\n— "Pressão mata criatividade" — PARCIALMENTE VERDADEIRO. {{Teresa Amabile}} (Harvard) mostrou que pressão moderada com propósito claro pode aumentar criatividade, mas pressão por controle a destrói.',
+                text: 'O insight criativo (momento "eureka") ocorre quando a Salience Network detecta uma conexão inesperada gerada pela DMN e a passa para validação pela ECN. Isso explica por que muitas ideias brilhantes surgem no chuveiro ou durante caminhadas — momentos em que a DMN opera {{livremente}}.',
               },
               {
-                kind: 'paragraph',
-                text: '**Criatividade no Brasil — Cases que Inspiram:**\n— Havaianas: de chinelo de borracha de R$ 2 a produto de moda global vendido em 100+ países. A mesma base técnica, reinventada por design, posicionamento e co-branding (ex: coleções com Disney, artistas). Criatividade aplicada ao marketing, não ao produto.\n— Nubank: numa indústria dominada por 5 bancos com décadas de tradição, um grupo de 8 pessoas em um apartamento em São Paulo reimaginou a experiência bancária. A criatividade não foi tecnológica (a tecnologia já existia) — foi no modelo e na experiência.\n— Embraer: compete com Boeing e Airbus criando aviões para nichos que as gigantes ignoram. Criatividade estratégica: não tentar ser maior, mas ser melhor no segmento certo.',
+                kind: 'pillar-grid',
+                title: 'O que define uma pessoa criativa',
+                pillars: [
+                  { icon: '🔍', title: 'Curiosidade', description: 'Interesse genuíno por como as coisas funcionam e por que são como são.' },
+                  { icon: '🔄', title: 'Ângulo inusitado', description: 'Capacidade de ver as coisas de forma que outros {{não veem}}.' },
+                  { icon: '💪', title: 'Perseverança', description: 'Não desistir na primeira dificuldade. O processo criativo é {{lento e trabalhoso}}.' },
+                  { icon: '🤝', title: 'Humildade', description: 'Perceber os próprios limites e pedir ajuda. Criatividade raramente é {{solo}}.' },
+                ],
               },
               {
-                kind: 'paragraph',
-                text: '**Exercício prático — Ative sua criatividade em 5 minutos:**\nPegue o produto/serviço principal da sua empresa e responda:\n1. O que aconteceria se custasse R$ 0? (força repensar o modelo)\n2. O que aconteceria se fosse 10x mais caro? (força repensar o valor)\n3. O que aconteceria se uma criança de 10 anos tivesse que usá-lo? (força simplificação)\nEssas 3 perguntas ativam as 3 redes cerebrais (DMN, ECN, SN) simultaneamente.',
-              },
-              {
-                kind: 'paragraph',
-                text: '',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Um dos primeiros a elaborar testes no campo da criatividade foi o norte-americano {{Joy Paul Guilford}}, considerado o mentor do estudo científico da criatividade. Em 1950, durante um discurso para a Associação Norte-Americana de Psicologia, ele chamou a atenção dos colegas para a necessidade de pesquisar o assunto.',
-              },
-              {
-                kind: 'paragraph',
-                text: ' Em 1967, Guilford criou um conceito decisivo: a diferenciação entre {{pensamento convergente}} e {{pensamento divergente}}.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Pensamento Convergente** é aquele que, por meio de um raciocínio analítico, leva a uma única solução lógica para determinado problema. O pensamento convergente parte de muitos pontos para chegar a um só destino.',
+                kind: 'pillar-grid',
+                title: 'Os 4 Ps da Criatividade (Mel Rhodes, 1961)',
+                pillars: [
+                  { icon: '🧠', title: 'Person', description: 'Traços cognitivos e de personalidade: abertura a experiências, {{tolerância à ambiguidade}}.' },
+                  { icon: '⚙️', title: 'Process', description: 'Etapas do pensamento criativo: preparação, incubação, iluminação, verificação ({{Wallas}}, 1926).' },
+                  { icon: '📦', title: 'Product', description: 'O resultado tangível avaliado por {{originalidade}} e utilidade. Sem produto, criatividade é devaneio.' },
+                  { icon: '🌍', title: 'Press', description: 'O ambiente que facilita ou bloqueia: cultura, {{pressão}}, recursos, liberdade para errar.' },
+                ],
               },
               {
                 kind: 'heading',
-                text: 'Pensamento Divergente',
+                text: 'Mitos que precisam morrer',
               },
               {
-                kind: 'paragraph',
-                text: 'É importante lembrar que o pensamento divergente não é "melhor" do que o convergente. Os dois são importantes e se retroalimentam. Quanto mais a pessoa se informar e desenvolver sua capacidade lógico-analítica, fortalecendo seu pensamento convergente, mais estará apta a ter, também, momentos de pensamento divergente.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Pensamento Divergente — As 4 Métricas de Guilford:**\nGuilford identificou quatro métricas para avaliar a capacidade divergente:\n— **Fluência:** quantidade de ideias geradas (volume bruto)\n— **Flexibilidade:** variedade de categorias das ideias (amplitude)\n— **Originalidade:** raridade estatística das respostas (unicidade)\n— **Elaboração:** nível de detalhe e desenvolvimento de cada ideia (profundidade)',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Exemplo corporativo: quando a Amazon perguntou "como podemos entregar mais rápido?", o pensamento divergente gerou desde drones até lockers, passando por parcerias com motoristas de aplicativo — volume e variedade.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Pensamento Convergente:**\nÉ a capacidade de avaliar, filtrar e selecionar a melhor solução entre muitas. Usa critérios como viabilidade, custo, impacto e alinhamento estratégico. Sem convergência, o pensamento divergente produz caos.',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Exemplo: após gerar 200+ ideias de entrega, a Amazon convergiu para Amazon Prime (velocidade), Amazon Locker (conveniência) e Amazon Go (eliminação de filas) — três soluções que atendiam critérios de escala e margem.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**O Modelo Diamante Duplo (Design Council UK):**\nVisualiza perfeitamente a alternância divergente-convergente:\n— **Diamante 1 — Descobrir (divergir):** explorar o espaço do problema amplamente\n— **Diamante 1 — Definir (convergir):** sintetizar insights no problema certo a resolver\n— **Diamante 2 — Desenvolver (divergir):** gerar múltiplas soluções possíveis\n— **Diamante 2 — Entregar (convergir):** prototipar, testar e implementar a melhor solução',
-              },
-              {
-                kind: 'paragraph',
-                text: '**O Erro Mais Comum em Empresas:**\nEquipes corporativas tendem a convergir prematuramente — julgam ideias antes de gerar volume suficiente. Estudos da IDEO mostram que as melhores ideias geralmente surgem após a ideia #50. A regra de ouro: separe fisicamente as sessões divergentes das convergentes. Nunca faça ambas na mesma reunião.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Exercício prático — Teste de Usos Alternativos (Guilford):**\nPegue um objeto comum (ex: clipe de papel) e liste 30 usos alternativos em 5 minutos. Depois categorize por: quantos usos gerou (fluência), quantas categorias diferentes (flexibilidade), quantos são estatisticamente raros (originalidade). Esta é uma métrica real de capacidade divergente.',
-              },
-              {
-                kind: 'paragraph',
-                text: '',
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: '"Criatividade é inata"',
+                    period: 'FALSO',
+                    text: 'Estudos longitudinais de {{George Land}} (NASA) mostraram que 98% das crianças de 5 anos são "gênios criativos", mas apenas 2% dos adultos mantêm esse nível. A criatividade é {{desaprendida}}, não ausente.',
+                    caseStudy: {
+                      company: 'NASA / George Land',
+                      year: 1968,
+                      story: 'Teste aplicado a {{1.600 crianças}} de 4-5 anos e repetido ao longo de 15 anos. Resultado: 98% (5 anos) → 30% (10 anos) → 12% (15 anos) → {{2% adultos}}.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '98%', label: 'Crianças de 5 anos (gênios criativos)' },
+                        { value: '2%', label: 'Adultos (mesmo teste)' },
+                        { value: '15 anos', label: 'Duração do estudo' },
+                      ],
+                      insight: 'A criatividade não é adicionada pela educação — é {{removida}} por ela. O sistema premia convergência (resposta certa) e pune divergência (resposta diferente).',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: '"Brainstorming sempre funciona"',
+                    period: 'PARCIALMENTE FALSO',
+                    text: 'Sem estrutura adequada, grupos produzem {{menos}} e piores ideias que indivíduos trabalhando sozinhos. O problema: bloqueio de produção (só um fala por vez), medo de julgamento e free-riding.',
+                    caseStudy: {
+                      company: 'Universidade de Tübingen',
+                      year: 1987,
+                      story: '{{Diehl & Stroebe}} publicaram no Journal of Personality and Social Psychology: grupos sem regras geram menos ideias que a soma dos indivíduos sozinhos. Solução: {{brainwriting}} estruturado.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '-40%', label: 'Produtividade de grupo sem estrutura' },
+                        { value: '3 causas', label: 'Bloqueio, medo, free-riding' },
+                        { value: '6-3-5', label: 'Brainwriting: 108 ideias em 30min' },
+                      ],
+                      insight: 'A solução não é abolir brainstorming — é {{estruturá-lo}}. Brainwriting 6-3-5 elimina os 3 problemas de uma vez.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: '"Pressão mata criatividade"',
+                    period: 'PARCIALMENTE VERDADEIRO',
+                    text: '{{Teresa Amabile}} (Harvard) mostrou que pressão moderada com propósito claro pode aumentar criatividade, mas pressão por {{controle}} a destrói. A diferença: pressão com significado vs pressão com medo.',
+                    caseStudy: {
+                      company: 'Harvard Business School',
+                      year: 1996,
+                      story: 'Amabile estudou diários de {{238 profissionais}} em projetos criativos. Resultado: motivação {{intrínseca}} (significado, autonomia) aumenta criatividade. Recompensas extrínsecas e deadlines apertados a destroem.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '238', label: 'Profissionais estudados' },
+                        { value: '#1', label: 'Motivação intrínseca como driver' },
+                        { value: '1998', label: '"How to Kill Creativity" (HBR)' },
+                      ],
+                      insight: 'A pergunta não é "quanta pressão?" — é "{{que tipo}} de pressão?". Pressão por propósito energiza. Pressão por controle paralisa.',
+                    },
+                  },
+                ],
               },
               {
                 kind: 'heading',
-                text: 'Lado Direito do Cérebro e Criatividade',
+                text: 'Guilford: pensamento divergente vs convergente',
               },
               {
                 kind: 'paragraph',
-                text: 'A teoria de Guilford intrigou os cientistas: se o cérebro era capaz de ter pensamentos convergentes e divergentes, será que esses dois tipos de raciocínio ocorreriam em áreas diferentes do cérebro?',
+                text: 'Joy Paul Guilford, considerado o mentor do estudo científico da criatividade, criou em 1967 um conceito decisivo: a diferenciação entre pensamento convergente (raciocínio analítico que leva a uma solução) e pensamento divergente (que apresenta várias alternativas para o mesmo problema). Os dois são importantes e se {{retroalimentam}}.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'As 4 métricas do pensamento divergente (Guilford, 1967)',
+                pillars: [
+                  { icon: '📊', title: 'Fluência', description: '{{Quantidade}} de ideias geradas. Volume bruto. Amazon: 200+ ideias para "entregar mais rápido".' },
+                  { icon: '🔀', title: 'Flexibilidade', description: '{{Variedade}} de categorias. Amazon: drones, lockers, motoristas de app — categorias diferentes.' },
+                  { icon: '💎', title: 'Originalidade', description: '{{Raridade}} estatística das respostas. As ideias que ninguém mais teve.' },
+                  { icon: '🔬', title: 'Elaboração', description: 'Nível de {{detalhe}} e desenvolvimento. Não basta a ideia — precisa de corpo.' },
+                ],
               },
               {
                 kind: 'paragraph',
-                text: '{{Roger Sperry}} (Nobel de Medicina, 1981) descobriu que cada hemisfério cerebral se especializa em tarefas distintas:\n— **Hemisfério esquerdo:** tarefas verbais, lógicas e analíticas — acionado quando lemos um jornal ou fazemos uma conta\n— **Hemisfério direito:** elementos não-verbais como expressões faciais, melodias, imagens e percepção espacial — acionado quando indicamos um caminho, apreciamos música ou nos emocionamos',
+                text: 'O erro mais comum em empresas: equipes convergem prematuramente — julgam ideias antes de gerar volume suficiente. Estudos da IDEO mostram que as melhores ideias surgem após a {{ideia #50}}. Regra de ouro: separe fisicamente as sessões divergentes das convergentes. Nunca faça ambas na mesma reunião.',
+              },
+              {
+                kind: 'heading',
+                text: 'Estilos criativos e ambiente organizacional',
               },
               {
                 kind: 'paragraph',
-                text: 'IMPORTANTE: A neurociência moderna superou essa visão simplista. Hoje sabemos que a criatividade envolve AMBOS os hemisférios trabalhando em rede (DMN, ECN, SN). O modelo de Sperry é útil para entender especializações, mas criatividade não é "coisa do lado direito" — é colaboração entre os dois lados.',
+                text: 'Michael Kirton propôs que todas as pessoas são criativas, mas diferem no ESTILO: {{Adaptadores}} preferem melhorar o que existe (inovação incremental). {{Inovadores}} preferem mudar o sistema (inovação radical). Nenhum estilo é melhor — equipes eficazes precisam de ambos.',
               },
               {
                 kind: 'paragraph',
-                text: 'O mais antigo modelo do processo criativo, de {{Graham Wallas}} (preparação, incubação, iluminação e verificação',
-              },
-              {
-                kind: 'paragraph',
-                text: '), é útil porém simplificado demais. Na prática, o processo criativo tem 6 etapas que se retroalimentam:',
-              },
-              {
-                kind: 'paragraph',
-                text: '**1ª Etapa — Reconhecimento de Insights**\nRelacionada à habilidade de análise, abertura a novas ideias e sensibilidade para problemas. Reconhecer insights significa perceber oportunidades de inovar um processo ou resolver um problema por meio de uma nova solução.',
+                text: 'Göran Ekvall (Universidade de Lund, Suécia) identificou 9 condições que influenciam a criatividade das equipes: Desafio, Liberdade, Tempo para pensar, Apoio a ideias, Confiança, Descontração, Conflitos saudáveis, Debates e Disposição para riscos. As dimensões com nota mais baixa são os {{gargalos}} da criatividade — não falta de talento, falta de ambiente.',
               },
               {
                 kind: 'step-flow',
                 title: 'As 6 etapas do processo criativo',
                 steps: [
-                  { number: 1, title: 'Reconhecimento de Insights', description: 'Habilidade de análise, abertura a novas ideias e sensibilidade para problemas. Perceber {{oportunidades}} de inovar.' },
-                  { number: 2, title: 'Geração de Alternativas', description: 'Fluência e flexibilidade (Guilford). Produzir muitas alternativas em categorias distintas. {{Quantidade}} antes de qualidade.' },
-                  { number: 3, title: 'Seleção de Alternativas', description: 'Bom-senso e capacidade de ouvir críticas. Estilo analítico (planejadores, críticos) indica pontos a {{aprimorar}}.' },
-                  { number: 4, title: 'Iteração', description: 'Repetir etapas 2 e 3. O processo criativo é lento e trabalhoso. {{Não desista}} na primeira rodada.' },
-                  { number: 5, title: 'Transferência ao Mundo Real', description: 'Nasce o produto: mercadoria, serviço, estratégia, processo ou nova maneira de ver as coisas.' },
-                  { number: 6, title: 'Aprendizado', description: 'O processo criativo {{nunca acaba}}. Se acabou, é porque o produto não interessa mais. Recomeça em busca de aperfeiçoamentos.' },
+                  { number: 1, title: 'Reconhecimento de Insights', description: 'Perceber oportunidades. Mantenha um "caderno de insights" — anote toda vez que pensar "isso poderia ser {{melhor}}".' },
+                  { number: 2, title: 'Geração de Alternativas', description: 'Fluência e flexibilidade. Produzir muitas alternativas em categorias distintas. {{Quantidade}} antes de qualidade.' },
+                  { number: 3, title: 'Seleção de Alternativas', description: 'Bom-senso e crítica construtiva. Pessoas analíticas indicam pontos a {{aprimorar}}.' },
+                  { number: 4, title: 'Iteração', description: 'Repetir etapas 2 e 3. O processo é {{lento e trabalhoso}}. Não desista na primeira rodada.' },
+                  { number: 5, title: 'Transferência ao Mundo Real', description: 'Nasce o produto: mercadoria, serviço, estratégia ou nova maneira de ver as coisas.' },
+                  { number: 6, title: 'Aprendizado', description: 'O processo {{nunca acaba}}. Recomeça em busca de aperfeiçoamentos.' },
                 ],
               },
               {
@@ -751,94 +762,62 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                     index: 1,
                     title: 'Criatividade de Produto',
                     period: 'Reinventar o que se vende',
-                    text: 'A mesma base técnica, reinventada por design, posicionamento e co-branding. Criatividade aplicada ao {{marketing}}, não ao produto em si. Prova que inovar não exige tecnologia nova — exige olhar novo.',
+                    text: 'A mesma base técnica, reinventada por design e posicionamento. Criatividade aplicada ao {{marketing}}, não ao produto em si.',
                     caseStudy: {
                       company: 'Havaianas',
                       year: 1994,
-                      story: 'De chinelo de borracha de {{R$ 2}} a produto de moda global vendido em {{100+ países}}. Coleções com Disney e artistas. O produto é o mesmo desde 1962 — a criatividade foi no posicionamento.',
+                      story: 'De chinelo de {{R$ 2}} a produto global em {{100+ países}}. O produto é o mesmo desde 1962 — a criatividade foi no posicionamento.',
                     },
                     deepDive: {
                       keyNumbers: [
-                        { value: 'R$ 2 → R$ 80', label: 'Preço unitário (1994 vs 2024)' },
-                        { value: '100+', label: 'Países de venda' },
-                        { value: '1962', label: 'Produto base inalterado' },
+                        { value: 'R$ 2 → R$ 80', label: 'Preço (1994 vs 2024)' },
+                        { value: '100+', label: 'Países' },
+                        { value: '1962', label: 'Produto inalterado' },
                       ],
-                      insight: 'Inovação de produto não exige mudar o produto. Exige mudar como o mercado {{percebe}} o produto. Havaianas mudou percepção — não borracha.',
+                      insight: 'Inovação de produto não exige mudar o produto — exige mudar como o mercado {{percebe}} o produto.',
                     },
                   },
                   {
                     index: 2,
                     title: 'Criatividade de Modelo',
-                    period: 'Reinventar como se captura valor',
-                    text: 'Numa indústria dominada por 5 bancos com décadas de tradição, um grupo de 8 pessoas reimaginou a experiência bancária. A criatividade não foi tecnológica — a tecnologia já existia. Foi no {{modelo}} e na experiência.',
+                    period: 'Reinventar como captura valor',
+                    text: '8 pessoas reimaginaram a experiência bancária. A criatividade não foi tecnológica — foi no {{modelo}} e na experiência.',
                     caseStudy: {
                       company: 'Nubank',
                       year: 2013,
-                      story: '{{8 pessoas}} num apartamento em São Paulo. Sem agência, sem tarifa, sem fila. Hoje: {{80 milhões}} de clientes, maior banco digital do mundo fora da China. CAC de R$ 30-50 vs R$ 800+ bancário.',
+                      story: '{{80 milhões}} de clientes. CAC de R$ 30-50 vs R$ 800+ bancário. Maior banco digital do mundo fora da China.',
                     },
                     deepDive: {
                       keyNumbers: [
-                        { value: '80M', label: 'Clientes (2023)' },
-                        { value: 'R$ 30-50', label: 'CAC vs R$ 800+ bancário' },
+                        { value: '80M', label: 'Clientes' },
+                        { value: 'R$ 30-50', label: 'CAC' },
                         { value: '8', label: 'Funcionários iniciais' },
                       ],
-                      insight: 'Christensen (Harvard, 1997): inovação disruptiva começa atendendo quem ninguém atende. Nubank começou pelos {{excluídos bancários}} — simples e barato, depois dominou.',
+                      insight: 'Christensen: inovação disruptiva começa atendendo quem ninguém atende — os {{excluídos}}.',
                     },
                   },
                   {
                     index: 3,
                     title: 'Criatividade Estratégica',
                     period: 'Competir onde ninguém compete',
-                    text: 'Não tentou ser maior que Boeing e Airbus — criou aviões para {{nichos}} que as gigantes ignoravam. Criatividade estratégica: não tentar ser maior, mas ser melhor no segmento certo.',
+                    text: 'Não tentou ser maior — criou aviões para {{nichos}} que as gigantes ignoravam.',
                     caseStudy: {
                       company: 'Embraer',
                       year: 2000,
-                      story: 'Jatos regionais de {{70-130 assentos}} — faixa que Boeing/Airbus consideravam pequena demais. Resultado: líder mundial em aviação regional com {{receita de US$ 5+ bilhões}}. Prova que criatividade pode ser estratégica, não só artística.',
+                      story: 'Jatos de {{70-130 assentos}}. Líder mundial aviação regional. Receita {{US$ 5B+}}.',
                     },
                     deepDive: {
                       keyNumbers: [
                         { value: 'US$ 5B+', label: 'Receita anual' },
-                        { value: '70-130', label: 'Assentos por aeronave' },
-                        { value: '#1', label: 'Líder mundial aviação regional' },
+                        { value: '#1', label: 'Aviação regional' },
+                        { value: '70-130', label: 'Assentos' },
                       ],
-                      quote: {
-                        text: 'The essence of strategy is choosing what not to do.',
-                        author: 'Michael Porter · Harvard · Competitive Strategy 1980',
-                      },
-                      insight: 'Chan Kim (INSEAD, 2005): Oceano Azul é criar mercado onde não há concorrência. Embraer não competiu no oceano vermelho dos jatos grandes — criou o {{oceano azul}} dos regionais.',
+                      insight: 'Chan Kim (INSEAD): Oceano Azul é criar mercado sem concorrência. Embraer criou o {{oceano azul}} dos regionais.',
                     },
                   },
                 ],
               },
-              {
-                kind: 'paragraph',
-                text: 'Na prática: Mantenha um "caderno de insights" — anote toda vez que pensar "isso poderia ser melhor" ou "por que ninguém faz isso?" Esses são sinais de oportunidade criativa.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**2ª Etapa — Geração de Alternativas**\nAqui entram em jogo a fluência e a flexibilidade (métricas de Guilford). O ideal é produzir muitas alternativas, em várias categorias distintas. Quantidade antes de qualidade.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**3ª Etapa — Seleção de Alternativas**\nBom-senso e capacidade de ouvir críticas são fundamentais. Pessoas com estilo cognitivo analítico (planejadores, críticos, modificadores no modelo Creatrix) podem indicar pontos que precisam ser aprimorados ou sintetizar pontos positivos de diferentes projetos.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**4ª Etapa — Repetição das Etapas 2 e 3**\nA grande falha dos modelos lineares é que partem do pressuposto irreal de que basta uma rodada de geração e seleção de ideias para encontrar a solução adequada. O processo criativo é normalmente lento e trabalhoso. Não desista na primeira rodada.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**5ª Etapa — Transferência para o Mundo Real**\nÉ aqui que nasce o produto do processo criativo. Pode ser literalmente um produto (mercadoria), um serviço, uma nova estratégia, um novo processo, uma nova maneira de ver as coisas — o produto pode assumir inúmeras formas, dependendo do que se buscava inicialmente.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**6ª Etapa — Aprendizado do Processo**\nPor mais brilhante que seja o produto criativo, ele nunca representará o fim do processo. O processo criativo não acaba nunca. Se acabar, é porque o produto não interessa mais. Do contrário, recomeça-se todo o processo em busca de aperfeiçoamentos.',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Dica: O ciclo criativo completo (6 etapas) pode levar de 1 dia a 1 ano, dependendo da complexidade. O erro mais comum é pular da etapa 1 direto para a etapa 5 — ter uma ideia e executar sem gerar alternativas, selecionar ou iterar. Isso não é criatividade — é impulsividade.',
-              },
-            ],
+],
             application: {
               kind: 'compare-and-drag',
               intro: 'Dois tipos de pensamento se complementam no processo criativo. Veja a diferença — depois classifique ações reais.',
@@ -885,181 +864,23 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             opening: {
               leadText: 'Conhecer a teoria da criatividade sem dominar os métodos é como saber que precisa inovar mas não saber {como começar}. Os três métodos abaixo cobrem 80% dos cenários de inovação em empresas — de startups a multinacionais.',
             },
-            body: [
+            body: 
               {
                 kind: 'paragraph',
-                text: '{{Design Thinking}} é uma abordagem de resolução de problemas centrada no ser humano, popularizada pela IDEO e pela d.school de Stanford. Não é um processo linear — é iterativo, messy e profundamente empático. As 5 fases são:',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Fase 1 — Empatizar:**\nO objetivo não é perguntar ao cliente o que ele quer, mas observar o que ele faz. Técnicas:\n— Entrevistas em profundidade (perguntar "por quê?" 5 vezes — técnica dos 5 Porquês da Toyota)\n— Observação etnográfica (shadowing — seguir o usuário em seu contexto real)\n— Mapa de empatia (o que o usuário diz, pensa, faz e sente)',
-              },
-              {
-                kind: 'pillar-grid',
-                title: 'Design Thinking — 5 fases',
-                pillars: [
-                  { icon: '👁️', title: 'Empatizar', description: 'Observar o usuário em contexto real. Entrevistas, {{shadowing}}, mapa de empatia. Não pergunte o que quer — observe o que faz.' },
-                  { icon: '🎯', title: 'Definir', description: 'Sintetizar observações em POV acionável: "[Usuário] precisa de [Necessidade] porque [{{Insight}}]".' },
-                  { icon: '💡', title: 'Idear', description: 'Geração volumétrica. Regras: adiar julgamento, buscar {{quantidade}}, construir sobre ideias dos outros.' },
-                  { icon: '🔨', title: 'Prototipar', description: 'Versão mais simples possível. {{Rápido, barato, descartável}}. Protótipo de papel, role-playing, Mágico de Oz.' },
-                  { icon: '🧪', title: 'Testar', description: 'Não é validação — é {{aprendizado}}. Observar uso real, iterar. Falhar rápido e barato é o objetivo.' },
-                ],
-              },
-              {
-                kind: 'paragraph',
-                text: 'Caso IDEO: ao redesenhar carrinhos de compras para a ABC Nightline, a equipe passou dias em supermercados observando comportamentos reais — descobriram que idosos têm medo de carrinhos pesados e mães precisam de espaço para crianças. Nenhuma pesquisa quantitativa revelaria isso.',
-              },
-              {
-                kind: 'heading',
-                text: 'Fase 2 — Definir:',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Caso Airbnb: "Viajantes econômicos precisam de experiências autênticas porque hotéis padronizados os fazem sentir como turistas, não como moradores locais." Este POV redirecionou toda a estratégia da empresa — de "alugar quartos baratos" para "pertencer a qualquer lugar".',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Fase 3 — Idear:**\nGeração volumétrica de soluções usando regras de brainstorming da IDEO:\n— Adiar julgamento / Uma conversa por vez / Construir sobre ideias dos outros / Encorajar ideias selvagens / Ser visual / Ficar focado no tópico / Buscar quantidade',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Fase 4 — Prototipar:**\n"Se uma imagem vale mil palavras, um protótipo vale mil reuniões." Protótipos devem ser rápidos, baratos e descartáveis.\n— Protótipos de papel (wireframes desenhados à mão)\n— Protótipos de experiência (role-playing do serviço)\n— Protótipos de Mágico de Oz (simular funcionalidade manualmente)',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Caso Natura: antes de lançar a linha Ekos com ingredientes da Amazônia, a Natura criou protótipos de embalagem usando materiais reciclados e testou com consumidores em lojas-conceito. Os feedbacks mudaram completamente o design final — a textura da embalagem importava mais que o visual.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Fase 5 — Testar:**\nNão é validação — é aprendizado. O objetivo é falhar rápido e barato.\n— Teste A/B com protótipos diferentes\n— Observação direta do uso (não perguntar — observar)\n— Iterar com base em dados reais, não opiniões',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Design Thinking para PME — Versão Simplificada (3 dias):**\nVocê não precisa de consultoria de R$ 200k para aplicar DT. Versão prática:\n— Dia 1 (Empatia): Ligue para 5 clientes e pergunte "qual foi a última vez que você ficou frustrado com nosso produto/serviço?". Anote literalmente o que disseram.\n— Dia 2 (Ideação): Reúna sua equipe (mesmo que sejam 3 pessoas) por 1h. Apresente as frustrações reais. Usem brainwriting: cada um escreve 5 soluções em silêncio, depois discutem.\n— Dia 3 (Protótipo): Escolham a melhor ideia. Criem a versão mais simples possível (pode ser um mock-up no Canva, um fluxo no papel, ou simplesmente mudar o processo manualmente). Testem com 3 clientes na mesma semana.',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Custo: R$ 0. Tempo: 3 dias. Resultado: uma melhoria real baseada em dados reais, não em "achismo" da diretoria.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Design Thinking NÃO é ideal para:**\n— Problemas com solução técnica conhecida (use engenharia)\n— Otimizações incrementais de processo (use Lean/Six Sigma)\n— Situações com zero acesso ao usuário final',
-              },
-              {
-                kind: 'paragraph',
-                text: '',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Alex Osborn criou o brainstorming em 1953 com uma premissa simples: grupos podem gerar mais e melhores ideias que indivíduos, SE as regras certas forem seguidas. O problema é que 90% das sessões corporativas de brainstorming violam essas regras.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**As 4 Regras Originais de Osborn:**\n1. **Sem julgamento:** nenhuma ideia é criticada durante a geração (nem com linguagem corporal)\n2. **Quantidade sobre qualidade:** buscar o maior volume possível — a qualidade vem depois\n3. **Ideias selvagens são bem-vindas:** quanto mais ousada, melhor — é mais fácil domesticar uma ideia selvagem do que tornar uma ideia medíocre em brilhante\n4. **Construir sobre ideias dos outros:** usar "sim, e..." em vez de "sim, mas..."',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Por que Brainstorming Tradicional Falha (e como corrigir):**\nPesquisas de Diehl & Stroebe (1987) e Mullen, Johnson & Salas (1991) mostraram que grupos de brainstorming livre produzem MENOS ideias que o mesmo número de indivíduos trabalhando separadamente. Os culpados:',
-              },
-              {
-                kind: 'paragraph',
-                text: '— **Bloqueio de produção:** só uma pessoa fala por vez, as outras perdem ideias enquanto esperam\n— **Apreensão social:** medo de julgamento, mesmo quando a regra diz o contrário\n— **Loafing social:** alguns participantes "pegam carona" no esforço dos outros\n— **Ancoragem:** as primeiras ideias ancoram o grupo em uma direção',
-              },
-              {
-                kind: 'heading',
-                text: 'Variantes Estruturadas que Funcionam:',
-              },
-              {
-                kind: 'paragraph',
-                text: '1. **Brainwriting (6-3-5):** 6 pessoas, 3 ideias cada, 5 minutos por rodada. Cada um escreve em silêncio e passa a folha. Elimina bloqueio de produção e apreensão social. Gera 108 ideias em 30 minutos.',
-              },
-              {
-                kind: 'paragraph',
-                text: '2. **Brainstorming Reverso:** em vez de "como resolver X?", perguntar "como piorar X ao máximo?". Depois inverter cada resposta. Extremamente eficaz para problemas onde o grupo está "travado".',
-              },
-              {
-                kind: 'paragraph',
-                text: '3. **Starbursting:** em vez de gerar soluções, gerar perguntas (Quem? O quê? Quando? Onde? Por quê? Como?). Ideal para fase inicial de exploração.',
-              },
-              {
-                kind: 'paragraph',
-                text: '4. **Round Robin:** cada pessoa contribui uma ideia por vez em rodadas sequenciais. Garante participação igualitária.',
-              },
-              {
-                kind: 'paragraph',
-                text: '5. **{{SCAMPER}} Dirigido:** usar os 7 operadores SCAMPER como prompts sequenciais para forçar perspectivas diferentes.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Quando NÃO Usar Brainstorming:**\n— Problemas com solução técnica conhecida (não precisa de ideação)\n— Grupos com hierarquia forte não gerenciada (o chefe fala primeiro e ancora todos)\n— Sem facilitador treinado (vira reunião caótica)\n— Para decisões que exigem análise quantitativa (use dados, não ideias)\n— Com mais de 8 pessoas (subdivida em grupos menores)',
-              },
-              {
-                kind: 'paragraph',
-                text: 'SCAMPER é um acrônimo criado por Bob Eberle (1971), baseado nas listas de verificação de Alex Osborn. É a ferramenta mais sistemática para inovação incremental — força o cérebro a examinar um produto, serviço ou processo sob 7 ângulos diferentes.',
-              },
-              {
-                kind: 'pillar-grid',
-                title: 'SCAMPER — 7 operadores',
-                pillars: [
-                  { icon: '🔄', title: 'S — Substituir', description: 'Material, pessoa, processo, componente. O que pode ser {{trocado}} por algo melhor?' },
-                  { icon: '🤝', title: 'C — Combinar', description: 'Funções, ideias, produtos. O que pode ser {{unido}} para criar algo novo?' },
-                  { icon: '🔧', title: 'A — Adaptar', description: 'O que de outro setor/contexto pode ser {{adaptado}} ao seu problema?' },
-                  { icon: '📐', title: 'M — Modificar', description: 'O que acontece se {{aumentar, diminuir, mudar}} forma, cor, significado?' },
-                  { icon: '♻️', title: 'P — Outros usos', description: 'Que {{outro uso}} esse produto/processo tem que ninguém pensou?' },
-                  { icon: '✂️', title: 'E — Eliminar', description: 'O que pode ser {{removido}} sem perder a função essencial?' },
-                  { icon: '↩️', title: 'R — Reverter', description: 'O que acontece se {{inverter}} a ordem, o fluxo, a hierarquia?' },
-                ],
+                text: 'Design Thinking é uma abordagem de resolução de problemas centrada no ser humano, popularizada pela IDEO e pela d.school de Stanford. Não é um processo linear — é iterativo e profundamente empático. O objetivo não é perguntar ao cliente o que ele quer, mas {{observar o que ele faz}}.',
               },
               {
                 kind: 'phase-group',
                 cards: [
                   {
                     index: 1,
-                    title: 'Design Thinking na Prática',
-                    period: 'Caso Natura',
-                    text: 'Antes de lançar a linha Ekos com ingredientes da Amazônia, a Natura criou protótipos de embalagem usando materiais reciclados e testou com consumidores em lojas-conceito. Os feedbacks mudaram {{completamente}} o design final.',
-                    caseStudy: {
-                      company: 'Natura',
-                      year: 2000,
-                      story: 'Descoberta: a {{textura}} da embalagem importava mais que o visual. Consumidores tocavam antes de comprar. Redesenho baseado em empatia (Fase 1 do DT) evitou erro que teria custado {{milhões}}.',
-                    },
-                    deepDive: {
-                      keyNumbers: [
-                        { value: 'R$ 0', label: 'Custo da pesquisa (lojas próprias)' },
-                        { value: 'Textura > Visual', label: 'Insight principal' },
-                        { value: '100+', label: 'Ingredientes da Amazônia' },
-                      ],
-                      insight: 'Design Thinking para PME em 3 dias: Dia 1 — ligue para 5 clientes e pergunte a última frustração. Dia 2 — equipe gera 5 soluções cada. Dia 3 — protótipo e teste. Custo: {{R$ 0}}.',
-                    },
-                  },
-                  {
-                    index: 2,
-                    title: 'SCAMPER na Prática',
-                    period: 'Caso iPhone',
-                    text: 'Steve Jobs não inventou o telefone, o music player ou o navegador. Ele {{combinou}} os três (C), {{eliminou}} o teclado físico (E), {{substituiu}} botões por touchscreen (S) e {{reorganizou}} a loja de apps (R).',
-                    caseStudy: {
-                      company: 'Apple',
-                      year: 2007,
-                      story: 'Cada mudança isolada era incremental. Juntas, {{redefiniram categoria}}. O iPhone não foi uma invenção — foi SCAMPER aplicado com maestria. Em 2 anos, Nokia perdeu 50% de market share.',
-                    },
-                    deepDive: {
-                      keyNumbers: [
-                        { value: '4 operadores', label: 'SCAMPER usados (C, E, S, R)' },
-                        { value: '-50%', label: 'Market share Nokia em 2 anos' },
-                        { value: '$3.5T', label: 'Valor Apple (2024)' },
-                      ],
-                      insight: 'SCAMPER funciona porque força a pensar {{sistematicamente}} sobre cada aspecto do produto. Não é inspiração — é método.',
-                    },
-                  },
-                  {
-                    index: 3,
-                    title: 'Brainstorming Estruturado na Prática',
-                    period: 'Caso IDEO',
-                    text: 'A IDEO redesenhou o carrinho de supermercado para a ABC Nightline em {{5 dias}}. A equipe passou dias em supermercados observando comportamentos. Geraram centenas de ideias antes de convergir.',
+                    title: 'Fase 1 — Empatizar',
+                    period: 'Observar',
+                    text: 'Técnicas: entrevistas em profundidade (5 Porquês da Toyota), observação etnográfica ({{shadowing}}), mapa de empatia (o que o usuário diz, pensa, faz e sente).',
                     caseStudy: {
                       company: 'IDEO',
                       year: 1999,
-                      story: 'Descobertas: idosos têm medo de carrinhos pesados. Mães precisam de espaço para crianças. Resultado: carrinho modular com cestas removíveis. Nenhuma {{pesquisa quantitativa}} revelaria isso — veio da observação.',
+                      story: 'Redesenhou carrinhos de supermercado passando dias em lojas. Descobertas: idosos têm medo de carrinhos pesados, mães precisam de espaço para crianças. {{Nenhuma pesquisa quantitativa}} revelaria isso.',
                     },
                     deepDive: {
                       keyNumbers: [
@@ -1067,44 +888,181 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                         { value: '200+', label: 'Ideias geradas' },
                         { value: 'Regra #50', label: 'Melhores ideias surgem após a 50ª' },
                       ],
-                      insight: 'Diehl & Stroebe (1987): brainstorming sem estrutura produz MENOS que indivíduos sozinhos. A IDEO usa brainwriting 6-3-5: {{6 pessoas, 3 ideias, 5 rodadas = 108 ideias em 30 min}}.',
+                      insight: 'Empatia não é pesquisa de mercado. É {{observar}} o que as pessoas fazem quando ninguém está olhando.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Fase 2 — Definir',
+                    period: 'Sintetizar',
+                    text: 'Sintetizar observações em POV acionável: "[Usuário] precisa de [Necessidade] porque [{{Insight surpreendente}}]".',
+                    caseStudy: {
+                      company: 'Airbnb',
+                      year: 2009,
+                      story: 'POV: "Viajantes econômicos precisam de experiências {{autênticas}} porque hotéis os fazem sentir turistas, não moradores." Redirecionou de "quartos baratos" para "pertencer a qualquer lugar".',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '1 frase', label: 'Formato do POV' },
+                        { value: 'Pertencer', label: 'Novo posicionamento Airbnb' },
+                        { value: '$100B+', label: 'Valor Airbnb (2024)' },
+                      ],
+                      insight: 'Um bom POV muda a direção da empresa inteira. Um ruim desperdiça {{meses}} de ideação.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Fase 3 — Idear',
+                    period: 'Divergir',
+                    text: 'Geração volumétrica seguindo regras da IDEO: adiar julgamento, uma conversa por vez, construir sobre ideias dos outros, encorajar ideias selvagens, ser visual, buscar {{quantidade}}.',
+                    caseStudy: {
+                      company: 'Google',
+                      year: 2004,
+                      story: 'Gmail nasceu do "{{20% time}}" — tempo livre para ideias selvagens. Funcionários podiam trabalhar em projetos pessoais 1 dia por semana. Resultado: Gmail, Google Maps, AdSense.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '20%', label: 'Tempo livre Google' },
+                        { value: 'Gmail', label: 'Nasceu de ideação livre' },
+                        { value: '$350B+', label: 'Receita AdSense (acumulada)' },
+                      ],
+                      insight: 'Regra IDEO: as melhores ideias surgem após a #50. Se você julgou antes, {{matou o potencial}}.',
+                    },
+                  },
+                  {
+                    index: 4,
+                    title: 'Fase 4 — Prototipar',
+                    period: 'Construir',
+                    text: '"Se uma imagem vale mil palavras, um protótipo vale {{mil reuniões}}." Deve ser rápido, barato e descartável.',
+                    caseStudy: {
+                      company: 'Natura',
+                      year: 2000,
+                      story: 'Protótipos de embalagem Ekos com materiais reciclados testados em lojas. Descoberta: a {{textura}} importava mais que o visual. Redesenho evitou erro de milhões.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 0', label: 'Custo da pesquisa (lojas próprias)' },
+                        { value: 'Textura > Visual', label: 'Insight principal' },
+                        { value: '5 níveis', label: 'Fidelidade de protótipo' },
+                      ],
+                      insight: 'Protótipo de papel, role-playing, Mágico de Oz (simular funcionalidade manualmente). Não precisa de {{código}}.',
+                    },
+                  },
+                  {
+                    index: 5,
+                    title: 'Fase 5 — Testar',
+                    period: 'Aprender',
+                    text: 'Não é validação — é {{aprendizado}}. Observar uso real, iterar. Falhar rápido e barato é o objetivo.',
+                    caseStudy: {
+                      company: 'Dropbox',
+                      year: 2008,
+                      story: 'Validou o produto inteiro com um {{vídeo de demonstração}} antes de construir a tecnologia. O vídeo gerou 75.000 sign-ups overnight. Sem uma linha de código.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '75.000', label: 'Sign-ups do vídeo (overnight)' },
+                        { value: '0', label: 'Linhas de código no teste' },
+                        { value: '$12B', label: 'Valor Dropbox no IPO' },
+                      ],
+                      insight: 'Nielsen: {{5 usuários}} revelam 85% dos problemas de usabilidade. Não precisa de centenas.',
                     },
                   },
                 ],
               },
               {
                 kind: 'paragraph',
-                text: '**S — Substituir (Substitute):**\nO que pode ser substituído? Materiais, pessoas, processos, ingredientes, local, tecnologia.\n— Exemplo: a Beyond Meat substituiu proteína animal por proteína vegetal — mesmo produto (hambúrguer), ingrediente diferente, mercado bilionário.\n— Pergunta-chave: "E se eu substituísse [componente X] por [alternativa Y]?"',
+                text: '**DT para PME em 3 dias:** Dia 1 (Empatia) — ligue para 5 clientes e pergunte a última frustração. Dia 2 (Ideação) — equipe gera soluções via brainwriting. Dia 3 (Protótipo) — versão mais simples possível, teste com 3 clientes. Custo: {{R$ 0}}.',
+              },
+              {
+                kind: 'heading',
+                text: 'Brainstorming estruturado',
               },
               {
                 kind: 'paragraph',
-                text: '**C — Combinar (Combine):**\nO que pode ser combinado? Funções, mercados, ideias, materiais.\n— Exemplo: o smartphone combinou telefone + câmera + GPS + player de música + computador. O iPhone não inventou nada — combinou tudo.\n— Pergunta-chave: "E se eu combinasse [função A] com [função B] em um único produto?"',
+                text: 'Alex Osborn criou o brainstorming em 1953 com uma premissa simples: grupos geram mais ideias que indivíduos. Diehl & Stroebe (1987) provaram que isso só funciona COM estrutura. Sem regras, grupos produzem {{menos}} que a soma dos indivíduos sozinhos.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Variantes que funcionam',
+                pillars: [
+                  { icon: '✍️', title: 'Brainwriting 6-3-5', description: '6 pessoas, 3 ideias cada, 5 rodadas de 5 minutos. Cada um escreve em silêncio, passa a folha. {{108 ideias em 30 minutos}}.', metric: { value: '108', label: 'ideias em 30 min' } },
+                  { icon: '🔄', title: 'Round Robin', description: 'Cada participante contribui uma ideia por rodada. Garante que {{todos}} participem igualmente.' },
+                  { icon: '⏱️', title: 'Crazy 8s', description: '8 ideias em 8 minutos. Força {{velocidade}} que supera o filtro interno de autocensura.' },
+                  { icon: '🎲', title: 'Brainstorming Reverso', description: '"Como {{piorar}} o problema?" Depois inverte. Gera insights que o brainstorming direto não alcança.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'SCAMPER — 7 operadores',
               },
               {
                 kind: 'paragraph',
-                text: '**A — Adaptar (Adapt):**\nO que pode ser adaptado de outro contexto? Outro setor, outra cultura, outra época.\n— Exemplo: a Southwest Airlines adaptou o modelo de pit stop da Fórmula 1 para reduzir tempo de solo de aviões de 45 para 15 minutos.\n— Pergunta-chave: "Que solução de [setor X] eu poderia adaptar para meu contexto?"',
+                text: 'SCAMPER é acrônimo criado por Bob Eberle (1971), baseado nas listas de Alex Osborn. É a ferramenta mais prática para inovar sobre algo que {{já existe}}.',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'S — Substituir',
+                    period: 'Trocar componentes',
+                    text: 'O que pode ser substituído? Materiais, pessoas, processos, ingredientes.',
+                    caseStudy: {
+                      company: 'Beyond Meat',
+                      year: 2016,
+                      story: 'Substituiu proteína animal por {{vegetal}} — mesmo produto (hambúrguer), ingrediente diferente, mercado bilionário.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '$10B+', label: 'Mercado plant-based (2024)' },
+                        { value: '1 operador', label: 'S de SCAMPER' },
+                      ],
+                      insight: 'Pergunta-chave: "E se eu substituísse [X] por [Y]?"',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'C — Combinar',
+                    period: 'Unir funções',
+                    text: 'O que pode ser combinado? Funções, mercados, ideias, materiais.',
+                    caseStudy: {
+                      company: 'Apple',
+                      year: 2007,
+                      story: 'iPhone {{combinou}} telefone + câmera + GPS + player + computador. Não inventou nada — combinou tudo.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '5 dispositivos', label: 'Combinados em 1' },
+                        { value: '-50%', label: 'Market share Nokia em 2 anos' },
+                      ],
+                      insight: 'A maioria das inovações é {{combinação}}, não invenção.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'E — Eliminar',
+                    period: 'Remover o desnecessário',
+                    text: 'O que pode ser removido sem perder a função essencial?',
+                    caseStudy: {
+                      company: 'IKEA',
+                      year: 1958,
+                      story: 'Eliminou a {{montagem}} na fábrica — transferiu para o consumidor. Custo -30-50%, criou experiência de "monte seu móvel".',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '-30-50%', label: 'Redução de custo' },
+                        { value: '€45B', label: 'Receita IKEA (2023)' },
+                      ],
+                      insight: 'Eliminar é a forma mais {{subestimada}} de inovação.',
+                    },
+                  },
+                ],
               },
               {
                 kind: 'paragraph',
-                text: '**M — Modificar/Magnificar (Modify/Magnify):**\nO que pode ser ampliado, reduzido, exagerado ou minimizado?\n— Exemplo: o iPad é um iPhone magnificado. Parece simples, mas criou uma categoria inteira (tablets) que gerou US$ 36B em receita para a Apple.\n— Pergunta-chave: "E se eu fizesse isso 10x maior/menor/mais rápido/mais lento?"',
+                text: 'Como usar: defina o produto a inovar → passe por cada operador (7-10 min cada) → gere pelo menos 3 ideias por operador ({{mínimo 21 total}}) → avalie e combine as melhores → prototipe os 2-3 mais promissores.',
               },
-              {
-                kind: 'paragraph',
-                text: '**P — Propor outros usos (Put to other uses):**\nQue outros usos este produto/processo poderia ter?\n— Exemplo: o Bubble Wrap foi inventado como papel de parede texturizado (fracasso). Reposicionado como material de embalagem, virou produto icônico.\n— Pergunta-chave: "Para que mais isso poderia servir? Que outro público se beneficiaria?"',
-              },
-              {
-                kind: 'paragraph',
-                text: '**E — Eliminar (Eliminate):**\nO que pode ser removido, simplificado ou eliminado?\n— Exemplo: a IKEA eliminou a montagem na fábrica — transferiu para o consumidor. Reduziu custo em 30-50%, criou experiência de "construir seu próprio móvel" e eliminou custos logísticos massivos.\n— Pergunta-chave: "O que acontece se eu remover completamente [componente X]?"',
-              },
-              {
-                kind: 'paragraph',
-                text: '**R — Reorganizar/Reverter (Rearrange/Reverse):**\nE se a ordem fosse invertida? E se o processo rodasse ao contrário?\n— Exemplo: a Dell inverteu a cadeia de produção — em vez de fabricar e depois vender, primeiro vendia e depois fabricava sob demanda. Reduziu estoque a quase zero.\n— Pergunta-chave: "E se eu invertesse a ordem de [processo X]? E se o cliente fizesse antes do fornecedor?"',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Como usar SCAMPER na prática:**\n1. Defina claramente o produto/serviço/processo a inovar\n2. Passe por cada operador sequencialmente (7-10 min cada)\n3. Gere pelo menos 3 ideias por operador (mínimo 21 ideias total)\n4. Avalie e combine as melhores ideias em conceitos viáveis\n5. Prototipe os 2-3 conceitos mais promissores',
-              },
-            ],
+],
             application: {
               kind: 'compare-and-drag',
               intro: 'Cada método serve a um tipo de problema. Classifique corretamente.',
@@ -1151,234 +1109,163 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             opening: {
               leadText: 'Design Thinking e SCAMPER resolvem a maioria dos problemas. Mas quando o impasse é profundo, quando as ideias convencionais já se esgotaram, ou quando há {contradição técnica} que parece impossível — ferramentas avançadas entram em jogo.',
             },
-            body: [
+            body: 
               {
                 kind: 'pillar-grid',
                 title: 'Ferramentas avançadas de criatividade',
                 pillars: [
-                  { icon: '🔀', title: 'Pensamento Lateral', description: 'De Bono (1967). Pensar fora do caminho lógico. {{Provocação}}, Analogia, Inversão. 6 Chapéus para trocar perspectiva.' },
-                  { icon: '⚡', title: 'TRIZ', description: 'Altshuller (1946). 40 princípios de {{200.000 patentes}}. Resolve contradições: melhorar A sem piorar B.' },
-                  { icon: '🗺️', title: 'Mapas Mentais', description: 'Buzan (1970s). Ideação visual radial. Conceito central + ramificações. Boeing usa mapas de {{7+ metros}}.' },
-                  { icon: '🔒', title: 'Restrição Criativa', description: 'Limites {{geram}} inovação. Google: melhores interfaces nasceram de restrições de velocidade.' },
+                  { icon: '🔀', title: 'Pensamento Lateral', description: 'De Bono (1967). Pensar fora do caminho lógico. {{Provocação}}, Analogia, Inversão.' },
+                  { icon: '⚡', title: 'TRIZ', description: 'Altshuller (1946). 40 princípios de {{200.000 patentes}}. Resolve contradições técnicas.' },
+                  { icon: '🗺️', title: 'Mapas Mentais', description: 'Buzan (1970s). Ideação visual radial. Boeing usa mapas de {{7+ metros}}.' },
+                  { icon: '🔒', title: 'Restrição Criativa', description: 'Limites {{geram}} inovação. Twitter: 140 caracteres criou linguagem própria.' },
                 ],
               },
               {
-                kind: 'paragraph',
-                text: 'Os conceitos de pensamento convergente e divergente elaborados por Guilford nos anos 1950 foram retomados e desenvolvidos por {{Edward de Bono}} nos anos 1970 e 1980. De Bono, considerado hoje a maior autoridade mundial em criatividade e inovação, criou o conceito de pensamento lateral, em oposição ao pensamento vertical.',
+                kind: 'heading',
+                text: 'Os seis chapéus do pensamento (De Bono, 1985)',
               },
               {
                 kind: 'paragraph',
-                text: '**Pensamento Vertical** é o pensamento lógico, matemático e seletivo que caminha numa única direção predefinida. **{{Pensamento Lateral}}** não se move de modo previsível — busca novas possibilidades e pode até dar "saltos". Enquanto o pensamento vertical leva em conta apenas informações relacionadas ao problema, o lateral considera elementos que pouco ou nada têm a ver com a questão.',
+                text: 'Cada chapéu representa um modo de pensar. A regra: todos usam o MESMO chapéu ao mesmo tempo — elimina conflitos ego-a-ego e permite exploração {{paralela}}.',
               },
               {
-                kind: 'paragraph',
-                text: 'O pensamento vertical cava mais fundo no mesmo buraco; o lateral abre novos buracos.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Os Seis Chapéus do Pensamento:**\nDesenvolvidos em 1985, são a ferramenta mais difundida de De Bono. Cada chapéu representa um modo de pensar. A regra fundamental: todos usam o MESMO chapéu ao mesmo tempo — isso elimina conflitos ego-a-ego e permite exploração paralela.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Chapéu Branco (Fatos):**\nApenas dados, números e informações verificáveis. "O que sabemos? O que não sabemos? Que informação precisamos?"\nExemplo: "Nossa taxa de churn é 4,2% ao mês. O mercado médio é 3,1%. Não temos dados sobre motivo de cancelamento dos últimos 6 meses."',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Chapéu Vermelho (Emoções):**\nIntuição, sentimentos e pressentimentos — SEM necessidade de justificativa. "O que meu instinto diz?"\nExemplo: "Sinto que esse produto não vai funcionar no Brasil. Não consigo explicar por quê, mas algo me incomoda."',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Chapéu Preto (Cautela):**\nRiscos, problemas, obstáculos. O chapéu mais natural para executivos brasileiros — mas aqui é usado de forma controlada, não como modo padrão.\nExemplo: "Se lançarmos em dezembro, competiremos com Black Friday e o time estará em férias para correções."',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Chapéu Amarelo (Otimismo):**\nBenefícios, oportunidades, cenário positivo. Obrigatório após o Preto para balancear.\nExemplo: "Se funcionar, seremos os primeiros no mercado brasileiro. O timing de dezembro pode pegar a onda de compras impulsivas."',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Chapéu Verde (Criatividade):**\nIdeias novas, alternativas, provocações. É o chapéu que mais se beneficia das técnicas de De Bono.\nExemplo: "E se em vez de lançar o produto, lançássemos a ausência dele? Uma campanha de "o que você está perdendo" antes do lançamento real."',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Chapéu Azul (Processo):**\nMeta-pensamento — gerencia o processo dos outros chapéus. Geralmente usado pelo facilitador.\nExemplo: "Vamos começar com 5 minutos de Branco para alinhar fatos, depois 3 minutos de Vermelho para capturar intuições antes que sejam racionalizadas."',
+                kind: 'pillar-grid',
+                title: '6 Chapéus do Pensamento',
+                pillars: [
+                  { icon: '⬜', title: 'Branco — Fatos', description: 'Apenas dados e informações verificáveis. "O que {{sabemos}}? O que não sabemos?"' },
+                  { icon: '🟥', title: 'Vermelho — Emoções', description: 'Intuição e pressentimentos SEM justificativa. "O que meu {{instinto}} diz?"' },
+                  { icon: '⬛', title: 'Preto — Cautela', description: 'Riscos e obstáculos. O mais natural para executivos — mas usado de forma {{controlada}}.' },
+                  { icon: '🟨', title: 'Amarelo — Otimismo', description: 'Benefícios e oportunidades. Obrigatório {{após}} o Preto para balancear.' },
+                  { icon: '🟩', title: 'Verde — Criatividade', description: 'Ideias novas, alternativas, provocações. É o chapéu que mais usa técnicas de {{De Bono}}.' },
+                  { icon: '🟦', title: 'Azul — Processo', description: 'Meta-pensamento. Gerencia o processo dos outros chapéus. Usado pelo {{facilitador}}.' },
+                ],
               },
               {
                 kind: 'heading',
-                text: 'A Técnica de Provocação (Po):',
+                text: 'Bloqueios criativos',
               },
               {
                 kind: 'paragraph',
-                text: 'Exemplo: "Po: e se nossos clientes nos pagassem ZERO pelo produto?"\nMovimento: isso leva a modelos freemium, assinaturas cruzadas, monetização por dados ou publicidade — modelos que empresas como Google e Spotify adotaram com sucesso.',
+                text: 'Bloqueios criativos não são falhas de caráter — são estados cognitivos previsíveis com causas identificáveis e soluções comprovadas. James L. Adams (Stanford, 1974) classificou os bloqueios em "{{Conceptual Blockbusting}}".',
               },
               {
-                kind: 'paragraph',
-                text: '**Resultados documentados:**\n— DuPont: reduziu tempo de reuniões em 75% usando Seis Chapéus\n— Siemens: aumentou inovação em equipes de P&D em 40%\n— Statoil (Noruega): resolveu um impasse de 2 anos sobre localização de plataforma em uma única sessão de Seis Chapéus de 4 horas',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Tony Buzan formalizou os {{Mapas Mentais}} nos anos 1970 com base em pesquisas sobre como o cérebro armazena e recupera informações. A premissa: o cérebro não pensa em listas lineares — pensa em redes associativas radiais. Forçar o pensamento em formato linear (listas, tópicos, bullets) literalmente limita a capacidade criativa.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Regras de Buzan para Mapas Mentais Eficazes:**\n1. Comece pelo centro com uma imagem/palavra central\n2. Use ramos curvos (não retos) — o cérebro se entedia com linhas retas\n3. Uma palavra-chave por ramo (não frases)\n4. Use cores diferentes para cada ramo principal\n5. Use imagens e ícones sempre que possível\n6. Ramos principais são grossos, sub-ramos são finos\n7. Mantenha tudo na mesma página (visão holística)',
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Bloqueio Perceptivo',
+                    period: 'Não ver o problema',
+                    text: 'O cérebro "trava" em uma representação fixa. {{Fixação funcional}}: ver objetos apenas no uso convencional. Delimitação prematura: definir o problema estreito demais.',
+                    caseStudy: {
+                      company: 'Uber',
+                      year: 2009,
+                      story: 'Perguntar "como fazer um {{carro}} melhor?" produz incrementos. Perguntar "como mover pessoas sem carro?" produziu Uber, Lime, Hyperloop.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '$150B+', label: 'Mercado de mobilidade (2024)' },
+                        { value: '1 pergunta', label: 'Mudou o enquadramento inteiro' },
+                      ],
+                      insight: 'Solução: mudar o {{enquadramento}}. A pergunta errada produz a resposta certa para o problema errado.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Bloqueio Emocional',
+                    period: 'Medo de julgamento',
+                    text: 'Causa #1 de silêncio em brainstorming. Desconforto com ambiguidade, medo do fracasso, {{síndrome do impostor}}.',
+                    caseStudy: {
+                      company: 'Google',
+                      year: 2015,
+                      story: 'Projeto Aristotle: {{180 equipes}} estudadas. Fator #1 de alta performance: {{segurança psicológica}} — poder errar sem medo. Não era talento individual.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '180', label: 'Equipes estudadas' },
+                        { value: '#1', label: 'Segurança psicológica' },
+                        { value: 'Gmail', label: 'Nasceu de espaço seguro' },
+                      ],
+                      quote: {
+                        text: 'There is no innovation without experimentation, and there is no experimentation without the freedom to fail.',
+                        author: 'Amy Edmondson · Harvard · The Fearless Organization 2018',
+                      },
+                      insight: 'Solução: exercícios de "pior ideia possível". Quando pede para serem {{propositalmente ruins}}, relaxam.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Bloqueio Cultural',
+                    period: '"Sempre fizemos assim"',
+                    text: 'Normas organizacionais que punem pensamento diferente. {{Groupthink}}: grupos coesos suprimem dissidência. Hierarquia rígida: chefe sempre tem razão = criatividade morre.',
+                    caseStudy: {
+                      company: 'CIA / Red Teams',
+                      year: 2001,
+                      story: 'Após falhas de inteligência, CIA criou {{Red Teams}} — equipes designadas para atacar a ideia dominante. Evita Groupthink em decisões críticas. Empresas podem designar "advogado do diabo" rotativo.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'Red Team', label: 'Equipe que ataca a ideia' },
+                        { value: 'Rotativo', label: 'Advogado do diabo muda a cada reunião' },
+                      ],
+                      insight: 'A frase mais cara da história corporativa: "{{Sempre fizemos assim}}".',
+                    },
+                  },
+                  {
+                    index: 4,
+                    title: 'Bloqueio Ambiental',
+                    period: 'Sem tempo, sem espaço',
+                    text: 'Interrupções constantes (cérebro leva {{23 minutos}} para retomar foco), ambientes monótonos, excesso de reuniões, ferramentas inadequadas.',
+                    caseStudy: {
+                      company: '3M',
+                      year: 1948,
+                      story: '3M permite {{15% do tempo}} para projetos pessoais. O Post-it nasceu daí — Spencer Silver descobriu o adesivo em 1968, Art Fry aplicou em marcadores de livro em 1974. Sem tempo livre, não existiria.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '23 min', label: 'Tempo para retomar foco após interrupção' },
+                        { value: '15%', label: 'Tempo livre 3M' },
+                        { value: 'Post-it', label: 'Nasceu de tempo livre' },
+                      ],
+                      insight: 'Cal Newport (Deep Work): blocos de {{90+ minutos}} sem interrupção para trabalho criativo.',
+                    },
+                  },
+                ],
               },
               {
                 kind: 'heading',
-                text: 'Aplicações Empresariais Comprovadas:',
+                text: 'Prototipagem rápida',
               },
               {
                 kind: 'paragraph',
-                text: '**Planejamento Estratégico:**\nColocar o objetivo estratégico no centro e radiar: mercados, competidores, recursos, riscos, oportunidades, tendências, parceiros. Em 30 minutos, uma equipe gera um mapa mais rico que um documento de 20 páginas.',
+                text: 'A prototipagem rápida é o antídoto para o excesso de planejamento. Uma ideia no papel não vale nada até ser testada com pessoas reais. A velocidade de aprendizado é diretamente proporcional à velocidade de {{prototipagem}}.',
               },
               {
-                kind: 'paragraph',
-                text: '**Gestão de Projetos:**\nO centro é o projeto. Ramos: escopo, stakeholders, riscos, cronograma, recursos, dependências. A Boeing usa mapas mentais para gerenciar projetos de US$ 100M+ porque a visualização revela interdependências que Gantt charts ocultam.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Resolução de Problemas:**\nColocar o problema no centro. Primeiro ciclo: causas possíveis. Segundo ciclo: evidências. Terceiro ciclo: soluções. A vantagem sobre o Diagrama de Ishikawa é que permite conexões cruzadas entre categorias.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Associação Livre Estruturada:**\nDiferente do brainstorming, a associação livre opera com regras mínimas:\n1. Palavra-estímulo central\n2. Escrever a PRIMEIRA palavra que vier à mente (sem filtro)\n3. Usar cada nova palavra como estímulo para a próxima\n4. Após 3-5 minutos, revisar a cadeia buscando conexões inesperadas',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Exemplo prático:\n"Logística" → "Velocidade" → "Fórmula 1" → "Pit Stop" → "15 segundos" → "Fast Food" → "Drive-thru" → "Sem sair do carro" → "Entrega no porta-malas"\nResultado: serviço de entrega onde o cliente não sai do carro — conceito que originou serviços como curbside pickup.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Ferramentas Digitais Recomendadas:**\n— MindMeister: colaboração em tempo real, integração com Google Workspace\n— Miro: mapas mentais + quadro branco infinito + templates\n— XMind: melhor para mapas complexos com múltiplos níveis\n— Papel e caneta: ainda a melhor opção para sessões individuais de ideação rápida (a fricção do digital atrapalha o fluxo)',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Uma das descobertas mais contra-intuitivas da ciência da criatividade é que restrições não inibem a inovação — frequentemente a amplificam. Pesquisas de Catrinel Haught-Tromp (2016) e Patricia Stokes (2005) demonstram consistentemente que limitações bem definidas forçam o cérebro a buscar caminhos não-óbvios.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**A Psicologia por Trás:**\nQuando temos liberdade total, o cérebro entra em "paradoxo da escolha" (Barry Schwartz) — paralisa diante de opções infinitas. Restrições funcionam como "andaimes criativos" que:\n— Eliminam opções óbvias, forçando busca em territórios inexplorados\n— Reduzem ansiedade decisória (menos opções = menos estresse)\n— Criam pressão produtiva que ativa redes cerebrais de resolução de problemas',
-              },
-              {
-                kind: 'heading',
-                text: 'Casos Emblemáticos:',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Twitter (140 caracteres):**\nA restrição de 140 caracteres não foi limitação — foi a feature que definiu a plataforma. Forçou comunicação concisa, criou uma linguagem própria (hashtags, threads, quote tweets) e diferenciou o Twitter de blogs e Facebook. Quando expandiram para 280, muitos argumentam que a plataforma perdeu parte de sua identidade.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Dogma 95 (Cinema):**\nLars von Trier e Thomas Vinterberg criaram regras restritivas para cinema: sem trilha sonora adicionada, sem iluminação artificial, sem efeitos especiais, câmera na mão. Resultado: filmes como "Festa de Família" e "Os Idiotas" que reinventaram a linguagem cinematográfica.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Apollo 13 ("Failure is not an option"):**\nEngenheiros da NASA precisaram criar um filtro de CO2 usando APENAS materiais disponíveis dentro da nave: sacos plásticos, fita adesiva, capas de manuais e mangueiras de trajes espaciais. A restrição extrema produziu uma das soluções de engenharia mais criativas da história.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**IKEA (Custo como restrição):**\nA regra de Ingvar Kamprad era: "primeiro, defina o preço; depois, projete o produto". Ao inverter o processo tradicional (projetar primeiro, calcular custo depois), a IKEA forçou designers a serem criativos com materiais, montagem e logística.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Aplicação Empresarial — Restrições Produtivas:**\n1. **Restrição de tempo:** "Resolva em 48h, não em 4 semanas" — elimina perfeccionismo e força priorização\n2. **Restrição de orçamento:** "Lance com R$ 0 de marketing" — força criatividade em distribuição orgânica\n3. **Restrição de features:** "O produto só pode ter 3 funcionalidades" — força foco no essencial\n4. **Restrição de formato:** "Explique em 1 slide" — força clareza de pensamento\n5. **Restrição de público:** "Resolva para 1 pessoa específica, não para milhões" — força empatia profunda',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Framework "Constraint Storming":**\n1. Defina o desafio criativo\n2. Liste 5 restrições artificiais (tempo, dinheiro, materiais, pessoas, tecnologia)\n3. Aplique uma restrição por rodada de ideação (10 min cada)\n4. Compare as ideias geradas sob cada restrição\n5. As melhores ideias frequentemente surgem das restrições mais severas',
-              },
-              {
-                kind: 'paragraph',
-                text: '',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Bloqueios criativos não são falhas de caráter — são estados cognitivos previsíveis com causas identificáveis e soluções comprovadas. James L. Adams (Stanford) classificou os bloqueios em quatro categorias em seu clássico "Conceptual Blockbusting" (1974).',
-              },
-              {
-                kind: 'paragraph',
-                text: '**1. Bloqueios Perceptuais:**\nIncapacidade de ver o problema de forma diferente. O cérebro "trava" em uma representação fixa.\n— **Fixação funcional:** ver objetos apenas em seu uso convencional (um tijolo é "só" para construção)\n— **Delimitação prematura:** definir o problema de forma muito estreita ("precisamos de um carro melhor" vs. "precisamos de mobilidade melhor")\n— **Saturação informacional:** excesso de dados impede a percepção de padrões',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Solução: mudar o enquadramento. A pergunta "como fazer um carro melhor?" produz incrementos. A pergunta "como mover pessoas sem carro?" produziu Uber, Lime, Hyperloop.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**2. Bloqueios Emocionais:**\nMedo, ansiedade e insegurança que inibem a expressão criativa.\n— **Medo do julgamento:** a causa #1 de silêncio em reuniões de brainstorming\n— **Desconforto com ambiguidade:** necessidade prematura de certeza mata exploração\n— **Medo do fracasso:** evitar riscos criativos por aversão à perda\n— **Síndrome do impostor:** "quem sou eu para ter ideias inovadoras?"',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Solução: Amy Edmondson (Harvard) demonstrou que "segurança psicológica" é o fator #1 que diferencia equipes criativas de equipes medíocres. Google confirmou isso no Projeto Aristóteles: as melhores equipes não tinham os melhores indivíduos — tinham o ambiente mais seguro para errar.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**3. Bloqueios Culturais:**\nNormas sociais e organizacionais que punem o pensamento diferente.\n— **"Sempre fizemos assim":** a frase mais cara da história corporativa\n— **Conformidade grupal (Groupthink):** Irving Janis documentou como grupos coesos suprimem dissidência\n— **Hierarquia rígida:** em culturas onde o chefe sempre tem razão, a criatividade morre\n— **Viés de confirmação organizacional:** buscar apenas dados que confirmem a estratégia atual',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Solução: "Red Teams" — equipes designadas para atacar a ideia dominante. A CIA e militares usam Red Teams para evitar Groupthink em decisões de segurança nacional. Empresas podem designar um "advogado do diabo" rotativo.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**4. Bloqueios Ambientais:**\nCondições físicas e organizacionais que impedem o fluxo criativo.\n— **Interrupções constantes:** estudos mostram que o cérebro leva 23 minutos para retomar foco profundo após uma interrupção\n— **Ambientes monótonos:** espaços uniformes produzem pensamento uniforme\n— **Excesso de reuniões:** fragmenta o dia e impede períodos de "deep work"\n— **Ferramentas inadequadas:** brainstorming por e-mail, por exemplo, é anti-criativo',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Solução: Cal Newport (Deep Work) recomenda blocos de 90+ minutos sem interrupção para trabalho criativo. A 3M permite 15% do tempo para projetos pessoais. A Google tinha os famosos 20% time (de onde nasceram Gmail e Google Maps).',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Técnicas de Desbloqueio Rápido:**\n1. **Mudança de ambiente:** sair do escritório, caminhar na natureza (Stanford: caminhada aumenta criatividade em 60%)\n2. **Restrição artificial:** "resolva usando apenas 3 palavras" — força o cérebro a sair do loop\n3. **Analogia forçada:** "como a natureza resolveria este problema?" — biomimética\n4. **Distanciamento temporal:** "como resolveriam isso em 2050?" — remove limitações atuais\n5. **Inversão:** "como piorar o problema ao máximo?" — brainstorming reverso',
-              },
-              {
-                kind: 'paragraph',
-                text: 'A prototipagem rápida é o antídoto para o excesso de planejamento. O princípio é simples: uma ideia no papel não vale nada até ser testada com pessoas reais. A velocidade de aprendizado é diretamente proporcional à velocidade de prototipagem.',
-              },
-              {
-                kind: 'heading',
-                text: 'Os 5 Níveis de Fidelidade:',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Nível 1 — Sketch (0-2h):**\nDesenho à mão em papel ou quadro branco. Zero investimento. Objetivo: comunicar a ideia visualmente.\n— Quando usar: primeiras 24h de uma ideia. Para validar se a equipe entende o conceito.\n— Exemplo: os fundadores do Airbnb desenharam o fluxo da experiência em guardanapos antes de escrever uma linha de código.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Nível 2 — Storyboard (2-8h):**\nSequência de cenas que mostram a jornada do usuário interagindo com a solução.\n— Quando usar: para entender o contexto de uso e identificar pontos de fricção.\n— Exemplo: a Pixar usa storyboards para testar histórias inteiras antes de animar um único frame. Se a história não funciona em desenhos simples, não funcionará com US$ 200M em animação.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Nível 3 — Mockup Interativo (8-24h):**\nUsando ferramentas como Figma, Sketch ou até PowerPoint com links, criar uma simulação clicável da experiência.\n— Quando usar: para testar fluxo e usabilidade com usuários reais.\n— Exemplo: a Dropbox validou seu produto inteiro com um vídeo de demonstração antes de construir a tecnologia. O vídeo gerou 75.000 sign-ups overnight.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Nível 4 — Protótipo Funcional (24-48h):**\nVersão simplificada que funciona de verdade, mesmo que com "gambiarra" no backend.\n— Quando usar: para validar se o usuário realmente usaria e pagaria.\n— Exemplo: Zappos (vendas de sapatos online) começou sem estoque — Nick Swinmurn ia a lojas, fotografava sapatos, postava online. Se alguém comprava, ele ia à loja, comprava e enviava. "Mágico de Oz" puro.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Nível 5 — MVP (Minimum Viable Product) (48h-2 semanas):**\nO menor produto possível que entrega valor real e gera aprendizado validado.\n— Quando usar: para testar product-market fit antes de investir em escala.\n— Eric Ries (Lean Startup): "O MVP é a versão do produto que permite dar uma volta completa no loop Construir-Medir-Aprender com o mínimo de esforço e tempo de desenvolvimento."',
-              },
-              {
-                kind: 'paragraph',
-                text: '**O Framework SPRINT (Google Ventures):**\nJake Knapp criou o Design Sprint — processo de 5 dias para ir de ideia a protótipo testado:\n— Segunda: Mapear o problema e escolher um foco\n— Terça: Esboçar soluções individuais (divergir)\n— Quarta: Decidir a melhor solução (convergir)\n— Quinta: Construir protótipo realista\n— Sexta: Testar com 5 usuários reais',
-              },
-              {
-                kind: 'paragraph',
-                text: 'Slack, Blue Bottle Coffee e Flatiron Health usaram Design Sprints para validar conceitos que se tornaram produtos de bilhões de dólares.',
-              },
-              {
-                kind: 'paragraph',
-                text: '**Regras de Ouro da Prototipagem:**\n1. Se você não tem vergonha do seu protótipo, lançou tarde demais (Reid Hoffman, LinkedIn)\n2. O objetivo é aprender, não impressionar\n3. Teste com 5 usuários — Nielsen demonstrou que 5 usuários revelam 85% dos problemas de usabilidade\n4. Pergunte "o que você faria?" — não "o que você acha?"\n5. Protótipo que ninguém testa é desperdício — agende testes ANTES de construir',
-              },
-                          {
                 kind: 'step-flow',
-                title: 'Os 5 tipos de bloqueio criativo',
+                title: '5 níveis de fidelidade de protótipo',
                 steps: [
-                  { number: 1, title: 'Perceptivo', description: 'Não {{ver}} o problema. Solução: saia do ambiente, ouça cliente, benchmark fora do setor.' },
-                  { number: 2, title: 'Cultural', description: 'Hierarquia e tradição travam. Solução: citar cases de fora, dar {{permissão social}} para questionar.' },
-                  { number: 3, title: 'Emocional', description: 'Medo de julgamento — o mais comum. Solução: pior ideia possível, {{segurança psicológica}}.' },
-                  { number: 4, title: 'Cognitivo', description: 'Mente presa num padrão. Solução: técnicas {{estruturadas}} (SCAMPER, TRIZ, 6 Chapéus).' },
-                  { number: 5, title: 'Ambiental', description: 'Sem tempo, sobrecarga. Solução: bloco de tempo {{protegido}} — 2h/semana sem interrupção.' },
+                  { number: 1, title: 'Sketch (0-2h)', description: 'Desenho à mão. Zero investimento. Objetivo: comunicar a ideia visualmente.', caseSnippet: 'Airbnb: fundadores desenharam fluxo da experiência em guardanapos.' },
+                  { number: 2, title: 'Storyboard (2-8h)', description: 'Sequência de cenas mostrando a jornada do usuário.', caseSnippet: 'Pixar: testa histórias inteiras antes de animar um frame. Se não funciona em desenho simples, não funciona com US$ 200M.' },
+                  { number: 3, title: 'Mockup Interativo (8-24h)', description: 'Figma, Sketch ou PowerPoint com links. Simulação clicável.', caseSnippet: 'Dropbox: vídeo de demonstração gerou 75.000 sign-ups sem uma linha de código.' },
+                  { number: 4, title: 'Protótipo Funcional (24-48h)', description: 'Versão simplificada que funciona de verdade, mesmo com "gambiarra".', caseSnippet: 'Zappos: fotografava sapatos em lojas, postava online. Se compravam, ia à loja e enviava. Mágico de Oz puro.' },
+                  { number: 5, title: 'MVP (48h-2 semanas)', description: 'Menor produto que entrega valor real e gera aprendizado validado.', author: 'Eric Ries (Lean Startup): "A versão que permite dar uma volta no loop Construir-Medir-Aprender com mínimo esforço"' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Restrição como motor criativo',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Limites geram inovação. Marissa Mayer (Google): as melhores interfaces nasceram de restrições de velocidade de página. A IKEA define o preço ANTES de projetar — forçando designers a serem criativos com materiais. O Apollo 13 produziu solução genial usando APENAS materiais dentro da nave: sacos plásticos, fita adesiva e {{mangueiras de trajes espaciais}}.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Restrições produtivas para empresas',
+                pillars: [
+                  { icon: '⏱️', title: 'Tempo', description: '"Resolva em 48h, não 4 semanas" — elimina {{perfeccionismo}} e força priorização.' },
+                  { icon: '💰', title: 'Orçamento', description: '"Lance com R$ 0 de marketing" — força criatividade em {{distribuição orgânica}}.' },
+                  { icon: '✂️', title: 'Features', description: '"Só pode ter 3 funcionalidades" — força foco no {{essencial}}.' },
+                  { icon: '👤', title: 'Público', description: '"Resolva para 1 pessoa específica" — força {{empatia}} profunda.' },
                 ],
               },
 ],
@@ -1441,13 +1328,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             simulationId: 'lab-criatividade',
             description: 'Sessão prática de SCAMPER, 6 Chapéus ou Provocação com timer real.',
           },
-          {
-            id: 'M1-1-ch1',
-            type: 'challenge',
-            prompt: 'Aplique DOIS métodos diferentes (Design Thinking + SCAMPER, ou Design Thinking + 6 Chapéus) ao MESMO problema do seu negócio. Entregue: 1) O problema formulado, 2) 5 ideias do primeiro método, 3) 5 ideias do segundo, 4) Comparação: qual gerou ideias mais originais e por quê.',
-            rubric: ['Problema bem formulado', 'Método 1 aplicado de verdade', 'Método 2 aplicado de verdade', 'Comparação crítica', 'Originalidade das ideias'],
-            artifactType: 'analysis',
-          },
+          
         ],
       },
       {
