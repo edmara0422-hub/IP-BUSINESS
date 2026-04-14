@@ -608,7 +608,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: '**A Neurociência da Criatividade:**\nPesquisas com fMRI (ressonância magnética funcional) revelam que a criatividade não reside em um hemisfério específico. O neurocientista [[author:jung|Rex Jung]] (Universidade do Novo México) demonstrou que o processo criativo envolve três redes cerebrais simultâneas:\n— **[[concept:dmn|Default Mode Network]] (DMN):** ativa durante devaneios e associações livres — é a rede da imaginação\n— **[[concept:ecn|Executive Control Network]] (ECN):** avalia, refina e seleciona ideias — é o "editor interno"\n— **[[concept:sn|Salience Network]] (SN):** alterna entre DMN e ECN, detectando quando uma ideia merece atenção',
+                text: '**A Neurociência da Criatividade:**\nPesquisas com fMRI (ressonância magnética funcional) revelam que a criatividade não reside em um hemisfério específico. O neurocientista {{Rex Jung}} (Universidade do Novo México) demonstrou que o processo criativo envolve três redes cerebrais simultâneas:\n— **{{Default Mode Network}} (DMN):** ativa durante devaneios e associações livres — é a rede da imaginação\n— **{{Executive Control Network}} (ECN):** avalia, refina e seleciona ideias — é o "editor interno"\n— **{{Salience Network}} (SN):** alterna entre DMN e ECN, detectando quando uma ideia merece atenção',
               },
               {
                 kind: 'paragraph',
@@ -624,7 +624,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: '**Os 4 Ps da Criatividade ([[author:rhodes|Mel Rhodes]], 1961):**\nAs quatro dimensões da criatividade também são chamadas de quatro Ps da criatividade, porque as palavras escolhidas por Rhodes em inglês foram: Person, Process, Product e Press (pressão do ambiente).\n— **Person:** traços cognitivos e de personalidade (abertura a experiências, tolerância à ambiguidade)\n— **Process:** etapas do pensamento criativo (preparação, incubação, iluminação, verificação — modelo de Wallas)\n— **Product:** o resultado tangível que pode ser avaliado por originalidade e utilidade\n— **Press:** o ambiente que facilita ou bloqueia a criatividade (cultura organizacional, pressão, recursos)',
+                text: '**Os 4 Ps da Criatividade ({{Mel Rhodes}}, 1961):**\nAs quatro dimensões da criatividade também são chamadas de quatro Ps da criatividade, porque as palavras escolhidas por Rhodes em inglês foram: Person, Process, Product e Press (pressão do ambiente).\n— **Person:** traços cognitivos e de personalidade (abertura a experiências, tolerância à ambiguidade)\n— **Process:** etapas do pensamento criativo (preparação, incubação, iluminação, verificação — modelo de Wallas)\n— **Product:** o resultado tangível que pode ser avaliado por originalidade e utilidade\n— **Press:** o ambiente que facilita ou bloqueia a criatividade (cultura organizacional, pressão, recursos)',
               },
               {
                 kind: 'pillar-grid',
@@ -638,7 +638,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: '**Mitos que Precisam Morrer:**\n— "Criatividade é inata" — FALSO. Estudos longitudinais de [[author:land|George Land]] (NASA) mostraram que 98% das crianças de 5 anos são "gênios criativos", mas apenas 2% dos adultos mantêm esse nível. A criatividade é desaprendida, não ausente.\n— "Brainstorming sempre funciona" — PARCIALMENTE FALSO. Sem estrutura adequada, grupos produzem menos e piores ideias que indivíduos trabalhando sozinhos ([[author:diehl|Diehl & Stroebe]], 1987).\n— "Drogas e álcool aumentam criatividade" — FALSO. Podem reduzir inibição temporariamente, mas comprometem a rede ECN necessária para refinar ideias.\n— "Pressão mata criatividade" — PARCIALMENTE VERDADEIRO. [[author:amabile|Teresa Amabile]] (Harvard) mostrou que pressão moderada com propósito claro pode aumentar criatividade, mas pressão por controle a destrói.',
+                text: '**Mitos que Precisam Morrer:**\n— "Criatividade é inata" — FALSO. Estudos longitudinais de {{George Land}} (NASA) mostraram que 98% das crianças de 5 anos são "gênios criativos", mas apenas 2% dos adultos mantêm esse nível. A criatividade é desaprendida, não ausente.\n— "Brainstorming sempre funciona" — PARCIALMENTE FALSO. Sem estrutura adequada, grupos produzem menos e piores ideias que indivíduos trabalhando sozinhos ({{Diehl & Stroebe}}, 1987).\n— "Drogas e álcool aumentam criatividade" — FALSO. Podem reduzir inibição temporariamente, mas comprometem a rede ECN necessária para refinar ideias.\n— "Pressão mata criatividade" — PARCIALMENTE VERDADEIRO. {{Teresa Amabile}} (Harvard) mostrou que pressão moderada com propósito claro pode aumentar criatividade, mas pressão por controle a destrói.',
               },
               {
                 kind: 'paragraph',
@@ -650,15 +650,15 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: '[[pause:neurociencia]]',
+                text: '',
               },
               {
                 kind: 'paragraph',
-                text: 'Um dos primeiros a elaborar testes no campo da criatividade foi o norte-americano [[author:guilford|Joy Paul Guilford]], considerado o mentor do estudo científico da criatividade. Em 1950, durante um discurso para a Associação Norte-Americana de Psicologia, ele chamou a atenção dos colegas para a necessidade de pesquisar o assunto.',
+                text: 'Um dos primeiros a elaborar testes no campo da criatividade foi o norte-americano {{Joy Paul Guilford}}, considerado o mentor do estudo científico da criatividade. Em 1950, durante um discurso para a Associação Norte-Americana de Psicologia, ele chamou a atenção dos colegas para a necessidade de pesquisar o assunto.',
               },
               {
                 kind: 'paragraph',
-                text: '[[quote:guilford1950]] Em 1967, Guilford criou um conceito decisivo: a diferenciação entre [[concept:convergente|pensamento convergente]] e [[concept:divergente|pensamento divergente]].',
+                text: ' Em 1967, Guilford criou um conceito decisivo: a diferenciação entre {{pensamento convergente}} e {{pensamento divergente}}.',
               },
               {
                 kind: 'paragraph',
@@ -702,7 +702,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: '[[pause:divergente]]',
+                text: '',
               },
               {
                 kind: 'heading',
@@ -714,7 +714,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: '[[author:sperry|Roger Sperry]] (Nobel de Medicina, 1981) descobriu que cada hemisfério cerebral se especializa em tarefas distintas:\n— **Hemisfério esquerdo:** tarefas verbais, lógicas e analíticas — acionado quando lemos um jornal ou fazemos uma conta\n— **Hemisfério direito:** elementos não-verbais como expressões faciais, melodias, imagens e percepção espacial — acionado quando indicamos um caminho, apreciamos música ou nos emocionamos',
+                text: '{{Roger Sperry}} (Nobel de Medicina, 1981) descobriu que cada hemisfério cerebral se especializa em tarefas distintas:\n— **Hemisfério esquerdo:** tarefas verbais, lógicas e analíticas — acionado quando lemos um jornal ou fazemos uma conta\n— **Hemisfério direito:** elementos não-verbais como expressões faciais, melodias, imagens e percepção espacial — acionado quando indicamos um caminho, apreciamos música ou nos emocionamos',
               },
               {
                 kind: 'paragraph',
@@ -722,11 +722,11 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: 'O mais antigo modelo do processo criativo, de [[author:wallas|Graham Wallas]] (preparação, incubação, iluminação e verificação',
+                text: 'O mais antigo modelo do processo criativo, de {{Graham Wallas}} (preparação, incubação, iluminação e verificação',
               },
               {
                 kind: 'paragraph',
-                text: '[[anim:wallas]]), é útil porém simplificado demais. Na prática, o processo criativo tem 6 etapas que se retroalimentam:',
+                text: '), é útil porém simplificado demais. Na prática, o processo criativo tem 6 etapas que se retroalimentam:',
               },
               {
                 kind: 'paragraph',
@@ -742,6 +742,72 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   { number: 4, title: 'Iteração', description: 'Repetir etapas 2 e 3. O processo criativo é lento e trabalhoso. {{Não desista}} na primeira rodada.' },
                   { number: 5, title: 'Transferência ao Mundo Real', description: 'Nasce o produto: mercadoria, serviço, estratégia, processo ou nova maneira de ver as coisas.' },
                   { number: 6, title: 'Aprendizado', description: 'O processo criativo {{nunca acaba}}. Se acabou, é porque o produto não interessa mais. Recomeça em busca de aperfeiçoamentos.' },
+                ],
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Criatividade de Produto',
+                    period: 'Reinventar o que se vende',
+                    text: 'A mesma base técnica, reinventada por design, posicionamento e co-branding. Criatividade aplicada ao {{marketing}}, não ao produto em si. Prova que inovar não exige tecnologia nova — exige olhar novo.',
+                    caseStudy: {
+                      company: 'Havaianas',
+                      year: 1994,
+                      story: 'De chinelo de borracha de {{R$ 2}} a produto de moda global vendido em {{100+ países}}. Coleções com Disney e artistas. O produto é o mesmo desde 1962 — a criatividade foi no posicionamento.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 2 → R$ 80', label: 'Preço unitário (1994 vs 2024)' },
+                        { value: '100+', label: 'Países de venda' },
+                        { value: '1962', label: 'Produto base inalterado' },
+                      ],
+                      insight: 'Inovação de produto não exige mudar o produto. Exige mudar como o mercado {{percebe}} o produto. Havaianas mudou percepção — não borracha.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Criatividade de Modelo',
+                    period: 'Reinventar como se captura valor',
+                    text: 'Numa indústria dominada por 5 bancos com décadas de tradição, um grupo de 8 pessoas reimaginou a experiência bancária. A criatividade não foi tecnológica — a tecnologia já existia. Foi no {{modelo}} e na experiência.',
+                    caseStudy: {
+                      company: 'Nubank',
+                      year: 2013,
+                      story: '{{8 pessoas}} num apartamento em São Paulo. Sem agência, sem tarifa, sem fila. Hoje: {{80 milhões}} de clientes, maior banco digital do mundo fora da China. CAC de R$ 30-50 vs R$ 800+ bancário.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '80M', label: 'Clientes (2023)' },
+                        { value: 'R$ 30-50', label: 'CAC vs R$ 800+ bancário' },
+                        { value: '8', label: 'Funcionários iniciais' },
+                      ],
+                      insight: 'Christensen (Harvard, 1997): inovação disruptiva começa atendendo quem ninguém atende. Nubank começou pelos {{excluídos bancários}} — simples e barato, depois dominou.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Criatividade Estratégica',
+                    period: 'Competir onde ninguém compete',
+                    text: 'Não tentou ser maior que Boeing e Airbus — criou aviões para {{nichos}} que as gigantes ignoravam. Criatividade estratégica: não tentar ser maior, mas ser melhor no segmento certo.',
+                    caseStudy: {
+                      company: 'Embraer',
+                      year: 2000,
+                      story: 'Jatos regionais de {{70-130 assentos}} — faixa que Boeing/Airbus consideravam pequena demais. Resultado: líder mundial em aviação regional com {{receita de US$ 5+ bilhões}}. Prova que criatividade pode ser estratégica, não só artística.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'US$ 5B+', label: 'Receita anual' },
+                        { value: '70-130', label: 'Assentos por aeronave' },
+                        { value: '#1', label: 'Líder mundial aviação regional' },
+                      ],
+                      quote: {
+                        text: 'The essence of strategy is choosing what not to do.',
+                        author: 'Michael Porter · Harvard · Competitive Strategy 1980',
+                      },
+                      insight: 'Chan Kim (INSEAD, 2005): Oceano Azul é criar mercado onde não há concorrência. Embraer não competiu no oceano vermelho dos jatos grandes — criou o {{oceano azul}} dos regionais.',
+                    },
+                  },
                 ],
               },
               {
@@ -822,7 +888,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             body: [
               {
                 kind: 'paragraph',
-                text: '[[concept:dt|Design Thinking]] é uma abordagem de resolução de problemas centrada no ser humano, popularizada pela IDEO e pela d.school de Stanford. Não é um processo linear — é iterativo, messy e profundamente empático. As 5 fases são:',
+                text: '{{Design Thinking}} é uma abordagem de resolução de problemas centrada no ser humano, popularizada pela IDEO e pela d.school de Stanford. Não é um processo linear — é iterativo, messy e profundamente empático. As 5 fases são:',
               },
               {
                 kind: 'paragraph',
@@ -881,7 +947,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: '[[pause:metodo]]',
+                text: '',
               },
               {
                 kind: 'paragraph',
@@ -921,7 +987,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: '5. **[[concept:scamper|SCAMPER]] Dirigido:** usar os 7 operadores SCAMPER como prompts sequenciais para forçar perspectivas diferentes.',
+                text: '5. **{{SCAMPER}} Dirigido:** usar os 7 operadores SCAMPER como prompts sequenciais para forçar perspectivas diferentes.',
               },
               {
                 kind: 'paragraph',
@@ -942,6 +1008,68 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   { icon: '♻️', title: 'P — Outros usos', description: 'Que {{outro uso}} esse produto/processo tem que ninguém pensou?' },
                   { icon: '✂️', title: 'E — Eliminar', description: 'O que pode ser {{removido}} sem perder a função essencial?' },
                   { icon: '↩️', title: 'R — Reverter', description: 'O que acontece se {{inverter}} a ordem, o fluxo, a hierarquia?' },
+                ],
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Design Thinking na Prática',
+                    period: 'Caso Natura',
+                    text: 'Antes de lançar a linha Ekos com ingredientes da Amazônia, a Natura criou protótipos de embalagem usando materiais reciclados e testou com consumidores em lojas-conceito. Os feedbacks mudaram {{completamente}} o design final.',
+                    caseStudy: {
+                      company: 'Natura',
+                      year: 2000,
+                      story: 'Descoberta: a {{textura}} da embalagem importava mais que o visual. Consumidores tocavam antes de comprar. Redesenho baseado em empatia (Fase 1 do DT) evitou erro que teria custado {{milhões}}.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 0', label: 'Custo da pesquisa (lojas próprias)' },
+                        { value: 'Textura > Visual', label: 'Insight principal' },
+                        { value: '100+', label: 'Ingredientes da Amazônia' },
+                      ],
+                      insight: 'Design Thinking para PME em 3 dias: Dia 1 — ligue para 5 clientes e pergunte a última frustração. Dia 2 — equipe gera 5 soluções cada. Dia 3 — protótipo e teste. Custo: {{R$ 0}}.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'SCAMPER na Prática',
+                    period: 'Caso iPhone',
+                    text: 'Steve Jobs não inventou o telefone, o music player ou o navegador. Ele {{combinou}} os três (C), {{eliminou}} o teclado físico (E), {{substituiu}} botões por touchscreen (S) e {{reorganizou}} a loja de apps (R).',
+                    caseStudy: {
+                      company: 'Apple',
+                      year: 2007,
+                      story: 'Cada mudança isolada era incremental. Juntas, {{redefiniram categoria}}. O iPhone não foi uma invenção — foi SCAMPER aplicado com maestria. Em 2 anos, Nokia perdeu 50% de market share.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '4 operadores', label: 'SCAMPER usados (C, E, S, R)' },
+                        { value: '-50%', label: 'Market share Nokia em 2 anos' },
+                        { value: '$3.5T', label: 'Valor Apple (2024)' },
+                      ],
+                      insight: 'SCAMPER funciona porque força a pensar {{sistematicamente}} sobre cada aspecto do produto. Não é inspiração — é método.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Brainstorming Estruturado na Prática',
+                    period: 'Caso IDEO',
+                    text: 'A IDEO redesenhou o carrinho de supermercado para a ABC Nightline em {{5 dias}}. A equipe passou dias em supermercados observando comportamentos. Geraram centenas de ideias antes de convergir.',
+                    caseStudy: {
+                      company: 'IDEO',
+                      year: 1999,
+                      story: 'Descobertas: idosos têm medo de carrinhos pesados. Mães precisam de espaço para crianças. Resultado: carrinho modular com cestas removíveis. Nenhuma {{pesquisa quantitativa}} revelaria isso — veio da observação.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '5 dias', label: 'Do briefing ao protótipo' },
+                        { value: '200+', label: 'Ideias geradas' },
+                        { value: 'Regra #50', label: 'Melhores ideias surgem após a 50ª' },
+                      ],
+                      insight: 'Diehl & Stroebe (1987): brainstorming sem estrutura produz MENOS que indivíduos sozinhos. A IDEO usa brainwriting 6-3-5: {{6 pessoas, 3 ideias, 5 rodadas = 108 ideias em 30 min}}.',
+                    },
+                  },
                 ],
               },
               {
@@ -1036,11 +1164,11 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: 'Os conceitos de pensamento convergente e divergente elaborados por Guilford nos anos 1950 foram retomados e desenvolvidos por [[author:debono|Edward de Bono]] nos anos 1970 e 1980. De Bono, considerado hoje a maior autoridade mundial em criatividade e inovação, criou o conceito de pensamento lateral, em oposição ao pensamento vertical.',
+                text: 'Os conceitos de pensamento convergente e divergente elaborados por Guilford nos anos 1950 foram retomados e desenvolvidos por {{Edward de Bono}} nos anos 1970 e 1980. De Bono, considerado hoje a maior autoridade mundial em criatividade e inovação, criou o conceito de pensamento lateral, em oposição ao pensamento vertical.',
               },
               {
                 kind: 'paragraph',
-                text: '**Pensamento Vertical** é o pensamento lógico, matemático e seletivo que caminha numa única direção predefinida. **[[concept:lateral|Pensamento Lateral]]** não se move de modo previsível — busca novas possibilidades e pode até dar "saltos". Enquanto o pensamento vertical leva em conta apenas informações relacionadas ao problema, o lateral considera elementos que pouco ou nada têm a ver com a questão.',
+                text: '**Pensamento Vertical** é o pensamento lógico, matemático e seletivo que caminha numa única direção predefinida. **{{Pensamento Lateral}}** não se move de modo previsível — busca novas possibilidades e pode até dar "saltos". Enquanto o pensamento vertical leva em conta apenas informações relacionadas ao problema, o lateral considera elementos que pouco ou nada têm a ver com a questão.',
               },
               {
                 kind: 'paragraph',
@@ -1088,7 +1216,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: 'Tony Buzan formalizou os [[concept:mapamental|Mapas Mentais]] nos anos 1970 com base em pesquisas sobre como o cérebro armazena e recupera informações. A premissa: o cérebro não pensa em listas lineares — pensa em redes associativas radiais. Forçar o pensamento em formato linear (listas, tópicos, bullets) literalmente limita a capacidade criativa.',
+                text: 'Tony Buzan formalizou os {{Mapas Mentais}} nos anos 1970 com base em pesquisas sobre como o cérebro armazena e recupera informações. A premissa: o cérebro não pensa em listas lineares — pensa em redes associativas radiais. Forçar o pensamento em formato linear (listas, tópicos, bullets) literalmente limita a capacidade criativa.',
               },
               {
                 kind: 'paragraph',
@@ -1160,7 +1288,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: '[[pause:aplicar]]',
+                text: '',
               },
               {
                 kind: 'paragraph',
