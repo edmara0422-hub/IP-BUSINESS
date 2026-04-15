@@ -4737,193 +4737,504 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Filosofia',
         blocks: [
           {
-            id: 'M4-0-t1',
-            type: 'text',
-            title: 'Por que Filosofia em um Curso de Negócios?',
-            body: 'Filosofia não é abstração inútil. É a disciplina que treina o pensamento rigoroso — a capacidade de questionar suposições, construir argumentos e tomar decisões sob incerteza. Todo modelo de negócio, toda estratégia, toda decisão ética parte de premissas filosóficas, mesmo quando não são explicitadas.\n\n**O que a filosofia treina:**\n— Pensamento crítico: separar opinião de argumento fundamentado\n— Lógica: identificar falácias, construir raciocínios válidos\n— Ética: decidir o que é certo quando não há resposta óbvia\n— Epistemologia: "como sei que sei?" — base para decisões baseadas em evidências\n\n**Na prática empresarial:**\n— "Nosso cliente quer isso" → Como você sabe? Qual a evidência? (epistemologia)\n— "É assim que sempre fizemos" → Essa premissa ainda é válida? (pensamento crítico)\n— "O concorrente fez, então devemos fazer" → Falácia do apelo à autoridade (lógica)\n— "Vamos demitir 500 pessoas para aumentar a margem" → É justo? Para quem? (ética)\n\nSócrates resumiu: "Uma vida não examinada não vale a pena ser vivida." Para negócios: uma estratégia não examinada não vale a pena ser executada.\n\n**Cases brasileiros onde filosofia fez falta:**\n— Americanas (2023): rombo de R$ 25 bilhões. A pergunta ética "é certo inflar resultados para manter o preço da ação?" nunca foi feita — ou foi ignorada. Lógica: se ninguém questiona as premissas contábeis, o sistema colapsa.\n— JBS: multas bilionárias por corrupção. A decisão de subornar fiscais sanitários parecia "racional" no curto prazo. Teste filosófico de Kant: "aceitaria que toda empresa fizesse isso?" Se sim, o sistema inteiro de inspeção colapsa.\n— Uber e iFood: motoristas sem direitos trabalhistas. Utilitarismo diria "maior bem para mais pessoas" (consumidores felizes). Contratualismo de Rawls diria "se você não soubesse se seria o CEO ou o motorista, aceitaria este modelo?"\n\nFilosofia não dá respostas prontas — dá as perguntas certas. E perguntas certas evitam desastres.',
-          },
-          {
-            id: 'M4-0-t2',
-            type: 'text',
-            title: 'Pensamento Crítico e Lógica Aplicada a Decisões',
-            body: 'Pensamento crítico é a capacidade de avaliar informações de forma objetiva, identificar vieses e construir conclusões fundamentadas. É a competência mais valorizada por CEOs globais (World Economic Forum, 2025).\n\n**Os 5 Passos do Pensamento Crítico:**\n\n1. Identifique a questão real\n— "Estamos vendendo pouco" não é uma questão — é um sintoma. A questão é: por que vendemos pouco? Qual segmento? Desde quando? O que mudou?\n\n2. Colete evidências relevantes\n— Dados, não opiniões. Fatos, não intuição. Se não há dados, assuma que você não sabe.\n\n3. Avalie as evidências\n— A fonte é confiável? A amostra é suficiente? Há viés de confirmação?\n\n4. Considere alternativas\n— Qual é a explicação mais simples (Navalha de Occam)? Existem outras hipóteses?\n\n5. Chegue a uma conclusão provisória\n— Toda conclusão é provisória até que novos dados a confirmem ou refutem.\n\n**As 10 Falácias Lógicas Mais Comuns em Negócios:**\n\n1. **Ad Hominem** — Atacar a pessoa em vez do argumento. "Ele é júnior, não sabe do que fala."\n2. **Apelo à Autoridade** — "O CEO da Apple disse isso, então é verdade."\n3. **Falsa Dicotomia** — "Ou cortamos custos ou falimos." (existem outras opções)\n4. **Correlação ≠ Causalidade** — "Vendas subiram depois da campanha, logo a campanha causou." (pode ser coincidência)\n5. **Viés de Confirmação** — Buscar apenas dados que confirmam o que já acreditamos\n6. **Falácia do Custo Irrecuperável** — "Já investimos R$ 2M, não podemos parar agora." (o investimento passado é irrelevante para a decisão futura)\n7. **Generalização Apressada** — "3 clientes reclamaram, logo o produto é ruim." (e os outros 10.000?)\n8. **Apelo à Tradição** — "Sempre fizemos assim." (e se o contexto mudou?)\n9. **Falsa Causa** — "Depois que troquei o gerente, o faturamento caiu." (post hoc ergo propter hoc)\n10. **Argumento da Ladeira Escorregadia** — "Se permitirmos home office, ninguém mais vai trabalhar." (salto lógico sem evidência)\n\n**Exercício prático:** Na próxima reunião, identifique pelo menos 2 falácias usadas nas discussões. Não precisa apontar publicamente — observe e anote. Esse exercício treina o olhar crítico.',
-          },
-          {
-            id: 'M4-fil-concept1',
-            type: 'concept',
-            term: 'Pensamento Crítico',
-            definition: 'Capacidade de avaliar informações objetivamente, identificar vieses e construir conclusões fundamentadas. É a competência #1 mais valorizada por CEOs globais (WEF, 2025).',
-            example: '"Estamos vendendo pouco" não é uma questão — é um sintoma. Pensamento crítico pergunta: vendendo pouco em qual segmento? Desde quando? O que mudou? Quais dados sustentam isso?',
-            antiExample: '"O gerente sênior acha que o problema é o preço, então é o preço." Isso é falácia de apelo à autoridade, não análise crítica.',
-          },
-          {
-            id: 'M4-fil-exercise1',
-            type: 'inline-exercise',
-            prompt: 'Identifique 3 falácias lógicas em decisões reais que você presenciou no trabalho.',
-            context: 'As 10 falácias mais comuns: Ad Hominem, Apelo à Autoridade, Falsa Dicotomia, Correlação ≠ Causalidade, Viés de Confirmação, Custo Irrecuperável, Generalização Apressada, Apelo à Tradição, Falsa Causa, Ladeira Escorregadia.',
-            fields: [
-              { id: 'fallacy1', label: 'Falácia 1: Qual foi a frase ou decisão?', placeholder: 'Ex: "Já investimos R$ 2M nesse projeto, não podemos parar agora"', multiline: true },
-              { id: 'fallacy1-name', label: 'Qual falácia é essa?', placeholder: 'Ex: Custo Irrecuperável (investimento passado é irrelevante para decisão futura)' },
-              { id: 'fallacy2', label: 'Falácia 2: Qual foi a frase ou decisão?', placeholder: 'Ex: "Sempre fizemos assim e funcionou"', multiline: true },
-              { id: 'fallacy2-name', label: 'Qual falácia é essa?', placeholder: 'Ex: Apelo à Tradição (contexto pode ter mudado)' },
-              { id: 'fallacy3', label: 'Falácia 3: Qual foi a frase ou decisão?', placeholder: 'Ex: "Depois da campanha, vendas subiram, logo a campanha causou"', multiline: true },
-              { id: 'fallacy3-name', label: 'Qual falácia é essa?', placeholder: 'Ex: Falsa Causa / Post hoc ergo propter hoc' },
+            id: 'M4-0-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Pensamento Crítico e Lógica nos Negócios',
+            subtitle: 'Por que filosofia importa — falácias, vieses e como pensar com rigor',
+            opening: {
+              leadText: 'Filosofia não é abstração inútil. É a disciplina que treina o {{pensamento rigoroso}} — questionar suposições, construir argumentos e tomar decisões sob incerteza. Todo gestor que já tomou uma decisão baseada em suposição não verificada precisava de filosofia.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'Pensamento crítico é a capacidade de avaliar informações de forma objetiva, identificar vieses e construir conclusões fundamentadas. É a competência mais valorizada por CEOs globais (World Economic Forum, 2023) — acima de liderança e {{comunicação}}.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Ferramentas do pensamento crítico',
+                pillars: [
+                  { icon: '🔍', title: 'Análise de argumentos', description: 'Separar premissa de conclusão. A conclusão {{decorre}} das premissas? Ou tem salto lógico?' },
+                  { icon: '⚠️', title: 'Identificação de vieses', description: 'Viés de confirmação (buscar só o que confirma), ancoragem (primeira informação {{domina}}), efeito halo.' },
+                  { icon: '🧪', title: 'Método socrático', description: 'Perguntar "por quê?" até chegar à premissa fundamental. Se a premissa é {{falsa}}, toda conclusão cai.' },
+                  { icon: '❌', title: 'Detecção de falácias', description: 'Argumentos que parecem válidos mas não são: apelo à autoridade, falsa dicotomia, {{ad hominem}}, correlação ≠ causalidade.' },
+                ],
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Falácia do Apelo à Autoridade',
+                    period: 'Erro lógico #1 em negócios',
+                    text: '"O CEO da empresa X disse que funciona, logo funciona." Autoridade não prova verdade. Até especialistas erram. A pergunta certa: quais são os {{dados}}, independente de quem falou?',
+                    caseStudy: {
+                      company: 'WeWork',
+                      year: 2019,
+                      story: 'Adam Neumann (CEO) convenceu investidores com carisma, não dados. Valuation de {{US$ 47 bilhões}} caiu para US$ 9 bilhões quando os números foram analisados. Autoridade sem dado = bolha.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '$47B → $9B', label: 'Queda de valuation' },
+                        { value: '0', label: 'Lucro acumulado' },
+                        { value: 'Carisma', label: 'Substituiu análise' },
+                      ],
+                      insight: 'Falácia de autoridade é o viés mais {{caro}} do mundo corporativo. Dados vencem cargo.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Correlação ≠ Causalidade',
+                    period: 'Erro lógico #2 em dados',
+                    text: '"Vendas subiram depois da campanha, logo a campanha causou a subida." Pode ser coincidência, sazonalidade ou outro fator. Correlação mostra {{associação}}, não causa.',
+                    caseStudy: {
+                      company: 'Marketing digital',
+                      year: 2024,
+                      story: 'Empresa investiu R$ 500k em branding. Vendas subiram 20%. Mas o mercado inteiro subiu 18%. O branding contribuiu {{2%}}, não 20%. Sem grupo controle, atribuição é chute.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '20%', label: 'Crescimento total' },
+                        { value: '18%', label: 'Crescimento do mercado' },
+                        { value: '2%', label: 'Contribuição real' },
+                      ],
+                      insight: 'Para provar causalidade: grupo controle, teste A/B ou análise {{contrafactual}}. Sem isso, é opinião.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Viés de Confirmação',
+                    period: 'O viés mais perigoso',
+                    text: 'Buscar apenas informações que confirmam o que já acredita. Ignorar ou desqualificar evidências {{contrárias}}. Todo ser humano tem. Gestores disciplinados combatem ativamente.',
+                    caseStudy: {
+                      company: 'Kodak',
+                      year: 1997,
+                      story: 'Diretoria tinha dados mostrando crescimento de câmeras digitais. Mas buscava relatórios que confirmassem que filme era {{superior}}. Viés de confirmação custou 130 anos de história.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '130 anos', label: 'História perdida' },
+                        { value: '2012', label: 'Falência' },
+                        { value: '$6.75B', label: 'Dívidas' },
+                      ],
+                      insight: 'Antídoto: designar um "Red Team" que ataque a ideia dominante. CIA e militares usam. Empresas {{deveriam}}.',
+                    },
+                  },
+                ],
+              },
             ],
-            evaluationCriteria: ['Identifica corretamente o nome da falácia', 'Explica por que o raciocínio é inválido', 'Propõe como seria o raciocínio correto'],
-            expectedConcepts: ['falácia lógica', 'viés cognitivo', 'pensamento crítico'],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada falácia/viés opera de forma diferente. Identifique.',
+              compare: {
+                columnHeaders: ['Apelo à Autoridade', 'Correlação ≠ Causa', 'Viés Confirmação'],
+                rows: [
+                  { label: 'Erro', values: ['Cargo prova verdade', 'Associação prova causa', 'Busca só o que confirma'] },
+                  { label: 'Antídoto', values: ['Exigir dados', 'Grupo controle', 'Red Team'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual falácia/viés?',
+                zones: [
+                  { id: 'aut', label: 'Apelo à Autoridade' },
+                  { id: 'cor', label: 'Correlação ≠ Causa' },
+                  { id: 'conf', label: 'Viés de Confirmação' },
+                ],
+                items: [
+                  { id: 'ceo', label: '"O Elon Musk faz assim, logo devemos fazer"', correctZone: 'aut', correctFeedback: 'Certo. Autoridade ≠ verdade.', wrongFeedback: '"Fulano faz" = apelo à autoridade.' },
+                  { id: 'sorvete', label: '"Vendas de sorvete sobem no verão, afogamentos também"', correctZone: 'cor', correctFeedback: 'Certo. Ambos correlacionam com calor, não entre si.', wrongFeedback: 'Coincidência temporal ≠ causa.' },
+                  { id: 'rel', label: '"Li 5 artigos que confirmam minha tese"', correctZone: 'conf', correctFeedback: 'Certo. Buscou só confirmação.', wrongFeedback: 'Buscar só o que confirma = viés.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Pensamento crítico é a competência {{#1}} do século XXI (WEF 2023). Falácias e vieses custam bilhões — WeWork ($47B→$9B), Kodak (130 anos). O antídoto: dados, método e humildade intelectual.',
+              keyInsights: [
+                'WEF 2023: pensamento crítico é a competência mais valorizada por CEOs — acima de {{liderança}}.',
+                'WeWork: falácia de autoridade custou {{US$ 38 bilhões}} em valuation.',
+                'Viés de confirmação: designar Red Team que ataque a ideia dominante. Se {{sobrevive}}, é robusta.',
+              ],
+              nextChapterHint: 'Capítulo 2 · Ética Empresarial',
+              nextChapterBlurb: '4 frameworks para decisões difíceis — utilitarismo, Kant, virtude e cuidado.',
+            },
+          },
+          {
+            id: 'M4-0-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Ética Empresarial e Epistemologia',
+            subtitle: '4 frameworks éticos + como separar conhecimento válido de achismo',
+            opening: {
+              leadText: 'Toda decisão empresarial tem dimensão ética, mesmo quando não é óbvia. Demitir, precificar, terceirizar, usar dados — cada ação afeta {{pessoas}}. Os 4 frameworks éticos dão estrutura para decidir quando não há resposta fácil.',
+            },
+            body: [
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Utilitarismo',
+                    period: 'Consequências',
+                    text: 'Jeremy Bentham e John Stuart Mill. A ação correta é a que produz o {{maior bem para o maior número}}. Foco nas consequências, não nas intenções.',
+                    caseStudy: {
+                      company: 'Ford Pinto',
+                      year: 1978,
+                      story: 'Ford calculou: consertar tanque = {{US$ 137M}}. Indenizações por mortes = US$ 49M. Decisão utilitarista: não consertar. Resultado: escândalo, destruição de reputação, lição sobre os limites do cálculo.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '$137M', label: 'Custo do conserto' },
+                        { value: '$49M', label: 'Custo das indenizações' },
+                        { value: 'Bilhões', label: 'Custo reputacional real' },
+                      ],
+                      insight: 'Utilitarismo funciona para decisões de {{escala}} (política pública, alocação de recursos). Falha quando reduz vidas a números.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Deontologia (Kant)',
+                    period: 'Dever e regras',
+                    text: 'Immanuel Kant: a ação é ética se pode ser {{universalizada}} sem contradição. "Mentir é errado" — mesmo que a verdade cause prejuízo. O dever moral importa mais que a consequência.',
+                    caseStudy: {
+                      company: 'Johnson & Johnson',
+                      year: 1982,
+                      story: 'Tylenol envenenado matou 7 pessoas. J&J recolheu {{31 milhões}} de frascos, custando US$ 100M. Decisão kantiana: "se fosse nosso filho?" Resultado: confiança reconstruída, marca fortalecida.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '31M', label: 'Frascos recolhidos' },
+                        { value: '$100M', label: 'Custo do recall' },
+                        { value: '#1', label: 'Caso de ética corporativa' },
+                      ],
+                      insight: 'Kant funciona quando a ação {{pode ser universalizada}}: "se todos fizessem isso, o mundo seria melhor?"',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Ética das Virtudes (Aristóteles)',
+                    period: 'Caráter',
+                    text: 'Aristóteles: a ação ética vem do {{caráter}} do agente, não de regras ou cálculos. Cultive virtudes (coragem, temperança, justiça, prudência) e as decisões éticas seguem naturalmente.',
+                    caseStudy: {
+                      company: 'Patagonia',
+                      year: 2022,
+                      story: 'Yvon Chouinard doou a empresa inteira ({{US$ 3 bilhões}}) para combate às mudanças climáticas. Não por cálculo nem por regra — por caráter. "Earth is now our only shareholder."',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '$3B', label: 'Valor doado' },
+                        { value: '100%', label: 'Da empresa' },
+                        { value: 'Caráter', label: 'Não cálculo nem regra' },
+                      ],
+                      insight: 'Virtude não se ensina em PowerPoint — se {{cultiva}} ao longo do tempo. É a ética mais difícil e mais duradoura.',
+                    },
+                  },
+                  {
+                    index: 4,
+                    title: 'Ética do Cuidado',
+                    period: 'Relacionamentos',
+                    text: 'Carol Gilligan (Harvard, 1982): ética baseada em {{relacionamentos e responsabilidade}} com os outros. A pergunta não é "o que é justo?" mas "quem será afetado e como posso cuidar?"',
+                    caseStudy: {
+                      company: 'Natura',
+                      year: 2010,
+                      story: 'Relação com comunidades amazônicas: não como fornecedores descartáveis mas como {{parceiros}} de longo prazo. 2.000+ famílias com renda garantida. Cuidado como modelo de negócio.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '2.000+', label: 'Famílias parceiras' },
+                        { value: '33', label: 'Comunidades' },
+                        { value: 'R$ 2B', label: 'Receita Amazônia' },
+                      ],
+                      insight: 'Ética do cuidado é a base da sustentabilidade real: tratar stakeholders como {{pessoas}}, não como variáveis.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Epistemologia — como sabemos o que sabemos?',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Epistemologia estuda o conhecimento: o que é verdade? Como justificar uma crença? A maioria das decisões empresariais é baseada em suposições não verificadas — "o mercado quer isso", "nosso diferencial é qualidade", "o problema é preço". Epistemologia ensina a perguntar: "como eu {{sei}} isso? Qual a evidência?"',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Karl Popper: conhecimento científico é aquele que pode ser {{falsificado}}. Se não existe experimento que possa provar que uma teoria é falsa, ela não é ciência — é crença. No mundo dos negócios: "nosso produto é o melhor" — como falsificar isso? Qual métrica? Qual benchmark? Se não tem como provar que é falso, não é dado — é fé.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada framework ético faz uma pergunta diferente. Classifique.',
+              compare: {
+                columnHeaders: ['Utilitarismo', 'Kant', 'Virtude', 'Cuidado'],
+                rows: [
+                  { label: 'Pergunta', values: ['Maior bem?', 'Universalizável?', 'Que caráter?', 'Quem é afetado?'] },
+                  { label: 'Foco', values: ['Consequência', 'Dever', 'Caráter', 'Relação'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual framework ético guiou a decisão?',
+                zones: [
+                  { id: 'util', label: 'Utilitarismo' },
+                  { id: 'kant', label: 'Kant' },
+                  { id: 'virt', label: 'Virtude' },
+                  { id: 'cuid', label: 'Cuidado' },
+                ],
+                items: [
+                  { id: 'jj', label: 'J&J recolheu 31M frascos por dever moral', correctZone: 'kant', correctFeedback: 'Certo. "Se fosse nosso filho?" = dever universal.', wrongFeedback: 'Recolher por princípio = Kant.' },
+                  { id: 'pat', label: 'Patagonia doou US$ 3B por caráter', correctZone: 'virt', correctFeedback: 'Certo. Não por cálculo — por quem Chouinard é.', wrongFeedback: 'Doação por caráter = virtude.' },
+                  { id: 'nat', label: 'Natura cuida de comunidades como parceiras', correctZone: 'cuid', correctFeedback: 'Certo. Relação de cuidado = ética do cuidado.', wrongFeedback: 'Parceria de cuidado = ética do cuidado.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Não existe framework ético "melhor". Utilitarismo para {{escala}}, Kant para {{princípios}}, Virtude para {{caráter}}, Cuidado para {{relações}}. Usar os 4 juntos é a abordagem mais robusta.',
+              keyInsights: [
+                'Ford Pinto: utilitarismo puro reduz vidas a números. Consequências importam mas não são {{tudo}}.',
+                'J&J Tylenol: decisão kantiana custou $100M mas salvou a marca. Princípio > {{cálculo}} de curto prazo.',
+                'Popper: se não pode ser {{falsificado}}, não é conhecimento — é crença.',
+              ],
+              nextChapterHint: 'Capítulo 3 · Filosofia Política e Existencialismo',
+              nextChapterBlurb: 'De Adam Smith a Rawls — e por que trabalho precisa de significado.',
+            },
+          },
+          {
+            id: 'M4-0-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Filosofia Política, Ciência e Propósito',
+            subtitle: 'Smith, Marx, Rawls — e por que existencialismo importa para gestores',
+            opening: {
+              leadText: 'Todo modelo de negócio opera dentro de um sistema econômico. Todo sistema econômico é baseado em premissas filosóficas sobre a {{natureza humana}}, justiça e o papel do Estado. E o existencialismo responde à pergunta mais negligenciada: por que estamos fazendo isso?',
+            },
+            body: [
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Adam Smith — Mão Invisível',
+                    period: 'Liberalismo econômico',
+                    text: '"A Riqueza das Nações" (1776). O interesse próprio, guiado pela competição, leva ao {{bem coletivo}}. A "mão invisível" do mercado aloca recursos melhor que o Estado.',
+                    caseStudy: {
+                      company: 'Silicon Valley',
+                      year: 2024,
+                      story: 'Modelo de startups: competição feroz, auto-interesse dos fundadores, mas o resultado agrega valor para {{milhões}} de usuários. Smith aplicado ao extremo.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '1776', label: 'A Riqueza das Nações' },
+                        { value: 'Mão invisível', label: 'Mercado regula' },
+                      ],
+                      insight: 'Smith não era anti-Estado. Defendia que o Estado garantisse {{regras do jogo}} — educação, justiça, defesa. Laissez-faire puro não é Smith.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Karl Marx — Crítica ao Capital',
+                    period: 'Conflito de classes',
+                    text: '"O Capital" (1867). O capitalismo gera {{desigualdade}} estrutural. O trabalhador produz mais valor do que recebe (mais-valia). A contradição entre capital e trabalho é insolúvel dentro do sistema.',
+                    caseStudy: {
+                      company: 'Gig Economy',
+                      year: 2024,
+                      story: 'Entregadores de iFood/Uber: produzem {{bilhões}} em GMV, recebem salário mínimo. Marx diria: mais-valia digital. O debate sobre regulação da gig economy é marxismo aplicado.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '1867', label: 'O Capital' },
+                        { value: 'Mais-valia', label: 'Valor apropriado pelo capital' },
+                      ],
+                      insight: 'Não é preciso ser marxista para reconhecer que {{desigualdade extrema}} desestabiliza mercados e sociedades.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'John Rawls — Véu da Ignorância',
+                    period: 'Justiça como equidade',
+                    text: '"Uma Teoria da Justiça" (1971). Se você não soubesse qual posição ocuparia na sociedade ({{véu da ignorância}}), que regras criaria? As regras justas são as que protegem os mais vulneráveis.',
+                    caseStudy: {
+                      company: 'Políticas de diversidade',
+                      year: 2024,
+                      story: 'Rawls fundamenta cotas e programas de inclusão: se você não soubesse se nasceria homem ou mulher, negro ou branco, rico ou pobre — apoiaria {{igualdade}} de oportunidades.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '1971', label: 'Uma Teoria da Justiça' },
+                        { value: 'Véu', label: 'Da ignorância' },
+                      ],
+                      insight: 'Rawls é a base filosófica do ESG social: criar regras que protejam os mais {{vulneráveis}}, não os mais poderosos.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Existencialismo e propósito',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O existencialismo coloca liberdade e responsabilidade individual no centro. Sartre: "estamos condenados a ser {{livres}}" — cada escolha define quem somos. Para negócios: por que essa empresa existe? Se a resposta é apenas "lucro", funcionários, clientes e investidores cada vez mais procuram outra empresa com resposta {{melhor}}.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Viktor Frankl ("Em Busca de Sentido", 1946): pessoas que encontram significado no que fazem são mais resilientes, produtivas e engajadas. Empresas com propósito claro têm {{3x mais engajamento}} (Deloitte, 2023). Propósito não é slogan na parede — é critério de decisão em momentos difíceis.',
+              },
+              {
+                kind: 'heading',
+                text: 'Filosofia da ciência aplicada',
+              },
+              {
+                kind: 'paragraph',
+                text: 'No mundo dos negócios, consultores e influencers vendem "metodologias" que parecem ciência mas não são. Karl Popper ensinou: conhecimento científico é {{falsificável}}. Thomas Kuhn mostrou que paradigmas mudam por revoluções, não evolução gradual. Para gestores: questione "verdades" do setor. O que é paradigma estabelecido pode ser o próximo a {{cair}}.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada filósofo fundamenta uma visão diferente de economia e sociedade.',
+              compare: {
+                columnHeaders: ['Smith', 'Marx', 'Rawls'],
+                rows: [
+                  { label: 'Pergunta', values: ['Como criar riqueza?', 'Quem se beneficia?', 'O que é justo?'] },
+                  { label: 'Resposta', values: ['Mercado livre', 'Trabalhador explorado', 'Proteger vulneráveis'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual filósofo fundamenta cada argumento?',
+                zones: [
+                  { id: 'smith', label: 'Smith' },
+                  { id: 'marx', label: 'Marx' },
+                  { id: 'rawls', label: 'Rawls' },
+                ],
+                items: [
+                  { id: 'comp', label: '"Competição entre empresas beneficia o consumidor"', correctZone: 'smith', correctFeedback: 'Certo. Mão invisível = Smith.', wrongFeedback: 'Competição → bem coletivo = Smith.' },
+                  { id: 'gig', label: '"Entregadores produzem bilhões e recebem mínimo"', correctZone: 'marx', correctFeedback: 'Certo. Mais-valia = Marx.', wrongFeedback: 'Desigualdade estrutural = Marx.' },
+                  { id: 'cota', label: '"Se não soubesse sua posição, criaria cotas"', correctZone: 'rawls', correctFeedback: 'Certo. Véu da ignorância = Rawls.', wrongFeedback: 'Proteger vulneráveis = Rawls.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Smith, Marx e Rawls não são história — são as lentes pelas quais {{toda}} decisão econômica e política é debatida hoje. E o existencialismo lembra: sem propósito, a empresa é máquina de lucro sem alma.',
+              keyInsights: [
+                'Smith: mercado livre cria riqueza. Mas Smith também defendia que o Estado garantisse {{regras do jogo}}.',
+                'Marx: desigualdade extrema {{desestabiliza}}. Gig economy é o debate marxista do século XXI.',
+                'Frankl: empresas com propósito têm {{3x}} mais engajamento. Propósito não é marketing — é decisão.',
+              ],
+            },
+          },
+          {
+            id: 'M4-0-cap4',
+            type: 'chapter',
+            number: 4,
+            title: 'Filosofia Oriental, Linguagem, Estética e Tecnologia',
+            subtitle: 'Zen e liderança, poder das palavras, beleza como diferencial e ética da IA',
+            opening: {
+              leadText: 'A filosofia ocidental enfatiza análise, controle e ação. A filosofia oriental oferece perspectivas complementares — e cada vez mais {{valorizadas}} em liderança e inovação. A linguagem cria realidade. A estética diferencia. E a tecnologia nunca é neutra.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Filosofia Oriental aplicada a negócios',
+                pillars: [
+                  { icon: '☯️', title: 'Taoísmo (Lao Tzu)', description: '"O líder supremo é aquele cujo povo mal sabe que ele existe." Liderança como {{não-ação}} (wu wei). Criar condições para que as coisas aconteçam naturalmente.' },
+                  { icon: '🧘', title: 'Zen Budismo', description: 'Foco no presente. Mente de principiante (shoshin). Steve Jobs praticava zen: "Stay hungry, stay foolish." Simplicidade como {{filosofia}}, não como limitação.' },
+                  { icon: '⚔️', title: 'Sun Tzu', description: '"A Arte da Guerra" (500 a.C.). Estratégia como antecipação: "conheça o inimigo e a si mesmo e em 100 batalhas não {{correrá}} perigo." Aplicado a competição de mercado.' },
+                  { icon: '🌊', title: 'Wabi-Sabi', description: 'Estética japonesa da imperfeição. Aceitar o imperfeito, o transitório, o incompleto. Aplicação: MVP — lance imperfeito, {{itere}}. Perfeição é inimiga do progresso.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Linguagem e comunicação',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A linguagem não apenas descreve a realidade — ela {{CRIA}} a realidade. Ludwig Wittgenstein (1889-1951): "os limites da minha linguagem são os limites do meu mundo." Como você nomeia as coisas determina como as pessoas pensam sobre elas. "Demissão" vs "reestruturação" vs "realinhamento estratégico" — mesmo evento, narrativas completamente diferentes.',
+              },
+              {
+                kind: 'heading',
+                text: 'Estética e experiência',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Estética é diferencial competitivo. Apple cobrou premium por décadas não por superioridade técnica — mas por {{beleza}} e experiência sensorial. Dieter Rams (Braun/Vitsoe): "bom design é o mínimo de design possível." Estética sustentável: produtos que envelhecem com {{dignidade}} em vez de virar lixo.',
+              },
+              {
+                kind: 'heading',
+                text: 'Filosofia da tecnologia e ética da IA',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A tecnologia nunca é neutra. Toda ferramenta carrega os valores de quem a criou. Martin Heidegger alertou que a tecnologia moderna transforma tudo em "{{recurso a ser otimizado}}" — inclusive pessoas. A IA generativa amplifica vieses existentes. Quem decide o que a IA "aprende" decide o que ela reproduz. A pergunta não é "a IA pode fazer isso?" — é "a IA {{deve}} fazer isso?"',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Dilemas da IA que gestores enfrentam',
+                pillars: [
+                  { icon: '🔍', title: 'Viés algorítmico', description: 'IA treinada com dados históricos reproduz {{discriminação}} histórica. Recrutamento por IA pode discriminar gênero e raça.' },
+                  { icon: '👁️', title: 'Vigilância', description: 'Monitoramento de produtividade: eficiência ou {{invasão}} de privacidade? Onde está o limite?' },
+                  { icon: '🤖', title: 'Substituição', description: 'Automatizar para reduzir custo: legítimo ou {{irresponsável}} socialmente? Quem absorve os desempregados?' },
+                  { icon: '🧬', title: 'Transhumanismo', description: 'Implantes neurais, edição genética, extensão de vida. A pergunta: quem terá {{acesso}}? Pode criar desigualdade biológica irreversível.' },
+                ],
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada ramo filosófico responde a uma dimensão diferente dos negócios.',
+              compare: {
+                columnHeaders: ['Oriental', 'Linguagem', 'Estética', 'Tecnologia'],
+                rows: [
+                  { label: 'Ensina', values: ['Equilíbrio', 'Narrativa', 'Beleza', 'Responsabilidade'] },
+                  { label: 'Aplicação', values: ['Liderança', 'Comunicação', 'Produto', 'IA/Dados'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual filósofo/conceito se aplica?',
+                zones: [
+                  { id: 'ori', label: 'Oriental' },
+                  { id: 'ling', label: 'Linguagem' },
+                  { id: 'est', label: 'Estética' },
+                  { id: 'tech', label: 'Tecnologia' },
+                ],
+                items: [
+                  { id: 'jobs', label: 'Steve Jobs: "Stay hungry, stay foolish"', correctZone: 'ori', correctFeedback: 'Certo. Jobs era praticante de Zen.', wrongFeedback: 'Mente de principiante = Zen = oriental.' },
+                  { id: 'witt', label: '"Limites da linguagem = limites do mundo"', correctZone: 'ling', correctFeedback: 'Certo. Wittgenstein = linguagem.', wrongFeedback: 'Wittgenstein = filosofia da linguagem.' },
+                  { id: 'rams', label: '"Bom design é o mínimo de design possível"', correctZone: 'est', correctFeedback: 'Certo. Dieter Rams = estética.', wrongFeedback: 'Design mínimo = estética.' },
+                  { id: 'bias', label: 'IA de recrutamento discrimina gênero', correctZone: 'tech', correctFeedback: 'Certo. Viés algorítmico = ética da tecnologia.', wrongFeedback: 'Viés de IA = filosofia da tecnologia.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Filosofia oriental ensina {{equilíbrio}}. Linguagem cria realidade. Estética diferencia. E a tecnologia nunca é neutra — quem programa a IA programa os {{valores}} que ela reproduz.',
+              keyInsights: [
+                'Lao Tzu: o melhor líder é aquele que o povo mal sabe que {{existe}}. Liderar é criar condições.',
+                'Wittgenstein: "limites da linguagem = limites do {{mundo}}." Renomear muda a percepção.',
+                'Heidegger: tecnologia transforma tudo em recurso. A pergunta não é "pode?" — é "{{deve}}?"',
+              ],
+            },
           },
           {
             id: 'M4-0-s1',
             type: 'simulation',
             title: 'Detector de Falácias — Identifique o Erro Lógico',
             simulationId: 'fallacy-detector',
-            description: 'Receba 10 frases comuns do mundo corporativo e identifique qual falácia lógica cada uma contém. Desenvolva o olhar crítico para argumentos inválidos.',
-          },
-          {
-            id: 'M4-0-t3',
-            type: 'text',
-            title: 'Ética Empresarial — Os 4 Frameworks para Decisões Difíceis',
-            body: 'Toda decisão empresarial tem dimensão ética, mesmo quando não é óbvia. Demitir, precificar, terceirizar, usar dados — cada ação afeta pessoas.\n\n**Framework 1 — Utilitarismo (Consequencialismo)**\nPergunta: "Qual ação gera o maior bem para o maior número?"\nOrigem: Jeremy Bentham, John Stuart Mill (séc. XVIII-XIX)\nComo aplicar: Some os benefícios e custos para TODOS os afetados. Escolha a ação com saldo positivo máximo.\nExemplo: Fechar fábrica em cidade pequena (200 empregos) para abrir em cidade grande (500 empregos). Utilitarismo puro diria: fecha, porque 500 > 200.\nLimitação: Pode justificar injustiças contra minorias se a maioria se beneficia. Os 200 trabalhadores não são menos humanos que os 500.\n\n**Framework 2 — Deontologia (Ética do Dever)**\nPergunta: "Essa ação respeita regras morais universais, independente do resultado?"\nOrigem: Immanuel Kant (séc. XVIII)\nImperativo Categórico: "Aja apenas segundo uma máxima que você possa querer que se torne lei universal."\nComo aplicar: Se todo mundo fizesse isso, o mundo funcionaria? Se não, é errado.\nExemplo: Mentir para fechar uma venda. Mesmo que gere lucro (consequência boa), mentir não pode ser universalizado — se todos mentissem, o comércio colapsa.\nLimitação: Rígido demais. Às vezes a regra gera resultado pior (ex: "nunca mentir" pode causar dano em situações extremas).\n\n**Framework 3 — Ética das Virtudes**\nPergunta: "Uma pessoa virtuosa faria isso?"\nOrigem: Aristóteles (séc. IV a.C.)\nComo aplicar: Foque no caráter, não na ação isolada. Virtudes: coragem, justiça, temperança, prudência, honestidade, generosidade.\nExemplo: Um gestor descobre fraude de um amigo próximo. A ética das virtudes pergunta: o que uma pessoa justa e corajosa faria? Denunciar, mesmo com custo pessoal.\nLimitação: Subjetivo. Culturas diferentes valorizam virtudes diferentes.\n\n**Framework 4 — Ética do Cuidado**\nPergunta: "Essa decisão considera as relações e responsabilidades com quem é vulnerável?"\nOrigem: Carol Gilligan (1982)\nComo aplicar: Priorize relações e responsabilidades. Quem é mais vulnerável nesta decisão?\nExemplo: Ao terceirizar atendimento, a empresa reduz custos — mas os terceirizados ganham menos e não têm benefícios. A ética do cuidado pergunta: qual é nossa responsabilidade com essas pessoas?\nLimitação: Pode gerar paternalismo. Nem toda decisão pode priorizar relações sobre resultados.\n\n**Na prática — Como usar os 4 frameworks juntos:**\nQuando enfrentar uma decisão ética difícil, passe por todos:\n1. Utilitarismo: Quem se beneficia? Quem é prejudicado? Qual o saldo?\n2. Deontologia: Essa ação pode ser universalizada? Respeita direitos fundamentais?\n3. Virtudes: Uma pessoa que eu admiro faria isso?\n4. Cuidado: Quem é vulnerável nessa situação? Qual minha responsabilidade?\n\nSe os 4 frameworks apontam na mesma direção → decisão clara.\nSe divergem → a tensão é real e merece deliberação profunda.',
-          },
-          {
-            id: 'M4-fil-compare1',
-            type: 'compare',
-            title: '4 Frameworks Éticos — Mesma Situação, Conclusões Diferentes',
-            question: 'Se uma empresa precisa demitir 200 pessoas para não falir (e salvar 800 empregos), o que cada framework diz?',
-            dimensions: ['Pergunta central', 'Veredicto sobre a demissão', 'Justificativa', 'Limitação'],
-            items: [
-              { id: 'util', label: 'Utilitarismo', values: ['Qual ação gera maior bem para mais pessoas?', 'AUTORIZA — 800 salvos > 200 demitidos', 'Saldo positivo: mais pessoas se beneficiam', 'Ignora o sofrimento dos 200. Minoria sacrificada pela maioria.'], highlight: 'Cuidado: pode justificar injustiças contra minorias.' },
-              { id: 'deont', label: 'Deontologia (Kant)', values: ['Essa ação respeita regras morais universais?', 'QUESTIONA — demitir pessoas como "meio" para um fim viola a dignidade humana', 'Imperativo: trate pessoas como fins, nunca apenas como meios', 'Rígida demais: às vezes a alternativa (falir) é pior para todos.'], highlight: 'Se universalizar "demitir quando convém", a relação de trabalho perde sentido.' },
-              { id: 'virt', label: 'Ética das Virtudes', values: ['Uma pessoa virtuosa faria isso?', 'DEPENDE — se fez o possível antes (cortar custos, renegociar), sim', 'A intenção e o caráter importam. Demitir com dignidade e suporte é virtuoso.', 'Subjetivo: depende de quem define "virtuoso".'], highlight: 'Como demite importa tanto quanto se demite.' },
-              { id: 'care', label: 'Ética do Cuidado', values: ['Quem é vulnerável nessa decisão?', 'EXIGE CUIDADO — os 200 demitidos são os mais vulneráveis', 'Responsabilidade especial com quem será mais afetado', 'Pode gerar paternalismo ou paralisia decisória.'], highlight: 'Ofereceu outplacement? Aviso prévio justo? Extensão de plano de saúde?' },
-            ],
-            insight: 'Quando os 4 frameworks divergem, a tensão é REAL e merece deliberação profunda. Empresas éticas não escolhem 1 framework — passam a decisão por todos e buscam o caminho com menor dano total.',
-          },
-          {
-            id: 'M4-fil-decision1',
-            type: 'decision',
-            scenario: 'Você é CEO de uma fintech brasileira. Seu algoritmo de crédito usa dados de redes sociais para prever inadimplência — e funciona (reduz default em 18%). Porém, uma análise interna revela que o modelo reprova 2.3x mais pessoas negras e de periferias. O que você faz?',
-            options: [
-              { label: 'Manter o modelo — os dados são objetivos', tradeoffs: { upside: 'Menor inadimplência, maior margem de lucro', downside: 'Reproduz discriminação sistêmica com verniz tecnológico', risk: 'high' as const } },
-              { label: 'Remover variáveis discriminatórias e retreinar o modelo', tradeoffs: { upside: 'Modelo mais justo, alinhado com princípios ESG', downside: 'Pode aumentar inadimplência em 5-8%, reduzindo margem', risk: 'medium' as const } },
-              { label: 'Criar modelo híbrido: IA + revisão humana para casos limítrofes', tradeoffs: { upside: 'Equilíbrio entre eficiência e justiça', downside: 'Custo operacional maior, processo mais lento', risk: 'low' as const } },
-            ],
-            realWorldAnalog: 'O caso COMPAS (EUA) mostrou que algoritmos de justiça criminal classificavam negros como 2.3x mais propensos a reincidir. No Brasil, o Nubank enfrentou críticas por limites de crédito mais baixos para clientes de periferias — e ajustou seus modelos.',
-            lesson: 'Dados históricos carregam os vieses da sociedade que os gerou. "O algoritmo decidiu" não é defesa ética — a responsabilidade é de quem constrói e usa o sistema.',
+            description: '10 argumentos empresariais. Identifique a falácia em cada um.',
           },
           {
             id: 'M4-0-s2',
             type: 'simulation',
             title: 'Dilemas Éticos Empresariais — Aplique os 4 Frameworks',
             simulationId: 'ethics-dilemmas',
-            description: 'Enfrente 5 dilemas éticos reais de empresas. Para cada um, analise sob os 4 frameworks (Utilitarismo, Deontologia, Virtudes, Cuidado) e compare com a decisão que a empresa tomou.',
-          },
-          {
-            id: 'M4-0-t4',
-            type: 'text',
-            title: 'Epistemologia Empresarial — Como Sabemos o que Sabemos?',
-            body: 'Epistemologia é o estudo do conhecimento: o que é verdade? Como posso justificar uma crença? Qual a diferença entre saber e achar?\n\n**Por que importa para negócios:**\nA maioria das decisões empresariais é tomada com base em "achismos" que parecem dados.\n\n— "Nossos clientes querem X" → Você perguntou? Quantos? Como?\n— "O mercado está crescendo" → Baseado em qual fonte? Qual período?\n— "Essa estratégia funciona" → Funciona comparado a quê? Qual o contrafactual?\n\n**Hierarquia de Evidências para Decisões:**\n\nNível 1 (mais forte): Experimento controlado (teste A/B, RCT)\n— Dividimos clientes em dois grupos. Grupo A recebeu desconto, grupo B não. Vendas do grupo A subiram 23%.\n\nNível 2: Dados históricos com análise estatística\n— Analisamos 3 anos de vendas e identificamos correlação entre investimento em marketing e crescimento.\n\nNível 3: Pesquisa qualitativa estruturada\n— Entrevistamos 30 clientes com roteiro semi-estruturado e identificamos 5 padrões.\n\nNível 4: Opinião de especialista\n— O consultor com 20 anos de experiência recomenda.\n\nNível 5 (mais fraco): Intuição / "sempre fizemos assim"\n— "Eu sinto que é por aí."\n\n**Vieses Cognitivos que Distorcem o Conhecimento:**\n\n— Viés de Confirmação: buscamos informações que confirmam o que já acreditamos\n— Efeito Halo: se a pessoa/empresa é boa em uma coisa, assumimos que é boa em tudo\n— Viés de Sobrevivência: estudamos apenas quem teve sucesso, ignorando quem falhou fazendo a mesma coisa\n— Ancoragem: o primeiro número que vemos influencia toda a negociação\n— Efeito Dunning-Kruger: quem sabe pouco superestima seu conhecimento; quem sabe muito subestima\n\n**Regra prática para gestores:**\nAntes de tomar qualquer decisão baseada em "dados":\n1. Qual a fonte? É confiável?\n2. Qual o tamanho da amostra? É representativo?\n3. Existe uma explicação alternativa?\n4. Eu buscaria essa informação se ela contradissesse minha opinião?',
-          },
-          {
-            id: 'M4-0-t5',
-            type: 'text',
-            title: 'Filosofia Política e Modelos Econômicos — De Smith a Rawls',
-            body: 'Todo modelo de negócio opera dentro de um sistema econômico. Todo sistema econômico é baseado em premissas filosóficas sobre a natureza humana, justiça e o papel do Estado.\n\n**Adam Smith (1723–1790) — Liberalismo Econômico**\nIdeia central: O livre mercado, guiado pela "mão invisível", aloca recursos de forma mais eficiente do que qualquer planejamento central.\nPremissa: Indivíduos buscando seu interesse próprio inadvertidamente promovem o bem coletivo.\nLimitação: Smith também escreveu "Teoria dos Sentimentos Morais" — ele sabia que o mercado precisa de ética. O problema é que seus seguidores frequentemente ignoram essa parte.\nPara negócios: Justifica livre concorrência, desregulamentação e meritocracia.\n\n**Karl Marx (1818–1883) — Crítica ao Capitalismo**\nIdeia central: O capitalismo gera alienação (o trabalhador não se reconhece no produto), concentração de riqueza e exploração sistêmica.\nPremissa: A mais-valia (diferença entre o valor que o trabalhador produz e o que recebe) é a base do lucro capitalista.\nLimitação: As alternativas propostas (socialismo, comunismo) geraram sistemas ainda mais concentradores de poder.\nPara negócios: Entender Marx ajuda a diagnosticar tensões trabalhistas, desigualdade salarial e alienação no trabalho — problemas que custam caro em turnover e produtividade.\n\n**John Maynard Keynes (1883–1946) — Intervencionismo**\nIdeia central: O mercado não se autorregula perfeitamente. Em crises, o Estado deve intervir com gastos públicos para estimular a demanda.\nPremissa: Demanda insuficiente é o principal problema econômico, não oferta.\nPara negócios: Explica políticas anticíclicas (crédito subsidiado, incentivos fiscais) que afetam diretamente o ambiente de negócios.\n\n**John Rawls (1921–2002) — Justiça como Equidade**\nIdeia central: O "Véu da Ignorância" — se você não soubesse qual posição ocuparia na sociedade (rico/pobre, homem/mulher, branco/negro), que regras escolheria?\nDois princípios:\n1. Liberdades básicas iguais para todos\n2. Desigualdades são aceitáveis APENAS se beneficiam os menos favorecidos (Princípio da Diferença)\nPara negócios: Base filosófica do ESG e da justiça distributiva. Pergunta: "Esse modelo de negócio beneficia ou prejudica os mais vulneráveis?"\n\n**Aplicação prática para gestores:**\n— Política de salários: Smith diria "pague o mínimo que o mercado aceita". Rawls diria "pague de forma que os menos favorecidos se beneficiem". A maioria das empresas bem-sucedidas opera entre os dois.\n— Precificação: Cobrar o máximo que o mercado suporta (Smith) ou precificar de forma que o produto seja acessível (Rawls)?\n— Modelo de negócio: Maximizar lucro do acionista (Friedman/Smith) ou gerar valor compartilhado (Porter/Rawls)?',
-          },
-          {
-            id: 'M4-fil-concept2',
-            type: 'concept',
-            term: 'Véu da Ignorância (Rawls)',
-            definition: 'Experimento mental: se você não soubesse qual posição ocuparia na sociedade (rico/pobre, homem/mulher, branco/negro), que regras escolheria? As regras justas são as que protegem os mais vulneráveis.',
-            example: 'Se você não soubesse se seria o CEO ou o motorista de app, aceitaria o modelo atual de trabalho por plataforma? Essa pergunta é a base filosófica do ESG e da justiça distributiva.',
-            antiExample: '"O mercado define o salário justo" ignora que o poder de barganha é assimétrico. Rawls diria: o mercado sem regulação favorece quem já tem vantagem.',
-          },
-          {
-            id: 'M4-fil-compare2',
-            type: 'compare',
-            title: 'Smith vs Marx vs Keynes vs Rawls — Filosofia Política e Negócios',
-            question: 'Como cada pensador responderia: "Qual o salário justo para pagar aos funcionários?"',
-            dimensions: ['Ideia central', 'Resposta sobre salários', 'Aplicação em negócios', 'Limitação prática'],
-            items: [
-              { id: 'smith', label: 'Adam Smith', values: ['Livre mercado aloca recursos melhor', 'Pague o que o mercado aceita (oferta × demanda)', 'Justifica meritocracia e livre concorrência', 'Ignora assimetria de poder e falhas de mercado'], highlight: 'Smith TAMBÉM escreveu sobre ética — seus seguidores frequentemente ignoram.' },
-              { id: 'marx', label: 'Karl Marx', values: ['Capitalismo gera alienação e exploração', 'Lucro = diferença entre valor produzido e salário pago (mais-valia)', 'Explica tensões trabalhistas e turnover alto', 'Alternativas propostas geraram concentração de poder ainda maior'], highlight: 'Entender Marx ajuda a diagnosticar desigualdade salarial interna.' },
-              { id: 'keynes', label: 'John M. Keynes', values: ['Mercado não se autorregula; Estado deve intervir', 'Salários devem sustentar consumo — demanda puxa a economia', 'Explica políticas anticíclicas e crédito subsidiado', 'Intervenção excessiva pode gerar inflação e ineficiência'], highlight: 'Quando o governo sobe o salário mínimo, Keynes está operando.' },
-              { id: 'rawls', label: 'John Rawls', values: ['Desigualdade só é justa se beneficia os mais vulneráveis', 'Pague de forma que os menos favorecidos se beneficiem', 'Base do ESG, compliance e responsabilidade social', 'Pode reduzir incentivos de performance e meritocracia'], highlight: 'Teste: "Se eu não soubesse meu cargo, aceitaria essa estrutura salarial?"' },
-            ],
-            insight: 'A maioria das empresas bem-sucedidas opera entre Smith e Rawls: remunera pelo mercado, mas investe em equidade e desenvolvimento para reter talentos e reduzir turnover (que custa 1.5-2x o salário anual).',
-          },
-          {
-            id: 'M4-0-t6',
-            type: 'text',
-            title: 'Existencialismo e Propósito — Por que Trabalho Precisa de Significado',
-            body: 'O existencialismo é a filosofia que coloca a liberdade e a responsabilidade individual no centro da existência. Para negócios, responde à pergunta mais negligenciada: por que estamos fazendo isso?\n\n**Jean-Paul Sartre (1905–1980) — "A existência precede a essência"**\nIdeia: Não nascemos com um propósito definido. Somos livres — e condenados a escolher.\nPara negócios: A empresa não tem propósito inerente. O propósito é uma ESCOLHA. Se a liderança não escolhe conscientemente, o propósito default é "maximizar lucro" — e isso tem consequências.\n\nMá-fé (Mauvaise Foi): Sartre chama de "má-fé" quando fingimos que não temos escolha.\n— "O mercado exige que paguemos pouco" → Má-fé. Você ESCOLHE pagar pouco.\n— "Não temos alternativa senão demitir" → Má-fé, se alternativas não foram exploradas.\n— "É assim que a indústria funciona" → Má-fé. Você pode desafiar a indústria.\n\n**Viktor Frankl (1905–1997) — Logoterapia e a Busca por Sentido**\nFrankl sobreviveu a Auschwitz e concluiu: quem encontra SENTIDO no sofrimento sobrevive. Quem perde o sentido, desiste.\n\n"Quem tem um PORQUÊ suporta qualquer COMO." — Nietzsche (citado por Frankl)\n\nPara negócios:\n— Funcionários que entendem o PORQUÊ do trabalho têm 3x mais engajamento (Gallup)\n— Empresas com propósito claro superam o S&P 500 em 10x ao longo de 15 anos (Firms of Endearment, Sisodia et al.)\n— A geração Z (26% da força de trabalho em 2025) recusa empregos que não tenham propósito alinhado aos seus valores\n\n**Simon Sinek e o Golden Circle:**\nPor quê → Como → O quê\n— Apple: "Desafiamos o status quo" (por quê) → "Com design intuitivo" (como) → "Fazemos computadores" (o quê)\n— A maioria das empresas comunica ao contrário: "Vendemos computadores. Com bom design. Quer comprar?"\n\n**Exercício existencialista para gestores:**\n1. Por que sua empresa existe? (não vale "para dar lucro" — lucro é consequência)\n2. Se sua empresa fechasse amanhã, o que o mundo perderia?\n3. Seus funcionários sabem responder essas perguntas?\n4. Se não sabem — é aí que a desconexão começa.',
-          },
-          {
-            id: 'M4-0-t7',
-            type: 'text',
-            title: 'Filosofia da Ciência — Como Separar Conhecimento Válido de Charlatanismo',
-            body: 'No mundo dos negócios, consultores, gurus e influencers vendem "metodologias" que parecem ciência mas não são. A filosofia da ciência ensina a distinguir conhecimento válido de opinião fantasiada.\n\n**Karl Popper (1902–1994) — Falsificabilidade**\nIdeia: Uma teoria só é científica se pode ser REFUTADA. Se nenhum resultado possível pode provar que está errada, não é ciência — é pseudociência.\n\nExemplos no mundo corporativo:\n— "Nossa cultura é forte" → Como mediria se está errado? Se não pode medir, é crença.\n— "O mercado vai crescer" → Qual dado provaria que está errado? Defina antes.\n— "Ágil funciona para todos" → Qual cenário mostraria que ágil falha? Se não admite nenhum, é dogma.\n\nRegra Popper para gestores: Para toda afirmação estratégica, pergunte: "O que me faria mudar de ideia?"\n\n**Thomas Kuhn (1922–1996) — Paradigmas e Revoluções**\nIdeia: A ciência não evolui linearmente. Opera dentro de "paradigmas" (conjunto de pressupostos aceitos) até que anomalias se acumulam e um novo paradigma emerge (revolução).\n\nPara negócios:\n— Paradigma: "Lojas físicas são o canal principal" → Anomalia: Amazon cresce 30%/ano → Revolução: e-commerce domina\n— Paradigma: "Táxis são regulados e protegidos" → Anomalia: Uber cresce exponencialmente → Revolução: economia compartilhada\n— Paradigma: "Bancos precisam de agências" → Anomalia: Nubank atinge 80M de clientes sem nenhuma → Revolução: banco digital\n\nA maioria das empresas que morre não morre por incompetência — morre por se agarrar ao paradigma antigo quando o novo já está claro.\n\n**Nassim Taleb — Antifragilidade e Cisnes Negros**\nIdeia: Sistemas frágeis quebram sob estresse. Sistemas resilientes resistem. Sistemas antifrágeis MELHORAM sob estresse.\n\nPara negócios:\n— Frágil: Empresa com um único cliente (se perde, quebra)\n— Resiliente: Empresa com carteira diversificada (absorve choques)\n— Antifrágil: Empresa que usa crises para comprar concorrentes baratos e sair mais forte\n\nO Cisne Negro: evento raro, imprevisível, de impacto massivo. COVID, crise de 2008, ascensão do ChatGPT.\n— Você não pode prever Cisnes Negros\n— Mas pode se preparar: diversificação, caixa, opcionalidade\n\n**Método Científico Aplicado a Negócios:**\n1. Observação: "Vendas caíram 15% no trimestre"\n2. Hipótese: "A causa é o novo concorrente no segmento premium"\n3. Teste: Pesquisa com clientes perdidos + análise de market share\n4. Análise: "60% dos clientes perdidos migraram para o concorrente. 40% reduziram consumo geral"\n5. Conclusão provisória: "O concorrente é responsável por ~9pp da queda. A economia explica ~6pp"\n6. Ação: Estratégia diferenciada para cada causa\n7. Revisão: Medir resultado em 90 dias e ajustar',
-          },
-          {
-            id: 'M4-fil-concept3',
-            type: 'concept',
-            term: 'Falsificabilidade (Popper)',
-            definition: 'Uma teoria só é científica se pode ser REFUTADA. Se nenhum resultado possível pode provar que está errada, não é ciência — é pseudociência ou dogma.',
-            example: '"Se investirmos em marketing de conteúdo, esperamos aumento de 15% em leads qualificados em 6 meses. Se não acontecer, a hipótese está errada." Isso é falsificável.',
-            antiExample: '"Nossa cultura é forte" — como provaria que está errado? Se não pode medir nem refutar, é crença, não conhecimento.',
-          },
-          {
-            id: 'M4-fil-framework1',
-            type: 'framework',
-            frameworkId: 'popper-business',
-            title: 'Teste de Popper para Estratégias de Negócio',
-            description: 'Pegue 3 afirmações estratégicas que sua empresa usa e aplique o teste de falsificabilidade. Se não pode ser refutada, não é estratégia — é fé.',
-            fields: [
-              { id: 'claim1', label: 'Afirmação estratégica 1', placeholder: 'Ex: "Nosso diferencial é o atendimento"', helpText: 'Escreva uma afirmação que sua empresa trata como verdade.' },
-              { id: 'falsify1', label: 'O que provaria que está errada?', placeholder: 'Ex: "Se o NPS cair abaixo de 50 E clientes citarem atendimento como motivo de saída"', helpText: 'Se não consegue definir o que a refutaria, não é estratégia testável.' },
-              { id: 'claim2', label: 'Afirmação estratégica 2', placeholder: 'Ex: "O mercado está crescendo"', helpText: 'Baseado em qual fonte? Qual período?' },
-              { id: 'falsify2', label: 'O que provaria que está errada?', placeholder: 'Ex: "Se o crescimento do setor ficar abaixo de 5% por 2 trimestres consecutivos"', helpText: 'Defina o critério ANTES de ver os dados.' },
-            ],
-          },
-          {
-            id: 'M4-0-t8',
-            type: 'text',
-            title: 'Filosofia Oriental e Gestão — Zen, Taoísmo e a Arte de Liderar',
-            body: 'A filosofia ocidental enfatiza análise, controle e ação. A filosofia oriental oferece perspectivas complementares que são cada vez mais valorizadas em liderança e inovação.\n\n**Taoísmo (Lao Tzu, séc. VI a.C.) — Wu Wei: A Ação pela Não-Ação**\n"O líder sábio não força. Quando o melhor líder termina seu trabalho, as pessoas dizem: nós fizemos isso sozinhos."\n\nPara negócios:\n— Wu Wei não é passividade. É agir no momento certo, da forma certa, sem forçar.\n— Microgerenciamento é o oposto do Wu Wei — é força sem sabedoria.\n— O melhor marketing não parece marketing. O melhor líder não parece estar liderando.\n\nCaso prático: A Toyota desenvolveu o Toyota Production System baseado em princípios taoístas — deixar o sistema fluir, remover obstáculos em vez de adicionar controles, confiar no processo.\n\n**Zen Budismo — Mente do Principiante (Shoshin)**\n"Na mente do especialista há poucas possibilidades. Na mente do principiante, infinitas." — Shunryu Suzuki\n\nPara negócios:\n— Especialistas ficam presos no que sabem. Principiantes fazem perguntas que experts não fazem.\n— Steve Jobs: "Stay hungry, stay foolish" — mantenha a mente do principiante.\n— Design Thinking é Shoshin aplicado: observar sem julgamento, perguntar "por quê?" como uma criança.\n\nExercício: Na próxima vez que alguém apresentar um problema "impossível", finja que nunca ouviu falar do assunto. Que perguntas faria?\n\n**Confucionismo — Relações, Hierarquia e Virtude**\nIdeia: A sociedade funciona quando cada pessoa cumpre seu papel com excelência e respeito.\n5 Relações fundamentais: governante-governado, pai-filho, marido-esposa, irmão mais velho-mais novo, amigo-amigo.\n\nPara negócios:\n— Empresas asiáticas (Samsung, Toyota, Alibaba) operam com forte influência confucionista\n— Lealdade à empresa, respeito à hierarquia, visão de longo prazo\n— Limitação: pode inibir dissenso e inovação disruptiva\n\n**Estoicismo (Marco Aurélio, Epicteto, Sêneca) — O que Você Controla?**\n"Não temos controle sobre eventos externos. O que podemos controlar é como respondemos." — Epicteto\n\nDicotomia do Controle:\n— O que você controla: suas decisões, sua preparação, sua resposta, seu esforço\n— O que NÃO controla: o mercado, concorrentes, economia, clima, opinião dos outros\n\nPara gestores:\n— Parou de chover e vendas de guarda-chuva caíram? Não controla o clima. Controla a diversificação de portfólio.\n— Concorrente baixou preço? Não controla o concorrente. Controla sua proposta de valor.\n— Funcionário pediu demissão? Não controla a decisão dele. Controla a cultura que constrói.\n\nMarco Aurélio governou o Império Romano com diário estoico (Meditações). Jeff Bezos, Tim Ferriss e Phil Jackson praticam estoicismo. É a filosofia mais prática para líderes sob pressão.',
-          },
-          {
-            id: 'M4-0-t9',
-            type: 'text',
-            title: 'Filosofia da Linguagem e Comunicação — O Poder das Palavras nos Negócios',
-            body: 'A linguagem não apenas descreve a realidade — ela CRIA a realidade. Como você nomeia as coisas determina como as pessoas pensam sobre elas.\n\n**Ludwig Wittgenstein (1889–1951) — "Os limites da minha linguagem são os limites do meu mundo"**\nIdeia: Só podemos pensar sobre aquilo que temos palavras para descrever.\n\nPara negócios:\n— "Custo" vs "Investimento" — mesma despesa, percepção oposta\n— "Funcionário" vs "Colaborador" vs "Parceiro" — cada termo cria expectativa diferente\n— "Problema" vs "Oportunidade" vs "Desafio" — cada palavra programa a resposta emocional\n— "Demissão" vs "Reestruturação" vs "Rightsizing" — linguagem corporativa frequentemente mascara realidade\n\n**Teoria dos Atos de Fala (John Austin, John Searle)**\nIdeia: Falar não é apenas descrever — é FAZER. Certas palavras são ações.\n\n5 tipos de atos de fala no contexto corporativo:\n1. Assertivos: "O mercado cresceu 5%" (descreve fato)\n2. Diretivos: "Prepare o relatório até sexta" (ordena ação)\n3. Comissivos: "Entregaremos o projeto em 30 dias" (compromete-se)\n4. Expressivos: "Estou frustrado com esse resultado" (expressa sentimento)\n5. Declarativos: "Você está promovido" (cria nova realidade ao ser dito)\n\nA maioria dos conflitos empresariais surge quando:\n— Alguém faz um comissivo ("vou entregar") sem intenção real\n— Um diretivo é interpretado como sugestão ("seria bom se..." lido como "se quiser...")\n— Um assertivo é aceito sem verificação ("o mercado cresceu" — fonte?)\n\n**Retórica (Aristóteles) — A Arte da Persuasão:**\n3 pilares da persuasão:\n— Ethos: Credibilidade do comunicador (quem fala importa)\n— Pathos: Conexão emocional com a audiência (como sente importa)\n— Logos: Lógica e evidência do argumento (o que diz importa)\n\nNa prática:\n— Pitch para investidor: Ethos (sua experiência) + Logos (dados de mercado) + Pathos (história do problema)\n— Email ao CEO: Logos primeiro (dados), Ethos implícito (você sabe do que fala), Pathos mínimo\n— Venda ao consumidor: Pathos (emocional) + Ethos (marca confiável) + Logos (especificações)\n\n**Erros de comunicação com raiz filosófica:**\n— Falácia naturalista: "É assim que o mercado funciona" (descrever como é ≠ justificar como deveria ser)\n— Ambiguidade estratégica: Usar linguagem vaga de propósito para evitar compromisso ("vamos analisar")\n— Eufemismo corporativo: Substituir palavras duras por suaves para evitar reação ("adequação de quadro" = demissão em massa)',
-          },
-          {
-            id: 'M4-0-t10',
-            type: 'text',
-            title: 'Estética e Design Thinking — A Filosofia por trás da Experiência',
-            body: 'Estética é o ramo da filosofia que estuda a beleza, a arte e a experiência sensorial. No mundo dos negócios, estética é diferencial competitivo.\n\n**Por que estética importa em negócios:**\n— Apple não vende tecnologia. Vende experiência estética. O unboxing de um iPhone é projetado com o mesmo cuidado que o chip.\n— Starbucks não vende café. Vende o "terceiro lugar" — uma experiência sensorial entre casa e trabalho.\n— Aesop não vende creme. Vende minimalismo e sofisticação — a embalagem É o produto.\n\n**Kant e a Experiência Estética:**\nKant distinguiu entre o belo (prazer desinteressado) e o agradável (prazer funcional).\nPara negócios: Produtos "agradáveis" resolvem problemas. Produtos "belos" transcendem a função e criam conexão emocional.\n— Carro agradável: Honda Civic (funciona perfeitamente)\n— Carro belo: Porsche 911 (funciona E emociona)\n— A margem de lucro do belo é 3-10x maior que a do agradável.\n\n**Design Thinking como Filosofia Aplicada:**\n\nDesign Thinking não é ferramenta. É postura filosófica:\n— Empatia (fenomenologia): entender a experiência do outro COMO ELE a vive, não como você imagina\n— Definição (epistemologia): qual é o VERDADEIRO problema? (não o problema que parece óbvio)\n— Ideação (pragmatismo): gerar alternativas sem julgamento prematuro\n— Prototipagem (empirismo): testar na realidade, não na planilha\n— Teste (falseabilidade/Popper): o que provaria que nossa solução está errada?\n\n**As 5 Fases do Design Thinking:**\n1. Empatizar — Observar e entrevistar o usuário no contexto real. Não pergunte o que ele quer. Observe o que ele FAZ.\n2. Definir — Sintetize em um "Problem Statement": "[Persona] precisa de [necessidade] porque [insight]"\n3. Idear — Brainstorm: quantidade > qualidade. Ideias ruins no início levam a ideias boas depois.\n4. Prototipar — Construa a versão mais simples possível em horas (não semanas). Papel, Figma, simulação.\n5. Testar — Coloque na mão do usuário. Observe. Não explique. Se precisa explicar, o design falhou.\n\n**Wabi-Sabi — A Estética da Imperfeição (filosofia japonesa):**\nIdeia: A beleza está na imperfeição, na impermanência e na incompletude.\nPara negócios: MVP não precisa ser perfeito. A primeira versão do Google era uma página em branco com uma caixa de busca. A imperfeição funcional vale mais que a perfeição adiada.',
-          },
-          {
-            id: 'M4-0-t11',
-            type: 'text',
-            title: 'Filosofia da Tecnologia — Ética da IA, Privacidade e Transhumanismo',
-            body: 'A tecnologia nunca é neutra. Toda ferramenta carrega os valores de quem a criou e transforma quem a usa. A filosofia da tecnologia questiona: para onde estamos indo?\n\n**Martin Heidegger (1889–1976) — A Questão da Técnica**\nIdeia: A tecnologia moderna transforma tudo em "recurso disponível" (Bestand). A natureza vira "recurso natural". Pessoas viram "recursos humanos". Atenção vira "recurso de engajamento".\nPerigo: Quando tudo é recurso, nada tem valor intrínseco. A eficiência substitui o significado.\nPara negócios: Automatizar tudo que pode ser automatizado não é necessariamente bom. Algumas interações humanas têm valor que a eficiência destrói (atendimento ao cliente, mentoria, criação).\n\n**Hannah Arendt (1906–1975) — A Banalidade do Mal**\nIdeia: O mal mais perigoso não vem de monstros — vem de pessoas normais que param de pensar e apenas seguem ordens.\nPara negócios:\n— Engenheiros que constroem algoritmos discriminatórios "porque o gerente pediu"\n— Funcionários que vendem dados de clientes "porque a meta exige"\n— Gestores que implementam layoffs "porque o mercado espera"\nA banalidade do mal corporativo: "Eu só estava fazendo meu trabalho" não é defesa ética.\n\n**Ética da Inteligência Artificial — Os 4 Princípios (IEEE/EU):**\n\n1. Transparência: O usuário sabe que está interagindo com IA? Sabe como a decisão foi tomada?\n2. Justiça: O sistema discrimina por raça, gênero, idade, renda? Viés nos dados = viés nas decisões.\n3. Responsabilidade: Se a IA erra, quem é responsável? O desenvolvedor? A empresa? O usuário?\n4. Privacidade: Os dados usados foram coletados com consentimento? São armazenados com segurança?\n\n**Casos reais que ilustram os dilemas:**\n— COMPAS (justiça criminal EUA): algoritmo previa reincidência criminal — classificava negros como 2x mais propensos a reincidir, mesmo com histórico similar. Viés nos dados históricos reproduziu racismo sistêmico.\n— Clearview AI: coletou 3 bilhões de fotos de redes sociais sem consentimento para reconhecimento facial vendido à polícia. Violação massiva de privacidade.\n— GPT/Claude: Modelos de linguagem podem gerar desinformação convincente, automatizar manipulação e substituir empregos criativos. Quem regula? Quem é responsável pelo uso?\n\n**Transhumanismo — O Futuro da Condição Humana:**\nIdeia: Usar tecnologia para superar limitações biológicas — longevidade, capacidade cognitiva, interface cérebro-máquina.\nPara negócios: Neuralink (interface cerebral), CRISPR (edição genética), longevidade (bilionários investindo em "não morrer"). Isso cria novos mercados E novos dilemas éticos.\nPergunta filosófica central: Se podemos melhorar humanos com tecnologia, DEVEMOS? Quem terá acesso — todos ou só os ricos?',
+            description: '5 dilemas reais. Analise cada um pelos 4 frameworks éticos.',
           },
           {
             id: 'M4-0-s3',
             type: 'simulation',
             title: 'Tribunal Filosófico — Julgue Decisões Empresariais',
             simulationId: 'philosophy-tribunal',
-            description: 'Receba 6 decisões empresariais controversas. Para cada uma, avalie sob a perspectiva de 3 filósofos diferentes (Kant, Aristóteles, Sartre, Rawls, Lao Tzu, Popper). Descubra como a filosofia muda radicalmente a conclusão.',
-          },
-          {
-            id: 'M4-0-t12',
-            type: 'text',
-            title: 'Mapa Filosófico para Gestores — Quando Usar Cada Pensador',
-            body: '**Guia prático — qual filósofo consultar em cada situação:**\n\n**Decisão ética difícil:**\n→ Utilitarismo: Quem se beneficia e quem é prejudicado?\n→ Kant: Pode ser universalizado?\n→ Aristóteles: Uma pessoa virtuosa faria isso?\n→ Rawls: Os mais vulneráveis são protegidos?\n\n**Questionar uma estratégia:**\n→ Popper: O que provaria que estamos errados?\n→ Kuhn: Estamos presos a um paradigma ultrapassado?\n→ Wittgenstein: A linguagem que usamos esconde premissas?\n\n**Liderar em crise:**\n→ Estoicismo (Marco Aurélio): O que eu controlo? Foque nisso.\n→ Frankl: Qual o sentido desta situação?\n→ Taleb: Como saio mais forte disso (antifrágil)?\n\n**Inovar e criar:**\n→ Zen (Shoshin): Olhe com mente de principiante\n→ Design Thinking: Empatize antes de criar\n→ Wabi-Sabi: Imperfeição funcional > perfeição adiada\n\n**Construir propósito:**\n→ Sartre: O propósito é uma escolha — não uma descoberta\n→ Frankl: Significado gera resiliência\n→ Sinek: Por quê → Como → O quê\n\n**Avaliar tecnologia:**\n→ Heidegger: Isso transforma pessoas em recurso?\n→ Arendt: Estamos fazendo sem pensar?\n→ IEEE/EU: Transparência, justiça, responsabilidade, privacidade?\n\n**Tomar decisões sob incerteza:**\n→ Taleb: Posicione-se para ser antifrágil\n→ Popper: Defina o que falsificaria sua hipótese\n→ Bayes (epistemologia): Atualize crenças com evidências\n\n**Negociar e persuadir:**\n→ Aristóteles (Retórica): Ethos + Pathos + Logos\n→ Austin/Searle: Que ato de fala estou performando?\n→ Taoísmo: A melhor negociação não parece negociação\n\n**Gerir pessoas:**\n→ Confúcio: Relações e papéis claros\n→ Sartre: Respeite a liberdade do outro\n→ Liderança Servidora (Greenleaf): Sirva antes de comandar\n→ Estoicismo: Controle suas reações, não as pessoas',
+            description: 'Decisões polêmicas de empresas reais julgadas por diferentes filósofos.',
           },
         ],
       },
+
       {
         id: 'M4-1',
         title: 'Calculo Aplicado a Negocios',
