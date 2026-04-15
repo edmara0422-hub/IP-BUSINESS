@@ -2843,254 +2843,428 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Gestao de Negocios',
         blocks: [
           {
-            id: 'M2-0-t1',
-            type: 'text',
-            title: 'Modelos de Negócio: O que é, Para que Serve e Como Estruturar',
-            body: 'Um modelo de negócio descreve a lógica pela qual uma organização cria, entrega e captura valor. Não é o mesmo que plano de negócio — o modelo é a arquitetura estratégica; o plano é o documento operacional que detalha a execução.\n\n**Alexander Osterwalder** (2010) formalizou o conceito com o Business Model Canvas — um framework visual com 9 blocos que permite mapear qualquer negócio em uma única página.\n\n**Os 9 blocos do Canvas:**\n\n**Proposta de Valor** — o que você oferece que resolve um problema ou satisfaz uma necessidade do cliente? Qual dor você elimina? Qual ganho você entrega? A proposta de valor é o coração do modelo — tudo gira ao redor dela.\n\n**Segmentos de Clientes** — para quem você cria valor? Mercado de massa, nicho, plataforma multilateral? Sem clareza sobre quem é o cliente, toda estratégia é genérica.\n\n**Canais** — como você alcança e entrega valor ao cliente? Canais de comunicação, distribuição e venda. Digital, físico ou híbrido.\n\n**Relacionamento com Clientes** — que tipo de relação você mantém? Autoatendimento, comunidade, assistência pessoal, co-criação?\n\n**Fontes de Receita** — como o negócio gera dinheiro? Venda direta, assinatura, licenciamento, comissão, freemium? Um modelo pode ter múltiplas fontes.\n\n**Recursos-chave** — quais ativos são essenciais? Físicos (fábricas), intelectuais (patentes, marca), humanos (equipe), financeiros (capital).\n\n**Atividades-chave** — o que a empresa precisa fazer excepcionalmente bem? Produção, resolução de problemas, gestão de plataforma.\n\n**Parcerias-chave** — quem são os aliados estratégicos? Fornecedores, alianças com concorrentes, joint ventures.\n\n**Estrutura de Custos** — quais são os custos mais relevantes? Modelo orientado a custo (low-cost) ou orientado a valor (premium)?\n\nPergunta-chave: Se você tivesse que explicar como sua empresa ganha dinheiro em 2 minutos para um investidor, conseguiria? O Canvas força essa clareza.',
-          },
-          {
-            id: 'M2-0-c1',
-            type: 'concept',
-            term: 'Proposta de Valor',
-            definition: 'A razão pela qual o cliente escolhe a sua empresa e não a do concorrente. É a combinação específica de benefícios que resolve uma dor ou entrega um ganho único para um segmento de clientes. Não é slogan — é a promessa concreta que sustenta o modelo de negócio.',
-            example: 'Nubank: conta digital com zero anuidade, zero tarifa, zero burocracia. A proposta de valor não é "ser digital" — é eliminar as 3 maiores dores do cliente bancário brasileiro (custo, taxa e fila). Resultado: 80 milhões de clientes em 10 anos.',
-            antiExample: 'Empresa que diz sua proposta de valor é "qualidade e inovação" sem especificar o que isso significa na prática. Qualidade comparada a quem? Inovação em quê? Proposta genérica = zero diferenciação = competição por preço.',
-          },
-          {
-            id: 'M2-0-d1',
-            type: 'decision',
-            scenario: 'Você tem uma loja física de produtos artesanais que fatura R$ 50.000/mês com margem de 40%. Um grande marketplace oferece parceria: 15% de comissão sobre cada venda, mas acesso a 10x mais clientes potenciais. Seu time atual já opera no limite da capacidade.',
-            options: [
+            id: 'M2-0-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Modelos de Negócio e Canvas',
+            subtitle: 'Como uma empresa cria, entrega e captura valor — do conceito ao Canvas',
+            opening: {
+              leadText: 'Um modelo de negócio descreve a lógica pela qual uma organização {{cria, entrega e captura valor}}. Não é o mesmo que plano de negócio — o modelo é a arquitetura estratégica; o plano é o documento operacional. Sem modelo claro, a empresa opera às cegas.',
+            },
+            body: [
               {
-                label: 'Aceitar a parceria e entrar no marketplace',
-                tradeoffs: {
-                  upside: 'Acesso imediato a base de milhões de clientes, crescimento de receita potencial de 3-5x, visibilidade da marca, infraestrutura logística do marketplace',
-                  downside: 'Margem cai de 40% para 25% (comissão de 15%), perda de controle da experiência do cliente, dependência de plataforma de terceiros, necessidade de investir em estoque e equipe para atender demanda maior',
-                  risk: 'medium' as const,
-                },
+                kind: 'paragraph',
+                text: 'Alexander Osterwalder e Yves Pigneur (2010) criaram o Business Model Canvas (BMC) — ferramenta visual que permite definir e visualizar modelos de negócio de forma sistêmica, integrada e em uma {{única página}}. O Canvas divide o modelo em 9 blocos que cobrem desde a proposta de valor até a estrutura de custos.',
               },
               {
-                label: 'Recusar e investir no canal próprio (e-commerce)',
-                tradeoffs: {
-                  upside: 'Margem preservada em 40%, controle total da marca e experiência, dados dos clientes são seus, sem dependência de terceiros',
-                  downside: 'Crescimento mais lento, custo de aquisição de clientes (marketing digital), necessidade de montar operação logística própria, investimento inicial em plataforma e tráfego',
-                  risk: 'medium' as const,
-                },
+                kind: 'pillar-grid',
+                title: 'Os 9 blocos do Business Model Canvas',
+                pillars: [
+                  { icon: '💎', title: 'Proposta de Valor', description: 'Que {{problema}} você resolve? Que necessidade atende? O que torna sua oferta única.' },
+                  { icon: '👥', title: 'Segmentos de Clientes', description: 'Para {{quem}} você cria valor? Quais segmentos são prioridade?' },
+                  { icon: '📣', title: 'Canais', description: '{{Como}} você alcança e entrega valor aos clientes? Loja, app, marketplace, vendedor direto.' },
+                  { icon: '🤝', title: 'Relacionamento', description: 'Que tipo de {{relação}} cada segmento espera? Self-service, assistência pessoal, comunidade.' },
+                  { icon: '💰', title: 'Fontes de Receita', description: 'Por {{que valor}} os clientes pagam? Venda, assinatura, freemium, licenciamento.' },
+                  { icon: '🔧', title: 'Recursos Principais', description: 'Que {{ativos}} são essenciais? Físicos, intelectuais, humanos, financeiros.' },
+                  { icon: '⚙️', title: 'Atividades-Chave', description: 'Que {{ações}} são críticas? Produção, resolução de problemas, plataforma/rede.' },
+                  { icon: '🤲', title: 'Parcerias Principais', description: 'Quem são os {{parceiros}} e fornecedores estratégicos? O que eles fornecem que você não faz?' },
+                  { icon: '📊', title: 'Estrutura de Custos', description: 'Quais são os {{custos}} mais importantes? Fixos, variáveis, economias de escala.' },
+                ],
               },
               {
-                label: 'Estratégia híbrida: marketplace para aquisição + canal próprio para retenção',
-                tradeoffs: {
-                  upside: 'Usa o marketplace como vitrine para novos clientes e direciona para o canal próprio na recompra, diversifica fontes de receita, testa demanda sem apostar tudo',
-                  downside: 'Complexidade operacional dobra (dois canais), possível conflito de preços, marketplace pode penalizar se perceber redirecionamento, exige mais equipe',
-                  risk: 'low' as const,
-                },
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Canvas na Prática — Nubank',
+                    period: 'Fintech',
+                    text: 'Proposta de valor: banco sem tarifa, sem agência, 100% app. Segmento: {{jovens}} e excluídos bancários. Canais: app + indicação. Receita: interchange + crédito. Custo: 100% cloud, zero agência.',
+                    caseStudy: {
+                      company: 'Nubank',
+                      year: 2013,
+                      story: '8 pessoas, 1 apartamento. Canvas inteiro cabia num {{guardanapo}}: sem agência = sem custo fixo = tarifa zero = aquisição por indicação. Hoje: 80M clientes.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '80M', label: 'Clientes' },
+                        { value: 'R$ 30', label: 'CAC (vs R$ 800+ bancário)' },
+                        { value: '0', label: 'Agências físicas' },
+                      ],
+                      insight: 'O Canvas do Nubank eliminava 3 blocos inteiros (lojas, vendedores, custo fixo) — e isso ERA a {{inovação}}.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Canvas na Prática — iFood',
+                    period: 'Plataforma',
+                    text: 'Proposta de valor: conveniência (qualquer restaurante, qualquer hora). Segmento: {{3 lados}} (consumidor, restaurante, entregador). Receita: comissão por pedido. Recurso-chave: algoritmo.',
+                    caseStudy: {
+                      company: 'iFood',
+                      year: 2023,
+                      story: 'R$ 100B GMV/ano {{sem cozinha}} própria. O Canvas é pura plataforma: cada bloco conecta 3 stakeholders diferentes. Complexidade no modelo, simplicidade na experiência.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 100B', label: 'GMV anual' },
+                        { value: '3 lados', label: 'Consumidor + restaurante + entregador' },
+                        { value: '0', label: 'Ativos físicos' },
+                      ],
+                      insight: 'Plataformas têm Canvas com {{múltiplos segmentos}} — cada lado precisa da proposta de valor própria.',
+                    },
+                  },
+                ],
               },
             ],
-            realWorldAnalog: 'A Reserva (moda) começou vendendo apenas em lojas próprias, entrou no Mercado Livre e Dafiti para escalar, mas manteve o e-commerce próprio com preços e experiência premium. O marketplace trouxe volume; o canal próprio trouxe margem.',
-            lesson: 'Canal de venda não é decisão binária. A pergunta certa não é "marketplace ou canal próprio?" — é "qual canal para qual objetivo?" Marketplace para aquisição, canal próprio para margem e dados.',
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Os 9 blocos do Canvas cobrem 4 áreas. Classifique.',
+              compare: {
+                columnHeaders: ['Oferta', 'Clientes', 'Infraestrutura', 'Finanças'],
+                rows: [
+                  { label: 'Blocos', values: ['Proposta de Valor', 'Segmentos, Canais, Relação', 'Recursos, Atividades, Parcerias', 'Receita, Custos'] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada bloco na área correta:',
+                zones: [
+                  { id: 'of', label: 'Oferta' },
+                  { id: 'cl', label: 'Clientes' },
+                  { id: 'inf', label: 'Infraestrutura' },
+                  { id: 'fin', label: 'Finanças' },
+                ],
+                items: [
+                  { id: 'pv', label: 'Proposta de Valor', correctZone: 'of', correctFeedback: 'Certo. O que você oferece.', wrongFeedback: 'Proposta de valor = Oferta.' },
+                  { id: 'seg', label: 'Segmentos de Clientes', correctZone: 'cl', correctFeedback: 'Certo. Para quem.', wrongFeedback: 'Segmentos = Clientes.' },
+                  { id: 'rec', label: 'Recursos Principais', correctZone: 'inf', correctFeedback: 'Certo. Com o que faz.', wrongFeedback: 'Recursos = Infraestrutura.' },
+                  { id: 'rev', label: 'Fontes de Receita', correctZone: 'fin', correctFeedback: 'Certo. Como ganha dinheiro.', wrongFeedback: 'Receita = Finanças.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'O Canvas reduz um modelo de negócio inteiro a {{9 blocos}} numa página. É ferramenta de pensamento, não de burocracia. Quando não consegue preencher um bloco, encontrou o gap estratégico.',
+              keyInsights: [
+                'Osterwalder & Pigneur (2010): Canvas permite {{visualizar}} o modelo de negócio completo numa página.',
+                'Plataformas (iFood, Uber) têm Canvas com {{múltiplos segmentos}} — cada lado tem proposta de valor própria.',
+                'O bloco mais crítico é Proposta de Valor — se não resolve {{problema real}}, os outros 8 não salvam.',
+              ],
+              nextChapterHint: 'Capítulo 2 · Planejamento Estratégico',
+              nextChapterBlurb: 'SWOT, 5 Forças de Porter e Objetivos — como definir direção de longo prazo.',
+            },
+          },
+          {
+            id: 'M2-0-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Planejamento Estratégico',
+            subtitle: 'SWOT, 5 Forças de Porter e Objetivos — definir direção antes de agir',
+            opening: {
+              leadText: 'Planejamento estratégico é o processo de definir a direção de longo prazo — onde a empresa quer chegar e {{como}} pretende chegar lá. Sem planejamento, a empresa opera por reação; com planejamento, opera por escolha.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Análise SWOT — 4 quadrantes',
+                pillars: [
+                  { icon: '💪', title: 'S — Forças', description: 'Vantagens {{internas}}: competências, recursos, marca, equipe, tecnologia. O que você faz melhor que o concorrente.' },
+                  { icon: '⚠️', title: 'W — Fraquezas', description: 'Limitações {{internas}}: gaps de competência, recursos escassos, processos falhos. Onde você é vulnerável.' },
+                  { icon: '🚀', title: 'O — Oportunidades', description: 'Fatores {{externos}} favoráveis: tendências de mercado, regulação, tecnologia nova. O que o ambiente oferece.' },
+                  { icon: '🔥', title: 'T — Ameaças', description: 'Fatores {{externos}} adversos: concorrentes, crise, regulação restritiva. O que pode te prejudicar.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A SWOT cruza análise interna (Forças × Fraquezas) com análise externa (Oportunidades × Ameaças). O poder está nos cruzamentos: usar {{Forças}} para capturar Oportunidades, e eliminar Fraquezas que amplificam Ameaças.',
+              },
+              {
+                kind: 'heading',
+                text: '5 Forças de Porter — análise competitiva',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Michael Porter (Harvard, 1979) propôs que a rentabilidade de um setor é determinada por 5 forças competitivas — não apenas pela rivalidade direta. Entender as 5 forças é entender {{por que}} alguns setores são lucrativos e outros não.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: '5 Forças Competitivas (Porter, 1979)',
+                pillars: [
+                  { icon: '⚔️', title: 'Rivalidade entre concorrentes', description: 'Intensidade da competição. Muitos concorrentes + produtos similares = guerra de {{preço}} e margem baixa.' },
+                  { icon: '🚪', title: 'Ameaça de novos entrantes', description: 'Quão fácil é entrar no setor? Barreiras: capital, regulação, marca, {{escala}}. Baixas barreiras = mais competição.' },
+                  { icon: '🔄', title: 'Ameaça de substitutos', description: 'Produtos/serviços que resolvem o mesmo problema de forma {{diferente}}. Netflix substituiu Blockbuster sem ser locadora.' },
+                  { icon: '💼', title: 'Poder dos fornecedores', description: 'Poucos fornecedores ou matéria exclusiva = fornecedor {{dita}} termos. Diversificar reduz dependência.' },
+                  { icon: '🛒', title: 'Poder dos compradores', description: 'Compradores grandes ou com muitas opções = comprador {{pressiona}} preço. Diferenciação reduz esse poder.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'Definir objetivos estratégicos usando a metodologia SMART: {{Específicos}} (claros), {{Mensuráveis}} (com indicador), {{Atingíveis}} (realistas), {{Relevantes}} (alinhados à missão) e {{Temporais}} (com prazo). "Crescer" não é objetivo. "Aumentar receita em 20% até dezembro 2026" é.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'SWOT e Porter analisam dimensões diferentes. Classifique.',
+              compare: {
+                columnHeaders: ['SWOT', '5 Forças de Porter'],
+                rows: [
+                  { label: 'Foco', values: ['Empresa vs ambiente', 'Setor inteiro'] },
+                  { label: 'Pergunta', values: ['Onde estamos?', 'O setor é lucrativo?'] },
+                  { label: 'Autor', values: ['Andrews (Harvard, 1960s)', 'Porter (Harvard, 1979)'] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique: é fator SWOT ou Força de Porter?',
+                zones: [
+                  { id: 'swot', label: 'SWOT' },
+                  { id: 'porter', label: 'Porter' },
+                ],
+                items: [
+                  { id: 'marca', label: 'Marca forte da empresa', correctZone: 'swot', correctFeedback: 'Certo. Força interna = SWOT.', wrongFeedback: 'Marca da empresa = Força (SWOT).' },
+                  { id: 'sub', label: 'Netflix substituindo Blockbuster', correctZone: 'porter', correctFeedback: 'Certo. Ameaça de substituto = Porter.', wrongFeedback: 'Substituto é força setorial = Porter.' },
+                  { id: 'crise', label: 'Crise econômica no país', correctZone: 'swot', correctFeedback: 'Certo. Ameaça externa = SWOT.', wrongFeedback: 'Fator externo adverso = Ameaça (SWOT).' },
+                  { id: 'forn', label: 'Fornecedor único de matéria-prima', correctZone: 'porter', correctFeedback: 'Certo. Poder do fornecedor = Porter.', wrongFeedback: 'Poder de barganha = Porter.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'SWOT analisa a empresa {{por dentro e por fora}}. Porter analisa o setor como um todo. SMART transforma análise em ação. Os três juntos = estratégia completa.',
+              keyInsights: [
+                'SWOT: o poder está nos {{cruzamentos}} — Força × Oportunidade = ação estratégica prioritária.',
+                'Porter (1979): {{5 forças}} determinam a rentabilidade do setor, não só a rivalidade direta.',
+                'Objetivo sem prazo é desejo. Com SMART, vira {{meta acionável}}.',
+              ],
+              nextChapterHint: 'Capítulo 3 · Gestão de Processos',
+              nextChapterBlurb: 'Cadeia de Valor, processos core e como transformar atividades em vantagem competitiva.',
+            },
+          },
+          {
+            id: 'M2-0-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Gestão de Processos e Cadeia de Valor',
+            subtitle: 'Como cada atividade cria (ou destrói) valor para o cliente',
+            opening: {
+              leadText: 'Um processo é uma sequência de atividades que transforma insumos em resultados. Toda empresa é, essencialmente, um conjunto de processos — alguns geram valor, outros geram {{custo sem valor}}.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'Michael Porter (Harvard, 1985) criou o modelo da Cadeia de Valor para visualizar como cada atividade dentro da empresa contribui para a margem de lucro. A cadeia divide as atividades em {{primárias}} (que tocam o produto/serviço diretamente) e de {{suporte}} (que sustentam as primárias).',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Atividades Primárias',
+                    period: 'Criam valor diretamente',
+                    text: '**Logística de entrada** (receber matéria-prima), **Operações** (transformar insumo em produto), **Logística de saída** (entregar ao cliente), **Marketing e Vendas** (atrair e converter), **Serviço** (pós-venda e suporte).',
+                    caseStudy: {
+                      company: 'Amazon',
+                      year: 2023,
+                      story: 'A vantagem competitiva da Amazon está na {{logística de saída}}: entrega em 1 dia (Prime). Investiu US$ 60B+ em centros de distribuição. A atividade primária mais forte define a empresa.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'US$ 60B+', label: 'Investimento em logística' },
+                        { value: '1 dia', label: 'Entrega Prime' },
+                        { value: '200+', label: 'Centros de distribuição' },
+                      ],
+                      insight: 'A atividade primária mais forte da cadeia de valor define a {{vantagem competitiva}} da empresa.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Atividades de Suporte',
+                    period: 'Sustentam as primárias',
+                    text: '**Infraestrutura** (gestão, planejamento, finanças), **RH** (recrutamento, treinamento), **Desenvolvimento de Tecnologia** (P&D, sistemas), **Aquisição** (compras, fornecedores).',
+                    caseStudy: {
+                      company: 'Google',
+                      year: 2023,
+                      story: 'A atividade de suporte mais forte do Google é {{Desenvolvimento de Tecnologia}} (P&D). Investe US$ 40B+/ano em pesquisa. A busca é a primária, mas a IA que sustenta é suporte.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'US$ 40B+', label: 'P&D anual' },
+                        { value: '180.000', label: 'Funcionários' },
+                        { value: '#1', label: 'Busca global' },
+                      ],
+                      insight: 'Atividades de suporte {{invisíveis}} para o cliente podem ser a maior fonte de vantagem competitiva.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A margem é a diferença entre o valor total gerado e o custo total das atividades. Para aumentar margem, ou {{aumenta valor percebido}} (diferenciação) ou {{reduz custo}} das atividades (eficiência). Porter: estratégia é escolher quais atividades fazer diferente do concorrente.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Atividades primárias vs suporte. Classifique.',
+              compare: {
+                columnHeaders: ['Primárias', 'Suporte'],
+                rows: [
+                  { label: 'Relação com produto', values: ['Direta', 'Indireta'] },
+                  { label: 'Exemplos', values: ['Logística, operações, vendas', 'RH, P&D, infra, compras'] },
+                ],
+              },
+              drag: {
+                instruction: 'Primária ou Suporte?',
+                zones: [
+                  { id: 'pri', label: 'Primária' },
+                  { id: 'sup', label: 'Suporte' },
+                ],
+                items: [
+                  { id: 'log', label: 'Entrega do produto ao cliente', correctZone: 'pri', correctFeedback: 'Certo. Logística de saída = primária.', wrongFeedback: 'Entrega toca o produto = primária.' },
+                  { id: 'rh', label: 'Treinamento de funcionários', correctZone: 'sup', correctFeedback: 'Certo. RH = suporte.', wrongFeedback: 'Treinamento = suporte (RH).' },
+                  { id: 'mkt', label: 'Campanha de marketing', correctZone: 'pri', correctFeedback: 'Certo. Marketing e vendas = primária.', wrongFeedback: 'Marketing toca o cliente = primária.' },
+                  { id: 'ti', label: 'Desenvolvimento de sistema interno', correctZone: 'sup', correctFeedback: 'Certo. Tecnologia = suporte.', wrongFeedback: 'Sistema interno = suporte (tecnologia).' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'A Cadeia de Valor mostra que toda atividade ou {{cria valor}} ou gera custo sem valor. A vantagem competitiva vem de fazer atividades diferentes — ou de fazer as mesmas atividades de forma diferente.',
+              keyInsights: [
+                'Porter (1985): estratégia é {{escolher}} quais atividades fazer diferente do concorrente.',
+                'Amazon: US$ 60B+ em logística. A atividade primária mais forte {{define}} a empresa.',
+                'Margem = valor total - custo total. Ou diferencia (mais valor) ou eficienta (menos custo).',
+              ],
+              nextChapterHint: 'Capítulo 4 · Tipos de Empresa e Tributação',
+              nextChapterBlurb: 'MEI, ME, LTDA — estrutura jurídica e regime tributário que impactam seu negócio.',
+            },
+          },
+          {
+            id: 'M2-0-cap4',
+            type: 'chapter',
+            number: 4,
+            title: 'Tipos de Empresa e Regime Tributário',
+            subtitle: 'MEI, ME, LTDA, Simples, Presumido — a estrutura que define quanto você paga',
+            opening: {
+              leadText: 'A escolha da estrutura jurídica e do regime tributário impacta diretamente a carga fiscal, a responsabilidade dos sócios e a {{capacidade de crescimento}} do negócio. Errar aqui custa caro — literalmente.',
+            },
+            body: [
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'MEI — Microempreendedor Individual',
+                    period: 'Até R$ 81k/ano',
+                    text: 'Faturamento até R$ 81 mil/ano. Pode ter {{1 funcionário}}. Impostos fixos (~R$ 70/mês). Sem sócio. CNPJ simplificado. Ideal para começar ou formalizar atividade autônoma.',
+                    caseStudy: {
+                      company: 'Estatística Brasil',
+                      year: 2024,
+                      story: '{{15 milhões}} de MEIs no Brasil. 70% da formalização de novos negócios. Custo fixo de ~R$ 70/mês cobre INSS + ISS/ICMS. O caminho mais rápido de CPF para CNPJ.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '15M', label: 'MEIs no Brasil' },
+                        { value: 'R$ 81k', label: 'Limite anual' },
+                        { value: '~R$ 70', label: 'Imposto fixo/mês' },
+                      ],
+                      insight: 'MEI é porta de entrada, não destino. Ao ultrapassar R$ 81k, migra para {{ME}} automaticamente.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'ME / EPP — Microempresa',
+                    period: 'Até R$ 4.8M/ano',
+                    text: 'Faturamento até R$ 4.8 milhões/ano. Pode ter sócios e mais funcionários. Acesso ao {{Simples Nacional}} (tributação unificada). Maioria das PMEs brasileiras.',
+                    caseStudy: {
+                      company: 'Sebrae',
+                      year: 2023,
+                      story: 'Simples Nacional atende {{5.7 milhões}} de empresas. Unifica 8 tributos em 1 guia (DAS). Alíquota inicia em {{6%}} para comércio e 15.5% para serviços.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '5.7M', label: 'Empresas no Simples' },
+                        { value: '6%', label: 'Alíquota inicial (comércio)' },
+                        { value: '1 guia', label: 'DAS unifica 8 tributos' },
+                      ],
+                      insight: 'Simples simplifica mas nem sempre é o mais {{barato}}. Acima de certo faturamento, Lucro Presumido pode pagar menos.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'LTDA / S.A.',
+                    period: 'Sem limite',
+                    text: 'LTDA: responsabilidade limitada ao capital social. S.A.: pode ter ações negociadas em bolsa. Obrigatória para empresas maiores, investimento externo e {{governança corporativa}} formal.',
+                    caseStudy: {
+                      company: 'Magazine Luiza',
+                      year: 2015,
+                      story: 'Migrou de LTDA familiar para S.A. aberta na B3. Permitiu captar capital para a {{transformação digital}} que multiplicou valor por 100x. Estrutura jurídica habilitou a estratégia.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'B3', label: 'Bolsa de valores brasileira' },
+                        { value: '100x', label: 'Valorização Magalu' },
+                        { value: 'Governança', label: 'Conselho obrigatório' },
+                      ],
+                      insight: 'A estrutura jurídica não é burocracia — é {{habilitador estratégico}}. S.A. abre portas que LTDA não abre.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Regimes tributários',
+              },
+              {
+                kind: 'pillar-grid',
+                title: '3 regimes tributários no Brasil',
+                pillars: [
+                  { icon: '📦', title: 'Simples Nacional', description: '8 tributos em 1 guia. Alíquota de {{6% a 33%}} conforme faturamento e atividade. Até R$ 4.8M/ano. O mais simples mas nem sempre mais barato.', metric: { value: '5.7M', label: 'empresas' } },
+                  { icon: '📊', title: 'Lucro Presumido', description: 'Base de cálculo presumida (8% comércio, 32% serviços). Até R$ 78M/ano. Pode ser mais {{barato}} que Simples para margens altas.', metric: { value: 'R$ 78M', label: 'limite anual' } },
+                  { icon: '📈', title: 'Lucro Real', description: 'Imposto sobre lucro efetivo. Obrigatório acima de R$ 78M ou setores regulados. Mais complexo mas mais {{justo}} para margens baixas.', metric: { value: 'Obrigatório', label: 'bancos, seguradoras' } },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A escolha do regime impacta diretamente quanto a empresa paga de imposto. Um restaurante com margem de 15% no Simples pode pagar mais do que no Presumido. Um SaaS com margem de 60% no Presumido pode pagar mais do que no Simples. A resposta é sempre: {{depende do caso}}. Contador é investimento, não custo.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada tipo de empresa serve a um momento do negócio. Classifique.',
+              compare: {
+                columnHeaders: ['MEI', 'ME/Simples', 'LTDA/S.A.'],
+                rows: [
+                  { label: 'Faturamento', values: ['Até R$ 81k', 'Até R$ 4.8M', 'Sem limite'] },
+                  { label: 'Complexidade', values: ['Mínima', 'Média', 'Alta'], viz: 'bars', intensities: [0.15, 0.5, 0.9] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual estrutura para cada situação?',
+                zones: [
+                  { id: 'mei', label: 'MEI' },
+                  { id: 'me', label: 'ME/Simples' },
+                  { id: 'sa', label: 'LTDA/S.A.' },
+                ],
+                items: [
+                  { id: 'free', label: 'Freelancer que fatura R$ 60k/ano', correctZone: 'mei', correctFeedback: 'Certo. Abaixo de R$ 81k = MEI.', wrongFeedback: 'R$ 60k/ano cabe no MEI.' },
+                  { id: 'rest', label: 'Restaurante com R$ 2M/ano', correctZone: 'me', correctFeedback: 'Certo. PME com sócios = ME/Simples.', wrongFeedback: 'R$ 2M com sócios = ME/Simples.' },
+                  { id: 'inv', label: 'Startup querendo investidor externo', correctZone: 'sa', correctFeedback: 'Certo. Investimento externo exige S.A. ou LTDA.', wrongFeedback: 'Investidor exige governança = LTDA/S.A.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Estrutura jurídica e regime tributário são decisões {{estratégicas}}, não burocráticas. MEI para começar, ME para crescer, S.A. para escalar. Simples para simplificar, Presumido para otimizar, Real para margens baixas.',
+              keyInsights: [
+                '15 milhões de MEIs no Brasil. Porta de entrada: R$ 70/mês e {{CNPJ}} em 15 minutos.',
+                'Simples nem sempre é mais barato. Acima de certo faturamento, Presumido pode {{economizar}} 30%+.',
+                'Magazine Luiza: LTDA → S.A. habilitou a transformação digital. Estrutura jurídica = {{habilitador estratégico}}.',
+              ],
+            },
           },
           {
             id: 'M2-0-s1',
             type: 'simulation',
             title: 'Business Model Canvas — Monte Seu Modelo de Negócio',
             simulationId: 'business-model-canvas',
-            description: 'Preencha os 9 blocos do Canvas para estruturar ou repensar seu modelo de negócio. Compare com exemplos de empresas reais.',
-          },
-          {
-            id: 'M2-0-t2',
-            type: 'text',
-            title: 'Planejamento Estratégico: SWOT, Porter e Objetivos',
-            body: 'Planejamento estratégico é o processo de definir a direção de longo prazo de uma organização — onde ela quer chegar e como pretende chegar lá. Sem planejamento, a empresa opera por reação; com planejamento, opera por intenção.\n\n**Análise SWOT** (Strengths, Weaknesses, Opportunities, Threats)\nFramework que cruza fatores internos (forças e fraquezas) com fatores externos (oportunidades e ameaças). O valor não está em preencher os quadrantes — está em cruzar: como usar forças para capturar oportunidades? Como mitigar fraquezas que amplificam ameaças?\n\n**5 Forças de Porter** — modelo que analisa a intensidade competitiva de um setor:\n1. Rivalidade entre concorrentes — quantos competem? Com qual intensidade?\n2. Poder de barganha dos fornecedores — poucos fornecedores = alto poder = margens comprimidas\n3. Poder de barganha dos compradores — cliente concentrado pressiona preços\n4. Ameaça de substitutos — produtos alternativos que resolvem o mesmo problema\n5. Ameaça de novos entrantes — barreiras de entrada protegem ou expõem o mercado?\n\n**Definindo Objetivos Estratégicos:**\n— Objetivos SMART: Específicos, Mensuráveis, Atingíveis, Relevantes, Temporais\n— OKRs (Objectives & Key Results): Objetivo qualitativo + resultados-chave quantitativos\n— KPIs: indicadores que medem se os objetivos estão sendo atingidos\n\nNa prática: A maioria das empresas falha na execução, não na estratégia. O planejamento precisa ser vivo — revisado trimestralmente, com responsáveis claros e métricas acompanhadas semanalmente.\n\nPergunta-chave: Sua empresa tem um plano estratégico documentado e revisado? Ou a estratégia existe apenas na cabeça do fundador?',
-          },
-          {
-            id: 'M2-0-cmp1',
-            type: 'compare',
-            title: 'SWOT vs 5 Forças de Porter',
-            question: 'Quando usar SWOT e quando usar as 5 Forças de Porter? São concorrentes ou complementares?',
-            dimensions: ['Foco', 'Pergunta central', 'Quando usar', 'Limitação', 'Complemento ideal'],
-            items: [
-              {
-                id: 'swot',
-                label: 'Análise SWOT',
-                values: [
-                  'Fatores internos (forças/fraquezas) + externos (oportunidades/ameaças) da empresa específica',
-                  'Onde estamos e o que podemos fazer com o que temos?',
-                  'Planejamento estratégico interno, definição de prioridades, preparação para decisões de investimento ou pivô',
-                  'Subjetiva — depende de quem preenche. Sem dados, vira lista de achismos. Forças e fraquezas mudam rápido',
-                  'Cruzar com Porter para validar oportunidades e ameaças com dados do setor',
-                ],
-                highlight: 'Melhor para autodiagnóstico rápido da empresa',
-              },
-              {
-                id: 'porter',
-                label: '5 Forças de Porter',
-                values: [
-                  'Estrutura competitiva do setor inteiro — independe da empresa',
-                  'Esse setor é atrativo? Onde está o poder de barganha?',
-                  'Análise de entrada em novo mercado, avaliação de atratividade setorial, decisão de investimento',
-                  'Estática — fotografa o setor hoje, não prevê disrupção. Ignora colaboração e ecossistemas',
-                  'Cruzar com SWOT para posicionar a empresa dentro das forças do setor',
-                ],
-                highlight: 'Melhor para entender o campo de batalha antes de entrar',
-              },
-            ],
-            insight: 'SWOT e Porter não competem — se complementam. Porter mapeia o terreno (o setor). SWOT posiciona o soldado (sua empresa) nesse terreno. Usar um sem o outro é como ter GPS sem saber onde você está, ou saber onde está sem ter mapa.',
-          },
-          {
-            id: 'M2-0-fw1',
-            type: 'framework',
-            frameworkId: 'swot-analysis',
-            title: 'Análise SWOT do Seu Negócio',
-            description: 'Preencha os 4 quadrantes da SWOT para sua empresa ou ideia de negócio. A chave não é apenas listar — é cruzar: como usar forças para capturar oportunidades? Como mitigar fraquezas que amplificam ameaças?',
-            fields: [
-              {
-                id: 'strengths',
-                label: 'Forças (Strengths)',
-                placeholder: 'Ex: Equipe técnica experiente, marca reconhecida no nicho, custo operacional 20% menor que concorrentes',
-                helpText: 'Fatores internos positivos — o que sua empresa faz melhor que a concorrência? Que recursos únicos possui?',
-              },
-              {
-                id: 'weaknesses',
-                label: 'Fraquezas (Weaknesses)',
-                placeholder: 'Ex: Dependência de um único fornecedor, falta de presença digital, turnover alto na equipe comercial',
-                helpText: 'Fatores internos negativos — onde a concorrência é melhor? O que seus clientes reclamam? Que recurso falta?',
-              },
-              {
-                id: 'opportunities',
-                label: 'Oportunidades (Opportunities)',
-                placeholder: 'Ex: Mercado de e-commerce crescendo 30% ao ano, novo incentivo fiscal do governo, concorrente principal fechou',
-                helpText: 'Fatores externos favoráveis — que tendências de mercado beneficiam seu negócio? Que lacunas existem no setor?',
-              },
-              {
-                id: 'threats',
-                label: 'Ameaças (Threats)',
-                placeholder: 'Ex: Novo concorrente com funding de R$ 50M, regulação mais restritiva prevista para 2026, taxa Selic em alta',
-                helpText: 'Fatores externos desfavoráveis — que mudanças regulatórias, tecnológicas ou de mercado podem prejudicar seu negócio?',
-              },
-            ],
-          },
-          {
-            id: 'M2-0-t3',
-            type: 'text',
-            title: 'Gestão de Processos e Cadeia de Valor',
-            body: 'Um processo é uma sequência de atividades que transforma insumos em resultados. Toda empresa é, essencialmente, um conjunto de processos — alguns geram valor, outros geram custo sem valor.\n\n**Cadeia de Valor (Michael Porter)**\nModelo que divide as atividades de uma empresa em primárias e de suporte:\n\n**Atividades Primárias** — geram valor direto:\n— Logística de entrada: recebimento e armazenamento de insumos\n— Operações: transformação de insumos em produto/serviço final\n— Logística de saída: distribuição do produto ao cliente\n— Marketing e vendas: como o cliente descobre e compra\n— Serviço pós-venda: suporte, garantia, fidelização\n\n**Atividades de Suporte** — viabilizam as primárias:\n— Infraestrutura da empresa (finanças, planejamento, jurídico)\n— Gestão de recursos humanos\n— Desenvolvimento de tecnologia\n— Aquisição (procurement)\n\n**BPM — Business Process Management:**\nMetodologia para mapear, analisar, redesenhar e monitorar processos. O ciclo:\n1. Mapear o processo atual (AS-IS)\n2. Identificar gargalos e desperdícios\n3. Redesenhar o processo otimizado (TO-BE)\n4. Implementar e automatizar\n5. Monitorar com indicadores\n\nExemplo prático: Uma loja virtual que demora 5 dias para despachar um pedido pode ter gargalos em conferência de estoque (processo) ou na embalagem (operação). O BPM identifica onde o tempo é desperdiçado.\n\nDica: Processos mal gerenciados são o maior dreno silencioso de lucratividade. Antes de cortar custos, mapeie onde o dinheiro é desperdiçado.',
-          },
-          {
-            id: 'M2-0-c2',
-            type: 'concept',
-            term: 'Cadeia de Valor',
-            definition: 'Modelo de Michael Porter que decompõe uma empresa em atividades primárias (logística de entrada, operações, logística de saída, marketing/vendas, pós-venda) e atividades de suporte (infraestrutura, RH, tecnologia, aquisição). O objetivo é identificar onde a empresa cria valor e onde gera custo sem valor — otimizando a margem.',
-            example: 'Magazine Luiza mapeou sua cadeia de valor e identificou que a logística de saída era o maior gargalo (entregas demoradas gerando reclamações). Investiu R$ 1 bilhão em centros de distribuição e tecnologia logística. Resultado: entrega em 1 dia em capitais, NPS disparou e vendas online cresceram 60%.',
-            antiExample: 'Empresa que terceiriza toda a operação sem mapear a cadeia de valor — fornecedor entrega com atraso, qualidade varia, e o cliente culpa a marca. A empresa não sabe onde o problema está porque nunca mapeou as atividades.',
-          },
-          {
-            id: 'M2-0-ex1',
-            type: 'inline-exercise',
-            prompt: 'Mapeie 1 processo crítico do seu negócio usando a lógica do BPM (Business Process Management). Identifique o estado atual, o gargalo e proponha uma melhoria.',
-            context: 'O BPM segue o ciclo: mapear o processo atual (AS-IS) → identificar gargalos → redesenhar (TO-BE) → implementar → monitorar. Processos mal gerenciados são o maior dreno silencioso de lucratividade.',
-            fields: [
-              {
-                id: 'process-name',
-                label: 'Qual é o processo crítico?',
-                placeholder: 'Ex: Processo de atendimento ao cliente — do primeiro contato até a resolução do problema',
-              },
-              {
-                id: 'current-time',
-                label: 'Tempo atual do processo (AS-IS)',
-                placeholder: 'Ex: 48 horas em média para resolver um chamado, com 3 transferências entre setores',
-              },
-              {
-                id: 'bottleneck',
-                label: 'Gargalo identificado',
-                placeholder: 'Ex: Triagem manual — o atendente nível 1 não tem acesso ao histórico do cliente e precisa repassar para nível 2',
-                multiline: true,
-              },
-              {
-                id: 'improvement',
-                label: 'Proposta de melhoria (TO-BE)',
-                placeholder: 'Ex: Integrar CRM ao sistema de chamados para que nível 1 tenha histórico completo. Meta: resolver 70% dos chamados no primeiro contato, reduzindo tempo médio para 12 horas',
-                multiline: true,
-              },
-            ],
-            evaluationCriteria: [
-              'O processo escolhido é específico e relevante para o negócio',
-              'O tempo atual é quantificado (horas, dias, etapas)',
-              'O gargalo identifica a causa raiz, não apenas o sintoma',
-              'A melhoria proposta é acionável e tem meta mensurável',
-            ],
-            expectedConcepts: ['cadeia de valor', 'BPM', 'gargalo', 'AS-IS', 'TO-BE'],
-          },
-          {
-            id: 'M2-0-t4',
-            type: 'text',
-            title: 'Tipos de Empresa, Regime Tributário e Formalização',
-            body: 'A escolha da estrutura jurídica e do regime tributário impacta diretamente a carga fiscal, a responsabilidade dos sócios e a capacidade de crescimento do negócio.\n\n**Tipos de Empresa no Brasil:**\n\n**MEI** (Microempreendedor Individual) — faturamento até R$ 81.000/ano. Tributos fixos (~R$ 70/mês). Ideal para profissionais autônomos e pequenos negócios. Limitação: apenas 1 funcionário.\n\n**ME** (Microempresa) — faturamento até R$ 360.000/ano. Pode optar pelo Simples Nacional. Permite mais funcionários e sócios.\n\n**EPP** (Empresa de Pequeno Porte) — faturamento de R$ 360.000 a R$ 4.800.000/ano. Ainda elegível ao Simples.\n\n**LTDA** (Sociedade Limitada) — responsabilidade dos sócios limitada ao capital social. A mais comum no Brasil.\n\n**S.A.** (Sociedade Anônima) — capital dividido em ações. Necessária para empresas listadas em bolsa.\n\n**Regimes Tributários:**\n\n**Simples Nacional** — alíquota única progressiva (6% a 33%) que unifica 8 tributos. Simples na declaração, mas nem sempre é o mais barato. Empresas de serviços com alta folha podem pagar mais no Simples do que no Lucro Presumido.\n\n**Lucro Presumido** — tributos calculados sobre margem presumida (8% comércio, 32% serviços). Vantajoso quando a margem real é maior que a presumida.\n\n**Lucro Real** — tributos sobre o lucro efetivo. Obrigatório para faturamento > R$ 78M/ano. Vantajoso quando a margem é baixa ou há prejuízos.\n\nCuidado: Escolher o regime tributário errado pode significar pagar até 40% mais impostos do que o necessário. Simulações comparativas são essenciais antes de optar.\n\nPergunta-chave: Quando foi a última vez que sua empresa simulou a mudança de regime tributário? A maioria nunca fez.',
-          },
-          {
-            id: 'M2-0-cmp2',
-            type: 'compare',
-            title: 'MEI vs ME vs LTDA — Qual Estrutura Jurídica Escolher?',
-            question: 'Qual tipo de empresa é ideal para cada estágio de negócio?',
-            dimensions: ['Faturamento máximo', 'Funcionários', 'Tributos', 'Responsabilidade', 'Ideal para'],
-            items: [
-              {
-                id: 'mei',
-                label: 'MEI',
-                values: [
-                  'R$ 81.000/ano (R$ 6.750/mês)',
-                  'Apenas 1 funcionário',
-                  'Fixo: ~R$ 70/mês (INSS + ISS ou ICMS). Sem contabilidade obrigatória',
-                  'Ilimitada — patrimônio pessoal responde por dívidas da empresa',
-                  'Freelancers, autônomos, pequenos comércios, quem está começando e quer formalizar rápido',
-                ],
-                highlight: 'Menor custo e burocracia — ideal para validar uma ideia de negócio',
-              },
-              {
-                id: 'me',
-                label: 'ME (Microempresa)',
-                values: [
-                  'R$ 360.000/ano (R$ 30.000/mês)',
-                  'Sem limite (depende do setor)',
-                  'Simples Nacional: alíquota de 6% a 19% sobre faturamento, unificando 8 tributos',
-                  'Limitada ao capital social (se LTDA) ou ilimitada (se EI)',
-                  'Negócios em crescimento que ultrapassaram o MEI, com até R$ 30k/mês de faturamento',
-                ],
-              },
-              {
-                id: 'ltda',
-                label: 'LTDA',
-                values: [
-                  'Sem limite (pode ser ME, EPP ou empresa normal)',
-                  'Sem limite',
-                  'Simples, Presumido ou Real — depende do faturamento e margem. Exige contador',
-                  'Limitada ao capital social — patrimônio pessoal dos sócios protegido (salvo fraude)',
-                  'Negócios com sócios, faturamento acima de R$ 81k/ano, ou que precisam de proteção patrimonial',
-                ],
-                highlight: 'Tipo mais usado no Brasil — flexível e com proteção patrimonial',
-              },
-            ],
-            insight: 'A escolha não é permanente. Muitos empreendedores começam como MEI para validar, migram para ME quando o faturamento cresce, e abrem LTDA quando precisam de sócios ou proteção patrimonial. O erro é ficar no MEI depois de ultrapassar o limite — a Receita Federal autua retroativamente.',
-          },
-          {
-            id: 'M2-0-nc1',
-            type: 'number-crunch',
-            title: 'Simulador de Regime Tributário — Simples vs Presumido',
-            scenario: 'Compare quanto sua empresa pagaria de tributos no Simples Nacional vs Lucro Presumido. Insira seus números e descubra qual regime é mais vantajoso.',
-            inputs: [
-              { id: 'monthly-revenue', label: 'Faturamento Mensal', defaultValue: 50000, unit: 'R$', min: 1000, max: 5000000 },
-              { id: 'profit-margin', label: 'Margem de Lucro Real', defaultValue: 20, unit: '%', min: 1, max: 80 },
-              { id: 'payroll', label: 'Folha de Pagamento Mensal', defaultValue: 15000, unit: 'R$', min: 0, max: 2000000 },
-            ],
-            formula: '((monthly_revenue * 12 * 0.11) - (monthly_revenue * 12 * (profit_margin/100) * 0.0864 + monthly_revenue * 12 * 0.0365)) / (monthly_revenue * 12) * 100',
-            resultLabel: 'Diferença Estimada Simples vs Presumido (% do faturamento)',
-            interpretation: [
-              { max: -3, label: 'Simples é mais vantajoso — diferença significativa a favor do regime simplificado', color: 'green' },
-              { max: 3, label: 'Regimes praticamente equivalentes — consulte um contador para análise detalhada com seus números reais', color: 'amber' },
-              { max: 100, label: 'Lucro Presumido é mais vantajoso — sua margem real é alta o suficiente para compensar a tributação presumida menor', color: 'red' },
-            ],
+            description: 'Preencha os 9 blocos do Canvas para o seu negócio. Veja se a lógica fecha.',
           },
         ],
       },
+
       {
         id: 'M2-1',
         title: 'Demonstracoes Contabeis',
