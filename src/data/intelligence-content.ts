@@ -3950,158 +3950,400 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             id: 'M3-0-v1',
             type: 'video',
             title: 'M3-01 Economia de Empresa e Análise Mercadológica',
-            url: 'https://qvvqbngiwqfuxsbgcxtc.supabase.co/storage/v1/object/public/videos/IPB/Marketing__Escassez_e_Escolha.mp4',
+            url: 'https://qvvqbngiwqfuxsbgcxtc.supabase.co/storage/v1/object/public/videos/IPB/Economia_Mercado.mp4',
           },
           {
-            id: 'M3-0-t1',
-            type: 'text',
-            title: 'Introdução',
-            body: 'Marketing pode ser definido como uma série de atividades que levam a uma transação de troca com lucro entre comprador e vendedor. O composto de marketing — produto, preço, ponto-de-venda e promoção — é a ferramenta básica das empresas de hoje.\n\nA gênese do marketing reside em uma transformação estrutural profunda da economia política e da capacidade produtiva global. O marketing não emerge de uma necessidade comunicacional, mas de um imperativo econômico decorrente do colapso da assimetria histórica entre oferta e demanda.\n\nEra da Produção → Demanda > Oferta — o problema é produzir.\nEra do Marketing → Oferta > Demanda — o problema é vender.\n\nÉ nesse ponto que emerge o problema central que estrutura todo o campo do marketing: em um ambiente onde múltiplas ofertas competem por recursos limitados — tempo, dinheiro, atenção — como se organiza o processo de escolha?\n\n**Na prática brasileira:**\n— O mercado de cosméticos no Brasil movimenta R$ 130 bilhões/ano (4º maior do mundo). A Natura não vende apenas produtos — organiza o processo de escolha via consultoras, que reduzem o risco e o esforço de decisão da consumidora.\n— O iFood não inventou a entrega de comida — organizou o processo de escolha entre milhares de restaurantes usando dados, algoritmos de recomendação e avaliações.\n— O Mercado Livre não produz nada — é puro marketing: organiza a troca entre quem quer vender e quem quer comprar, reduzindo custo, risco e esforço de ambos os lados.\n\nPergunta-chave: Como sua empresa organiza o processo de escolha do cliente? Se a resposta é "não organiza", isso explica por que vender é tão difícil.',
-          },
-          {
-            id: 'M3-mkt-concept1',
-            type: 'concept',
-            term: 'Marketing',
-            definition: 'Marketing é o sistema pelo qual se organiza a criação, oferta, comunicação e entrega de valor para viabilizar trocas sob condições de escassez.',
-            example: 'O iFood não inventou a entrega de comida — organizou o processo de escolha entre milhares de restaurantes usando dados, algoritmos e avaliações.',
-            antiExample: 'Postar no Instagram sem estratégia NÃO é marketing. É comunicação sem sistema — não organiza escolha, não reduz risco, não facilita troca.',
-          },
-          {
-            id: 'M3-mkt-decision1',
-            type: 'decision',
-            scenario: 'Você é dono de uma marca de cosméticos artesanais. Suas vendas são boas pelo Instagram, mas o crescimento estagnou. O Mercado Livre oferece parceria para listar seus produtos. Você aceita?',
-            options: [
-              { label: 'Aceitar e listar todos os produtos', tradeoffs: { upside: 'Acesso a 80M+ compradores ativos no marketplace', downside: 'Comissão de 16-19% e perda de controle da experiência do cliente', risk: 'medium' as const } },
-              { label: 'Aceitar apenas com produtos exclusivos para o canal', tradeoffs: { upside: 'Testa o canal sem canibalizar vendas diretas', downside: 'Exige SKUs novos e gestão de estoque separada', risk: 'low' as const } },
-              { label: 'Recusar e investir no próprio e-commerce', tradeoffs: { upside: 'Controle total da marca e margem de 100%', downside: 'Investimento alto em tráfego pago e tecnologia, sem garantia de resultado', risk: 'high' as const } },
+            id: 'M3-0-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Fundamentos de Economia e Marketing',
+            subtitle: 'Escassez, custo de oportunidade e a evolução do marketing — de trocas a ecossistemas',
+            opening: {
+              leadText: 'Marketing pode ser definido como uma série de atividades que levam a uma transação de troca com lucro entre comprador e vendedor. Mas antes de existir anúncio, marca ou estratégia, existe um problema mais profundo: como organizar trocas em um mundo onde recursos são {{limitados}} e escolhas têm custo?',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'A economia define escassez não como falta absoluta, mas como a condição estrutural na qual os recursos disponíveis são insuficientes para atender a todas as necessidades e desejos simultaneamente. Toda escolha implica {{custo de oportunidade}} — o valor da melhor alternativa que foi sacrificada. Quando a empresa aloca R$ 1 milhão em marketing, está dizendo "não" a R$ 1 milhão em P&D, contratação ou expansão.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O composto de marketing — produto, preço, ponto-de-venda e promoção — são as atividades que precisam ser conduzidas para que a empresa consiga consumidores dispostos a pagar um preço que, ao mesmo tempo, proporcione {{lucro}}.',
+              },
+              {
+                kind: 'heading',
+                text: 'A evolução do marketing',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Marketing nasce no ponto em que economia e psicologia se encontram: entender o que as pessoas querem, por que querem, e como fazer essa troca funcionar para {{ambos os lados}}.',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Era da Produção (até 1930)',
+                    period: 'Foco no produto',
+                    text: '"Um bom produto se vende sozinho." Demanda superava oferta. Foco em {{eficiência produtiva}}. Bastava fabricar — o mercado absorvia.',
+                    caseStudy: {
+                      company: 'Ford',
+                      year: 1908,
+                      story: 'Henry Ford: "O cliente pode ter o carro da cor que quiser, desde que seja {{preto}}." Modelo T: 15 milhões de unidades, 1 cor, 1 modelo. Produção em massa como estratégia.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '15M', label: 'Modelo T produzidos' },
+                        { value: '1 cor', label: 'Preto' },
+                        { value: '$260', label: 'Preço final (vs $850 inicial)' },
+                      ],
+                      insight: 'Funcionou enquanto demanda > oferta. Quando GM ofereceu cores e modelos, Ford {{perdeu}} liderança.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Era do Marketing (1950-2000)',
+                    period: 'Foco no cliente',
+                    text: 'Oferta supera demanda. Não basta fabricar — precisa entender o que o cliente quer. {{Kotler}} (Northwestern) sistematiza: segmentação, targeting, posicionamento. Os 4Ps entram em cena.',
+                    caseStudy: {
+                      company: 'Coca-Cola',
+                      year: 1985,
+                      story: 'New Coke: mudou a fórmula baseada em pesquisa. Clientes {{rejeitaram}} — não era só sabor, era identidade. Voltou atrás em 79 dias. Marketing precisa entender emoção, não só dados.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '79 dias', label: 'Duração da New Coke' },
+                        { value: '$4M', label: 'Gasto em pesquisa (falha)' },
+                        { value: '+8%', label: 'Vendas após retorno da original' },
+                      ],
+                      quote: {
+                        text: 'Marketing is not the art of finding clever ways to dispose of what you make. It is the art of creating genuine customer value.',
+                        author: 'Philip Kotler · Marketing Management · Northwestern University',
+                      },
+                      insight: 'Kotler: marketing não é vender o que você faz — é fazer o que {{vale}} para o cliente.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Era Digital (2000+)',
+                    period: 'Foco em ecossistema',
+                    text: 'Dados, algoritmos e plataformas redefinem marketing. O cliente não é mais audiência — é {{participante}} que co-cria valor. Marketing vira ciência de dados + psicologia + tecnologia.',
+                    caseStudy: {
+                      company: 'Amazon',
+                      year: 2023,
+                      story: '{{35%}} das vendas da Amazon vêm de recomendações algorítmicas. O marketing não é campanha — é o próprio produto. Cada clique treina o algoritmo que vende mais.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '35%', label: 'Vendas por recomendação' },
+                        { value: 'Real-time', label: 'Personalização' },
+                        { value: '$600B+', label: 'Receita Amazon (2023)' },
+                      ],
+                      insight: 'No marketing digital, o {{produto}} é o marketing. Recomendação, UX, dados — tudo é venda.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Definições clássicas de Marketing',
+              },
+              {
+                kind: 'pillar-grid',
+                title: '3 visões que definem o campo',
+                pillars: [
+                  { icon: '🇧🇷', title: 'Raimar Richers', description: '"Marketing são as atividades sistemáticas de uma organização humana voltadas à busca e realização de {{trocas}} para com o seu meio ambiente, visando benefícios específicos."' },
+                  { icon: '📖', title: 'Peter Drucker', description: '"O objetivo do marketing é tornar a {{venda}} supérflua. Conhecer tão bem o cliente que o produto se vende sozinho." Marketing como filosofia, não departamento.' },
+                  { icon: '🌍', title: 'Philip Kotler', description: '"Marketing é o processo social pelo qual pessoas obtêm aquilo de que necessitam e desejam com a {{criação}}, oferta e livre negociação de produtos e serviços de valor."' },
+                ],
+              },
             ],
-            realWorldAnalog: 'A Natura opera nos dois modelos: venda direta por consultoras + marketplace próprio + presença em farmácias. A diversificação de canais foi chave para crescer de R$ 7B para R$ 26B em receita.',
-            lesson: 'Marketing não é escolher UM canal. É organizar o processo de escolha do cliente onde ele já está — e cada canal tem trade-offs diferentes.',
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada era do marketing tem foco diferente. Classifique.',
+              compare: {
+                columnHeaders: ['Produção', 'Marketing', 'Digital'],
+                rows: [
+                  { label: 'Foco', values: ['Fábrica', 'Cliente', 'Ecossistema'] },
+                  { label: 'Lógica', values: ['Produzir mais', 'Entender desejo', 'Dados + algoritmo'] },
+                  { label: 'Exemplo', values: ['Ford Modelo T', 'Coca-Cola', 'Amazon 35% recomendação'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual era do marketing?',
+                zones: [
+                  { id: 'prod', label: 'Produção' },
+                  { id: 'mkt', label: 'Marketing' },
+                  { id: 'dig', label: 'Digital' },
+                ],
+                items: [
+                  { id: 'ford', label: '"Qualquer cor, desde que preta"', correctZone: 'prod', correctFeedback: 'Certo. Foco na produção, não no cliente.', wrongFeedback: 'Ford = era da produção.' },
+                  { id: 'seg', label: 'Segmentação e posicionamento', correctZone: 'mkt', correctFeedback: 'Certo. Entender o cliente = era do marketing.', wrongFeedback: 'Segmentação = era do marketing (Kotler).' },
+                  { id: 'algo', label: 'Recomendação por algoritmo', correctZone: 'dig', correctFeedback: 'Certo. Dados e personalização = era digital.', wrongFeedback: 'Algoritmo = era digital.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Marketing evoluiu de "fabricar e vender" para "{{entender e servir}}". A escassez obriga escolhas. O custo de oportunidade dá peso a cada decisão. E as 3 eras mostram que quem não evolui com o mercado, desaparece.',
+              keyInsights: [
+                'Toda escolha tem {{custo de oportunidade}} — o valor da melhor alternativa sacrificada.',
+                'Kotler: marketing não é vender o que faz, é fazer o que {{vale}} para o cliente.',
+                'Amazon: 35% das vendas por recomendação. No digital, o produto {{é}} o marketing.',
+              ],
+              nextChapterHint: 'Capítulo 2 · Valor',
+              nextChapterBlurb: 'O conceito mais mal interpretado do marketing — valor não está no produto.',
+            },
           },
           {
-            id: 'M3-0-t2',
-            type: 'text',
-            title: 'Escassez, Custo de Oportunidade e a Natureza Decisória do Mercado',
-            body: 'A economia define escassez não como falta absoluta, mas como a condição estrutural na qual os recursos disponíveis são insuficientes para atender a todas as necessidades e desejos simultaneamente.\n\nEscassez → Recursos < Necessidades\nEscolha → Toda decisão implica renúncia\nCusto de Oportunidade → Valor da melhor alternativa descartada\n\nToda a teoria econômica moderna, de Adam Smith a Mankiw, parte da mesma premissa: recursos são limitados, desejos são ilimitados, logo toda escolha implica renúncia.\n\nDo ponto de vista do consumidor, toda decisão de compra é, simultaneamente:\n— Uma decisão de aquisição\n— Uma decisão de renúncia\n— Uma decisão de alocação de recursos escassos\n\nDo ponto de vista das organizações, toda estratégia de marketing é uma estratégia de priorização:\n— Escolher mercados é renunciar a outros\n— Escolher posicionamentos é abandonar outros\n— Escolher públicos é excluir outros\n\nPara o marketing estratégico, se o tempo e a atenção do consumidor são finitos, a competição deixa de ser apenas contra concorrentes diretos e passa a ser uma luta contra qualquer estímulo que dispute a mesma janela de atenção ou o mesmo orçamento mental. O sucesso de uma marca reside na sua capacidade de organizar o processo de escolha de tal forma que o consumidor perceba que a renúncia necessária é a menor e mais vantajosa possível.',
-          },
-          {
-            id: 'M3-mkt-concept2',
-            type: 'concept',
-            term: 'Custo de Oportunidade',
-            definition: 'O valor da melhor alternativa descartada ao fazer uma escolha. Toda decisão econômica implica renúncia — e o custo real inclui aquilo que você deixou de ganhar.',
-            example: 'Se você investe R$ 100K em estoque e o dinheiro renderia 12% ao ano no CDI, o custo de oportunidade do estoque é R$ 12K/ano — mesmo que "não tenha gastado" nada além do estoque.',
-            antiExample: 'Dizer "foi de graça" quando um serviço é grátis ignora o tempo investido. Se você gastou 8 horas para conseguir algo "grátis" e sua hora vale R$ 100, o custo de oportunidade foi R$ 800.',
-          },
-          {
-            id: 'M3-mkt-exercise1',
-            type: 'inline-exercise',
-            prompt: 'Analise o custo de oportunidade de uma decisão real do seu negócio (ou de um negócio que você conhece).',
-            context: 'Toda decisão empresarial envolve renúncia. O custo de oportunidade não é abstrato — ele aparece como lucro não realizado, clientes não atendidos ou mercados não explorados.',
-            fields: [
-              { id: 'decision', label: 'Qual decisão está analisando?', placeholder: 'Ex: Investir R$ 50K em reforma da loja vs. em marketing digital' },
-              { id: 'chosen', label: 'O que foi escolhido e por quê?', placeholder: 'Descreva a opção escolhida e a justificativa', multiline: true },
-              { id: 'opportunity-cost', label: 'Qual o custo de oportunidade? O que foi renunciado?', placeholder: 'Quanto a alternativa descartada geraria em receita, crescimento ou aprendizado?', multiline: true },
+            id: 'M3-0-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Valor — O Conceito Central do Marketing',
+            subtitle: 'Valor não está no produto — está na percepção do cliente',
+            opening: {
+              leadText: 'Valor não está no produto. Valor está na relação entre {{benefício percebido}} e {{custo percebido}}. O cérebro nunca pergunta "isso é objetivamente bom?" — ele pergunta "isso vale o que vai me custar?"',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'Valor percebido = Benefícios percebidos ÷ Custos percebidos. Os benefícios incluem funcionalidade, emoção, status, conveniência. Os custos incluem dinheiro, tempo, esforço, risco. Um iPhone de R$ 8.000 tem valor alto porque os benefícios percebidos (status, ecossistema, câmera, facilidade) superam o custo percebido para seu {{público-alvo}}.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Os 4 tipos de valor percebido',
+                pillars: [
+                  { icon: '⚙️', title: 'Funcional', description: 'O produto {{resolve}} o problema? Faz o que promete? Qualidade, durabilidade, desempenho técnico.' },
+                  { icon: '❤️', title: 'Emocional', description: 'Como o cliente se {{sente}} ao usar? Alegria, segurança, pertencimento. Coca-Cola vende emoção, não refrigerante.' },
+                  { icon: '👑', title: 'Social', description: 'O que usar esse produto diz sobre {{quem eu sou}}? Status, identidade, grupo. Apple vende pertencimento a uma tribo.' },
+                  { icon: '💰', title: 'Econômico', description: 'A relação custo-benefício é {{justa}}? Economia de tempo, dinheiro, esforço. Nubank vende economia (zero tarifa).' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A estratégia de marketing inteira gira em torno de valor: o produto cria valor (funcional), o preço sinaliza valor (econômico), a comunicação transmite valor (emocional/social), e a distribuição entrega valor (conveniência). Os {{4Ps}} são 4 formas de gerenciar valor percebido.',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Valor vs Preço — Havaianas',
+                    period: 'Mesmo produto, valor diferente',
+                    text: 'Chinelo de borracha: custo de produção ~R$ 3. Versão básica: R$ 15. Versão designer: R$ 80. Colaboração exclusiva: R$ 300+. A borracha é a {{mesma}}. O valor percebido é radicalmente diferente.',
+                    caseStudy: {
+                      company: 'Havaianas',
+                      year: 2020,
+                      story: 'Colaboração com {{Dolce & Gabbana}}: chinelo a R$ 350. Esgotou em horas. O produto funcional é idêntico ao de R$ 15. O valor social (exclusividade, marca, escassez) justifica 23x o preço.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '~R$ 3', label: 'Custo produção' },
+                        { value: 'R$ 350', label: 'Versão D&G' },
+                        { value: '23x', label: 'Diferença de preço' },
+                      ],
+                      insight: 'O marketing não muda o produto — muda o {{valor percebido}}. E valor percebido determina quanto o cliente paga.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Valor vs Preço — Nubank',
+                    period: 'Mesmo serviço, valor diferente',
+                    text: 'Cartão de crédito: produto idêntico ao de qualquer banco. Diferença: {{zero tarifa}}, app intuitivo, atendimento humano rápido. O valor econômico (economia) + funcional (facilidade) + emocional (respeito) gera 80M de clientes.',
+                    caseStudy: {
+                      company: 'Nubank',
+                      year: 2023,
+                      story: 'NPS (Net Promoter Score) de {{87}} — o mais alto do setor financeiro brasileiro. Bancos tradicionais: NPS de 20-40. Mesma funcionalidade, {{4x mais satisfação}}. Valor está na experiência.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '87', label: 'NPS Nubank' },
+                        { value: '20-40', label: 'NPS bancos tradicionais' },
+                        { value: '80M', label: 'Clientes' },
+                      ],
+                      insight: 'Valor percebido não é só funcional. Nubank vende {{respeito}} ao cliente — algo que bancos tradicionais nunca priorizaram.',
+                    },
+                  },
+                ],
+              },
             ],
-            evaluationCriteria: ['Identifica claramente a alternativa renunciada', 'Quantifica (ou estima) o valor da renúncia', 'Conclui se a escolha foi acertada considerando o trade-off'],
-            expectedConcepts: ['custo de oportunidade', 'trade-off', 'alocação de recursos'],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Os 4 tipos de valor se manifestam em diferentes produtos. Classifique.',
+              compare: {
+                columnHeaders: ['Funcional', 'Emocional', 'Social', 'Econômico'],
+                rows: [
+                  { label: 'Pergunta do cliente', values: ['Funciona?', 'Como me sinto?', 'O que diz de mim?', 'Vale o preço?'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual tipo de valor predomina?',
+                zones: [
+                  { id: 'func', label: 'Funcional' },
+                  { id: 'emoc', label: 'Emocional' },
+                  { id: 'soc', label: 'Social' },
+                  { id: 'econ', label: 'Econômico' },
+                ],
+                items: [
+                  { id: 'rolex', label: 'Relógio Rolex', correctZone: 'soc', correctFeedback: 'Certo. Rolex = status social.', wrongFeedback: 'Rolex vende status, não precisão.' },
+                  { id: 'uber', label: 'Uber vs táxi', correctZone: 'econ', correctFeedback: 'Certo. Conveniência e preço = valor econômico.', wrongFeedback: 'Uber compete em preço/conveniência.' },
+                  { id: 'coca', label: 'Coca-Cola na praia', correctZone: 'emoc', correctFeedback: 'Certo. Felicidade, nostalgia = emoção.', wrongFeedback: 'Coca vende emoção/momento.' },
+                  { id: 'dyson', label: 'Aspirador Dyson', correctZone: 'func', correctFeedback: 'Certo. Tecnologia e desempenho = funcional.', wrongFeedback: 'Dyson vende desempenho técnico.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Valor = Benefício percebido ÷ Custo percebido. Não está no produto — está na {{mente}} do cliente. Os 4 tipos (funcional, emocional, social, econômico) determinam quanto o cliente paga e se volta.',
+              keyInsights: [
+                'Havaianas: mesma borracha, preço de R$ 15 a R$ 350. A diferença é {{valor percebido}}, não custo.',
+                'Nubank NPS 87 vs bancos 20-40. Mesmo produto, 4x mais satisfação. Valor = {{experiência}}.',
+                'Os 4Ps são 4 formas de gerenciar valor: criar (produto), sinalizar (preço), comunicar (promoção), {{entregar}} (distribuição).',
+              ],
+              nextChapterHint: 'Capítulo 3 · Necessidade, Desejo e Demanda',
+              nextChapterBlurb: 'A diferença que separa marketing bom de marketing desperdiçado.',
+            },
+          },
+          {
+            id: 'M3-0-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Necessidade, Desejo e Demanda',
+            subtitle: 'A diferença que separa marketing eficiente de marketing desperdiçado',
+            opening: {
+              leadText: 'Na teoria clássica: {{Necessidade}} é carência humana básica (fisiológica ou psicológica, independe de cultura). {{Desejo}} é a forma culturalmente específica de satisfazer uma necessidade. {{Demanda}} é desejo acompanhado de poder de compra.',
+            },
+            body: [
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Necessidade',
+                    period: 'Universal e inata',
+                    text: 'Carência humana básica, fisiológica ou psicológica. {{Independe}} de cultura. Fome, sede, segurança, pertencimento, autoestima — existem em qualquer sociedade, em qualquer época.',
+                    caseStudy: {
+                      company: 'Maslow (1943)',
+                      year: 1943,
+                      story: 'Pirâmide de Maslow: {{5 níveis}} de necessidade — fisiológicas, segurança, sociais, estima, autorrealização. Marketing opera em todos os níveis, não só no básico.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '5', label: 'Níveis de Maslow' },
+                        { value: 'Universal', label: 'Toda cultura' },
+                        { value: 'Inata', label: 'Não é criada pelo marketing' },
+                      ],
+                      insight: 'Marketing NÃO cria necessidades. Necessidades {{existem}}. Marketing cria desejos e habilita demanda.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Desejo',
+                    period: 'Cultural e aprendido',
+                    text: 'Forma culturalmente específica de satisfazer uma necessidade. Necessidade de alimentação é universal. Desejo de {{sushi}} é cultural. O desejo é aprendido — moldado por cultura, família, mídia e experiência.',
+                    caseStudy: {
+                      company: 'Starbucks',
+                      year: 2000,
+                      story: 'Necessidade: energia (cafeína). Desejo: {{experiência}} Starbucks (ambiente, status, ritual). Ninguém PRECISA de café de R$ 25. Mas milhões DESEJAM a experiência que ele proporciona.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 25', label: 'Café Starbucks' },
+                        { value: 'R$ 3', label: 'Café padaria' },
+                        { value: '8x', label: 'Diferença de preço' },
+                      ],
+                      insight: 'O marketing transforma necessidade em desejo {{específico}}. A necessidade é de cafeína. O desejo é de Starbucks.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Demanda',
+                    period: 'Desejo + poder de compra',
+                    text: 'Desejo acompanhado de {{capacidade e disposição}} de pagar. Muitos desejam um iPhone. Nem todos podem pagar R$ 8.000. Demanda = desejo viável. É onde o marketing encontra o mercado real.',
+                    caseStudy: {
+                      company: 'Xiaomi',
+                      year: 2020,
+                      story: 'Necessidade: comunicação. Desejo: smartphone premium. Barreira: preço. Xiaomi oferece {{90% das funcionalidades}} por 30% do preço. Converteu desejo frustrado em demanda real.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '90%', label: 'Funcionalidades vs premium' },
+                        { value: '30%', label: 'Do preço' },
+                        { value: '#3', label: 'Market share global' },
+                      ],
+                      insight: 'Xiaomi não criou necessidade nem desejo — converteu {{desejo existente}} em demanda acessível. Esse é o poder do preço.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A distinção é estratégica: empresas que confundem necessidade com desejo lançam produtos genéricos. Empresas que confundem desejo com demanda lançam produtos que ninguém {{compra}} (tem vontade mas não tem dinheiro). O marketing eficiente atua nos três níveis: identifica necessidades, molda desejos e converte em demanda.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Necessidade, desejo e demanda são conceitos diferentes. Classifique.',
+              compare: {
+                columnHeaders: ['Necessidade', 'Desejo', 'Demanda'],
+                rows: [
+                  { label: 'Natureza', values: ['Universal', 'Cultural', 'Econômica'] },
+                  { label: 'Exemplo', values: ['Fome', 'Sushi', 'Sushi que posso pagar'] },
+                  { label: 'Marketing pode', values: ['Identificar', 'Moldar', 'Converter'] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada exemplo:',
+                zones: [
+                  { id: 'nec', label: 'Necessidade' },
+                  { id: 'des', label: 'Desejo' },
+                  { id: 'dem', label: 'Demanda' },
+                ],
+                items: [
+                  { id: 'sede', label: 'Sentir sede no calor', correctZone: 'nec', correctFeedback: 'Certo. Sede é necessidade fisiológica universal.', wrongFeedback: 'Sede = necessidade básica.' },
+                  { id: 'star', label: 'Querer um Frappuccino Starbucks', correctZone: 'des', correctFeedback: 'Certo. Forma específica de satisfazer sede = desejo.', wrongFeedback: 'Starbucks é desejo cultural.' },
+                  { id: 'comp', label: 'Comprar o Frappuccino por R$ 25', correctZone: 'dem', correctFeedback: 'Certo. Desejo + pagamento = demanda.', wrongFeedback: 'Desejo viabilizado = demanda.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Marketing NÃO cria necessidades — elas {{existem}}. Marketing molda desejos (cultural) e converte em demanda (poder de compra). Confundir os três é desperdiçar orçamento.',
+              keyInsights: [
+                'Maslow: 5 níveis de necessidade. Marketing opera em {{todos}} — não só no básico.',
+                'Starbucks: necessidade de cafeína → desejo de experiência → demanda de R$ 25. {{8x}} o preço da padaria.',
+                'Xiaomi: não criou necessidade nem desejo — converteu desejo frustrado em {{demanda acessível}}.',
+              ],
+            },
           },
           {
             id: 'M3-0-s1',
             type: 'simulation',
             title: 'Timeline da Evolução do Marketing',
             simulationId: 'marketing-timeline',
-            description: 'As 8 eras do marketing — da Era da Produção (1890) à Era da Decisão (2020–atual). Navegue por cada período e identifique o problema central e a lógica de cada fase.',
-          },
-          {
-            id: 'M3-0-t3',
-            type: 'text',
-            title: 'O que é Marketing?',
-            body: 'Antes de existir anúncio, marca ou estratégia, existe um problema mais profundo: como organizar trocas em um mundo onde recursos são limitados e escolhas têm custo? Marketing nasce exatamente nesse ponto.\n\nEnquanto tudo que se produzia era absorvido pelo mercado, marketing era desnecessário. Quando a capacidade de produzir superou a capacidade de absorver, surgiu a pergunta central: como fazer alguém escolher isto — e não aquilo?\n\nMarketing não nasce da criatividade. Marketing nasce da escassez.\n\nA American Marketing Association define marketing como o processo social pelo qual indivíduos e grupos obtêm o que necessitam e desejam, nos esforços de uma organização em satisfazer os desejos e necessidades de seu cliente, por meio da criação e troca de produtos e valores.\n\nAs definições de Kotler, Richers e Drucker convergem para o mesmo núcleo: marketing é o sistema pelo qual se organiza a criação, oferta, comunicação e entrega de valor para viabilizar trocas sob condições de restrição.\n\nO núcleo não é "promoção". O núcleo é troca.\n\nMarketing é um sistema de organização de valor, escolha e troca sob escassez. Existe para:\n— Reduzir incerteza\n— Reduzir risco percebido\n— Reduzir custo de decisão\n— Organizar percepção de valor\n— Facilitar escolha\n\nSe uma empresa precisa empurrar demais, explicar demais, insistir demais — isso não é marketing forte. É sistema fraco tentando compensar na força.',
-          },
-          {
-            id: 'M3-mkt-framework1',
-            type: 'framework',
-            frameworkId: 'marketing-diagnostic',
-            title: 'Diagnóstico — Sua Empresa Organiza o Processo de Escolha?',
-            description: 'Marketing é organizar valor, escolha e troca sob escassez. Avalie como sua empresa está nessas 5 funções.',
-            fields: [
-              { id: 'uncertainty', label: 'Como você reduz a incerteza do cliente?', placeholder: 'Ex: garantia, reviews, prova social, demonstração grátis...', helpText: 'Clientes com incerteza alta não compram. O que você faz para eliminar dúvidas?' },
-              { id: 'risk', label: 'Como você reduz o risco percebido?', placeholder: 'Ex: devolução sem custo, teste grátis, depoimentos...', helpText: 'Risco percebido = "e se eu me arrepender?" Quanto menor, maior a conversão.' },
-              { id: 'decision-cost', label: 'Como você reduz o custo de decisão?', placeholder: 'Ex: comparador de produtos, recomendação personalizada, curadoria...', helpText: 'Se o cliente precisa pensar muito para escolher, ele desiste. Simplifique.' },
-              { id: 'value-org', label: 'Como você organiza a percepção de valor?', placeholder: 'Ex: preço-âncora, planos comparativos, destaque do mais vendido...', helpText: 'O valor não está no produto — está na percepção. Como você posiciona?' },
-              { id: 'exchange', label: 'Como você facilita a troca?', placeholder: 'Ex: PIX, parcelamento, frete grátis, checkout de 1 clique...', helpText: 'Cada barreira na hora de pagar é um cliente perdido.' },
-            ],
+            description: 'Navegue pelas eras do marketing e veja como a lógica mudou.',
           },
           {
             id: 'M3-0-s2',
             type: 'simulation',
             title: 'Mapa de Definições: Richers, Drucker e Kotler',
             simulationId: 'marketing-definitions',
-            description: 'Compare as três definições fundacionais do marketing. Identifique o núcleo conceitual de cada autor e o que elas têm em comum.',
-          },
-          {
-            id: 'M3-0-t4',
-            type: 'text',
-            title: 'Valor: o conceito mais mal interpretado do marketing',
-            body: 'Valor não está no produto. Valor está na relação entre benefício percebido e custo percebido.\n\nO cérebro nunca pergunta "isso é objetivamente bom?" — ele pergunta "isso vale o que vai me custar?"\n\nCusto não é só dinheiro. Custo é:\n— Esforço físico e logístico\n— Tempo (custo de oportunidade do tempo gasto)\n— Risco (medo de errar)\n— Exposição social (risco de julgamento)\n— Energia mental (esforço cognitivo da decisão)\n— Frustração potencial\n\nPor isso produtos tecnicamente melhores perdem, soluções objetivamente piores vencem e marcas medianas dominam mercados. O cérebro não escolhe o melhor — escolhe o menos arriscado e menos custoso agora.\n\nApple e Chanel dominam porque manipulam essa balança:\n\nA exposição social deixa de ser custo e vira o maior benefício — comprar um iPhone ou uma bolsa Chanel zera o risco de julgamento negativo e entrega status, pertencimento e poder. O risco e o esforço mental despencam — a força da marca funciona como atalho cognitivo, eliminando a necessidade de comparar especificações.\n\nÉ a materialização de Drucker: "O objetivo do marketing é tornar a venda supérflua." Quando marketing e branding são bem executados ao longo do tempo, constroem atalhos sólidos no cérebro do consumidor. A lógica do menor risco e menor custo invisível comanda o show mesmo no mercado de alto luxo.',
-          },
-          {
-            id: 'M3-mkt-compare1',
-            type: 'compare',
-            title: 'Valor Percebido — Como Marcas Manipulam a Balança',
-            question: 'O que faz um produto "valer" 10x mais que outro similar?',
-            dimensions: ['Produto', 'Preço', 'Benefício funcional', 'Benefício emocional/social', 'Custo invisível reduzido', 'Resultado na balança'],
-            items: [
-              { id: 'havaianas', label: 'Havaianas Slim', values: ['Chinelo de borracha', 'R$ 45', 'Conforto básico', 'Status de "cool brasileiro", design colorido', 'Baixo risco social — aceita em qualquer contexto casual', 'Benefício percebido >> custo → vende 200M pares/ano'], highlight: 'O chinelo é o mesmo. O valor percebido mudou com reposicionamento.' },
-              { id: 'iphone', label: 'iPhone', values: ['Smartphone', 'R$ 8.000+', 'Câmera, apps, ecossistema Apple', 'Status social, pertencimento, "segurança" de escolha', 'Zero risco de julgamento negativo + atalho cognitivo (não precisa comparar specs)', 'Benefício emocional domina → margem de 45% (vs 5% da concorrência)'], highlight: 'A marca como atalho cognitivo elimina o esforço mental da escolha.' },
-              { id: 'nubank', label: 'Nubank', values: ['Banco digital', 'R$ 0 (sem tarifas)', 'App funcional, cartão sem anuidade', 'Anti-banco, modernidade, autonomia', 'Elimina filas, burocracia, gerente insistente', 'Custo zero + risco baixo → 100M+ clientes em 10 anos'], highlight: 'Zerou custos visíveis E invisíveis simultaneamente.' },
-            ],
-            insight: 'Produtos premium não vencem por serem "melhores" — vencem porque manipulam a equação de valor percebido. Reduzir custos invisíveis (risco social, esforço mental, tempo) pode ser mais poderoso que melhorar o produto.',
+            description: 'Compare as definições clássicas e conecte cada autor à sua visão.',
           },
           {
             id: 'M3-0-s3',
             type: 'simulation',
             title: 'Balança de Valor Percebido',
             simulationId: 'value-balance',
-            description: 'Ajuste os benefícios percebidos (funcional, social, emocional) e os custos percebidos (dinheiro, tempo, risco, esforço) e observe como o cérebro do consumidor decide.',
-          },
-          {
-            id: 'M3-0-t5',
-            type: 'text',
-            title: 'Necessidade, Desejo e Demanda',
-            body: 'Na teoria clássica:\n\nNecessidade = carência humana básica, fisiológica ou psicológica. Independe de cultura.\nDesejo = forma culturalmente específica de satisfazer uma necessidade. É aprendido.\nDemanda = desejo + capacidade real de troca. É o que o mercado efetivamente realiza.\n\nIsso é estrutural. Muitos negócios quebram porque:\n— Falam com o desejo mas não existe demanda real\n— Não existe capacidade de pagamento\n— Não existe contexto decisório adequado\n\nEntender a tríade é entender por que não basta ter um produto que as pessoas querem. É preciso que exista condição real de troca. Marketing sem demanda real é comunicação sem destino.\n\n**Teste prático para seu negócio:**\n— Necessidade existe? → As pessoas precisam do que você vende? (Se não, desista ou pivote)\n— Desejo existe? → As pessoas QUEREM a forma como você entrega? (Se não, redesenhe)\n— Demanda existe? → As pessoas PODEM pagar pelo que você cobra? (Se não, ajuste preço ou público)\n\nExemplo: Comida saudável é necessidade (todo mundo precisa comer bem). Açaí gourmet é desejo (forma específica de atender a necessidade). Açaí a R$ 45 num bairro de renda baixa não gera demanda — mesmo que o desejo exista, não há capacidade de troca. O mesmo açaí a R$ 45 nos Jardins (SP) gera fila.\n\nO marketing não cria necessidades — organiza desejos em demanda viável.',
-          },
-          {
-            id: 'M3-mkt-concept3',
-            type: 'concept',
-            term: 'Demanda',
-            definition: 'Demanda é desejo sustentado por capacidade real de troca. Não basta querer — é preciso poder pagar. Sem demanda real, marketing é comunicação sem destino.',
-            example: 'Açaí gourmet a R$ 45 nos Jardins (SP) gera fila. O mesmo açaí a R$ 45 num bairro de renda baixa não gera demanda — o desejo existe, mas não há capacidade de troca.',
-            antiExample: '"Todo mundo quer nosso produto!" não significa que há demanda. Se ninguém paga o preço que você precisa cobrar, não há demanda — há apenas desejo sem troca.',
-          },
-          {
-            id: 'M3-mkt-exercise2',
-            type: 'inline-exercise',
-            prompt: 'Aplique o teste Necessidade-Desejo-Demanda ao seu negócio (ou a um produto/serviço que você conhece).',
-            context: 'Marketing não cria necessidades — organiza desejos em demanda viável. O teste abaixo revela em qual ponto sua oferta pode estar falhando.',
-            fields: [
-              { id: 'product', label: 'Qual o produto ou serviço?', placeholder: 'Ex: Curso online de gestão financeira para MEIs' },
-              { id: 'need', label: 'A necessidade existe? As pessoas PRECISAM disso?', placeholder: 'Qual necessidade básica (fisiológica ou psicológica) isso atende?', multiline: true },
-              { id: 'desire', label: 'O desejo existe? As pessoas QUEREM a forma como você entrega?', placeholder: 'Elas preferem seu formato, marca e experiência? Ou há formas mais desejadas?', multiline: true },
-              { id: 'demand', label: 'A demanda existe? As pessoas PODEM pagar o que você cobra?', placeholder: 'Há capacidade real de troca no público-alvo? Quanto estariam dispostas a pagar?', multiline: true },
-            ],
-            evaluationCriteria: ['Distingue claramente necessidade, desejo e demanda', 'Identifica se o gargalo está na necessidade, no desejo ou na demanda', 'Propõe ajuste concreto se algum nível falha'],
-            expectedConcepts: ['necessidade', 'desejo', 'demanda', 'capacidade de troca'],
+            description: 'Ajuste benefícios e custos percebidos e veja como valor muda.',
           },
           {
             id: 'M3-0-s4',
             type: 'simulation',
             title: 'Diagnóstico: Necessidade, Desejo ou Demanda?',
             simulationId: 'need-desire-demand',
-            description: 'Cenários reais de negócio — identifique se há necessidade, desejo ou demanda. Descubra por que produtos falham mesmo sendo desejados.',
+            description: 'Cenários reais: classifique se é necessidade, desejo ou demanda.',
           },
         ],
       },
+
       {
         id: 'M3-1',
         title: 'Lideranca e Gestao de Equipes',
