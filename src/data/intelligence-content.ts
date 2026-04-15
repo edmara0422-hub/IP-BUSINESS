@@ -2317,7 +2317,27 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 kind: 'paragraph',
                 text: 'Nenhuma política terá sucesso se não estiver alinhada à estratégia global da empresa — esse alinhamento é {{imprescindível}} (Toledo & Farias Filho, 2023). Sustentabilidade não é departamento — é princípio que permeia toda a organização.',
               },
-            ],
+            
+              {
+                kind: 'heading',
+                text: 'Metodologia SMART para indicadores',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Um dos maiores pontos na criação de indicadores de sustentabilidade é a metodologia SMART — amplamente utilizada em administração e gestão estratégica. O termo é acrônimo de "esperto/ágil" em inglês e refere-se a cinco características essenciais para qualquer {{meta ou indicador}}.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'SMART — 5 critérios para metas eficazes',
+                pillars: [
+                  { icon: '🎯', title: 'S — Específico', description: 'A meta precisa ser {{clara e bem definida}}. "Reduzir emissões" é vago. "Reduzir emissões de CO2 em 15% na operação logística" é específico.' },
+                  { icon: '📊', title: 'M — Mensurável', description: 'Deve ser possível {{avaliar o progresso}}. Se não mede, não sabe se funciona. KPIs claros com linha de base.' },
+                  { icon: '✅', title: 'A — Atingível', description: 'A meta precisa ser {{alcançável}} com os recursos disponíveis. Ambiciosa mas realista — 0% emissão em 6 meses não é atingível.' },
+                  { icon: '💎', title: 'R — Relevante', description: 'Deve ser {{importante}}, alinhada com valores e objetivos estratégicos da empresa. Não desperdiçar esforço em meta irrelevante.' },
+                  { icon: '⏰', title: 'T — Temporal', description: 'Deve ter {{prazo definido}}. "Algum dia" não é meta. "Até dezembro de 2026" é.' },
+                ],
+              },
+],
             application: {
               kind: 'compare-and-drag',
               intro: 'Classifique cada etapa na fase correta do ciclo.',
@@ -2541,7 +2561,267 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
           },
 
           
-          {
+                    {
+            id: 'M1-2-cap7',
+            type: 'chapter',
+            number: 7,
+            title: 'Certificações, Selos e Indicadores Globais',
+            subtitle: 'B Corps, Instituto Ethos, Great Place to Work, Fair Trade e mais — como medir e provar sustentabilidade',
+            opening: {
+              leadText: 'Sustentabilidade sem {{certificação}} é promessa. Selos e indicadores globais padronizam a avaliação e permitem que empresas brasileiras sejam comparadas a organizações internacionais — ganhando visibilidade no cenário global.',
+            },
+            body: [
+              {
+                kind: 'heading',
+                text: 'Certificações de empresa',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'B Corps (Empresas B)',
+                    period: 'Propósito + Lucro',
+                    text: 'Certificadas pela {{B Lab}} — cumprem altos padrões de desempenho social, ambiental, transparência e responsabilidade legal. Equilibram propósito e lucro. Focam em benefícios para TODOS os stakeholders, não apenas acionistas.',
+                    caseStudy: {
+                      company: 'Natura',
+                      year: 2014,
+                      story: 'Primeira empresa de capital aberto do mundo a receber certificação {{B Corp}}. Avaliada em trabalhadores, comunidade, meio ambiente e clientes. Recertifica periodicamente com pontuação mínima na B Impact Assessment.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '7.000+', label: 'B Corps no mundo' },
+                        { value: '80+', label: 'Pontuação mínima (de 200)' },
+                        { value: 'Auditoria', label: 'B Impact Assessment' },
+                      ],
+                      insight: 'B Corp não certifica produto — certifica a {{empresa inteira}}. Avalia impacto abrangente em todas as dimensões.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Great Place to Work',
+                    period: 'Ambiente de trabalho',
+                    text: 'Organização internacional que avalia e certifica empresas pela qualidade do ambiente de trabalho e {{satisfação dos colaboradores}}. Pesquisas de clima, feedbacks, análise de gestão de pessoas.',
+                    caseStudy: {
+                      company: 'Magazine Luiza',
+                      year: 2022,
+                      story: 'Consistentemente no ranking GPTW Brasil. Pesquisa de satisfação com {{92% de aprovação}} dos funcionários. Foco em desenvolvimento de carreira, benefícios e cultura inclusiva.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '100+', label: 'Países com ranking GPTW' },
+                        { value: '92%', label: 'Aprovação Magalu' },
+                        { value: 'Anual', label: 'Certificação renovável' },
+                      ],
+                      insight: 'GPTW prova que ambiente bom = {{retenção}} de talentos. Empresas no ranking têm turnover 50% menor.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Instituto Ethos',
+                    period: 'Referência brasileira',
+                    text: 'Organização brasileira sem fins lucrativos que mobiliza empresas para práticas sustentáveis e responsáveis. Oferece {{indicadores}} para medir e melhorar práticas sociais, ambientais e econômicas.',
+                    caseStudy: {
+                      company: 'Itaú',
+                      year: 2010,
+                      story: 'Usa indicadores Ethos como base para relatório de sustentabilidade. Alinhamento com {{ODS da ONU}} e práticas visíveis globalmente, mesmo tendo foco brasileiro.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'Brasil', label: 'Foco nacional, impacto global' },
+                        { value: 'ODS', label: 'Alinhado à agenda ONU' },
+                        { value: 'Ferramentas', label: 'Indicadores + diagnóstico' },
+                      ],
+                      insight: 'Ethos permite empresas brasileiras serem {{comparadas}} a organizações internacionais em padrões reconhecidos.',
+                    },
+                  },
+                  {
+                    index: 4,
+                    title: 'Ethisphere',
+                    period: 'Ética global',
+                    text: 'Publica anualmente o ranking das empresas mais éticas do mundo (World\'s Most Ethical Companies). Avalia governança corporativa, responsabilidade social, transparência, {{cultura ética}} e integridade.',
+                    caseStudy: {
+                      company: 'Natura',
+                      year: 2023,
+                      story: 'Única empresa brasileira de cosméticos no ranking Ethisphere. Avaliação por {{questionário extenso}}, análise de documentos e auditorias independentes.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '136', label: 'Empresas no ranking 2024' },
+                        { value: '44', label: 'Países representados' },
+                        { value: '5 áreas', label: 'Governança, RSC, transparência, cultura, integridade' },
+                      ],
+                      insight: 'Estar no ranking Ethisphere é sinal de que ética não é {{discurso}} — é prática auditada.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Rankings e índices de sustentabilidade',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Índices que medem sustentabilidade corporativa',
+                pillars: [
+                  { icon: '🏆', title: 'Corporate Knights Global 100', description: '100 empresas mais sustentáveis do mundo. {{21 indicadores}} ESG: energia, carbono, água, diversidade. Métricas quantitativas e qualitativas.', metric: { value: '21', label: 'indicadores ESG' } },
+                  { icon: '🌿', title: 'UEBT', description: 'Union for Ethical BioTrade. Certifica comércio ético de recursos da {{biodiversidade}}. L\'Oréal, Body Shop, Aveda certificadas. Foco em América Latina, África e Ásia.' },
+                  { icon: '🇧🇷', title: 'ISE B3', description: 'Índice de Sustentabilidade Empresarial brasileiro. ~40 empresas com critérios rigorosos em E, S e G. Acesso a {{capital mais barato}}.', metric: { value: '~40', label: 'empresas selecionadas' } },
+                  { icon: '🌐', title: 'Pacto Global ONU', description: 'Iniciativa para empresas alinharem operações a {{10 princípios}} universais em direitos humanos, trabalho, meio ambiente e anticorrupção.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Padrões de reporte e transparência',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Não são "selos" para produto — são normas globais de como uma empresa deve {{medir e contar}} sua história de sustentabilidade para o mercado e investidores.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Padrões de disclosure',
+                pillars: [
+                  { icon: '📊', title: 'GRI', description: 'Padrão mais usado para relatórios de sustentabilidade. {{75%}} das 250 maiores empresas. Fala com todos os stakeholders.' },
+                  { icon: '💰', title: 'SASB', description: 'Focado em indicadores que afetam desempenho {{financeiro}}. 77 padrões por indústria. Favorito de investidores.' },
+                  { icon: '🌡️', title: 'CDP', description: 'Carbon Disclosure Project. Transparência sobre {{emissões de carbono}}, gestão de água e florestas. Nota de A a D-.' },
+                  { icon: '⚠️', title: 'TCFD', description: 'Task Force on Climate-related Financial Disclosures. Riscos financeiros relacionados a {{mudanças climáticas}}. Recomendação, não obrigação (ainda).' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Selos de produto e cadeia de suprimentos',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Certificam que a matéria-prima ou produto específico foi extraído ou produzido de forma {{ética e sustentável}}.',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Fair Trade International',
+                    period: 'Comércio justo',
+                    text: 'Garante {{comércio justo}}: preços mínimos para pequenos produtores e proibição de trabalho infantil. Selo reconhecido globalmente em café, cacau, algodão e mais.',
+                    caseStudy: {
+                      company: 'Café brasileiro',
+                      year: 2023,
+                      story: 'Brasil é o maior produtor de café Fair Trade do mundo. Cooperativas em {{Minas Gerais}} exportam com prêmio de preço de 20-30% acima do mercado convencional.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '+20-30%', label: 'Prêmio de preço' },
+                        { value: '1.9M', label: 'Produtores certificados' },
+                        { value: '70+', label: 'Países de origem' },
+                      ],
+                      insight: 'Fair Trade prova que pagar mais ao produtor {{não reduz}} margem — aumenta qualidade e fidelidade da cadeia.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Rainforest Alliance',
+                    period: 'O selo do sapinho',
+                    text: 'Atesta que o produto vem de fazendas que protegem {{biodiversidade}} e respeitam trabalhadores. O famoso sapinho verde em embalagens de chá, café, chocolate e banana.',
+                    caseStudy: {
+                      company: 'Nestlé',
+                      year: 2020,
+                      story: 'KitKat usa cacau {{100% Rainforest Alliance}}. Rastreabilidade da fazenda à fábrica. Investimento em comunidades produtoras do Oeste da África.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '🐸', label: 'Selo do sapinho' },
+                        { value: '70+', label: 'Países certificados' },
+                        { value: '6M+', label: 'Hectares certificados' },
+                      ],
+                      insight: 'Consumidor reconhece o sapinho — é o selo de produto sustentável mais {{visível}} no varejo global.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'FSC',
+                    period: 'Florestas responsáveis',
+                    text: 'Forest Stewardship Council. Garante que papel ou madeira vem de florestas manejadas de forma {{responsável}}. Três tipos: FSC 100%, FSC Misto e FSC Reciclado.',
+                    caseStudy: {
+                      company: 'Suzano',
+                      year: 2023,
+                      story: 'Maior produtora de celulose do mundo. {{100%}} das operações com certificação FSC. {{2.4 milhões}} de hectares de florestas plantadas certificadas no Brasil.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '200M+', label: 'Hectares certificados global' },
+                        { value: '2.4M', label: 'Hectares Suzano (BR)' },
+                        { value: '100%', label: 'Operações Suzano certificadas' },
+                      ],
+                      insight: 'FSC é pré-requisito para exportar papel e madeira para {{Europa e América do Norte}}.',
+                    },
+                  },
+                  {
+                    index: 4,
+                    title: 'Cradle to Cradle (C2C)',
+                    period: 'Economia circular',
+                    text: 'Certifica produtos baseados na {{economia circular}}: tudo é reaproveitado, nada vira lixo. Avalia material, reutilização, energia, água e justiça social.',
+                    caseStudy: {
+                      company: 'Interface (pisos)',
+                      year: 2020,
+                      story: 'Fabricante de carpetes com certificação C2C Gold. Coleta carpetes usados e transforma em {{novos produtos}}. Zero resíduo em aterro desde 2020.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '5 categorias', label: 'Material, reuso, energia, água, social' },
+                        { value: 'Basic→Platinum', label: '5 níveis de certificação' },
+                        { value: '0', label: 'Resíduo em aterro (Interface)' },
+                      ],
+                      insight: 'C2C é o padrão mais {{exigente}} — não basta reciclar, precisa provar que o ciclo é 100% fechado.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Outras alternativas',
+              },
+              {
+                kind: 'paragraph',
+                text: '**1% for the Planet**: empresas que doam 1% das vendas totais para causas ambientais (Patagonia é cofundadora). **Pacto Global da ONU**: 10 princípios universais em direitos humanos, trabalho, meio ambiente e anticorrupção. **CSRD** (Corporate Sustainability Reporting Directive): diretiva europeia que torna reporte ESG {{obrigatório}} para empresas que operam na UE — afeta exportadores brasileiros.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada certificação/selo tem foco diferente. Classifique.',
+              compare: {
+                columnHeaders: ['Empresa inteira', 'Reporte', 'Produto/Cadeia'],
+                rows: [
+                  { label: 'Exemplos', values: ['B Corp, GPTW, Ethisphere', 'GRI, SASB, CDP, TCFD', 'Fair Trade, FSC, C2C'] },
+                  { label: 'Avalia', values: ['Cultura e impacto total', 'Transparência e dados', 'Matéria-prima e produção'] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada certificação na categoria:',
+                zones: [
+                  { id: 'emp', label: 'Empresa inteira' },
+                  { id: 'rep', label: 'Reporte' },
+                  { id: 'prod', label: 'Produto/Cadeia' },
+                ],
+                items: [
+                  { id: 'bcorp', label: 'B Corp (B Lab)', correctZone: 'emp', correctFeedback: 'Certo. B Corp certifica a empresa inteira.', wrongFeedback: 'B Corp avalia impacto total da empresa.' },
+                  { id: 'cdp', label: 'CDP (Carbon Disclosure)', correctZone: 'rep', correctFeedback: 'Certo. CDP é padrão de reporte de carbono.', wrongFeedback: 'CDP é transparência/reporte.' },
+                  { id: 'fsc', label: 'FSC (Forest Stewardship)', correctZone: 'prod', correctFeedback: 'Certo. FSC certifica madeira/papel da cadeia.', wrongFeedback: 'FSC certifica produto/cadeia florestal.' },
+                  { id: 'gptw', label: 'Great Place to Work', correctZone: 'emp', correctFeedback: 'Certo. GPTW avalia ambiente de trabalho da empresa.', wrongFeedback: 'GPTW avalia a empresa como ambiente.' },
+                  { id: 'ft', label: 'Fair Trade', correctZone: 'prod', correctFeedback: 'Certo. Fair Trade certifica comércio justo na cadeia.', wrongFeedback: 'Fair Trade é selo de cadeia de suprimentos.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Certificações se dividem em 3 níveis: {{empresa inteira}} (B Corp, GPTW, Ethisphere), {{reporte}} (GRI, SASB, CDP, TCFD) e {{produto/cadeia}} (Fair Trade, FSC, C2C, Rainforest Alliance). Ter certificação diferencia no mercado. Não ter é risco reputacional crescente.',
+              keyInsights: [
+                'B Corp certifica a empresa {{inteira}} — não um produto. 7.000+ empresas no mundo.',
+                'CDP, TCFD e CSRD estão tornando reporte ESG {{obrigatório}}, não voluntário.',
+                'Cradle to Cradle é o mais exigente: prova que o ciclo é {{100% fechado}} — zero resíduo.',
+              ],
+            },
+          },
+{
             id: 'M1-2-s3',
             type: 'simulation',
             title: 'GRI vs. SASB — Escolha o Framework Certo',
