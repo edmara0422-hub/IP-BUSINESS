@@ -2059,6 +2059,63 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 kind: 'paragraph',
                 text: 'O CSV (Porter & Kramer, Harvard 2011) difere fundamentalmente da CSR tradicional. A CSR redistribui lucro existente; o CSV {{expande}} o bolo econômico e social simultaneamente. Três níveis: reconceber produtos/mercados (atender necessidades não supridas), redefinir produtividade na cadeia (investir em bem-estar de funcionários e fornecedores), e desenvolver {{clusters locais}} (fortalecer ecossistema de fornecedores e instituições).',
               },
+
+              {
+                kind: 'heading',
+                text: 'Os 17 ODS — Objetivos de Desenvolvimento Sustentável da ONU',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Estabelecidos pela ONU em 2015, os 17 ODS compõem a Agenda 2030. São metas globais voltadas para governos, sociedade civil e empresas para erradicar a pobreza, proteger o planeta e garantir prosperidade. Para empresas, a pergunta é: "quais ODS meu negócio impacta — positiva ou {{negativamente}}?"',
+              },
+              {
+                kind: 'step-flow',
+                title: '17 ODS — passo a passo',
+                steps: [
+                  { number: 1, title: 'Erradicação da Pobreza', description: 'Acabar com a pobreza em todas as formas. Empresas: salários dignos, inclusão de base da pirâmide na {{cadeia de valor}}.' },
+                  { number: 2, title: 'Fome Zero', description: 'Segurança alimentar e agricultura sustentável. Empresas de alimentos: redução de {{desperdício}}, fornecedores familiares.' },
+                  { number: 3, title: 'Saúde e Bem-Estar', description: 'Vida saudável para todos. Empresas: plano de saúde, ergonomia, saúde {{mental}} dos colaboradores.' },
+                  { number: 4, title: 'Educação de Qualidade', description: 'Educação inclusiva e equitativa. Empresas: universidade corporativa, bolsas, capacitação de {{comunidades}}.' },
+                  { number: 5, title: 'Igualdade de Gênero', description: 'Empoderar mulheres e meninas. Empresas: equidade salarial, mulheres em {{liderança}}, licença parental.' },
+                  { number: 6, title: 'Água Limpa e Saneamento', description: 'Acesso à água e gestão sustentável. Empresas: redução de consumo, tratamento de {{efluentes}}, reuso.' },
+                  { number: 7, title: 'Energia Acessível e Limpa', description: 'Energia renovável para todos. Empresas: matriz energética limpa, eficiência, {{autogeração}} solar.' },
+                  { number: 8, title: 'Trabalho Decente e Crescimento', description: 'Emprego produtivo e decente. Empresas: condições dignas, combate ao trabalho {{análogo à escravidão}} na cadeia.' },
+                  { number: 9, title: 'Indústria, Inovação e Infraestrutura', description: 'Infraestrutura resiliente e industrialização sustentável. Empresas: P&D, {{inovação}} de processos, tecnologia limpa.' },
+                  { number: 10, title: 'Redução das Desigualdades', description: 'Reduzir desigualdade dentro e entre países. Empresas: diversidade, inclusão, {{equidade}} de oportunidades.' },
+                  { number: 11, title: 'Cidades Sustentáveis', description: 'Cidades inclusivas, seguras e resilientes. Empresas: mobilidade, logística verde, impacto {{urbano}} positivo.' },
+                  { number: 12, title: 'Consumo e Produção Responsáveis', description: 'Padrões sustentáveis. Empresas: economia circular, redução de {{resíduos}}, design para reciclagem.' },
+                  { number: 13, title: 'Ação Contra Mudança Climática', description: 'Combater alterações climáticas. Empresas: metas de carbono, {{compensação}}, adaptação climática.' },
+                  { number: 14, title: 'Vida na Água', description: 'Conservar oceanos e recursos marinhos. Empresas: redução de plástico, tratamento de {{efluentes}} costeiros.' },
+                  { number: 15, title: 'Vida Terrestre', description: 'Proteger ecossistemas terrestres. Empresas: combate ao desmatamento, {{biodiversidade}} na cadeia de fornecedores.' },
+                  { number: 16, title: 'Paz, Justiça e Instituições Fortes', description: 'Instituições eficazes e inclusivas. Empresas: {{anticorrupção}}, transparência, governança sólida.' },
+                  { number: 17, title: 'Parcerias para os Objetivos', description: 'Fortalecer parcerias globais. Empresas: {{colaboração}} com governo, academia e sociedade civil.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A relação ODS-ESG: ODS é o "quê" deve ser alcançado globalmente. ESG é o "como" as empresas integram esses objetivos. Uma empresa pode adotar o ODS 5 (Igualdade de Gênero) como meta e usar indicadores ESG (pilar Social) para reportar a porcentagem de mulheres em {{liderança}}. O alinhamento aumenta transparência, melhora reputação e atende regulamentações como a CSRD europeia.',
+              },
+              {
+                kind: 'heading',
+                text: 'GRI vs SASB — perspectivas complementares',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O GRI olha de "{{dentro para fora}}": como a empresa impacta economia, ambiente e sociedade. Usa princípios universais para qualquer setor, com flexibilidade para customizar. O SASB olha de "{{fora para dentro}}": como questões ESG afetam o desempenho financeiro. Cobra métricas pré-definidas em 77 padrões específicos por indústria, facilitando comparação entre empresas do mesmo setor.',
+              },
+              {
+                kind: 'heading',
+                text: 'CSV — 3 níveis de valor compartilhado (Porter & Kramer)',
+              },
+              {
+                kind: 'step-flow',
+                title: 'Como criar valor compartilhado',
+                steps: [
+                  { number: 1, title: 'Reconceber Produtos e Mercados', description: 'Desenvolver produtos que atendam a necessidades sociais não supridas: alimentos nutritivos para baixa renda, tecnologias de saúde {{acessíveis}}.' },
+                  { number: 2, title: 'Redefinir Produtividade na Cadeia', description: 'Melhorar eficiência no uso de recursos, investir no bem-estar dos funcionários e {{capacitar}} fornecedores para reduzir custos e aumentar qualidade.' },
+                  { number: 3, title: 'Desenvolver Clusters Locais', description: 'Fortalecer ecossistema local de fornecedores, infraestrutura e instituições educacionais para criar ambiente de negócios mais {{produtivo e resiliente}}.' },
+                ],
+              },
 ],
             application: {
               kind: 'compare-and-drag',
@@ -2482,20 +2539,8 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               ],
             },
           },
-{
-            id: 'M1-2-s1',
-            type: 'simulation',
-            title: 'Diagnóstico TBL — Avalie uma Empresa nos 3Ps',
-            simulationId: 'tbl-diagnostic',
-            description: 'Avalie empresas reais em People, Planet e Profit. Compare seu rating com referência.',
-          },
-          {
-            id: 'M1-2-s2',
-            type: 'simulation',
-            title: 'Avaliação ESG — Monte o Rating de uma Empresa',
-            simulationId: 'esg-rating',
-            description: 'Pontue uma empresa em E, S e G e veja o rating MSCI resultante.',
-          },
+
+          
           {
             id: 'M1-2-s3',
             type: 'simulation',
@@ -2503,20 +2548,8 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             simulationId: 'gri-sasb-choice',
             description: 'Cenários reais: qual framework usar para cada situação?',
           },
-          {
-            id: 'M1-2-s4',
-            type: 'simulation',
-            title: 'CSV na Prática — Encontre o Valor Compartilhado',
-            simulationId: 'csv-finder',
-            description: 'Identifique oportunidades de valor compartilhado em diferentes setores.',
-          },
-          {
-            id: 'M1-2-s5',
-            type: 'simulation',
-            title: 'Diagnóstico Completo de Sustentabilidade Corporativa',
-            simulationId: 'sustainability-diagnostic',
-            description: 'Diagnóstico abrangente: maturidade da empresa em TBL, ESG, frameworks e política.',
-          },
+          
+          
         ],
       },
 
