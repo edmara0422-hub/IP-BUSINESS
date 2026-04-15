@@ -4349,180 +4349,384 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Lideranca e Gestao de Equipes',
         blocks: [
           {
-            id: 'M3-1-t1',
-            type: 'text',
-            title: 'O que é Liderança — E Por que Gestão Não é a Mesma Coisa',
-            body: 'Liderança e gestão são complementares, mas não são sinônimos. Confundir os dois é o erro mais comum em organizações.\n\n**Gestão** = fazer as coisas certas acontecerem. Planejar, organizar, controlar, medir. Foco: eficiência, processo, resultado previsível.\n\n**Liderança** = fazer as pessoas certas quererem fazer as coisas certas. Inspirar, alinhar, desenvolver, dar direção. Foco: visão, pessoas, mudança.\n\nPeter Drucker resumiu: "Gestão é fazer certo as coisas. Liderança é fazer as coisas certas."\n\nJohn Kotter (Harvard) complementa: gestão lida com complexidade — liderança lida com mudança. Organizações precisam das duas coisas, mas o desequilíbrio é o que gera problemas.\n\n**Na prática empresarial:**\n— Empresa com muita gestão e pouca liderança: processos impecáveis, zero inovação, equipe desmotivada executando sem saber por quê\n— Empresa com muita liderança e pouca gestão: visão inspiradora, execução caótica, resultados inconsistentes\n— Empresa equilibrada: direção clara + execução disciplinada + pessoas engajadas\n\n**Teste rápido — Você está liderando ou apenas gerenciando?**\n— Quanto tempo do seu dia é gasto em planilhas vs. conversas com pessoas?\n— Sua equipe sabe POR QUÊ faz o que faz, ou apenas O QUÊ fazer?\n— Se você sair por 30 dias, a equipe continua funcionando e tomando boas decisões?\n— Quando foi a última vez que alguém da equipe trouxe uma ideia nova sem você pedir?',
-          },
-          {
-            id: 'M3-lid-concept1',
-            type: 'concept',
-            term: 'Liderança vs Gestão',
-            definition: 'Gestão é fazer certo as coisas (eficiência, processo, controle). Liderança é fazer as coisas certas (visão, pessoas, mudança). São complementares, não sinônimos.',
-            example: 'Magazine Luiza: Frederico Trajano LIDERA a transformação digital (visão) enquanto o time de operações GERENCIA a integração de 1.300 lojas (processo).',
-            antiExample: 'Um gerente que cria planilhas perfeitas mas cuja equipe não sabe POR QUÊ faz o que faz está gerenciando, não liderando.',
-          },
-          {
-            id: 'M3-lid-exercise1',
-            type: 'inline-exercise',
-            prompt: 'Faça o teste rápido: Você está liderando ou apenas gerenciando?',
-            context: 'Peter Drucker: "Gestão é fazer certo as coisas. Liderança é fazer as coisas certas." A maioria dos gestores dedica 80% do tempo gerenciando e 20% liderando — quando deveria ser o oposto.',
-            fields: [
-              { id: 'time-split', label: 'Quanto do seu dia é planilhas vs. conversas com pessoas?', placeholder: 'Ex: 70% planilhas, 30% pessoas' },
-              { id: 'why-test', label: 'Sua equipe sabe POR QUÊ faz o que faz?', placeholder: 'Pergunte a 3 pessoas da equipe. O que elas diriam?', multiline: true },
-              { id: 'absence-test', label: 'Se você saísse por 30 dias, a equipe continuaria funcionando?', placeholder: 'Quais decisões parariam? O que continuaria rodando?', multiline: true },
+            id: 'M3-1-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Liderança, Teorias e Inteligência Emocional',
+            subtitle: 'Liderança ≠ Gestão — as 5 teorias e por que IE importa mais que QI',
+            opening: {
+              leadText: 'Liderança e gestão são complementares, mas não são sinônimos. {{Gestão}} = fazer as coisas certas acontecerem. {{Liderança}} = inspirar pessoas a quererem que aconteçam. Confundir os dois é o erro mais comum em organizações.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'Gestão lida com complexidade: planejamento, orçamento, organização, controle. Liderança lida com mudança: visão, alinhamento, motivação, inspiração. Uma empresa precisa de ambos. O problema é que a maioria {{promove gestores}} esperando que virem líderes — e a maioria das formações ensina gestão, não liderança.',
+              },
+              {
+                kind: 'heading',
+                text: 'As 5 teorias de liderança',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Teoria dos Traços (1900-1940)',
+                    period: 'Nasce-se líder?',
+                    text: '"Líderes nascem prontos." Buscava traços universais: carisma, inteligência, determinação. {{Falhou}} porque não explica por que pessoas com os mesmos traços às vezes lideram e às vezes não.',
+                    caseStudy: {
+                      company: 'Estudo histórico',
+                      year: 1940,
+                      story: 'Revisão de Stogdill (1948): analisou {{124 estudos}} de traços. Conclusão: nenhum traço garante liderança. Contexto importa tanto quanto personalidade.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '124', label: 'Estudos analisados' },
+                        { value: '0', label: 'Traços universais encontrados' },
+                      ],
+                      insight: 'Traços ajudam mas não determinam. Liderança é {{contexto + competência}}, não destino genético.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Teoria Comportamental (1940-1960)',
+                    period: 'O que líderes FAZEM?',
+                    text: 'Foco nos comportamentos, não nos traços. Liderança pode ser {{aprendida}}. Dois eixos: orientação para tarefas vs orientação para pessoas.',
+                    caseStudy: {
+                      company: 'Ohio State / Michigan',
+                      year: 1950,
+                      story: 'Estudos de Ohio State e Michigan identificaram 2 dimensões: {{estrutura}} (tarefa) e {{consideração}} (pessoas). Líderes eficazes pontuam alto em ambas.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '2 eixos', label: 'Tarefa + Pessoas' },
+                        { value: 'Alto-alto', label: 'Líder ideal' },
+                      ],
+                      insight: 'Se liderança é comportamento, pode ser {{treinada}}. Primeira teoria com implicação prática para RH.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Liderança Situacional (1969)',
+                    period: 'Depende do contexto',
+                    text: 'Hersey & Blanchard: não existe estilo melhor — existe o estilo certo para o {{nível de maturidade}} do liderado. 4 estilos: Direcionar (iniciante), Orientar (aprendiz), Apoiar (capaz mas inseguro), Delegar (autônomo).',
+                    caseStudy: {
+                      company: 'Gestão prática',
+                      year: 2024,
+                      story: 'Funcionário novo: precisa de {{direção}} (o que fazer, como fazer). Sênior: precisa de {{autonomia}} (defina o resultado, ele define o caminho). Usar o mesmo estilo para ambos é falha de liderança.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '4', label: 'Estilos situacionais' },
+                        { value: 'Maturidade', label: 'Do liderado define o estilo' },
+                      ],
+                      insight: 'O líder que usa um estilo só está {{acertando}} em 25% dos casos e errando em 75%.',
+                    },
+                  },
+                  {
+                    index: 4,
+                    title: 'Liderança Transformacional (1978)',
+                    period: 'Inspirar mudança',
+                    text: 'James MacGregor Burns: líderes transformacionais inspiram seguidores a transcender interesses individuais em prol de um {{propósito maior}}. 4 componentes: influência idealizada, motivação inspiradora, estimulação intelectual, consideração individualizada.',
+                    caseStudy: {
+                      company: 'Natura',
+                      year: 2014,
+                      story: 'Luiz Seabra (fundador) criou cultura de {{propósito}} que sobreviveu à sua saída. Colaboradores veem a empresa como causa, não emprego. Turnover 3x menor que mercado.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '4', label: 'Componentes transformacionais' },
+                        { value: '3x', label: 'Menor turnover Natura' },
+                      ],
+                      insight: 'Transformacional funciona quando o líder {{genuinamente}} acredita no propósito. Se é performance, a equipe percebe.',
+                    },
+                  },
+                  {
+                    index: 5,
+                    title: 'Liderança Servidora (1970)',
+                    period: 'Servir para liderar',
+                    text: 'Robert Greenleaf: o líder existe para servir a equipe, não o contrário. O líder remove {{obstáculos}}, fornece recursos e desenvolve pessoas. A equipe entrega resultado porque tem condições de fazer.',
+                    caseStudy: {
+                      company: 'Nubank',
+                      year: 2020,
+                      story: 'David Vélez pratica liderança servidora: "meu trabalho é garantir que {{vocês}} tenham o que precisam para resolver o problema do cliente." Resultado: equipes autônomas, decisão descentralizada.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'Servir', label: 'Líder serve a equipe' },
+                        { value: 'Autonomia', label: 'Equipe decide' },
+                      ],
+                      insight: 'Servidora é a teoria mais {{moderna}} e a mais difícil de praticar — exige ego baixo do líder.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Inteligência Emocional — a competência #1',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Daniel Goleman demonstrou que a inteligência emocional (IE) responde por {{67%}} das competências necessárias para performance superior em liderança — o dobro da importância de competências técnicas e QI combinados.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: '5 dimensões da IE (Goleman, 1995)',
+                pillars: [
+                  { icon: '🪞', title: 'Autoconhecimento', description: 'Reconhecer suas próprias emoções e como afetam os {{outros}}. Base de tudo.' },
+                  { icon: '🎛️', title: 'Autocontrole', description: 'Regular impulsos e emoções. Não reagir — {{responder}}. Pensar antes de agir.' },
+                  { icon: '🔥', title: 'Motivação', description: 'Impulso interno para realizar além do esperado. Não por dinheiro — por {{propósito}}.' },
+                  { icon: '🤝', title: 'Empatia', description: 'Compreender emoções dos outros. Não é concordar — é {{entender}} antes de agir.' },
+                  { icon: '🌐', title: 'Habilidade Social', description: 'Gerenciar relacionamentos. Influenciar, comunicar, resolver conflitos, {{construir}} redes.' },
+                ],
+              },
             ],
-            evaluationCriteria: ['Autoavaliação honesta do equilíbrio liderança vs gestão', 'Identifica gaps concretos na liderança', 'Propõe pelo menos uma mudança prática'],
-            expectedConcepts: ['liderança', 'gestão', 'autonomia', 'propósito'],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada teoria responde a uma pergunta diferente. Classifique.',
+              compare: {
+                columnHeaders: ['Traços', 'Situacional', 'Transformacional', 'Servidora'],
+                rows: [
+                  { label: 'Pergunta', values: ['Nasce líder?', 'Qual contexto?', 'Qual propósito?', 'Quem serve quem?'] },
+                  { label: 'Foco', values: ['Personalidade', 'Maturidade', 'Inspiração', 'Equipe'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual teoria se aplica?',
+                zones: [
+                  { id: 'sit', label: 'Situacional' },
+                  { id: 'trans', label: 'Transformacional' },
+                  { id: 'serv', label: 'Servidora' },
+                ],
+                items: [
+                  { id: 'novo', label: 'Funcionário novo precisa de direção clara', correctZone: 'sit', correctFeedback: 'Certo. Adaptar estilo ao nível = situacional.', wrongFeedback: 'Nível de maturidade = situacional.' },
+                  { id: 'prop', label: 'Equipe engajada por propósito, não salário', correctZone: 'trans', correctFeedback: 'Certo. Propósito maior = transformacional.', wrongFeedback: 'Inspirar propósito = transformacional.' },
+                  { id: 'obst', label: 'Líder remove obstáculos para a equipe entregar', correctZone: 'serv', correctFeedback: 'Certo. Servir a equipe = servidora.', wrongFeedback: 'Remover obstáculos = líder servidor.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Liderança não é cargo — é {{comportamento}}. As 5 teorias mostram a evolução: de "nasce líder" para "líder serve". E Goleman provou que IE importa 2x mais que QI para liderar.',
+              keyInsights: [
+                'Gestão = complexidade. Liderança = {{mudança}}. Empresa precisa dos dois.',
+                'Liderança Situacional: 4 estilos para 4 níveis de maturidade. Um estilo só = {{75% de erro}}.',
+                'Goleman: IE responde por {{67%}} das competências de liderança superior.',
+              ],
+              nextChapterHint: 'Capítulo 2 · Equipes e Ferramentas',
+              nextChapterBlurb: 'Tuckman, Feedback, Delegação — como formar equipes e desenvolver pessoas.',
+            },
           },
           {
-            id: 'M3-1-t2',
-            type: 'text',
-            title: 'As 5 Teorias de Liderança que Você Precisa Conhecer',
-            body: 'A teoria de liderança evoluiu em ondas. Cada uma responde a uma pergunta diferente:\n\n**1. Teoria dos Traços (anos 1900–1940)**\nPergunta: "Líderes nascem prontos?"\nIdeia: Liderança é inata — carisma, inteligência, determinação são características de nascença.\nLimitação: Não explica por que pessoas sem esses traços lideram bem, nem por que pessoas com esses traços falham.\nUso prático: Ajuda a identificar potenciais, mas não deve ser usada para excluir candidatos.\n\n**2. Teoria Comportamental (anos 1940–1960)**\nPergunta: "Liderança pode ser aprendida?"\nIdeia: O que importa não é quem o líder É, mas o que ele FAZ. Dois eixos fundamentais:\n— Orientação para Tarefa: foco em metas, prazos, processos, resultados\n— Orientação para Pessoas: foco em relacionamento, desenvolvimento, bem-estar\nGrid Gerencial (Blake & Mouton): cruza os dois eixos numa matriz 9×9\n— (1,1) Gestão empobrecida — mínimo esforço\n— (9,1) Gestão autoritária — resultados a qualquer custo\n— (1,9) Gestão "country club" — todos felizes, ninguém entrega\n— (9,9) Gestão de equipe — alta performance + alto cuidado com pessoas\nUso prático: Diagnóstico do estilo atual. Onde você está no grid?\n\n**3. Liderança Situacional (Hersey & Blanchard, 1969)**\nPergunta: "Existe um estilo ideal para todas as situações?"\nIdeia: NÃO. O melhor estilo depende da maturidade do liderado.\n\n4 Estilos × 4 Maturidades:\n— S1 Direcionar → para quem tem baixa competência e baixo comprometimento\n— S2 Orientar → para quem tem alguma competência mas ainda inseguro\n— S3 Apoiar → para quem é competente mas desmotivado ou inseguro\n— S4 Delegar → para quem é competente E comprometido\n\nErro fatal: usar S1 (direcionar) com profissionais sêniores → mata a motivação. Usar S4 (delegar) com juniores → gera abandono.\nUso prático: Para cada membro da sua equipe, pergunte: qual a competência E o comprometimento desta pessoa NESTA tarefa específica? Adapte o estilo.\n\n**4. Liderança Transformacional (Burns, 1978 / Bass, 1985)**\nPergunta: "Como líderes geram mudanças profundas?"\nIdeia: Líderes transformacionais elevam as aspirações dos liderados acima dos interesses individuais.\n4 componentes (os "4 Is"):\n— Influência Idealizada: líder como modelo — comportamento coerente com o discurso\n— Motivação Inspiracional: comunicar visão de futuro que gera significado\n— Estimulação Intelectual: desafiar suposições, encorajar criatividade\n— Consideração Individualizada: tratar cada pessoa como única, desenvolver potencial\nUso prático: O líder transformacional não diz "faça porque eu mando". Diz "faça porque isso importa — e eu faço junto."\n\n**5. Liderança Servidora (Robert Greenleaf, 1970)**\nPergunta: "E se o líder existisse para servir a equipe, e não o contrário?"\nIdeia: O líder existe para remover obstáculos, desenvolver pessoas e criar condições para que a equipe performe.\nPrincípios: escuta ativa, empatia, cura, consciência, persuasão (não coerção), visão de longo prazo, crescimento das pessoas.\nUso prático: Pergunte: "O que posso fazer para que você trabalhe melhor?" em vez de "Por que você não entregou?"',
-          },
-          {
-            id: 'M3-lid-compare1',
-            type: 'compare',
-            title: '5 Teorias de Liderança — Quando Usar Cada Uma',
-            question: 'Qual teoria de liderança é mais útil para qual situação?',
-            dimensions: ['Pergunta central', 'Foco', 'Quando usar', 'Limitação'],
-            items: [
-              { id: 'traits', label: 'Teoria dos Traços', values: ['Líderes nascem prontos?', 'Quem o líder É (carisma, inteligência)', 'Identificar potenciais de liderança', 'Não explica líderes sem traços clássicos'], highlight: 'Útil para seleção, mas nunca para excluir.' },
-              { id: 'behavioral', label: 'Comportamental', values: ['Liderança pode ser aprendida?', 'O que o líder FAZ (tarefa vs pessoas)', 'Diagnóstico de estilo atual (Grid 9×9)', 'Ignora o contexto situacional'], highlight: 'Busque o (9,9): alta performance + alto cuidado.' },
-              { id: 'situational', label: 'Situacional', values: ['Existe UM estilo ideal?', 'Maturidade do liderado (competência + comprometimento)', 'Adaptar estilo a cada pessoa/tarefa', 'Exige leitura precisa da maturidade'], highlight: 'O estilo CERTO depende da PESSOA, não do líder.' },
-              { id: 'transformational', label: 'Transformacional', values: ['Como gerar mudanças profundas?', '4 Is: Influência, Inspiração, Intelectual, Individual', 'Mudança cultural, visão de longo prazo', 'Pode criar dependência do líder carismático'], highlight: '"Faça porque isso importa — e eu faço junto."' },
-              { id: 'servant', label: 'Servidora', values: ['E se o líder servisse a equipe?', 'Remover obstáculos, desenvolver pessoas', 'Equipes maduras, cultura de confiança', 'Pode ser vista como fraqueza em culturas hierárquicas'], highlight: '"O que posso fazer para você trabalhar melhor?"' },
+            id: 'M3-1-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Formação de Equipes e Ferramentas de Gestão',
+            subtitle: 'Tuckman, Feedback SBI, Delegação e o custo de não delegar',
+            opening: {
+              leadText: 'Um grupo de pessoas trabalhando juntas NÃO é uma equipe. Equipe exige {{interdependência}}, objetivo compartilhado e responsabilidade mútua. A diferença entre grupo e equipe é a diferença entre 5 jogadores e um time.',
+            },
+            body: [
+              {
+                kind: 'step-flow',
+                title: 'Modelo de Tuckman — 5 fases de formação de equipe',
+                steps: [
+                  { number: 1, title: 'Forming (Formação)', description: 'Polidez e cautela. Membros se conhecem, evitam conflito. Dependência do líder para {{direção}}.', caseSnippet: 'Equipe nova: todos concordam com tudo. Parece harmonia — é superficialidade.' },
+                  { number: 2, title: 'Storming (Conflito)', description: 'Tensão emerge. Divergências de opinião, disputas de poder, frustração com processos. Fase mais {{desconfortável}} mas essencial.', caseSnippet: '70% das equipes ficam presas aqui. Líder que evita conflito impede amadurecimento.' },
+                  { number: 3, title: 'Norming (Normatização)', description: 'Regras se estabelecem. Papéis ficam claros. Confiança cresce. Equipe começa a funcionar como {{unidade}}.', caseSnippet: 'Sinais: membros pedem feedback, reconhecem forças dos outros, aceitam crítica.' },
+                  { number: 4, title: 'Performing (Desempenho)', description: 'Alta performance. Equipe autônoma, resolve problemas sem depender do líder. Foco em {{resultado}}, não em dinâmica.', caseSnippet: 'Google Aristotle: equipes performing têm segurança psicológica como base.' },
+                  { number: 5, title: 'Adjourning (Dissolução)', description: 'Equipe se dissolve (projeto acabou). Importante: {{celebrar}} conquistas e documentar aprendizados.', caseSnippet: 'Equipes que não fazem retrospectiva repetem erros no próximo projeto.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Feedback — a ferramenta mais poderosa (e mal usada)',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Feedback não é "bronca educada". É informação sobre desempenho com objetivo de gerar {{mudança}}. A maioria dos gestores evita dar feedback por medo de conflito — e a maioria dos que dão, dão mal (vago, tardio ou agressivo).',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Modelo SBI — Feedback estruturado',
+                pillars: [
+                  { icon: '📍', title: 'S — Situação', description: 'Descreva o {{contexto}} específico. "Na reunião de segunda com o cliente X..." Não generalizar ("você sempre...").' },
+                  { icon: '👁️', title: 'B — Comportamento', description: 'Descreva o {{comportamento}} observável. "Você interrompeu o cliente 3 vezes." Fato, não interpretação.' },
+                  { icon: '💥', title: 'I — Impacto', description: 'Descreva o {{impacto}} do comportamento. "O cliente ficou frustrado e encerrou a reunião 15 min antes." Consequência real.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Delegação — o gargalo invisível',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A incapacidade de delegar é o principal gargalo de crescimento de gestores e empresas. Se o líder precisa aprovar tudo, a velocidade da empresa = velocidade do líder. Razões para não delegar: "ninguém faz como eu", medo de perder controle, falta de {{confiança}} na equipe, falta de tempo para ensinar.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O custo de não delegar: líder sobrecarregado (burnout), equipe desmotivada (não cresce), empresa lenta (bottleneck). A regra: se alguém pode fazer 80% tão bem quanto você, {{delegue}}. Os 20% que faltam a pessoa aprende fazendo.',
+              },
             ],
-            insight: 'Não existe UMA teoria certa. Líderes eficazes combinam elementos de todas — adaptando o estilo à pessoa, à situação e ao momento da organização.',
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'As fases de Tuckman têm características distintas. Classifique.',
+              compare: {
+                columnHeaders: ['Forming', 'Storming', 'Performing'],
+                rows: [
+                  { label: 'Clima', values: ['Polidez', 'Tensão', 'Autonomia'] },
+                  { label: 'Líder deve', values: ['Direcionar', 'Mediar', 'Empoderar'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual fase de Tuckman?',
+                zones: [
+                  { id: 'form', label: 'Forming' },
+                  { id: 'storm', label: 'Storming' },
+                  { id: 'perf', label: 'Performing' },
+                ],
+                items: [
+                  { id: 'pol', label: 'Todos concordam sem questionar', correctZone: 'form', correctFeedback: 'Certo. Harmonia superficial = Forming.', wrongFeedback: 'Polidez excessiva = Forming.' },
+                  { id: 'brig', label: 'Dois membros discordam sobre prioridades', correctZone: 'storm', correctFeedback: 'Certo. Conflito = Storming (normal e necessário).', wrongFeedback: 'Conflito = Storming.' },
+                  { id: 'auto', label: 'Equipe resolve problema sem chamar o líder', correctZone: 'perf', correctFeedback: 'Certo. Autonomia = Performing.', wrongFeedback: 'Autonomia = alta performance.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Equipe não nasce — se {{forma}} em 5 fases. Feedback SBI (Situação-Comportamento-Impacto) é a ferramenta #1 de desenvolvimento. E delegar é aceitar 80% hoje para ter 100% amanhã.',
+              keyInsights: [
+                'Tuckman: {{70%}} das equipes ficam presas em Storming. Líder que evita conflito impede amadurecimento.',
+                'Feedback SBI: Situação específica + Comportamento observável + Impacto {{real}}.',
+                'Regra de delegação: se alguém faz 80% tão bem quanto você, {{delegue}}.',
+              ],
+              nextChapterHint: 'Capítulo 3 · Conflitos, Motivação e Cultura',
+              nextChapterBlurb: 'Gestão de conflitos, ciência da motivação e segurança psicológica.',
+            },
+          },
+          {
+            id: 'M3-1-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Conflitos, Motivação e Segurança Psicológica',
+            subtitle: 'Como transformar tensão em resultado e construir equipes que inovam',
+            opening: {
+              leadText: 'Conflito não é problema. Conflito {{mal gerenciado}} é problema. Equipes sem conflito estão em Forming — não se conhecem o suficiente para discordar. E motivação real não vem de dinheiro — vem de autonomia, maestria e propósito.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: '5 abordagens de gestão de conflitos (Thomas-Kilmann)',
+                pillars: [
+                  { icon: '🏆', title: 'Competir', description: 'Assertivo + não cooperativo. {{Ganhar}} a qualquer custo. Usar quando: decisão urgente, segurança em risco.' },
+                  { icon: '🤝', title: 'Colaborar', description: 'Assertivo + cooperativo. Buscar solução que {{atenda}} ambos. Ideal mas exige tempo e confiança.' },
+                  { icon: '⚖️', title: 'Comprometer', description: 'Meio-termo. Ambos cedem algo. Rápido mas pode gerar {{insatisfação}} mútua.' },
+                  { icon: '🙈', title: 'Evitar', description: 'Não assertivo + não cooperativo. Ignorar o conflito. Usar quando: assunto trivial ou {{emoções}} muito altas.' },
+                  { icon: '🎁', title: 'Acomodar', description: 'Não assertivo + cooperativo. Ceder para manter {{harmonia}}. Usar quando: você está errado ou a relação importa mais.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Motivação — o que a ciência diz',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A maioria dos gestores usa motivação errada: mais dinheiro, mais pressão, mais controle. A ciência mostra o oposto. Deci & Ryan (Teoria da Autodeterminação, 1985): motivação intrínseca supera extrínseca em tarefas que exigem {{criatividade e pensamento complexo}}.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: '3 drivers de motivação intrínseca (Daniel Pink, 2009)',
+                pillars: [
+                  { icon: '🔓', title: 'Autonomia', description: 'Poder decidir {{como}} fazer o trabalho. Não é liberdade total — é liberdade dentro de limites claros.', metric: { value: '+20%', label: 'produtividade com autonomia (Gallup)' } },
+                  { icon: '📈', title: 'Maestria', description: 'O desejo de ficar cada vez {{melhor}} em algo que importa. Pessoas querem progredir, não estagnar.', metric: { value: '#1', label: 'razão de saída: estagnação' } },
+                  { icon: '🎯', title: 'Propósito', description: 'Fazer algo que {{importa}} além de si mesmo. Empresas com propósito claro têm 3x mais engajamento.', metric: { value: '3x', label: 'mais engajamento (Deloitte)' } },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Reuniões 1:1',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O 1:1 é a reunião mais importante da gestão de pessoas. É o momento em que o líder dá atenção individual, alinha expectativas, remove bloqueios e desenvolve o colaborador. Regras: frequência fixa (semanal ou quinzenal), pauta do {{liderado}} (não do líder), foco em desenvolvimento (não em status de projeto).',
+              },
+              {
+                kind: 'heading',
+                text: 'Segurança psicológica',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O Projeto Aristóteles do Google analisou {{180 equipes}} para descobrir o que diferencia as de alta performance. A resposta não foi QI, talento ou experiência — foi segurança psicológica: a crença compartilhada de que a equipe é segura para {{correr riscos}} interpessoais.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Amy Edmondson (Harvard, 2018): "A Fearless Organization" mostrou que equipes com alta segurança psicológica reportam mais erros (porque não escondem), aprendem mais rápido e inovam mais. Equipes com baixa segurança têm {{menos erros reportados}} — mas não menos erros reais. Apenas erros escondidos.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada abordagem de conflito serve a uma situação. Classifique.',
+              compare: {
+                columnHeaders: ['Competir', 'Colaborar', 'Evitar'],
+                rows: [
+                  { label: 'Quando', values: ['Urgência', 'Tempo + confiança', 'Trivial ou emocional'] },
+                  { label: 'Resultado', values: ['Ganho unilateral', 'Ganho mútuo', 'Adiamento'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual abordagem usar?',
+                zones: [
+                  { id: 'comp', label: 'Competir' },
+                  { id: 'colab', label: 'Colaborar' },
+                  { id: 'evit', label: 'Evitar' },
+                  { id: 'acom', label: 'Acomodar' },
+                ],
+                items: [
+                  { id: 'fogo', label: 'Incêndio no prédio — evacuar agora', correctZone: 'comp', correctFeedback: 'Certo. Emergência = competir (decisão rápida).', wrongFeedback: 'Emergência exige decisão unilateral.' },
+                  { id: 'strat', label: 'Definir estratégia de 5 anos da empresa', correctZone: 'colab', correctFeedback: 'Certo. Decisão importante = colaborar.', wrongFeedback: 'Estratégia precisa de solução que atenda todos.' },
+                  { id: 'cafe', label: 'Discussão sobre sabor do café do escritório', correctZone: 'evit', correctFeedback: 'Certo. Trivial = evitar (não gaste energia).', wrongFeedback: 'Assunto trivial = não vale o conflito.' },
+                  { id: 'errei', label: 'Você cometeu erro claro e o colega apontou', correctZone: 'acom', correctFeedback: 'Certo. Você está errado = aceitar com humildade.', wrongFeedback: 'Quando está errado, acomodar é sabedoria.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Conflito bem gerenciado {{fortalece}}. Motivação real vem de autonomia, maestria e propósito — não de dinheiro. 1:1 é a ferramenta mais subutilizada. E segurança psicológica é o fator #1 de alta performance.',
+              keyInsights: [
+                'Thomas-Kilmann: {{5 abordagens}} de conflito. Nenhuma é sempre certa — o contexto define.',
+                'Daniel Pink (2009): Autonomia + Maestria + Propósito > dinheiro para motivação em trabalho {{complexo}}.',
+                'Google Aristotle (180 equipes): segurança psicológica = fator {{#1}} de alta performance.',
+              ],
+            },
           },
           {
             id: 'M3-1-s1',
             type: 'simulation',
             title: 'Qual é o Seu Estilo de Liderança?',
             simulationId: 'leadership-style',
-            description: 'Responda 12 cenários reais de gestão e descubra seu perfil dominante: Diretivo, Orientador, Apoiador ou Delegador. Receba análise dos pontos fortes e gaps.',
-          },
-          {
-            id: 'M3-1-t3',
-            type: 'text',
-            title: 'Inteligência Emocional — A Competência #1 da Liderança',
-            body: 'Daniel Goleman demonstrou que a inteligência emocional (IE) responde por 67% das competências necessárias para performance superior em liderança — o dobro da inteligência cognitiva e expertise técnica combinadas.\n\n**Os 5 Componentes da IE na Liderança:**\n\n**1. Autoconsciência**\nO que é: Reconhecer suas próprias emoções, forças, fraquezas e seu impacto nos outros.\nNa prática:\n— Líder autoconsciente: "Eu sei que fico impaciente em reuniões longas. Vou pedir para o João facilitar esta."\n— Líder sem autoconsciência: "Essa reunião é uma perda de tempo!" (desmotiva toda a equipe)\nComo desenvolver: Diário de reflexão — 5 minutos no final do dia: "O que senti? O que causou? Como reagi? O que faria diferente?"\n\n**2. Autorregulação**\nO que é: Controlar impulsos e emoções disruptivas. Pensar antes de agir.\nNa prática:\n— Líder autorregulado: recebe crítica → respira → pergunta "me explica melhor"\n— Líder desregulado: recebe crítica → reage defensivamente → equipe nunca mais traz feedback\nComo desenvolver: Regra dos 6 segundos — entre o estímulo e a resposta, conte até 6. Esse intervalo ativa o córtex pré-frontal (razão) sobre a amígdala (reação).\n\n**3. Motivação Intrínseca**\nO que é: Busca por excelência por satisfação interna, não por recompensa externa.\nNa prática: Líderes motivados intrinsecamente são otimistas diante de fracassos, comprometidos com metas de longo prazo e energizados por desafios.\nComo desenvolver: Conecte cada tarefa a um propósito maior. "Não estamos preenchendo planilhas — estamos garantindo que 500 famílias recebam seu pedido no prazo."\n\n**4. Empatia**\nO que é: Capacidade de compreender as emoções e perspectivas dos outros.\nNa prática:\n— Líder empático: "Percebi que você está sobrecarregado. Vamos reorganizar as prioridades juntos."\n— Líder sem empatia: "Todo mundo tem muito trabalho. Dá um jeito."\nComo desenvolver: Em cada 1:1, comece com "Como você está?" e escute a resposta de verdade.\n\n**5. Habilidades Sociais**\nO que é: Gestão de relacionamentos — influenciar, inspirar, desenvolver, resolver conflitos.\nNa prática: Construir redes, facilitar cooperação, negociar, comunicar com clareza.\nComo desenvolver: Pratique dar feedback com o modelo SBI: Situação → Comportamento → Impacto.\n\n**O ROI da Inteligência Emocional:**\n— Equipes com líderes de alta IE têm 20% mais engajamento (Gallup)\n— Líderes emocionalmente inteligentes retêm talentos 4x mais (CCL)\n— Empresas com liderança de alta IE superam pares em 20% no lucro (Hay Group)',
-          },
-          {
-            id: 'M3-lid-concept2',
-            type: 'concept',
-            term: 'Inteligência Emocional (IE)',
-            definition: 'Capacidade de reconhecer, compreender e gerenciar suas próprias emoções e as dos outros. Responde por 67% das competências de liderança superior — o dobro de QI + expertise técnica combinados.',
-            example: 'Líder autorregulado recebe crítica → respira → pergunta "me explica melhor". Ativa o córtex pré-frontal (razão) sobre a amígdala (reação). Resultado: equipe continua trazendo feedback.',
-            antiExample: 'Líder desregulado recebe crítica → reage defensivamente → equipe nunca mais traz feedback. Resultado: problemas ficam invisíveis até explodir.',
-          },
-          {
-            id: 'M3-lid-framework1',
-            type: 'framework',
-            frameworkId: 'ie-diagnostic',
-            title: 'Autodiagnóstico — 5 Componentes da Inteligência Emocional',
-            description: 'Avalie-se em cada componente da IE de Goleman. Seja brutalmente honesto — este diagnóstico é para você, não para mostrar a ninguém.',
-            fields: [
-              { id: 'autoconsciencia', label: 'Autoconsciência: Você reconhece suas emoções e seu impacto nos outros?', placeholder: 'De 1 a 10, onde está? Dê um exemplo recente.', helpText: 'Teste: Você consegue nomear a emoção que está sentindo AGORA? Se não, há espaço para crescer.' },
-              { id: 'autorregulacao', label: 'Autorregulação: Você controla impulsos antes de reagir?', placeholder: 'Na última vez que recebeu uma crítica, como reagiu?', helpText: 'Regra dos 6 segundos: entre o estímulo e a resposta, conte até 6.' },
-              { id: 'motivacao', label: 'Motivação Intrínseca: Você busca excelência por satisfação interna?', placeholder: 'O que te move: bônus e promoção, ou crescimento e impacto?', helpText: 'Se só trabalha bem quando há recompensa externa, a motivação é frágil.' },
-              { id: 'empatia', label: 'Empatia: Você compreende emoções e perspectivas dos outros?', placeholder: 'Na última 1:1, você realmente ouviu — ou estava esperando sua vez de falar?', helpText: 'Empatia não é concordar. É compreender antes de responder.' },
-              { id: 'hab-sociais', label: 'Habilidades Sociais: Você influencia, inspira e resolve conflitos?', placeholder: 'Quando foi a última vez que mediou um conflito com sucesso? Como?', helpText: 'Modelo SBI para feedback: Situação → Comportamento → Impacto.' },
-            ],
-          },
-          {
-            id: 'M3-1-t4',
-            type: 'text',
-            title: 'Formação de Equipes — Do Grupo ao Time de Alta Performance',
-            body: 'Um grupo de pessoas trabalhando juntas NÃO é uma equipe. Equipe exige interdependência, objetivo compartilhado e responsabilidade mútua.\n\n**Modelo de Tuckman — As 5 Fases de Desenvolvimento de Equipes:**\n\n**1. Forming (Formação)**\nO que acontece: Pessoas se conhecem, são educadas, evitam conflito. Dependência do líder é alta.\nO líder deve: Direcionar com clareza — definir propósito, papéis, regras do jogo.\nErro: Assumir que "estamos todos alinhados" só porque ninguém discordou.\n\n**2. Storming (Conflito)**\nO que acontece: Diferenças aparecem. Disputas por influência, estilo, prioridades. Tensão é natural e NECESSÁRIA.\nO líder deve: Mediar conflitos, não evitá-los. Normalizar o desconforto: "Discordância é sinal de que estamos pensando."\nErro fatal: Suprimir o conflito → vira conflito subterrâneo (fofoca, sabotagem passiva, desengajamento).\n\n**3. Norming (Normatização)**\nO que acontece: Regras implícitas se formam. Confiança cresce. Papéis ficam claros.\nO líder deve: Facilitar acordos sobre como trabalhar juntos. Reforçar comportamentos positivos.\nErro: Não formalizar os acordos — "a gente se entende" até que não se entende mais.\n\n**4. Performing (Performance)**\nO que acontece: A equipe opera com autonomia, resolve problemas sozinha, entrega consistentemente.\nO líder deve: Delegar e remover obstáculos. Sair do caminho.\nErro: Microgerenciar uma equipe madura → destrói confiança e autonomia.\n\n**5. Adjourning (Dissolução)**\nO que acontece: Projeto termina, equipe se dispersa.\nO líder deve: Celebrar conquistas, fazer retrospectiva, reconhecer contribuições individuais.\nErro: Ignorar o encerramento → pessoas saem sem closure, levam ressentimentos.\n\n**Diagnóstico rápido — Em qual fase sua equipe está?**\n— As pessoas evitam discordar abertamente? → Forming\n— Existem tensões recorrentes entre membros? → Storming\n— A equipe tem acordos claros sobre como trabalhar? → Norming\n— A equipe resolve problemas sem precisar do líder? → Performing\n\nA maioria das equipes fica presa entre Storming e Norming porque líderes evitam o conflito saudável.',
+            description: 'Descubra seu estilo predominante e como adaptar a cada situação.',
           },
           {
             id: 'M3-1-s2',
             type: 'simulation',
             title: 'Diagnóstico Tuckman — Em Qual Fase Está Sua Equipe?',
             simulationId: 'tuckman-diagnostic',
-            description: 'Responda 10 perguntas sobre o comportamento da sua equipe e descubra em qual fase de Tuckman ela está. Receba ações específicas para avançar para a próxima fase.',
-          },
-          {
-            id: 'M3-1-t5',
-            type: 'text',
-            title: 'Feedback — A Ferramenta Mais Poderosa (e Mal Usada) da Gestão',
-            body: 'Feedback não é "bronca educada". Feedback é informação sobre desempenho com o objetivo de gerar mudança. A maioria dos gestores evita dar feedback por medo de conflito. O resultado: problemas crescem silenciosamente até explodir.\n\n**O Modelo SBI — Situação, Comportamento, Impacto:**\n\nEstrutura simples e eficaz desenvolvida pelo Center for Creative Leadership:\n\n— Situação: "Na reunião de ontem com o cliente..."\n— Comportamento: "...você interrompeu a apresentação da Maria três vezes..."\n— Impacto: "...e o cliente ficou confuso sobre quem era o responsável pelo projeto."\n\n**Por que funciona:**\n— Separa o comportamento da identidade da pessoa (não é "você é rude", é "você interrompeu")\n— Dá um exemplo concreto e verificável\n— Mostra a consequência real (não é opinião, é impacto observável)\n\n**Feedback Positivo — Tão Importante Quanto o Corretivo:**\nA proporção ideal (Losada & Heaphy, 2004): 3 feedbacks positivos para cada 1 corretivo.\n— Abaixo de 3:1 → equipe desmotivada, defensiva\n— Acima de 6:1 → feedback perde credibilidade ("ele elogia tudo")\n\nExemplo de feedback positivo com SBI:\n— Situação: "No projeto X que entregamos semana passada..."\n— Comportamento: "...você tomou a iniciativa de resolver o bug de integração sozinho sem esperar o sprint planning..."\n— Impacto: "...e isso nos economizou 3 dias e impressionou o cliente."\n\n**Feedback 360° — Como Implementar:**\n1. Defina 5-8 competências-chave da empresa\n2. Cada pessoa é avaliada por: gestor + pares + subordinados + autoavaliação\n3. Use escala simples (1-5) + 1 pergunta aberta por competência\n4. Resultado é confidencial e compartilhado apenas com o avaliado + gestor\n5. Gera PDI (Plano de Desenvolvimento Individual) com 2-3 ações concretas\n\n**Erros fatais no feedback:**\n— Feedback só na avaliação anual → tarde demais para mudar\n— Feedback vago: "Precisa melhorar" → melhorar o quê? como?\n— Feedback em público: humilha → gera ressentimento\n— Feedback sanduíche (elogio-crítica-elogio): todo mundo percebe → perde credibilidade\n— Feedback sem follow-up: deu feedback e esqueceu → a pessoa conclui que não era importante',
-          },
-          {
-            id: 'M3-lid-decision1',
-            type: 'decision',
-            scenario: 'Você é gerente de uma equipe de 8 pessoas. Um membro sênior entregou um projeto com qualidade abaixo do esperado. O cliente reclamou. Você precisa dar feedback, mas esse membro é sensível a críticas e já ameaçou pedir demissão antes.',
-            options: [
-              { label: 'Dar feedback direto usando modelo SBI', tradeoffs: { upside: 'Transparência, clareza, chance de melhoria real', downside: 'Risco de reação emocional negativa', risk: 'medium' as const } },
-              { label: 'Elogiar primeiro, depois mencionar a melhoria (sanduíche)', tradeoffs: { upside: 'Suaviza o impacto emocional', downside: 'Feedback sanduíche perde credibilidade — a pessoa sabe que vem crítica', risk: 'medium' as const } },
-              { label: 'Não dar feedback individual — abordar "em geral" na reunião de equipe', tradeoffs: { upside: 'Evita confronto direto', downside: 'Mensagem diluída, equipe inteira se sente criticada injustamente', risk: 'high' as const } },
-              { label: 'Esperar a próxima entrega e ver se melhora sozinho', tradeoffs: { upside: 'Evita conflito imediato', downside: 'Problema cresce silenciosamente, cliente pode cancelar', risk: 'high' as const } },
-            ],
-            realWorldAnalog: 'O modelo SBI (Center for Creative Leadership) é usado por Google, Netflix e Nubank. Separar comportamento de identidade ("você interrompeu" vs "você é rude") muda completamente a receptividade.',
-            lesson: 'Feedback adiado é feedback multiplicado em dificuldade. A proporção ideal é 3:1 (3 positivos : 1 corretivo). Se você só dá feedback corretivo, a conta já está negativa.',
-          },
-          {
-            id: 'M3-1-t6',
-            type: 'text',
-            title: 'Delegação — Por que Líderes Não Delegam (e o Custo Disso)',
-            body: 'A incapacidade de delegar é o principal gargalo de crescimento de gestores e empresas. Se o líder precisa aprovar tudo, a velocidade da empresa = velocidade do líder.\n\n**Os 5 Níveis de Delegação:**\n\n**Nível 1 — "Faça o que eu disser"**\nO líder decide tudo. O liderado executa.\nQuando usar: Emergências, tarefas críticas com pessoa inexperiente.\nRisco: Cria dependência. Ninguém aprende.\n\n**Nível 2 — "Pesquise e me traga opções"**\nO liderado investiga. O líder decide.\nQuando usar: Pessoa em desenvolvimento que precisa aprender a pensar.\n\n**Nível 3 — "Recomende uma ação e eu aprovo"**\nO liderado propõe. O líder valida.\nQuando usar: Pessoa competente que ainda precisa de coaching.\n\n**Nível 4 — "Decida e me informe"**\nO liderado decide e comunica depois.\nQuando usar: Pessoa experiente em área conhecida.\n\n**Nível 5 — "Decida. Não precisa me contar."**\nAutonomia total.\nQuando usar: Pessoa sênior, confiança alta, área de especialidade.\n\n**A Matriz de Delegação — O que Delegar e O que Manter:**\n\nDelegar AGORA:\n— Tarefas operacionais que outra pessoa pode fazer com 80% da sua qualidade\n— Decisões reversíveis (se errar, corrige rápido)\n— Tarefas que desenvolvem a equipe\n\nNunca delegar:\n— Visão estratégica e direção\n— Feedback e desenvolvimento de pessoas\n— Decisões irreversíveis de alto impacto\n— Gestão de crise ativa\n\n**Por que líderes não delegam (e as desculpas reais):**\n— "Ninguém faz tão bem quanto eu" → Ego. E mesmo que fosse verdade, seu tempo vale mais em atividades estratégicas.\n— "É mais rápido eu fazer" → Verdade no curto prazo. Mentira no longo prazo. Cada vez que você faz, você ensina a equipe a depender de você.\n— "Se der errado, a culpa é minha" → Sim. E continua sendo sua culpa quando delega. A diferença é que delegando você multiplica capacidade.\n\n**Custo de não delegar:**\n— Líder sobrecarregado = decisões ruins por fadiga\n— Equipe infantilizada = zero iniciativa\n— Empresa limitada = cresce até o teto do líder e para',
-          },
-          {
-            id: 'M3-1-t7',
-            type: 'text',
-            title: 'Gestão de Conflitos — Transformar Tensão em Resultado',
-            body: 'Conflito não é problema. Conflito mal gerenciado é problema. Equipes sem conflito estão em estágio Forming (não se conhecem o suficiente para discordar) ou numa cultura de medo.\n\n**Modelo Thomas-Kilmann — 5 Estilos de Gestão de Conflitos:**\n\nCada estilo combina dois eixos: Assertividade (defender seus interesses) × Cooperação (considerar interesses do outro).\n\n**1. Competir (alta assertividade, baixa cooperação)**\n"Eu ganho, você perde."\nQuando usar: Emergências que exigem decisão rápida. Questões éticas inegociáveis.\nRisco: Destrói relacionamentos se usado frequentemente.\n\n**2. Acomodar (baixa assertividade, alta cooperação)**\n"Você ganha, eu cedo."\nQuando usar: Quando o assunto importa mais para o outro, ou para preservar uma relação crítica.\nRisco: Acumula ressentimento. Você para de ser ouvido.\n\n**3. Evitar (baixa assertividade, baixa cooperação)**\n"Ninguém lida com isso agora."\nQuando usar: Quando o timing é ruim ou a questão é trivial.\nRisco: Conflitos evitados crescem. O que era pequeno vira crise.\n\n**4. Comprometer (assertividade média, cooperação média)**\n"Cada um cede um pouco."\nQuando usar: Quando precisa de solução rápida e os dois lados têm poder similar.\nRisco: Ninguém fica satisfeito. Solução medíocre.\n\n**5. Colaborar (alta assertividade, alta cooperação)**\n"Vamos encontrar uma solução que atenda os dois."\nQuando usar: Quando a questão é importante e o relacionamento também.\nRisco: Consome mais tempo. Exige maturidade dos envolvidos.\n\n**Protocolo Prático para Mediar Conflitos na Equipe:**\n\n1. Separe as pessoas do problema\n— "Não estamos discutindo quem está certo. Estamos resolvendo como entregar o projeto."\n\n2. Ouça os dois lados sem interromper\n— Cada pessoa tem 3 minutos para explicar sua perspectiva. O outro escuta.\n\n3. Identifique interesses, não posições\n— Posição: "Eu quero mais prazo." Interesse: "Eu tenho medo de entregar com baixa qualidade."\n\n4. Gere opções antes de decidir\n— Brainstorm de 3+ alternativas antes de escolher.\n\n5. Acordo com critérios objetivos\n— "Vamos usar os dados de vendas do último trimestre para decidir, não a opinião de ninguém."\n\n6. Follow-up em 7 dias\n— Conflito resolvido sem follow-up = conflito adiado.',
+            description: 'Avalie sua equipe nas 5 fases e veja recomendações de ação.',
           },
           {
             id: 'M3-1-s3',
             type: 'simulation',
             title: 'Gestão de Conflitos — Escolha a Abordagem Certa',
             simulationId: 'conflict-management',
-            description: 'Receba 6 cenários reais de conflito em equipe. Para cada um, escolha o estilo Thomas-Kilmann mais adequado (Competir, Acomodar, Evitar, Comprometer ou Colaborar) e veja a análise.',
-          },
-          {
-            id: 'M3-1-t8',
-            type: 'text',
-            title: 'Motivação — O que a Ciência Diz sobre Engajar Pessoas',
-            body: 'A maioria dos gestores usa motivação errada: mais dinheiro, mais pressão, mais controle. A ciência mostra o oposto.\n\n**Teoria da Autodeterminação (Deci & Ryan)**\nAs 3 necessidades psicológicas universais para motivação intrínseca:\n\n**1. Autonomia** — a necessidade de sentir que você tem escolha\nNa prática:\n— Dê o "o quê" e o "por quê", mas deixe a pessoa decidir o "como"\n— Horário flexível, método de trabalho flexível, escolha de projetos\n— Anti-autonomia: microgerenciamento, aprovações para tudo, scripts rígidos\n\n**2. Competência** — a necessidade de sentir que você é capaz e está evoluindo\nNa prática:\n— Desafios calibrados: nem fácil demais (tédio) nem difícil demais (ansiedade)\n— Feedback frequente e específico (SBI)\n— Oportunidades de aprendizado e crescimento\n— Anti-competência: tarefas repetitivas sem variação, zero feedback, zero desenvolvimento\n\n**3. Pertencimento** — a necessidade de sentir que você importa para o grupo\nNa prática:\n— Reconhecimento público de contribuições\n— Rituais de equipe (daily, retrospectiva, celebrações)\n— Cultura de confiança onde vulnerabilidade é segura\n— Anti-pertencimento: favorecidos, panelinha, exclusão de decisões\n\n**Motivação Intrínseca vs. Extrínseca:**\n— Extrínseca (bônus, promoção, medo de demissão): funciona para tarefas simples e repetitivas. Para trabalho criativo e complexo, PREJUDICA a performance.\n— Intrínseca (propósito, domínio, autonomia): funciona para trabalho que exige pensamento, criatividade e julgamento. É sustentável a longo prazo.\n\nDaniel Pink (Drive, 2009) sintetiza: para trabalho do século XXI, os 3 motores são Autonomia, Maestria e Propósito — não cenoura e chicote.\n\n**Framework Prático de Motivação para Gestores:**\n1. Conecte cada tarefa a um propósito claro ("por que isso importa?")\n2. Dê autonomia no método (foque no resultado, não no processo)\n3. Calibre o desafio (pergunte: "isso está fácil demais ou difícil demais?")\n4. Reconheça publicamente, corrija em particular\n5. Invista em desenvolvimento (treinamento, mentoria, projetos desafiadores)\n6. Crie segurança psicológica (é seguro errar e pedir ajuda?)',
-          },
-          {
-            id: 'M3-lid-concept3',
-            type: 'concept',
-            term: 'Teoria da Autodeterminação',
-            definition: 'As 3 necessidades psicológicas universais para motivação intrínseca são: Autonomia (escolha), Competência (evolução) e Pertencimento (importar para o grupo). Satisfazer as três gera engajamento sustentável.',
-            example: 'Nubank dá autonomia de método (squads decidem como entregar), competência (hackathons, budget de aprendizado) e pertencimento (cultura horizontal, rituais de time). Turnover 3x menor que bancos tradicionais.',
-            antiExample: 'Microgerenciar o "como" (mata autonomia), dar tarefas repetitivas sem variação (mata competência) e excluir pessoas de decisões (mata pertencimento) = desengajamento garantido.',
-          },
-          {
-            id: 'M3-1-t9',
-            type: 'text',
-            title: 'Reuniões 1:1 — A Ferramenta de Gestão Mais Subutilizada',
-            body: 'O 1:1 (one-on-one) é a reunião mais importante da gestão de pessoas. É o momento em que o líder dá atenção individual, alinha expectativas, remove bloqueios e desenvolve o liderado.\n\n**Estrutura de um 1:1 Eficaz (30 min, semanal ou quinzenal):**\n\n**Primeiros 10 min — Agenda do Liderado**\n— "O que você quer discutir hoje?"\n— A pauta é DELE, não sua. Isso é autonomia na prática.\n— Se ele não trouxer pauta, pergunte: "O que te preocupa? Onde está travado? O que precisa de mim?"\n\n**10 min seguintes — Agenda do Líder**\n— Feedback (SBI) sobre situações recentes\n— Alinhamento de prioridades da semana\n— Checagem de desenvolvimento: "O que aprendeu? Onde quer crescer?"\n\n**Últimos 10 min — Acordos e Próximos Passos**\n— O que ficou decidido?\n— Quem faz o quê até quando?\n— Anote e siga no próximo 1:1\n\n**Erros que destroem o 1:1:**\n— Cancelar frequentemente → mensagem: "você não é prioridade"\n— Usar como reunião de status → para isso existem dailies e reports\n— Falar mais do que ouvir → proporção ideal: 70% liderado, 30% líder\n— Não anotar e não dar follow-up → perde credibilidade\n\n**Perguntas poderosas para 1:1:**\n— "Se você fosse eu, o que mudaria na equipe?"\n— "O que te faz perder energia no trabalho?"\n— "Qual é a coisa mais importante que eu posso fazer por você esta semana?"\n— "Onde você quer estar profissionalmente em 2 anos?"\n— "Tem algo que você não está me contando porque acha que eu não quero ouvir?"',
-          },
-          {
-            id: 'M3-1-t10',
-            type: 'text',
-            title: 'Segurança Psicológica — O Segredo das Equipes do Google',
-            body: 'O Projeto Aristóteles do Google analisou 180 equipes para descobrir o que diferencia as de alta performance. A resposta não foi QI, não foi talento, não foi experiência. Foi segurança psicológica.\n\n**O que é Segurança Psicológica (Amy Edmondson, Harvard):**\nA crença compartilhada de que é seguro tomar riscos interpessoais no grupo. Ou seja: posso discordar, admitir erro, pedir ajuda e propor ideias sem medo de punição ou humilhação.\n\n**O que o Google descobriu — Os 5 fatores de equipes de alta performance:**\n1. Segurança psicológica (disparadamente o mais importante)\n2. Confiabilidade (a equipe entrega o que promete)\n3. Estrutura e clareza (papéis e metas são claros)\n4. Significado (o trabalho é pessoalmente importante)\n5. Impacto (o trabalho faz diferença)\n\n**Na prática — Sinais de BAIXA segurança psicológica:**\n— Ninguém faz perguntas "óbvias" por medo de parecer incompetente\n— Erros são escondidos em vez de discutidos abertamente\n— As mesmas 2-3 pessoas falam em todas as reuniões\n— Feedback só acontece de cima para baixo, nunca de baixo para cima\n— Inovação é zero: ninguém arrisca porque "e se der errado?"\n\n**Sinais de ALTA segurança psicológica:**\n— Pessoas admitem erros abertamente: "errei aqui, e aprendi que..."\n— Todos participam das discussões, não só os seniores\n— Perguntas "ingênuas" são bem-vindas e frequentes\n— Críticas ao processo são normais e geram ação\n— O líder diz "não sei" e pede ajuda\n\n**7 Ações do Líder para Construir Segurança Psicológica:**\n1. Admita seus próprios erros primeiro e publicamente\n2. Faça perguntas em vez de dar respostas — "O que vocês acham?"\n3. Agradeça quem traz más notícias — "Obrigado por levantar isso"\n4. Responda a erros com curiosidade, não punição — "O que podemos aprender?"\n5. Nunca ridicularize uma pergunta ou sugestão\n6. Crie rituais de retrospectiva: "O que funcionou? O que não funcionou? O que mudamos?"\n7. Meça: "Numa escala de 1-5, quão seguro você se sente para discordar do líder nesta equipe?"',
+            description: 'Cenários reais: qual abordagem Thomas-Kilmann usar?',
           },
           {
             id: 'M3-1-s4',
             type: 'simulation',
             title: 'Diagnóstico de Liderança e Equipe — Avaliação 360°',
             simulationId: 'leadership-360',
-            description: 'Avalie sua liderança e sua equipe em 8 dimensões: estilo de liderança, IE, delegação, feedback, conflitos, motivação, segurança psicológica e maturidade da equipe. Receba um radar completo com recomendações.',
-          },
-          {
-            id: 'M3-1-t11',
-            type: 'text',
-            title: 'Mapa de Frameworks — Quando Usar Cada Ferramenta de Liderança',
-            body: '**Resumo prático — qual ferramenta usar em cada situação:**\n\n**Liderança Situacional** (Hersey & Blanchard)\nQuando: Precisa adaptar seu estilo a diferentes pessoas e situações\nComo: Avalie competência + comprometimento do liderado → escolha o estilo (S1-S4)\nFrequência: Toda interação de gestão\n\n**Liderança Transformacional** (Burns/Bass)\nQuando: Precisa gerar mudança cultural ou engajar equipe em visão de longo prazo\nComo: Comunique propósito, seja modelo, desafie o status quo, desenvolva individualmente\nFrequência: Estratégia, momentos de mudança, onboarding\n\n**Grid Gerencial** (Blake & Mouton)\nQuando: Quer diagnosticar seu equilíbrio entre foco em tarefa e foco em pessoas\nComo: Autoavaliação nos dois eixos (1-9). Busque o (9,9)\nFrequência: Autoavaliação trimestral\n\n**Modelo Tuckman** (Forming→Performing)\nQuando: Equipe nova, reorganizada, ou com problemas de dinâmica\nComo: Identifique a fase atual → aplique as ações correspondentes\nFrequência: Ao formar equipe e sempre que houver mudança de membros\n\n**Thomas-Kilmann** (Gestão de Conflitos)\nQuando: Conflito entre membros da equipe ou entre áreas\nComo: Avalie importância do resultado × importância do relacionamento → escolha estilo\nFrequência: Sempre que surgir tensão\n\n**Modelo SBI** (Feedback)\nQuando: Precisa dar feedback construtivo ou positivo\nComo: Situação → Comportamento → Impacto\nFrequência: Semanal (mínimo quinzenal)\n\n**Autodeterminação** (Deci & Ryan)\nQuando: Equipe desmotivada ou com baixo engajamento\nComo: Diagnostique qual das 3 necessidades está insatisfeita (autonomia, competência, pertencimento)\nFrequência: Monitoramento contínuo\n\n**Segurança Psicológica** (Edmondson)\nQuando: Equipe não inova, não traz problemas, não discorda\nComo: 7 ações do líder + medição trimestral\nFrequência: Cultura permanente — não é projeto, é prática diária',
+            description: 'Avaliação completa de liderança, equipe e cultura.',
           },
         ],
       },
+
     ],
   },
   {
