@@ -2295,6 +2295,193 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               ],
             },
           },
+          {
+            id: 'M1-2-cap6',
+            type: 'chapter',
+            number: 6,
+            title: 'BPMN — Modelagem de Processos de Negócio',
+            subtitle: 'Como mapear, analisar e otimizar processos usando a notação padrão global',
+            opening: {
+              leadText: 'A modelagem de processos é um conjunto de atividades voltadas para a representação de fluxos de trabalho. A {{BPMN}} (Business Process Model and Notation) é o padrão global que permite a analistas documentar procedimentos e a implementadores automatizá-los — sem perda de significado.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'Antes da BPMN, o mercado utilizava diversas linguagens (IDEF, EPC, UML) que careciam de ponte entre o desenho de negócio e a execução técnica. A BPMN foi projetada para preencher essa lacuna, funcionando como um {{tradutor universal}} entre áreas de negócio e TI.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O BPMN define um único tipo de diagrama: o Diagrama de Processos de Negócio (DPN). Nele são dispostos os elementos que representam atividades, decisões, eventos e fluxos. O escopo é exclusivamente processos de negócio — não cobre modelagem de estrutura organizacional, dados ou regras de negócio separadamente.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: '4 categorias de elementos gráficos',
+                pillars: [
+                  { icon: '⚡', title: 'Objetos de Fluxo', description: 'Eventos (início/fim), Atividades (tarefas) e Gateways (decisões). São os elementos {{dinâmicos}} que definem o comportamento.' },
+                  { icon: '➡️', title: 'Objetos de Conexão', description: 'Fluxos de sequência, fluxos de mensagens e associações. Definem a {{ordem}} de execução e troca de informações.' },
+                  { icon: '🏊', title: 'Swimlanes', description: 'Pools (organizações) e Lanes (departamentos). Organizam atividades por {{participante}} e função.' },
+                  { icon: '📎', title: 'Artefatos', description: 'Objetos de dados, anotações e grupos. Fornecem {{contexto}} sem alterar a lógica do fluxo.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'O conceito central é o **Token** — uma construção teórica que representa a instância ativa de um processo enquanto percorre o diagrama. Gateways, eventos e atividades atuam como mecanismos que criam, dividem, fundem ou consomem tokens. A lógica de execução é a gestão do {{ciclo de vida}} desses tokens do início ao fim.',
+              },
+              {
+                kind: 'heading',
+                text: 'Gateways — filtros de decisão',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Gateway Exclusivo (XOR)',
+                    period: 'Ou um ou outro',
+                    text: 'O mais comum. Apenas {{um caminho}} de saída pode ser seguido. Na convergência, repassa o primeiro token que chega. Perguntas devem ser objetivas.',
+                    caseStudy: {
+                      company: 'Exemplo prático',
+                      year: 2024,
+                      story: 'Check-in de hotel: cliente tem reserva? SIM → busca dados. NÃO → verifica disponibilidade. Apenas {{um caminho}} é seguido.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'XOR', label: 'Exclusive OR' },
+                        { value: '1', label: 'Caminho de saída ativo' },
+                      ],
+                      insight: 'Use quando a decisão é {{binária}} ou com opções mutuamente exclusivas.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Gateway Paralelo (AND)',
+                    period: 'Todos ao mesmo tempo',
+                    text: 'Cria caminhos que ocorrem {{simultaneamente}}. Na divergência, cria tokens para todos os caminhos. Na convergência, só prossegue quando TODOS chegarem — ponto de sincronização.',
+                    caseStudy: {
+                      company: 'Exemplo prático',
+                      year: 2024,
+                      story: 'Pedido online: após pagamento confirmado, {{simultaneamente}} separa estoque + gera nota fiscal + notifica transportadora. Só despacha quando os 3 terminarem.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'AND', label: 'Parallel gateway' },
+                        { value: 'Todos', label: 'Caminhos executados' },
+                      ],
+                      insight: 'Essencial para evitar {{race conditions}} — garante sincronização antes de prosseguir.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Gateway Inclusivo (OR)',
+                    period: 'Um ou mais caminhos',
+                    text: 'Permite que {{um ou mais}} caminhos sejam seguidos com base em condições. Na convergência, aguarda apenas os fluxos que foram ativados. O mais complexo dos gateways.',
+                    caseStudy: {
+                      company: 'Exemplo prático',
+                      year: 2024,
+                      story: 'Aprovação de crédito: pode precisar de análise financeira E/OU análise cadastral E/OU visita presencial, dependendo do valor. {{Cada condição}} ativa um caminho.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'OR', label: 'Inclusive gateway' },
+                        { value: '1+', label: 'Caminhos podem ser ativos' },
+                      ],
+                      insight: 'Devido à complexidade, muitas vezes é substituído por combinações de XOR + AND para maior {{clareza visual}}.',
+                    },
+                  },
+                  {
+                    index: 4,
+                    title: 'Gateway Baseado em Eventos',
+                    period: 'Quem chegar primeiro',
+                    text: 'Não decide por dados mas por qual {{evento externo}} ocorre primeiro. O primeiro evento "vence" e define o caminho, consumindo os outros.',
+                    caseStudy: {
+                      company: 'Exemplo prático',
+                      year: 2024,
+                      story: 'Aguardando fornecedor: resposta do fornecedor OU vencimento do prazo (30 dias). Se o {{prazo vence}} primeiro, cancela pedido automaticamente.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'Event', label: 'Baseado em evento externo' },
+                        { value: '1º', label: 'Primeiro evento define caminho' },
+                      ],
+                      insight: 'Ideal para processos com {{prazos}} e dependências externas imprevisíveis.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Swimlanes — quem faz o quê',
+              },
+              {
+                kind: 'paragraph',
+                text: 'BPMN usa swimlanes para dividir e organizar atividades. **Pools** representam organizações — especificam "quem faz o quê" em áreas separadas. **Lanes** representam departamentos ou funções dentro de uma organização. Um pool é a empresa, uma lane é o {{departamento}} dentro dela.',
+              },
+              {
+                kind: 'heading',
+                text: 'Tipos de processos',
+              },
+              {
+                kind: 'pillar-grid',
+                title: '3 tipos de processos BPMN',
+                pillars: [
+                  { icon: '🏠', title: 'Processo Privado', description: 'Ocorre {{dentro}} da organização. Atividades internas e como interagem entre si. O mais detalhado.' },
+                  { icon: '🌐', title: 'Processo Abstrato', description: 'Interações de um processo privado com entidade {{externa}}. Mostra só atividades que comunicam com fora.' },
+                  { icon: '🤝', title: 'Processo de Colaboração', description: 'Interações entre {{dois ou mais}} processos via troca de mensagens. Foco na comunicação entre organizações.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Níveis de maturidade na modelagem',
+              },
+              {
+                kind: 'step-flow',
+                title: '3 níveis de profundidade',
+                steps: [
+                  { number: 1, title: 'Descritivo', description: 'Documentação de alto nível. Qualquer pessoa entende. Subconjunto reduzido de símbolos. Foco no {{happy path}}. Ideal para manuais e apresentações a executivos.' },
+                  { number: 2, title: 'Analítico', description: 'Análise de desempenho e melhoria. Trata todas as exceções e regras complexas. Permite {{simulações}} de carga e tempo. Ferramentas como Bizagi atribuem custos a cada tarefa.' },
+                  { number: 3, title: 'Técnico/Executável', description: 'Automação total. Detalhes técnicos para interpretação por BPMS: scripts, formulários, conectores de banco. Fidelidade à semântica BPMN 2.0 é {{inegociável}}.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A transição para a visão de processos ponta a ponta é um dos pilares do BPM moderno. Diferente da gestão funcional clássica, o foco no processo permite que a organização visualize como o valor é criado para o cliente final, atravessando fronteiras departamentais e eliminando {{silos}} que geram ineficiência.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada gateway controla o fluxo de forma diferente. Classifique.',
+              compare: {
+                columnHeaders: ['XOR (Exclusivo)', 'AND (Paralelo)', 'OR (Inclusivo)', 'Evento'],
+                rows: [
+                  { label: 'Caminhos', values: ['Apenas 1', 'Todos', '1 ou mais', '1º evento'] },
+                  { label: 'Sincroniza?', values: ['Não', 'Sim (todos)', 'Sim (ativos)', 'Não'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual gateway usar em cada situação?',
+                zones: [
+                  { id: 'xor', label: 'XOR' },
+                  { id: 'and', label: 'AND' },
+                  { id: 'or', label: 'OR' },
+                  { id: 'evt', label: 'Evento' },
+                ],
+                items: [
+                  { id: 'sim', label: 'Pedido: aprovar OU reprovar', correctZone: 'xor', correctFeedback: 'Certo. Decisão binária = XOR.', wrongFeedback: 'Aprovar ou reprovar = exclusivo.' },
+                  { id: 'para', label: 'Separar estoque + gerar NF + notificar (tudo junto)', correctZone: 'and', correctFeedback: 'Certo. Todos simultâneos = AND.', wrongFeedback: 'Tudo ao mesmo tempo = paralelo.' },
+                  { id: 'inc', label: 'Crédito: análise financeira E/OU cadastral', correctZone: 'or', correctFeedback: 'Certo. Um ou mais caminhos = OR.', wrongFeedback: 'Depende de condições = inclusivo.' },
+                  { id: 'ev', label: 'Aguardar resposta OU vencer prazo', correctZone: 'evt', correctFeedback: 'Certo. Primeiro evento decide = baseado em evento.', wrongFeedback: 'Quem chegar primeiro = evento.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'BPMN é o {{tradutor universal}} entre negócio e TI. Os 4 gateways (XOR, AND, OR, Evento) controlam fluxo. Swimlanes definem responsabilidades. E os 3 níveis de maturidade (descritivo → analítico → executável) guiam a evolução da modelagem.',
+              keyInsights: [
+                'Token: instância ativa que percorre o diagrama. Gateways {{criam, dividem e fundem}} tokens.',
+                'Gateway Paralelo (AND): só prossegue quando {{TODOS}} os caminhos terminam — sincronização obrigatória.',
+                '3 níveis: descritivo (todos entendem), analítico (simulações), executável ({{automação}} em BPMS).',
+              ],
+            },
+          },
 {
             id: 'M1-2-s1',
             type: 'simulation',
