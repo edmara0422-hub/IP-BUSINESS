@@ -5240,171 +5240,362 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Calculo Aplicado a Negocios',
         blocks: [
           {
-            id: 'M4-1-t1',
-            type: 'text',
-            title: 'Por que Cálculo Importa em Negócios — A Matemática da Mudança',
-            body: 'Cálculo é a matemática da mudança. Se álgebra resolve problemas estáticos ("quanto custa?"), cálculo resolve problemas dinâmicos ("a que velocidade está mudando?" e "qual o acumulado?").\n\n**Onde cálculo aparece em negócios:**\n— Receita marginal: "Se vendermos mais uma unidade, quanto de receita extra ganhamos?" (derivada)\n— Custo marginal: "Se produzirmos mais uma unidade, quanto custa a mais?" (derivada)\n— Lucro máximo: "Em qual ponto a receita marginal = custo marginal?" (otimização)\n— Valor presente: "Quanto vale hoje um fluxo futuro de receitas?" (integral)\n— Elasticidade: "Se aumentarmos o preço em 1%, quanto a demanda cai?" (derivada percentual)\n\nVocê não precisa resolver equações diferenciais no dia a dia. Precisa entender o CONCEITO para:\n— Interpretar relatórios financeiros\n— Questionar projeções de analistas\n— Tomar decisões de preço, produção e investimento com fundamento',
-          },
-          {
-            id: 'M4-1-t2',
-            type: 'text',
-            title: 'Funções — A Linguagem Matemática dos Negócios',
-            body: 'Uma função é uma relação onde cada entrada produz exatamente uma saída. Negócios são feitos de funções.\n\n**Funções mais usadas em negócios:**\n\n**Função Linear: f(x) = ax + b**\nOnde aparece: Custos fixos + variáveis, depreciação linear, comissão de vendas\nExemplo: Custo total = R$ 50.000 (fixo) + R$ 12 × unidades produzidas\nC(x) = 50.000 + 12x\nSe x = 10.000 → C = R$ 170.000\n\n**Função Quadrática: f(x) = ax² + bx + c**\nOnde aparece: Receita com curva de demanda, lucro (que tem ponto máximo)\nExemplo: Receita = preço × quantidade, mas se o preço sobe, a quantidade cai\nR(p) = p × (1000 - 2p) = 1000p - 2p²\nO lucro máximo está no vértice da parábola.\n\n**Função Exponencial: f(x) = a × bˣ**\nOnde aparece: Juros compostos, crescimento de usuários, depreciação acelerada\nExemplo: Valor futuro = R$ 10.000 × (1,01)¹² = R$ 11.268 (1% ao mês por 12 meses)\nDinheiro cresce exponencialmente — essa é a base de todo investimento.\n\n**Função Logarítmica: f(x) = log(x)**\nOnde aparece: Retornos decrescentes, escalas de percepção (dB, Richter), tempo de duplicação\nExemplo: Se uma startup cresce 10% ao mês, em quantos meses dobra?\nlog(2) / log(1,10) = 7,3 meses\n\n**Na prática — Modelagem de Negócios:**\nToda planilha financeira é um conjunto de funções. Quando você muda uma variável e vê o impacto no resultado, está fazendo análise funcional. Entender a forma da função (linear? exponencial? com ponto máximo?) é mais importante que calcular o número exato.',
-          },
-          {
-            id: 'M4-calc-number1',
-            type: 'number-crunch',
-            title: 'Calculadora de Juros Compostos — Quanto Seu Dinheiro Cresce?',
-            scenario: 'Calcule o valor futuro de um investimento com juros compostos. Ajuste o capital inicial, a taxa mensal e o prazo para ver o poder dos juros sobre juros.',
-            inputs: [
-              { id: 'capital', label: 'Capital inicial (R$)', defaultValue: 10000, unit: 'R$', min: 100, max: 10000000 },
-              { id: 'taxa', label: 'Taxa de juros mensal (%)', defaultValue: 1, unit: '%', min: 0.1, max: 15 },
-              { id: 'meses', label: 'Prazo (meses)', defaultValue: 24, unit: 'meses', min: 1, max: 360 },
+            id: 'M4-1-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Funções, Derivadas e Otimização',
+            subtitle: 'A matemática da mudança — como derivadas encontram o ponto ótimo de lucro',
+            opening: {
+              leadText: 'Cálculo não é abstração acadêmica. É a matemática da {{mudança}} — e negócios são sobre mudança: preço muda, demanda muda, custo muda. Quem domina cálculo toma decisões melhores porque entende como variáveis se relacionam.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'Uma função descreve a relação entre variáveis. Receita = Preço × Quantidade. Lucro = Receita - Custo. Demanda = f(Preço). No mundo dos negócios, tudo é {{função}} — e entender a função é entender o negócio.',
+              },
+              {
+                kind: 'heading',
+                text: 'Derivadas — taxas de variação',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A derivada mede a taxa de variação instantânea. Em negócios: "se eu aumentar o preço em R$ 1, quanto muda a demanda?" Essa resposta é a derivada. Quando a derivada do lucro = 0, encontramos o {{ponto máximo}} (ou mínimo). É assim que se otimiza.',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Receita Marginal',
+                    period: 'Derivada da receita',
+                    text: 'Quanto a receita aumenta ao vender {{uma unidade a mais}}. Enquanto receita marginal > custo marginal, vale produzir mais. Quando se igualam, é o ponto ótimo.',
+                    caseStudy: {
+                      company: 'Netflix',
+                      year: 2023,
+                      story: 'Cada novo assinante tem receita marginal de {{~R$ 40/mês}}. Custo marginal de atender 1 a mais é quase zero (streaming). Por isso o modelo escala: marginal positiva em cada unidade.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '~R$ 40', label: 'Receita marginal por assinante' },
+                        { value: '~R$ 0', label: 'Custo marginal por assinante' },
+                        { value: '230M+', label: 'Assinantes globais' },
+                      ],
+                      insight: 'Negócios digitais têm custo marginal {{tendendo a zero}} — cada unidade adicional é quase lucro puro.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Custo Marginal',
+                    period: 'Derivada do custo',
+                    text: 'Quanto custa produzir {{uma unidade a mais}}. Em fábricas: cresce com capacidade (hora extra, desgaste). Em SaaS: quase zero. Entender custo marginal define precificação.',
+                    caseStudy: {
+                      company: 'Ambev',
+                      year: 2023,
+                      story: 'Produzir 1 cerveja a mais custa R$ 0,80 (matéria-prima + energia). Vende por R$ 3,50. Margem por unidade: {{R$ 2,70}}. Por isso volume é estratégia — cada unidade gera lucro.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 0,80', label: 'Custo marginal' },
+                        { value: 'R$ 3,50', label: 'Preço de venda' },
+                        { value: 'R$ 2,70', label: 'Margem por unidade' },
+                      ],
+                      insight: 'Ponto ótimo de produção: onde Receita Marginal = Custo Marginal. Antes disso, produzir {{mais}}. Depois, parar.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Elasticidade — como preço afeta demanda',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Elasticidade-preço mede a sensibilidade da demanda ao preço. Se |E| > 1 = {{elástico}} (sobe preço, demanda cai muito — ex: pizza delivery). Se |E| < 1 = {{inelástico}} (sobe preço, demanda mal muda — ex: remédio, combustível). Entender elasticidade é a diferença entre precificar certo e perder clientes.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Elasticidade na prática',
+                pillars: [
+                  { icon: '🍕', title: 'Elástico (|E| > 1)', description: 'Pizza, roupas, streaming. Muitas alternativas. Subir preço = perder {{clientes}} rapidamente.', metric: { value: '|E| > 1', label: 'sensível ao preço' } },
+                  { icon: '💊', title: 'Inelástico (|E| < 1)', description: 'Remédios, combustível, água. Poucas alternativas. Subir preço = demanda {{mal muda}}.', metric: { value: '|E| < 1', label: 'insensível ao preço' } },
+                  { icon: '💎', title: 'Unitário (|E| = 1)', description: 'Variação de preço causa variação {{proporcional}} na demanda. Receita total fica constante.', metric: { value: '|E| = 1', label: 'equilíbrio' } },
+                ],
+              },
             ],
-            formula: 'capital * Math.pow(1 + taxa/100, meses)',
-            resultLabel: 'Valor futuro (R$)',
-            interpretation: [
-              { max: 1.5, label: 'Rendimento modesto — considere prazos maiores ou taxas melhores', color: 'amber' as const },
-              { max: 3, label: 'Bom crescimento — juros compostos começando a trabalhar', color: 'green' as const },
-              { max: 100, label: 'Crescimento expressivo — esse é o poder exponencial!', color: 'green' as const },
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Entender elasticidade determina a estratégia de preço. Classifique.',
+              compare: {
+                columnHeaders: ['Elástico', 'Inelástico'],
+                rows: [
+                  { label: 'Reação ao preço', values: ['Demanda cai muito', 'Demanda mal muda'] },
+                  { label: 'Estratégia', values: ['Competir por preço/volume', 'Aumentar preço com cuidado'] },
+                ],
+              },
+              drag: {
+                instruction: 'Elástico ou Inelástico?',
+                zones: [
+                  { id: 'el', label: 'Elástico' },
+                  { id: 'in', label: 'Inelástico' },
+                ],
+                items: [
+                  { id: 'gas', label: 'Gasolina', correctZone: 'in', correctFeedback: 'Certo. Poucas alternativas = inelástico.', wrongFeedback: 'Combustível = poucas alternativas.' },
+                  { id: 'netflix', label: 'Assinatura Netflix', correctZone: 'el', correctFeedback: 'Certo. Muitas alternativas de entretenimento.', wrongFeedback: 'Streaming tem muitas alternativas.' },
+                  { id: 'insulina', label: 'Insulina', correctZone: 'in', correctFeedback: 'Certo. Necessidade vital = inelástico.', wrongFeedback: 'Remédio essencial = inelástico.' },
+                  { id: 'roupa', label: 'Camiseta básica', correctZone: 'el', correctFeedback: 'Certo. Muitas marcas e opções.', wrongFeedback: 'Roupa básica = muitas alternativas.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Derivadas encontram o {{ponto ótimo}}. Receita Marginal = Custo Marginal define quando parar de produzir. Elasticidade define como precificar. Cálculo não é teoria — é a linguagem das decisões de negócio.',
+              keyInsights: [
+                'Ponto ótimo: onde Receita Marginal = Custo Marginal. Antes: produzir mais. Depois: {{parar}}.',
+                'Netflix: custo marginal ~R$ 0 por assinante. Por isso escala = {{lucro puro}}.',
+                'Elasticidade: pizza = elástico (alternativas). Insulina = inelástico (sem {{alternativa}}).',
+              ],
+              nextChapterHint: 'Capítulo 2 · Investimentos e Valor do Dinheiro',
+              nextChapterBlurb: 'Integrais, juros compostos, VPL, TIR — as ferramentas de decisão financeira.',
+            },
+          },
+          {
+            id: 'M4-1-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Investimentos e Valor do Dinheiro',
+            subtitle: 'Integrais, juros compostos, VPL e TIR — decidir onde colocar dinheiro',
+            opening: {
+              leadText: 'Se a derivada mede a taxa de mudança, a {{integral}} mede o acumulado. No mundo financeiro: quanto acumulou ao longo do tempo? Juros compostos, VPL e TIR são integrais aplicadas — mesmo que você nunca vá resolver a integral na mão.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'A integral calcula a área sob a curva — em negócios, isso é {{acumulação}}: receita total ao longo do tempo, custo total acumulado, valor presente de um fluxo de caixa futuro. Juros compostos são a integral mais poderosa do mundo financeiro.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Ferramentas de decisão de investimento',
+                pillars: [
+                  { icon: '📊', title: 'VPL', description: 'Soma dos fluxos futuros trazidos a valor presente, menos investimento inicial. VPL > 0 = {{investir}}. É a ferramenta mais confiável.', metric: { value: '> 0', label: 'investir' } },
+                  { icon: '📈', title: 'TIR', description: 'Taxa que faz VPL = 0. Se TIR > custo de capital (WACC), o investimento {{gera valor}}. Comparar TIRs entre projetos.', metric: { value: '> WACC', label: 'gera valor' } },
+                  { icon: '⏱️', title: 'Payback', description: 'Tempo para recuperar o investimento. Simples ou descontado. Limitação: ignora o que acontece {{depois}}.', metric: { value: 'Quanto menor', label: 'melhor' } },
+                  { icon: '💰', title: 'Juros Compostos', description: 'M = C × (1+i)^t. Einstein: "8ª maravilha." Regra dos 72: 72 ÷ taxa = anos para {{dobrar}}.', metric: { value: 'Exponencial', label: 'crescimento' } },
+                ],
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'VPL na Prática',
+                    period: 'Decisão de investir',
+                    text: 'Nova linha de produção: investimento R$ 2M. Fluxos de R$ 600k/ano por 5 anos. Taxa: 12%. VPL = {{R$ 163k}} positivo. Investir — gera valor acima do custo de capital.',
+                    caseStudy: {
+                      company: 'Expansão industrial',
+                      year: 2024,
+                      story: 'Empresa avalia 2 projetos: Projeto A (VPL R$ 300k, TIR 18%) vs Projeto B (VPL R$ 150k, TIR {{25%}}). Escolha: se mutuamente exclusivos, priorize VPL (A). Se independentes, faça ambos.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 163k', label: 'VPL positivo' },
+                        { value: '12%', label: 'Taxa de desconto' },
+                        { value: '5 anos', label: 'Horizonte' },
+                      ],
+                      insight: 'VPL > 0 não garante sucesso — garante que SE os fluxos se confirmarem, o projeto {{gera valor}}.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Juros Compostos na Prática',
+                    period: 'O poder do tempo',
+                    text: 'R$ 1.000/mês a 1% a.m. por 20 anos: aporte R$ 240k. Resultado: {{R$ 989k}}. Os juros geraram R$ 749k — mais de 3x o que você colocou. Tempo é o ingrediente secreto.',
+                    caseStudy: {
+                      company: 'Investimento pessoal',
+                      year: 2024,
+                      story: 'Warren Buffett começou a investir aos {{11 anos}}. Aos 30, tinha US$ 1M. Aos 60, US$ 3.8B. Aos 90, US$ 100B+. 99% da riqueza veio depois dos 60 — juros compostos + tempo.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '3x', label: 'Juros > aporte em 20 anos' },
+                        { value: '99%', label: 'Riqueza Buffett após 60 anos' },
+                        { value: '72 ÷ taxa', label: 'Anos para dobrar' },
+                      ],
+                      insight: 'A variável mais importante dos juros compostos não é a taxa — é o {{tempo}}. Comece cedo.',
+                    },
+                  },
+                ],
+              },
             ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada ferramenta responde uma pergunta diferente. Classifique.',
+              compare: {
+                columnHeaders: ['VPL', 'TIR', 'Payback'],
+                rows: [
+                  { label: 'Responde', values: ['Quanto agrega (R$)', 'Qual retorno (%)', 'Quando recupera'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual ferramenta?',
+                zones: [
+                  { id: 'vpl', label: 'VPL' },
+                  { id: 'tir', label: 'TIR' },
+                  { id: 'pay', label: 'Payback' },
+                ],
+                items: [
+                  { id: 'val', label: '"Quanto esse projeto agrega em reais?"', correctZone: 'vpl', correctFeedback: 'Certo. Valor absoluto = VPL.', wrongFeedback: 'Valor em R$ = VPL.' },
+                  { id: 'ret', label: '"Qual a taxa de retorno?"', correctZone: 'tir', correctFeedback: 'Certo. Percentual = TIR.', wrongFeedback: 'Taxa = TIR.' },
+                  { id: 'tmp', label: '"Quando recupero o que investi?"', correctZone: 'pay', correctFeedback: 'Certo. Tempo = Payback.', wrongFeedback: 'Tempo de recuperação = Payback.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Integrais acumulam. Juros compostos multiplicam. VPL decide se vale. TIR compara retornos. {{Tempo}} é a variável mais poderosa — Buffett provou.',
+              keyInsights: [
+                'VPL > 0 = investir. Quando VPL e TIR divergem, priorize {{VPL}}.',
+                'Juros compostos: R$ 1.000/mês × 20 anos × 1% a.m. = {{R$ 989k}} (aporte: R$ 240k).',
+                'Buffett: 99% da riqueza veio depois dos 60. O ingrediente secreto é {{tempo}}.',
+              ],
+              nextChapterHint: 'Capítulo 3 · Break-Even e Aplicações',
+              nextChapterBlurb: 'Ponto de equilíbrio, depreciação e matemática no dia a dia do gestor.',
+            },
           },
           {
-            id: 'M4-calc-concept1',
-            type: 'concept',
-            term: 'Função Exponencial nos Negócios',
-            definition: 'A função exponencial f(x) = a × bˣ modela crescimento acelerado: juros compostos, base de usuários virais, depreciação acelerada. Cresce lentamente no início e explode depois.',
-            example: 'R$ 10.000 a 1% ao mês por 30 anos (juros compostos) = R$ 359.496. Juros simples no mesmo período = R$ 46.000. A diferença de 7.8x é o poder exponencial.',
-            antiExample: 'Assumir crescimento linear quando o fenômeno é exponencial (ou vice-versa) é o erro mais caro em projeções financeiras. COVID crescia exponencialmente — governos planejaram linearmente.',
-          },
-          {
-            id: 'M4-1-t3',
-            type: 'text',
-            title: 'Derivadas — Taxas de Variação e Decisões Marginais',
-            body: 'A derivada mede a taxa de variação instantânea. Em negócios: mede o impacto de uma mudança incremental.\n\n**Conceito intuitivo:**\nSe a receita é R(x) onde x = quantidade vendida, a derivada R\'(x) responde: "Se eu vender MAIS UMA unidade, quanto a receita muda?"\n\nIsso é a **receita marginal** — o conceito mais importante de microeconomia.\n\n**As 3 Derivadas Fundamentais em Negócios:**\n\n**1. Receita Marginal (RMg)**\nRMg = dR/dx = variação da receita por unidade adicional vendida\nExemplo: R(x) = 100x - 0.5x² → RMg = R\'(x) = 100 - x\nSe x = 60: RMg = R$ 40 (cada unidade extra gera R$ 40 de receita)\nSe x = 100: RMg = R$ 0 (vender mais não aumenta receita — ponto de saturação)\n\n**2. Custo Marginal (CMg)**\nCMg = dC/dx = variação do custo por unidade adicional produzida\nExemplo: C(x) = 5000 + 20x + 0.1x² → CMg = C\'(x) = 20 + 0.2x\nSe x = 50: CMg = R$ 30 (cada unidade extra custa R$ 30)\nNote: o custo marginal CRESCE — quanto mais você produz, mais caro fica a unidade adicional (rendimentos decrescentes).\n\n**3. Lucro Máximo**\nLucro = Receita - Custo → L(x) = R(x) - C(x)\nLucro máximo quando L\'(x) = 0, ou seja, RMg = CMg\n\nRegra de ouro: **Continue produzindo enquanto a receita marginal > custo marginal. Pare quando RMg = CMg.**\n\nExemplo completo:\nR(x) = 100x - 0.5x² → RMg = 100 - x\nC(x) = 5000 + 20x + 0.1x² → CMg = 20 + 0.2x\nRMg = CMg → 100 - x = 20 + 0.2x → 80 = 1.2x → x ≈ 67 unidades\n\nProduzir 67 unidades maximiza o lucro.\n\n**Aplicação direta:** Todo empresário que decide "quanto produzir" ou "quando parar de investir" está (conscientemente ou não) igualando receita marginal a custo marginal.',
+            id: 'M4-1-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Break-Even, Depreciação e Aplicações',
+            subtitle: 'Quando a empresa para de perder dinheiro — e o custo invisível dos ativos',
+            opening: {
+              leadText: 'O ponto de equilíbrio (break-even) é o momento em que receita total = custo total. Antes dele, a empresa opera no {{prejuízo}}. Depois, cada unidade vendida é lucro. Saber onde está esse ponto muda completamente a estratégia.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'Fórmula: Break-Even (unidades) = Custos Fixos ÷ (Preço Unitário - Custo Variável Unitário). A diferença (Preço - Custo Variável) é a {{margem de contribuição}} — quanto cada unidade contribui para pagar os custos fixos. Depois de pagar todos os fixos, cada unidade é lucro puro.',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Break-Even de Restaurante',
+                    period: 'Exemplo prático',
+                    text: 'Custo fixo: R$ 30.000/mês (aluguel + salários). Ticket médio: R$ 45. Custo variável por refeição: R$ 18. Margem de contribuição: R$ 27. Break-even: 30.000 ÷ 27 = {{1.111 refeições/mês}} = ~37/dia.',
+                    caseStudy: {
+                      company: 'Restaurante médio SP',
+                      year: 2024,
+                      story: 'Se atende {{50 refeições/dia}}, lucra (50-37) × R$ 27 × 30 = R$ 10.530/mês. Se atende 30, prejuízo de (37-30) × R$ 27 × 30 = {{-R$ 5.670/mês}}.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '1.111', label: 'Refeições break-even' },
+                        { value: '37/dia', label: 'Mínimo para empatar' },
+                        { value: 'R$ 27', label: 'Margem de contribuição' },
+                      ],
+                      insight: 'Todo restaurante que não sabe seu break-even está operando no {{escuro}}. É o número #1 do negócio.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Break-Even de SaaS',
+                    period: 'Modelo digital',
+                    text: 'Custo fixo: R$ 200k/mês (equipe + infra). Assinatura: R$ 99/mês. Custo variável por cliente: R$ 5/mês. Margem: R$ 94. Break-even: {{2.128 assinantes}}.',
+                    caseStudy: {
+                      company: 'Startup SaaS BR',
+                      year: 2024,
+                      story: 'Com 3.000 assinantes: lucro = (3.000 - 2.128) × R$ 94 = {{R$ 81.968/mês}}. A alavancagem do SaaS: depois do break-even, cada cliente é quase lucro puro (custo marginal baixíssimo).',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '2.128', label: 'Assinantes break-even' },
+                        { value: 'R$ 94', label: 'Margem por assinante' },
+                        { value: 'R$ 5', label: 'Custo variável (cloud)' },
+                      ],
+                      insight: 'SaaS tem custo variável baixíssimo. Depois do break-even, a escala é {{brutal}} — margem cresce com volume.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Depreciação e amortização',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Depreciação é o custo invisível dos ativos. Uma máquina de R$ 500k que dura 10 anos deprecia R$ 50k/ano. Não sai dinheiro do caixa — mas reduz o valor do ativo e o {{lucro contábil}}. Gestores que ignoram depreciação acham que o negócio é mais lucrativo do que realmente é.',
+              },
+              {
+                kind: 'paragraph',
+                text: '**Amortização** é o mesmo conceito aplicado a ativos {{intangíveis}}: patentes, softwares, marcas. Um software de R$ 120k amortizado em 3 anos = R$ 40k/ano de custo. Impacta DRE mas não impacta caixa — por isso EBITDA (que exclui depreciação e amortização) é tão usado em valuation.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Matemática no dia a dia do gestor',
+                pillars: [
+                  { icon: '📊', title: 'Break-Even', description: 'Custos Fixos ÷ Margem de Contribuição = unidades mínimas. Saber esse número muda a {{estratégia}} inteira.' },
+                  { icon: '📉', title: 'Depreciação', description: 'Custo do ativo distribuído no tempo. Não sai dinheiro mas reduz {{lucro contábil}} e valor do ativo.' },
+                  { icon: '📈', title: 'Margem de Contribuição', description: 'Preço - Custo Variável. Quanto cada unidade {{contribui}} para pagar fixos. A métrica mais importante de precificação.' },
+                  { icon: '🎯', title: 'Alavancagem Operacional', description: 'Quanto o lucro cresce para cada % de aumento em vendas. Custos fixos altos = alta alavancagem = alto {{risco}} e alto retorno.' },
+                ],
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada conceito de custo tem impacto diferente. Classifique.',
+              compare: {
+                columnHeaders: ['Custo Fixo', 'Custo Variável', 'Depreciação'],
+                rows: [
+                  { label: 'Muda com volume?', values: ['Não', 'Sim', 'Não'] },
+                  { label: 'Sai dinheiro?', values: ['Sim', 'Sim', 'Não (contábil)'] },
+                ],
+              },
+              drag: {
+                instruction: 'Fixo, Variável ou Depreciação?',
+                zones: [
+                  { id: 'fix', label: 'Fixo' },
+                  { id: 'var', label: 'Variável' },
+                  { id: 'dep', label: 'Depreciação' },
+                ],
+                items: [
+                  { id: 'alug', label: 'Aluguel do escritório', correctZone: 'fix', correctFeedback: 'Certo. Não muda com volume = fixo.', wrongFeedback: 'Aluguel é igual todo mês = fixo.' },
+                  { id: 'mat', label: 'Matéria-prima por unidade', correctZone: 'var', correctFeedback: 'Certo. Cresce com produção = variável.', wrongFeedback: 'Mais unidades = mais matéria = variável.' },
+                  { id: 'maq', label: 'Desgaste da máquina ao longo de 10 anos', correctZone: 'dep', correctFeedback: 'Certo. Custo contábil distribuído = depreciação.', wrongFeedback: 'Desgaste no tempo = depreciação.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Break-even é o número que todo gestor deve saber de cor. Depreciação é o custo que ninguém vê mas que afeta o {{lucro real}}. E a margem de contribuição define se vale a pena vender mais.',
+              keyInsights: [
+                'Restaurante que não sabe break-even opera no {{escuro}}. É o número #1.',
+                'SaaS: custo marginal baixíssimo. Depois do break-even, escala = {{lucro brutal}}.',
+                'Depreciação: não sai dinheiro do caixa mas reduz lucro. Por isso existe {{EBITDA}}.',
+              ],
+            },
           },
           {
             id: 'M4-1-s1',
             type: 'simulation',
             title: 'Otimização de Lucro — Encontre o Ponto Máximo',
             simulationId: 'profit-optimization',
-            description: 'Ajuste preço e quantidade de produção em 4 cenários empresariais. Observe como receita marginal e custo marginal se cruzam e encontre o ponto de lucro máximo.',
-          },
-          {
-            id: 'M4-1-t4',
-            type: 'text',
-            title: 'Elasticidade — Como Preço Afeta Demanda',
-            body: 'Elasticidade-preço da demanda mede a sensibilidade da demanda a mudanças de preço. É a ferramenta mais importante de precificação.\n\n**Fórmula:**\nEp = (% variação na quantidade demandada) / (% variação no preço)\n\n**Interpretação:**\n— |Ep| > 1: Demanda ELÁSTICA — consumidor é sensível ao preço. Aumento de preço REDUZ receita total.\n— |Ep| < 1: Demanda INELÁSTICA — consumidor é pouco sensível. Aumento de preço AUMENTA receita total.\n— |Ep| = 1: Elasticidade unitária — receita total não muda.\n\n**Exemplos reais:**\n— Gasolina: Ep ≈ -0.3 (inelástica). Preço sobe 10%, demanda cai só 3%. Você PRECISA abastecer.\n— Restaurante casual: Ep ≈ -1.8 (elástica). Preço sobe 10%, demanda cai 18%. Fácil ir a outro restaurante.\n— Medicamento essencial: Ep ≈ -0.1 (muito inelástica). Preço sobe 10%, demanda cai 1%. Sem alternativa.\n— Streaming: Ep ≈ -1.5 (elástica). Preço sobe 10%, 15% cancelam. Muitas alternativas.\n\n**Fatores que determinam a elasticidade:**\n1. Disponibilidade de substitutos (mais substitutos → mais elástica)\n2. Proporção da renda (custo maior em relação à renda → mais elástica)\n3. Necessidade vs. luxo (necessidade → mais inelástica)\n4. Horizonte de tempo (longo prazo → mais elástica — tempo para encontrar alternativas)\n\n**Aplicação em precificação:**\n— Produto inelástico: Pode subir preço → receita sobe (mas cuidado com regulação e ética)\n— Produto elástico: Reduzir preço pode AUMENTAR receita total (mais volume compensa preço menor)\n— Produto com Ep ≈ -1: Receita é maximizada. Estamos no ponto ótimo.\n\n**Como estimar na prática:**\n1. Teste A/B: ofereça preços diferentes para grupos diferentes e meça a resposta\n2. Análise histórica: quando mudamos preço no passado, o que aconteceu com as vendas?\n3. Pesquisa de sensibilidade: "Você compraria este produto por R$ X? E por R$ Y?"',
-          },
-          {
-            id: 'M4-calc-concept2',
-            type: 'concept',
-            term: 'Elasticidade-Preço da Demanda',
-            definition: 'Mede a sensibilidade da demanda a mudanças de preço. Se |Ep| > 1 (elástica), aumento de preço REDUZ receita total. Se |Ep| < 1 (inelástica), aumento de preço AUMENTA receita total.',
-            example: 'Gasolina (Ep ≈ -0.3, inelástica): preço sobe 10%, demanda cai só 3% — você PRECISA abastecer. Por isso postos aumentam preço sem medo.',
-            antiExample: 'Streaming (Ep ≈ -1.5, elástica): preço sobe 10%, 15% cancelam — muitas alternativas. Netflix perdeu 1M de assinantes quando subiu preço em 2022.',
-          },
-          {
-            id: 'M4-calc-decision1',
-            type: 'decision',
-            scenario: 'Você vende um SaaS B2B com 500 clientes pagando R$ 200/mês. Sua margem é apertada e precisa aumentar receita. Pesquisa indica elasticidade de -1.2 (elástica). O que você faz?',
-            options: [
-              { label: 'Aumentar preço em 20% para todos', tradeoffs: { upside: 'Se ninguém sair, receita sobe R$ 240K/ano', downside: 'Com Ep=-1.2, espere perder ~24% dos clientes (120). Receita CAI R$ 48K/ano.', risk: 'high' as const } },
-              { label: 'Criar plano premium (R$ 350) com features extras, manter plano atual', tradeoffs: { upside: 'Captura willingness-to-pay dos top 20% sem perder o resto', downside: 'Exige desenvolvimento de features e gestão de 2 planos', risk: 'low' as const } },
-              { label: 'Manter preço e focar em reduzir churn + aumentar base', tradeoffs: { upside: 'Receita cresce via volume, sem risco de perda', downside: 'CAC pode ser alto, crescimento mais lento', risk: 'medium' as const } },
-            ],
-            realWorldAnalog: 'O Spotify usa modelo freemium + tiers. Nunca aumentou o plano básico significativamente — criou o Duo (R$ 24.90) e Family (R$ 34.90) para capturar mais valor sem perder a base.',
-            lesson: 'Quando demanda é elástica, aumentar preço destrói receita. A estratégia correta é segmentar: ofereça mais valor para quem pode pagar mais, sem tocar no preço base.',
-          },
-          {
-            id: 'M4-1-t5',
-            type: 'text',
-            title: 'Integrais — Acumulação e Valor Presente',
-            body: 'Se a derivada mede a taxa de variação, a integral mede o acumulado. Em negócios: quanto se acumula ao longo do tempo.\n\n**Conceito intuitivo:**\nSe CMg(x) é o custo de cada unidade adicional, a integral ∫CMg(x)dx é o custo TOTAL de produzir x unidades.\nSe R\'(t) é a receita por mês, a integral ∫R\'(t)dt é a receita TOTAL acumulada no período.\n\n**Aplicações em negócios:**\n\n**1. Custo Total a partir do Custo Marginal**\nSe CMg(x) = 20 + 0.2x\nEntão CT(x) = ∫(20 + 0.2x)dx = 20x + 0.1x² + C (onde C = custo fixo)\nSe custo fixo = R$ 5.000: CT(x) = 5000 + 20x + 0.1x²\n\n**2. Excedente do Consumidor**\nÁrea entre a curva de demanda e o preço de mercado. Representa o "ganho" que consumidores obtêm por pagar menos do que estariam dispostos.\nSe a demanda é D(p) = 500 - 2p e o preço é R$ 100:\nExcedente = ∫₁₀₀²⁵⁰ (500 - 2p - 100)dp = valor que o consumidor "economiza"\n\n**3. Valor Presente de Fluxos Contínuos**\nSe uma empresa gera receita contínua R(t) e a taxa de desconto é r:\nVP = ∫₀ᵀ R(t) × e⁻ʳᵗ dt\nIsso é a base do valuation por DCF (Discounted Cash Flow).\n\n**4. Depreciação Acumulada**\nSe a taxa de depreciação é D(t) por ano:\nDepreciação total em T anos = ∫₀ᵀ D(t)dt\n\n**Na prática:**\nVocê raramente calculará integrais manualmente. Mas entender que o Excel está fazendo somas de Riemann quando calcula NPV, IRR ou depreciação acumulada permite questionar os resultados e identificar erros em modelos financeiros.',
-          },
-          {
-            id: 'M4-1-t6',
-            type: 'text',
-            title: 'Juros Compostos — A Oitava Maravilha do Mundo',
-            body: 'Einstein (supostamente) disse: "Os juros compostos são a oitava maravilha do mundo. Quem entende, ganha. Quem não entende, paga."\n\n**Juros Simples vs. Compostos:**\n— Simples: J = C × i × n (juros sobre o capital original)\n— Compostos: M = C × (1 + i)ⁿ (juros sobre juros)\n\nExemplo comparativo — R$ 10.000 a 1% ao mês por 24 meses:\n— Simples: M = 10.000 × (1 + 0,01 × 24) = R$ 12.400\n— Compostos: M = 10.000 × (1,01)²⁴ = R$ 12.697\n— Diferença: R$ 297 a mais nos compostos. Parece pouco em 2 anos.\n\nAgora com 10% ao ano por 30 anos:\n— Simples: R$ 10.000 × (1 + 0,10 × 30) = R$ 40.000\n— Compostos: R$ 10.000 × (1,10)³⁰ = R$ 174.494\n— Diferença: R$ 134.494. Juros compostos são 4.4x maiores.\n\n**Regra dos 72 — Quanto tempo para dobrar?**\nTempo para dobrar ≈ 72 / taxa de juros (%)\n— A 6% ao ano: 72/6 = 12 anos\n— A 12% ao ano: 72/12 = 6 anos\n— A 1% ao mês: 72/1 = 72 meses (6 anos)\n\n**Na prática empresarial:**\n\n1. Valor Futuro (FV) — "Quanto terei?":\nInvesti R$ 50K em equipamento que gera R$ 5K/mês. Em 24 meses reinvestindo a 1%/mês:\nFV = 5.000 × [(1,01)²⁴ - 1] / 0,01 = R$ 135.024\n\n2. Valor Presente (PV) — "Quanto vale hoje?":\nCliente oferece pagar R$ 100K daqui a 2 anos. Com custo de capital de 15%/ano:\nPV = 100.000 / (1,15)² = R$ 75.614\nOu seja, R$ 100K em 2 anos vale R$ 75,6K hoje.\n\n3. Parcelas (PMT) — "Quanto vou pagar por mês?":\nEmpréstimo de R$ 200K a 1.5%/mês por 36 meses:\nPMT = 200.000 × [0,015 × (1,015)³⁶] / [(1,015)³⁶ - 1] = R$ 7.576/mês\nTotal pago: R$ 272.736 → Juros: R$ 72.736 (36% do valor emprestado!)\n\n**Armadilha do crédito brasileiro:**\nCartão de crédito: ~14% ao mês compostos\nR$ 1.000 de dívida no rotativo por 12 meses = R$ 4.887\nO brasileiro médio paga 4.9x o valor original. Isso não é crédito — é destruição de patrimônio.',
-          },
-          {
-            id: 'M4-1-t7',
-            type: 'text',
-            title: 'Análise de Investimentos — VPL, TIR e Payback',
-            body: 'Toda decisão de investimento responde a uma pergunta: "Este projeto gera mais valor do que custa?" As 3 ferramentas fundamentais:\n\n**1. VPL (Valor Presente Líquido) — "Quanto valor este projeto cria?"**\nVPL = Σ [FCₜ / (1+r)ᵗ] - Investimento Inicial\nOnde: FC = fluxo de caixa, r = taxa de desconto, t = período\n\nRegra de decisão:\n— VPL > 0 → Projeto cria valor. ACEITE.\n— VPL < 0 → Projeto destrói valor. REJEITE.\n— VPL = 0 → Indiferente.\n\nExemplo:\nInvestimento: R$ 500K\nFluxos anuais: R$ 150K, R$ 200K, R$ 250K, R$ 180K\nTaxa de desconto: 12%\nVPL = 150/1,12 + 200/1,12² + 250/1,12³ + 180/1,12⁴ - 500\nVPL = 133,9 + 159,4 + 177,9 + 114,4 - 500 = R$ 85,6K\nVPL positivo → projeto cria R$ 85,6K de valor. Aceite.\n\n**2. TIR (Taxa Interna de Retorno) — "Qual a rentabilidade do projeto?"**\nTIR = taxa r que faz VPL = 0\n\nRegra de decisão:\n— TIR > custo de capital → ACEITE\n— TIR < custo de capital → REJEITE\n\nNo exemplo acima: TIR = 21,3%\nComo 21,3% > 12% (custo de capital) → Aceite.\n\n**3. Payback — "Em quanto tempo recupero o investimento?"**\n\nPayback Simples:\nAno 1: -500 + 150 = -350\nAno 2: -350 + 200 = -150\nAno 3: -150 + 250 = +100 → Payback entre ano 2 e 3\nPayback = 2 + (150/250) = 2,6 anos\n\nPayback Descontado (considera o valor do dinheiro no tempo):\nAno 1: -500 + 133,9 = -366,1\nAno 2: -366,1 + 159,4 = -206,7\nAno 3: -206,7 + 177,9 = -28,8\nAno 4: -28,8 + 114,4 = +85,6 → Payback descontado = 3,25 anos\n\n**Quando usar qual:**\n— VPL: A métrica mais confiável. Use sempre.\n— TIR: Útil para comparar projetos. Mas cuidado: pode dar resultados estranhos com fluxos não convencionais.\n— Payback: Útil para avaliar risco de liquidez. Projetos com payback curto têm menos risco.\n\n**No Excel:**\n— VPL: =VPL(taxa; fluxo1:fluxoN) + investimento_inicial\n— TIR: =TIR(investimento_inicial:fluxoN)\n— Use Ctrl+Shift+Enter se for fórmula matricial.',
+            description: 'Ajuste preço e veja lucro mudar. Encontre o ponto onde derivada = 0.',
           },
           {
             id: 'M4-1-s2',
             type: 'simulation',
             title: 'Calculadora de Investimentos — VPL, TIR e Payback',
             simulationId: 'investment-calculator',
-            description: 'Insira fluxos de caixa de projetos reais e calcule VPL, TIR e Payback automaticamente. Compare 2 projetos lado a lado e decida qual é melhor.',
-          },
-          {
-            id: 'M4-1-t8',
-            type: 'text',
-            title: 'Ponto de Equilíbrio — Quando a Empresa Para de Perder Dinheiro',
-            body: 'O ponto de equilíbrio (Break-Even Point) é a quantidade mínima que você precisa vender para cobrir todos os custos. Abaixo: prejuízo. Acima: lucro.\n\n**Fórmula básica:**\nPE (unidades) = Custo Fixo / (Preço - Custo Variável Unitário)\nPE (receita) = Custo Fixo / Margem de Contribuição %\n\nOnde: Margem de Contribuição = Preço - Custo Variável = quanto cada unidade contribui para pagar o custo fixo.\n\n**Exemplo prático — Cafeteria:**\n— Custo fixo: R$ 15.000/mês (aluguel, salários, energia)\n— Preço do café: R$ 12\n— Custo variável por café: R$ 4 (grão, leite, copo, guardanapo)\n— Margem de contribuição: R$ 12 - R$ 4 = R$ 8\n— PE = 15.000 / 8 = 1.875 cafés/mês\n— PE em receita = 1.875 × 12 = R$ 22.500/mês\n\nInterpretação: Precisa vender 1.875 cafés/mês (63 por dia) só para empatar. A partir do café 1.876, cada um gera R$ 8 de lucro puro.\n\n**Ponto de equilíbrio com múltiplos produtos:**\nA maioria das empresas vende mais de um produto. Neste caso:\n1. Calcule a margem de contribuição média ponderada\n2. Use os pesos de cada produto no mix de vendas\n\nExemplo:\n— Café (60% das vendas): MC = R$ 8\n— Bolo (30%): MC = R$ 15\n— Suco (10%): MC = R$ 6\n— MC média = 0,60×8 + 0,30×15 + 0,10×6 = 4,80 + 4,50 + 0,60 = R$ 9,90\n— PE = 15.000 / 9,90 = 1.515 unidades/mês\n\n**Análise de Sensibilidade — E se mudarem as variáveis?**\n— Se o aluguel subir 20%: PE sobe de 1.875 para 2.250 (aumento de 375 cafés/mês)\n— Se o preço subir para R$ 14: PE cai de 1.875 para 1.500 (economia de 375 cafés)\n— Se o custo do grão subir 50% (R$ 4 → R$ 6): PE sobe de 1.875 para 2.500 (aumento de 625!)\n\nA análise de sensibilidade mostra quais variáveis mais impactam seu ponto de equilíbrio. Foque em controlar estas.\n\n**Margem de Segurança:**\nMS = (Vendas Reais - Vendas no PE) / Vendas Reais × 100%\nSe vende 2.500 cafés/mês: MS = (2.500-1.875)/2.500 = 25%\nSignifica: vendas podem cair 25% antes de entrar no prejuízo.',
-          },
-          {
-            id: 'M4-calc-number2',
-            type: 'number-crunch',
-            title: 'Calculadora de Ponto de Equilíbrio (Break-Even)',
-            scenario: 'Descubra quantas unidades você precisa vender por mês para cobrir todos os custos e parar de perder dinheiro. Abaixo do break-even = prejuízo. Acima = lucro.',
-            inputs: [
-              { id: 'fixo', label: 'Custo fixo mensal (R$)', defaultValue: 15000, unit: 'R$', min: 100, max: 10000000 },
-              { id: 'preco', label: 'Preço de venda unitário (R$)', defaultValue: 50, unit: 'R$', min: 1, max: 100000 },
-              { id: 'cvu', label: 'Custo variável unitário (R$)', defaultValue: 20, unit: 'R$', min: 0, max: 99999 },
-            ],
-            formula: 'fixo / (preco - cvu)',
-            resultLabel: 'Ponto de equilíbrio (unidades/mês)',
-            interpretation: [
-              { max: 100, label: 'Excelente — poucas vendas para empatar. Negócio com boa margem de contribuição.', color: 'green' as const },
-              { max: 1000, label: 'Razoável — verifique se o volume é atingível com sua capacidade atual.', color: 'amber' as const },
-              { max: 1000000, label: 'Alto — considere reduzir custo fixo, aumentar preço ou reduzir custo variável.', color: 'red' as const },
-            ],
-          },
-          {
-            id: 'M4-calc-exercise1',
-            type: 'inline-exercise',
-            prompt: 'Calcule o ponto de equilíbrio do seu negócio (ou de um negócio que você conhece) e faça análise de sensibilidade.',
-            context: 'O break-even mostra o mínimo para sobreviver. A análise de sensibilidade mostra quais variáveis mais impactam — foque em controlá-las.',
-            fields: [
-              { id: 'breakeven', label: 'Qual o ponto de equilíbrio em unidades e em receita?', placeholder: 'PE = Custo Fixo / (Preço - CVu). Ex: R$ 15K / (R$ 50 - R$ 20) = 500 unidades = R$ 25K/mês', multiline: true },
-              { id: 'sensitivity', label: 'Se o custo fixo subir 30%, como muda o PE?', placeholder: 'Recalcule com o novo custo fixo. Quantas unidades a mais precisa vender?', multiline: true },
-              { id: 'margin-safety', label: 'Qual sua margem de segurança atual?', placeholder: 'MS = (Vendas Reais - PE) / Vendas Reais. Se < 20%, você está vulnerável.', multiline: true },
-            ],
-            evaluationCriteria: ['Calcula corretamente o ponto de equilíbrio', 'Identifica a variável mais sensível', 'Propõe ação para aumentar a margem de segurança'],
-            expectedConcepts: ['ponto de equilíbrio', 'margem de contribuição', 'análise de sensibilidade', 'margem de segurança'],
-          },
-          {
-            id: 'M4-1-t9',
-            type: 'text',
-            title: 'Depreciação e Amortização — O Custo Invisível dos Ativos',
-            body: 'Depreciação é a perda de valor de um ativo ao longo do tempo. Não é saída de caixa — mas afeta lucro contábil e imposto de renda.\n\n**Por que importa para gestores:**\n— Afeta o lucro líquido (DRE) — mesmo sem gastar dinheiro\n— Reduz imposto a pagar (depreciação é despesa dedutível)\n— Determina quando substituir equipamentos\n— Impacta decisões de comprar vs. alugar\n\n**Métodos de depreciação:**\n\n**1. Linear (Linha Reta)**\nDepreciação/ano = (Valor de Aquisição - Valor Residual) / Vida Útil\n\nExemplo: Máquina de R$ 100K, valor residual R$ 10K, vida útil 10 anos\nDep/ano = (100.000 - 10.000) / 10 = R$ 9.000/ano\nO mais usado no Brasil. Simples e previsível.\n\n**2. Acelerada (Soma dos Dígitos)**\nDepreciação maior nos primeiros anos, menor nos últimos.\nFator do ano n = (Vida útil - n + 1) / Soma dos dígitos\n\nPara vida útil de 5 anos: Soma = 1+2+3+4+5 = 15\nAno 1: 5/15 = 33,3% → R$ 30K\nAno 2: 4/15 = 26,7% → R$ 24K\nAno 3: 3/15 = 20,0% → R$ 18K\nAno 4: 2/15 = 13,3% → R$ 12K\nAno 5: 1/15 = 6,7% → R$ 6K\n\nVantagem: Mais realista (ativos perdem mais valor no início). Benefício fiscal maior nos primeiros anos.\n\n**Taxas de depreciação no Brasil (Receita Federal):**\n— Imóveis: 4% ao ano (25 anos)\n— Veículos: 20% ao ano (5 anos)\n— Máquinas: 10% ao ano (10 anos)\n— Computadores: 20% ao ano (5 anos)\n— Móveis: 10% ao ano (10 anos)\n— Software: 20% ao ano (5 anos)\n\n**Amortização:**\nIgual à depreciação, mas para ativos intangíveis: patentes, marcas, goodwill, software.\nExemplo: Patente adquirida por R$ 500K com proteção de 10 anos → Amortização = R$ 50K/ano\n\n**Decisão prática — Comprar vs. Alugar:**\nComprar: Deprecia, deduz do IR, tem valor residual ao final\nAlugar: Despesa operacional total, deduz 100% do IR, sem valor residual\n\nRegra simplificada: Se a taxa de juros é baixa e o ativo será usado por mais de 3 anos → compre. Se juros altos ou uso < 3 anos → alugue.',
-          },
-          {
-            id: 'M4-1-t10',
-            type: 'text',
-            title: 'Matemática Financeira no Dia a Dia do Gestor',
-            body: '**Decisões comuns que exigem cálculo financeiro:**\n\n**1. Desconto à vista vs. Prazo**\nCliente pergunta: "Se pagar à vista, quanto de desconto?"\nVocê precisa saber: qual seu custo de capital?\n\nSe custo de capital = 2%/mês e o prazo é 30 dias:\nDesconto máximo que compensa = 2% (se der mais, está perdendo dinheiro)\nSe o cliente pede 5% de desconto à vista: NÃO compensa. É melhor vender a prazo.\n\n**2. Antecipar recebíveis**\nBanco oferece antecipar R$ 50K em recebíveis de 60 dias por taxa de 3%/mês.\nCusto: 50.000 × 0,03 × 2 = R$ 3.000\nVocê recebe: R$ 47.000 hoje em vez de R$ 50.000 em 60 dias.\nVale a pena? Só se o uso imediato dos R$ 47K gera mais de R$ 3K de retorno em 60 dias.\n\n**3. Leasing vs. Compra à vista vs. Financiamento**\nCarro R$ 120K:\n— À vista: R$ 120K agora. Deprecia 20%/ano. Após 5 anos vale ~R$ 40K.\n— Financiamento 60x: ~R$ 2.800/mês. Total: R$ 168K. Custo do dinheiro: R$ 48K.\n— Leasing 48x: ~R$ 3.200/mês. Total: R$ 153K. Devolveu o carro. Zero valor residual.\nDecisão depende: tem o dinheiro? O custo de oportunidade (investir os R$ 120K) supera o custo do financiamento?\n\n**4. Mark-up vs. Margem**\nMark-up = (Preço - Custo) / Custo × 100%\nMargem = (Preço - Custo) / Preço × 100%\n\nCusto R$ 60, Preço R$ 100:\nMark-up = 40/60 = 66,7%\nMargem = 40/100 = 40%\n\nERRO COMUM: "Tenho 66% de margem!" → Não. Tem 66% de mark-up e 40% de margem.\nIsso muda completamente a análise de rentabilidade.\n\n**5. Inflação e Correção**\nPreço de 2020: R$ 100. Inflação acumulada 2020-2025: 35%.\nPreço corrigido: R$ 100 × 1,35 = R$ 135.\nSe seu preço ainda é R$ 120, você NÃO subiu preço — você REDUZIU preço real em 11%.\n\nSalário de R$ 5.000 em 2020 = R$ 3.703 em poder de compra de 2025 (sem reajuste).\nReajuste de 20% em 5 anos = perda real de 11% de poder de compra.',
+            description: 'Insira investimento e fluxos. Veja VPL, TIR e Payback calculados.',
           },
           {
             id: 'M4-1-s3',
             type: 'simulation',
             title: 'Simulador Break-Even — Encontre Seu Ponto de Equilíbrio',
             simulationId: 'breakeven-simulator',
-            description: 'Configure custos fixos, preço e custo variável de 3 cenários de negócio. Veja o ponto de equilíbrio mudar em tempo real. Teste análise de sensibilidade: o que acontece se o aluguel sobe 30%?',
-          },
-          {
-            id: 'M4-1-t11',
-            type: 'text',
-            title: 'Mapa de Conceitos — Cálculo e Matemática Financeira Aplicados',
-            body: '**Resumo — quando usar cada conceito:**\n\n**Funções**\nQuando: Modelar relações entre variáveis (preço × demanda, custo × produção)\nFerramenta: Excel, Google Sheets, Python\nPergunta: "Como uma variável afeta a outra?"\n\n**Derivada (Taxa de Variação)**\nQuando: Decisões marginais — "vale a pena produzir/vender MAIS UMA unidade?"\nConceitos-chave: Receita marginal, custo marginal, lucro máximo\nRegra de ouro: RMg = CMg → lucro máximo\n\n**Elasticidade**\nQuando: Decisões de preço\nRegra: |Ep| > 1 → não suba preço. |Ep| < 1 → pode subir.\n\n**Integral (Acumulação)**\nQuando: Calcular totais a partir de taxas, valuation, depreciação\n\n**Juros Compostos**\nQuando: Qualquer decisão envolvendo dinheiro no tempo\nFórmulas: FV = PV × (1+i)ⁿ / Regra dos 72 / PMT\nRegra: Sempre compare em valor presente.\n\n**VPL / TIR / Payback**\nQuando: Avaliar projetos de investimento\nRegra: VPL > 0 = aceite. TIR > custo de capital = aceite.\nFerramenta: Excel =VPL(), =TIR()\n\n**Ponto de Equilíbrio**\nQuando: Saber o mínimo para não ter prejuízo\nFórmula: PE = CF / (P - CVu)\nUse: Antes de abrir negócio, lançar produto, expandir\n\n**Depreciação**\nQuando: Avaliar custo real de ativos, planejar substituição, otimizar IR\nMétodos: Linear (simples), Acelerada (mais realista)\n\n**Mark-up vs. Margem**\nQuando: Precificação\nArmadilha: Não confundir os dois! Mark-up é sobre custo, margem é sobre preço.\n\n**Correção pela Inflação**\nQuando: Comparar valores de períodos diferentes\nRegra: Sempre deflacione para comparar em termos reais.',
+            description: 'Insira custos fixos, preço e custo variável. Veja quantas unidades precisa vender.',
           },
         ],
       },
+
       {
         id: 'M4-2',
         title: 'Analise Estatistica',
