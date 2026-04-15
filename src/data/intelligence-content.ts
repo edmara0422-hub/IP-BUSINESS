@@ -3605,178 +3605,338 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Matematica Financeira',
         blocks: [
           {
-            id: 'M2-2-t1',
-            type: 'text',
-            title: 'Juros Simples vs Juros Compostos: A Diferença que Muda Tudo',
-            body: 'A matemática financeira é a base de toda decisão econômica — de um empréstimo pessoal a um investimento de R$ 100 milhões. Compreender juros é compreender o custo do tempo.\n\n**Juros Simples:**\nJ = C × i × n\nO juro incide sempre sobre o capital inicial. A cada período, o valor dos juros é o mesmo.\n— Capital: R$ 10.000 | Taxa: 2% ao mês | 12 meses\n— Juros = 10.000 × 0,02 × 12 = R$ 2.400\n— Montante = R$ 12.400\n\n**Juros Compostos:**\nM = C × (1 + i)^n\nO juro incide sobre o montante acumulado (capital + juros anteriores). É o "juro sobre juro".\n— Capital: R$ 10.000 | Taxa: 2% ao mês | 12 meses\n— Montante = 10.000 × (1,02)^12 = R$ 12.682,42\n— Diferença: R$ 282,42 a mais que juros simples\n\n**Por que isso importa?**\nEm 12 meses a diferença é pequena. Em 60 meses:\n— Simples: R$ 22.000\n— Compostos: R$ 32.810\n— Diferença: R$ 10.810 (49% a mais!)\n\nEm 120 meses (10 anos):\n— Simples: R$ 34.000\n— Compostos: R$ 107.652\n— Diferença: R$ 73.652 (3x mais!)\n\nIMPORTANTE: Juros compostos trabalham a seu favor quando você investe e contra você quando deve. Um cartão de crédito a 14% ao mês (compostos) transforma R$ 1.000 em R$ 4.887 em 12 meses. É matematicamente impossível ganhar dinheiro pagando essa taxa.\n\nPergunta-chave: Seus investimentos rendem juros compostos a uma taxa maior do que seus empréstimos cobram? Se não, a prioridade financeira é clara: eliminar a dívida primeiro.',
+            id: 'M2-2-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Juros Simples vs Juros Compostos',
+            subtitle: 'A diferença que muda tudo — por que Einstein chamou juros compostos de 8ª maravilha',
+            opening: {
+              leadText: 'Juros simples crescem em linha reta. Juros compostos crescem em {{curva exponencial}} — porque incidem sobre juros anteriores, não só sobre o principal. Essa diferença transforma investimentos e destrói devedores.',
+            },
+            body: [
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Juros Simples',
+                    period: 'Crescimento linear',
+                    text: 'Fórmula: J = C × i × t. Os juros incidem apenas sobre o {{capital inicial}}. R$ 10.000 a 10% a.a. por 5 anos = R$ 5.000 de juros. Total: R$ 15.000. Crescimento previsível e constante.',
+                    caseStudy: {
+                      company: 'Exemplo prático',
+                      year: 2024,
+                      story: 'Empréstimo de R$ 50.000 a juros simples de 2% a.m. por 12 meses: juros = R$ 50.000 × 0.02 × 12 = {{R$ 12.000}}. Total a pagar: R$ 62.000. Cada mês paga o mesmo valor de juros.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'J = C×i×t', label: 'Fórmula' },
+                        { value: 'Linear', label: 'Crescimento' },
+                        { value: 'Raro', label: 'Pouco usado no mercado real' },
+                      ],
+                      insight: 'Juros simples são usados em pouquíssimas situações reais. O mercado financeiro opera quase exclusivamente com {{compostos}}.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Juros Compostos',
+                    period: 'Crescimento exponencial',
+                    text: 'Fórmula: M = C × (1 + i)^t. Juros incidem sobre {{juros anteriores}}. R$ 10.000 a 10% a.a. por 5 anos = R$ 16.105. Diferença de R$ 1.105 vs simples. Em 30 anos: R$ 174.494 vs R$ 40.000.',
+                    caseStudy: {
+                      company: 'Investimento real',
+                      year: 2024,
+                      story: 'R$ 1.000/mês a {{1% a.m.}} (Selic ~12% a.a.) por 20 anos: aporte total R$ 240.000. Valor final: {{R$ 989.000}}. Os juros compostos geraram R$ 749.000 — mais de 3x o que você colocou.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'M = C(1+i)^t', label: 'Fórmula' },
+                        { value: 'Exponencial', label: 'Crescimento' },
+                        { value: '3x', label: 'Juros > aporte em 20 anos' },
+                      ],
+                      insight: 'Einstein (atribuído): "Juros compostos são a {{8ª maravilha}} do mundo. Quem entende, ganha. Quem não entende, paga."',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A regra dos 72: divida 72 pela taxa anual para saber em quantos anos o dinheiro dobra. Taxa de 12% a.a. → 72 ÷ 12 = {{6 anos}} para dobrar. Taxa de 6% → 12 anos. Ferramenta mental rápida para avaliar investimentos e dívidas.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Juros simples vs compostos. Classifique.',
+              compare: {
+                columnHeaders: ['Simples', 'Compostos'],
+                rows: [
+                  { label: 'Incide sobre', values: ['Só capital inicial', 'Capital + juros anteriores'] },
+                  { label: 'Crescimento', values: ['Linear', 'Exponencial'] },
+                  { label: 'Uso real', values: ['Raro', 'Padrão do mercado'] },
+                ],
+              },
+              drag: {
+                instruction: 'Simples ou Compostos?',
+                zones: [
+                  { id: 'sim', label: 'Simples' },
+                  { id: 'comp', label: 'Compostos' },
+                ],
+                items: [
+                  { id: 'cart', label: 'Juros do cartão de crédito', correctZone: 'comp', correctFeedback: 'Certo. Cartão = compostos (e altíssimos).', wrongFeedback: 'Cartão usa juros compostos — por isso a dívida explode.' },
+                  { id: 'selic', label: 'Rendimento da Selic', correctZone: 'comp', correctFeedback: 'Certo. Investimentos usam compostos.', wrongFeedback: 'Selic rende juros sobre juros = compostos.' },
+                  { id: 'multa', label: 'Multa fixa de atraso', correctZone: 'sim', correctFeedback: 'Certo. Multa fixa não compõe.', wrongFeedback: 'Multa fixa = valor fixo = simples.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'A diferença entre simples e compostos parece pequena no curto prazo. No longo prazo, é a diferença entre {{riqueza e estagnação}}. Em 30 anos a 10% a.a.: simples dá R$ 40k; compostos dá R$ 174k.',
+              keyInsights: [
+                'Regra dos 72: 72 ÷ taxa = anos para {{dobrar}}. Selic 12% = 6 anos.',
+                'R$ 1.000/mês a 1% a.m. por 20 anos: aporte R$ 240k, resultado {{R$ 989k}}.',
+                'Juros compostos são padrão no mercado. Quem não entende, paga {{caro}}.',
+              ],
+              nextChapterHint: 'Capítulo 2 · Valor do Dinheiro no Tempo',
+              nextChapterBlurb: 'VP, VF, VPL e TIR — ferramentas para decidir se um investimento vale a pena.',
+            },
           },
           {
-            id: 'M2-2-c1',
-            type: 'concept',
-            term: 'Juros Compostos',
-            definition: 'Sistema de capitalização onde os juros incidem sobre o montante acumulado (capital + juros anteriores), gerando o efeito "juro sobre juro". Fórmula: M = C × (1 + i)^n. É o padrão do sistema financeiro mundial — todo empréstimo, investimento e financiamento usa juros compostos.',
-            example: 'R$ 10.000 investidos a 1% ao mês por 10 anos (compostos) viram R$ 33.003. Os mesmos R$ 10.000 a juros simples virariam R$ 22.000. A diferença de R$ 11.003 (50% a mais!) vem exclusivamente do efeito de juro sobre juro acumulando exponencialmente.',
-            antiExample: 'Pessoa que parcela R$ 5.000 no cartão de crédito a 14% ao mês achando que "são só 14% de juros". Em 12 meses, a dívida vira R$ 24.435 — quase 5x o valor original. Juros compostos contra você são devastadores.',
+            id: 'M2-2-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Valor do Dinheiro no Tempo',
+            subtitle: 'VP, VF, VPL e TIR — as ferramentas de decisão de investimento',
+            opening: {
+              leadText: 'R$ 100 hoje valem mais que R$ 100 daqui a um ano — porque hoje podem ser investidos e render juros. Esse princípio, o {{valor do dinheiro no tempo}}, fundamenta toda decisão de investimento.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Conceitos fundamentais',
+                pillars: [
+                  { icon: '⬅️', title: 'Valor Presente (VP)', description: 'Quanto vale HOJE um valor futuro. "Se vou receber R$ 10.000 em 2 anos, quanto isso vale {{agora}}?" Desconta pela taxa de juros.' },
+                  { icon: '➡️', title: 'Valor Futuro (VF)', description: 'Quanto vale NO FUTURO um valor de hoje. "Se invisto R$ 10.000 hoje a 10% a.a., quanto terei em {{5 anos}}?" Multiplica pela taxa.' },
+                  { icon: '📊', title: 'VPL', description: 'Valor Presente Líquido. Soma de todos os fluxos de caixa futuros trazidos a valor presente, {{menos}} o investimento inicial. VPL > 0 = investimento vale.', metric: { value: '> 0', label: 'investir' } },
+                  { icon: '📈', title: 'TIR', description: 'Taxa Interna de Retorno. A taxa que faz o VPL = 0. Se TIR > custo de capital, o investimento {{gera valor}}. Se TIR < custo, destrói.', metric: { value: '> WACC', label: 'gera valor' } },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'VPL e TIR são as duas ferramentas mais usadas por empresas para decidir investimentos. O VPL dá o valor absoluto (quanto o projeto agrega em reais). A TIR dá a taxa percentual de retorno. Quando divergem (VPL diz sim, TIR diz não), {{priorize o VPL}} — ele é mais confiável para projetos mutuamente exclusivos.',
+              },
+              {
+                kind: 'paragraph',
+                text: '**Payback** é o tempo para recuperar o investimento inicial. Payback simples ignora o valor do tempo; payback descontado traz os fluxos a valor presente. Limitação: ignora o que acontece {{depois}} de recuperar o investimento. Um projeto com payback de 5 anos pode gerar lucro por 20 anos — o payback não captura isso.',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'VPL na Prática',
+                    period: 'Decisão de investir',
+                    text: 'Investimento: R$ 500k. Fluxos esperados: R$ 150k/ano por 5 anos. Taxa de desconto: 12%. VPL = {{R$ 40.837}}. Como VPL > 0, o investimento gera valor acima do custo de capital.',
+                    caseStudy: {
+                      company: 'Expansão de fábrica',
+                      year: 2024,
+                      story: 'Ambev avalia nova linha de produção: investimento {{R$ 80M}}, fluxos de R$ 25M/ano por 6 anos. VPL a 10%: R$ 28.8M positivo. Aprovado — gera valor.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 28.8M', label: 'VPL do projeto' },
+                        { value: '10%', label: 'Taxa de desconto (WACC)' },
+                        { value: '6 anos', label: 'Horizonte dos fluxos' },
+                      ],
+                      insight: 'VPL > 0 não garante sucesso — garante que, SE os fluxos se confirmarem, o projeto {{gera valor}} acima do custo de capital.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'TIR na Prática',
+                    period: 'Comparação de retorno',
+                    text: 'Mesmo projeto da Ambev: TIR = {{18.7%}}. Como 18.7% > 10% (WACC), confirma que gera valor. Mas se outro projeto tem TIR de 25% com mesmo risco, priorize o de TIR maior.',
+                    caseStudy: {
+                      company: 'Startup vs Renda Fixa',
+                      year: 2024,
+                      story: 'Investir R$ 100k numa startup com TIR projetada de 35% ou num CDB de {{12%}}? A TIR maior justifica o risco maior — desde que a projeção seja confiável.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '18.7%', label: 'TIR do projeto Ambev' },
+                        { value: '> WACC', label: 'Condição para investir' },
+                        { value: 'Excel', label: 'Função TIR() calcula automaticamente' },
+                      ],
+                      insight: 'TIR alta com projeção {{otimista}} = risco. Sempre faça cenários pessimista, base e otimista.',
+                    },
+                  },
+                ],
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada ferramenta responde uma pergunta diferente. Classifique.',
+              compare: {
+                columnHeaders: ['VPL', 'TIR', 'Payback'],
+                rows: [
+                  { label: 'Responde', values: ['Quanto agrega (R$)', 'Qual retorno (%)', 'Quando recupera'] },
+                  { label: 'Limitação', values: ['Depende da taxa', 'Projetos excludentes', 'Ignora pós-payback'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual ferramenta usar?',
+                zones: [
+                  { id: 'vpl', label: 'VPL' },
+                  { id: 'tir', label: 'TIR' },
+                  { id: 'pay', label: 'Payback' },
+                ],
+                items: [
+                  { id: 'val', label: '"Quanto esse projeto agrega em reais?"', correctZone: 'vpl', correctFeedback: 'Certo. Valor absoluto = VPL.', wrongFeedback: 'Valor em reais = VPL.' },
+                  { id: 'ret', label: '"Qual a taxa de retorno?"', correctZone: 'tir', correctFeedback: 'Certo. Percentual = TIR.', wrongFeedback: 'Taxa de retorno = TIR.' },
+                  { id: 'tmp', label: '"Quando recupero o investimento?"', correctZone: 'pay', correctFeedback: 'Certo. Tempo = Payback.', wrongFeedback: 'Tempo de recuperação = Payback.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'R$ 100 hoje ≠ R$ 100 amanhã. VPL traduz fluxos futuros em {{valor presente}}. TIR dá a taxa de retorno. Payback dá o tempo. Quando VPL e TIR divergem, priorize VPL.',
+              keyInsights: [
+                'VPL > 0 = investimento {{gera valor}} acima do custo de capital. Regra de ouro.',
+                'TIR > WACC = retorno supera o custo do dinheiro. Mas cuidado com projeções {{otimistas}}.',
+                'Payback ignora o que acontece depois. Projeto de payback longo pode ser o mais {{lucrativo}}.',
+              ],
+              nextChapterHint: 'Capítulo 3 · Indicadores Financeiros',
+              nextChapterBlurb: 'ROI, Liquidez e Endividamento — os números que todo gestor deve saber de cor.',
+            },
           },
           {
-            id: 'M2-2-nc1',
-            type: 'number-crunch',
-            title: 'Calculadora de Juros Compostos',
-            scenario: 'Veja o poder (ou o perigo) dos juros compostos. Calcule quanto um investimento rende — ou quanto uma dívida cresce — ao longo do tempo.',
-            inputs: [
-              { id: 'principal', label: 'Capital Inicial', defaultValue: 10000, unit: 'R$', min: 100, max: 10000000 },
-              { id: 'rate', label: 'Taxa de Juros Mensal', defaultValue: 1, unit: '%', min: 0.1, max: 20 },
-              { id: 'months', label: 'Prazo', defaultValue: 24, unit: 'meses', min: 1, max: 360 },
+            id: 'M2-2-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Indicadores Financeiros',
+            subtitle: 'ROI, Liquidez e Endividamento — os 3 números que todo gestor precisa saber',
+            opening: {
+              leadText: 'Indicadores financeiros traduzem demonstrações contábeis em {{decisões}}. Não adianta ter balanço e DRE se ninguém lê. ROI, liquidez e endividamento são os indicadores mínimos que todo gestor deve monitorar.',
+            },
+            body: [
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'ROI — Retorno sobre Investimento',
+                    period: 'O básico dos básicos',
+                    text: 'Fórmula: ROI = (Ganho - Custo) / Custo × 100. Mede o {{retorno percentual}} de qualquer investimento. ROI de 50% = para cada R$ 1 investido, voltaram R$ 1,50.',
+                    caseStudy: {
+                      company: 'Marketing Digital',
+                      year: 2024,
+                      story: 'Campanha Google Ads: investiu {{R$ 10.000}}, gerou R$ 35.000 em vendas. ROI = (35k - 10k) / 10k = {{250%}}. Para cada R$ 1, voltaram R$ 3,50. Campanha excelente.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '250%', label: 'ROI da campanha' },
+                        { value: 'R$ 3,50', label: 'Retorno por R$ 1 investido' },
+                        { value: 'Universal', label: 'Funciona para qualquer investimento' },
+                      ],
+                      insight: 'ROI não considera {{tempo}}. ROI de 100% em 1 mês é melhor que 100% em 5 anos. Compare sempre no mesmo horizonte.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Liquidez Corrente',
+                    period: 'Capacidade de pagar',
+                    text: 'Fórmula: Ativo Circulante / Passivo Circulante. Mede se a empresa consegue pagar suas dívidas de {{curto prazo}}. Acima de 1 = saudável. Abaixo de 1 = alerta.',
+                    caseStudy: {
+                      company: 'Varejo brasileiro',
+                      year: 2023,
+                      story: 'Liquidez média do varejo BR: {{1.2}}. Magazine Luiza em crise (2022): liquidez caiu para 0.95 — cada R$ 1 de dívida tinha apenas R$ 0,95 em caixa. Reestruturou e voltou a 1.1.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '> 1.0', label: 'Saudável' },
+                        { value: '< 1.0', label: 'Alerta' },
+                        { value: '< 0.5', label: 'Emergência' },
+                      ],
+                      insight: 'Liquidez muito alta (> 3.0) pode significar dinheiro {{parado}} que deveria estar investido. O ótimo é entre 1.2 e 2.0.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Endividamento',
+                    period: 'Quanto é de terceiros',
+                    text: 'Fórmula: Passivo Total / Ativo Total × 100. Quanto do ativo é financiado por {{dívida de terceiros}}. Acima de 70% = risco elevado. Acima de 90% = zona de perigo.',
+                    caseStudy: {
+                      company: 'Americanas',
+                      year: 2023,
+                      story: 'Endividamento real (após fraude descoberta): acima de {{100%}} — devia mais do que tinha. Passivo de R$ 42 bilhões contra ativo de R$ 22 bilhões. Insolvência técnica.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '< 50%', label: 'Confortável' },
+                        { value: '50-70%', label: 'Atenção' },
+                        { value: '> 70%', label: 'Risco elevado' },
+                      ],
+                      insight: 'Dívida não é ruim por si. Dívida que gera retorno acima dos juros é {{alavancagem}}. Dívida que não gera retorno é armadilha.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Outros indicadores essenciais',
+                pillars: [
+                  { icon: '📊', title: 'EBITDA', description: 'Lucro antes de juros, impostos, depreciação e amortização. Mede geração de caixa {{operacional}}. Usado em valuation.', metric: { value: 'Operacional', label: 'puro' } },
+                  { icon: '🔄', title: 'Giro do Ativo', description: 'Receita / Ativo Total. Quantas vezes o ativo "gira" em receita por ano. Mede {{eficiência}} no uso dos recursos.' },
+                  { icon: '💰', title: 'Margem EBITDA', description: 'EBITDA / Receita. Rentabilidade operacional sem distorções contábeis. Ambev: ~35%. Varejo: {{~8%}}.', metric: { value: '> 15%', label: 'bom' } },
+                  { icon: '⏱️', title: 'Ciclo Financeiro', description: 'Prazo médio estoque + prazo recebimento - prazo pagamento. Quantos dias a empresa financia a {{operação}} com capital próprio.' },
+                ],
+              },
             ],
-            formula: 'principal * Math.pow(1 + rate/100, months)',
-            resultLabel: 'Montante Final',
-            interpretation: [
-              { max: 15000, label: 'Crescimento moderado — rendimento conservador, típico de renda fixa', color: 'green' },
-              { max: 50000, label: 'Crescimento significativo — efeito dos juros compostos já é visível. Se for dívida, atenção!', color: 'amber' },
-              { max: 999999999, label: 'Crescimento exponencial — se for investimento, ótimo. Se for dívida, é uma bola de neve perigosa', color: 'red' },
-            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada indicador responde uma pergunta diferente. Classifique.',
+              compare: {
+                columnHeaders: ['ROI', 'Liquidez', 'Endividamento'],
+                rows: [
+                  { label: 'Pergunta', values: ['Valeu investir?', 'Consigo pagar?', 'Quanto devo?'] },
+                  { label: 'Ideal', values: ['Quanto maior melhor', '1.2 a 2.0', 'Abaixo de 50%'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual indicador responde cada pergunta?',
+                zones: [
+                  { id: 'roi', label: 'ROI' },
+                  { id: 'liq', label: 'Liquidez' },
+                  { id: 'end', label: 'Endividamento' },
+                ],
+                items: [
+                  { id: 'camp', label: '"A campanha de marketing valeu a pena?"', correctZone: 'roi', correctFeedback: 'Certo. Retorno do investimento = ROI.', wrongFeedback: 'Valeu investir = ROI.' },
+                  { id: 'pag', label: '"Consigo pagar o fornecedor este mês?"', correctZone: 'liq', correctFeedback: 'Certo. Capacidade de pagar curto prazo = liquidez.', wrongFeedback: 'Pagar dívida curta = liquidez.' },
+                  { id: 'div', label: '"Quanto do meu ativo é financiado por dívida?"', correctZone: 'end', correctFeedback: 'Certo. Proporção de dívida = endividamento.', wrongFeedback: 'Proporção de terceiros = endividamento.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'ROI mede {{retorno}}. Liquidez mede {{capacidade de pagar}}. Endividamento mede {{dependência de terceiros}}. Os 3 juntos dão o diagnóstico financeiro mínimo de qualquer empresa.',
+              keyInsights: [
+                'ROI não considera tempo. Compare ROI sempre no {{mesmo horizonte}}.',
+                'Liquidez muito alta (> 3.0) = dinheiro {{parado}}. Ótimo: 1.2 a 2.0.',
+                'Dívida que gera retorno acima dos juros é {{alavancagem}}. Abaixo, é armadilha.',
+              ],
+            },
           },
           {
             id: 'M2-2-s1',
             type: 'simulation',
             title: 'Simulador Juros Simples vs Compostos',
             simulationId: 'compound-interest',
-            description: 'Compare visualmente o crescimento de juros simples e compostos ao longo do tempo. Ajuste capital, taxa e prazo e veja a diferença acumular.',
-          },
-          {
-            id: 'M2-2-t2',
-            type: 'text',
-            title: 'Valor do Dinheiro no Tempo: VP, VF e Fluxos de Caixa',
-            body: 'O princípio mais importante da matemática financeira: R$ 1 hoje vale mais do que R$ 1 amanhã. Isso ocorre por três razões: inflação, custo de oportunidade e risco.\n\n**Valor Futuro (VF):**\nVF = VP × (1 + i)^n\nQuanto R$ 1.000 de hoje valerão daqui a 5 anos investidos a 10% ao ano?\nVF = 1.000 × (1,10)^5 = R$ 1.610,51\n\n**Valor Presente (VP):**\nVP = VF ÷ (1 + i)^n\nQuanto vale hoje uma promessa de R$ 10.000 daqui a 3 anos, se a taxa de desconto é 12%?\nVP = 10.000 ÷ (1,12)^3 = R$ 7.117,80\n— Ou seja: aceitar R$ 7.118 hoje é equivalente a receber R$ 10.000 em 3 anos a 12%.\n\n**VPL — Valor Presente Líquido:**\nSoma dos fluxos de caixa futuros trazidos a valor presente, menos o investimento inicial.\n— VPL > 0: o projeto gera valor acima do custo de capital → aceitar\n— VPL = 0: o projeto empata com o custo de capital → indiferente\n— VPL < 0: o projeto destrói valor → rejeitar\n\n**TIR — Taxa Interna de Retorno:**\nÉ a taxa de desconto que faz o VPL = 0. Se TIR > taxa mínima de atratividade (TMA), o projeto é viável.\n\n**Payback:**\n— Simples: em quantos períodos o investimento se paga (sem considerar valor do dinheiro)\n— Descontado: considera o valor do dinheiro no tempo (mais preciso)\n\nNa prática: Toda decisão de investimento — comprar equipamento, abrir filial, lançar produto — deve passar pelo filtro VPL + TIR + Payback. Investir sem calcular é apostar.\n\nExemplo: Investir R$ 50k em uma máquina que gera R$ 15k/ano por 5 anos. TMA = 15%. VPL = R$ 50.282 – R$ 50.000 = R$ 282 (marginal). A TIR é ~15.2%. O projeto empata — qualquer atraso ou custo adicional o inviabiliza.',
-          },
-          {
-            id: 'M2-2-c2',
-            type: 'concept',
-            term: 'Valor Presente Líquido (VPL)',
-            definition: 'Soma de todos os fluxos de caixa futuros de um projeto, trazidos a valor presente usando uma taxa de desconto, menos o investimento inicial. VPL > 0 significa que o projeto gera valor acima do custo de capital — aceitar. VPL < 0 significa que o projeto destrói valor — rejeitar. É o critério mais robusto para decisão de investimento.',
-            example: 'Investir R$ 100k em uma máquina que gera R$ 3k/mês por 5 anos. Taxa de desconto: 12% ao ano. VPL = R$ 34.860 (positivo). O projeto gera R$ 34.860 de valor ACIMA do que renderia aplicando os R$ 100k a 12% ao ano. Vale a pena.',
-            antiExample: 'Empreendedor que avalia projeto somando os fluxos futuros sem descontar: "R$ 3k × 60 meses = R$ 180k, investimento de R$ 100k, lucro de R$ 80k!" Errado. R$ 3k daqui a 5 anos não valem R$ 3k hoje. Sem desconto, todo projeto parece bom.',
-          },
-          {
-            id: 'M2-2-c3',
-            type: 'concept',
-            term: 'TIR — Taxa Interna de Retorno',
-            definition: 'É a taxa de desconto que faz o VPL de um projeto ser zero. Representa o retorno percentual que o projeto gera. Se TIR > TMA (Taxa Mínima de Atratividade, ou custo de capital), o projeto é viável. Se TIR < TMA, o dinheiro rende mais em outra aplicação.',
-            example: 'Projeto com investimento de R$ 50k e retorno de R$ 15k/ano por 5 anos tem TIR de ~15,2%. Se a TMA da empresa é 12% (Selic + prêmio de risco), o projeto é viável pois rende 3,2 pontos acima do mínimo aceitável.',
-            antiExample: 'Usar TIR isoladamente para comparar projetos de tamanhos diferentes. Projeto A: TIR de 25% sobre R$ 10k. Projeto B: TIR de 18% sobre R$ 500k. O projeto B gera muito mais valor absoluto (VPL maior), mesmo com TIR menor. TIR sem VPL engana.',
-          },
-          {
-            id: 'M2-2-nc2',
-            type: 'number-crunch',
-            title: 'Calculadora de Valor Presente',
-            scenario: 'Quanto vale HOJE uma quantia que você receberá no futuro? Descubra o valor presente de um fluxo futuro, descontado pela taxa de oportunidade.',
-            inputs: [
-              { id: 'future-value', label: 'Valor Futuro (quanto receberá)', defaultValue: 100000, unit: 'R$', min: 100, max: 100000000 },
-              { id: 'discount-rate', label: 'Taxa de Desconto Anual', defaultValue: 12, unit: '%', min: 1, max: 50 },
-              { id: 'years', label: 'Prazo', defaultValue: 3, unit: 'anos', min: 1, max: 30 },
-            ],
-            formula: 'future_value / Math.pow(1 + discount_rate/100, years)',
-            resultLabel: 'Valor Presente',
-            interpretation: [
-              { max: 30000, label: 'Valor presente muito menor que o futuro — taxa alta ou prazo longo corroem significativamente o valor. Negocie receber antes', color: 'red' },
-              { max: 70000, label: 'Desconto moderado — considere se compensa esperar ou se há alternativas com retorno melhor', color: 'amber' },
-              { max: 999999999, label: 'Valor presente próximo ao futuro — taxa baixa ou prazo curto. A espera tem custo pequeno', color: 'green' },
-            ],
-          },
-          {
-            id: 'M2-2-ex1',
-            type: 'inline-exercise',
-            prompt: 'Analise um investimento real ou hipotético usando VPL e TIR. Determine se o projeto é viável financeiramente.',
-            context: 'VPL > 0 = projeto gera valor (aceitar). TIR > TMA = retorno supera o custo de capital (viável). Use TMA de 12% ao ano como referência (Selic + prêmio de risco para PMEs).',
-            fields: [
-              {
-                id: 'investment',
-                label: 'Investimento inicial necessário',
-                placeholder: 'Ex: R$ 80.000 para compra de equipamento novo',
-              },
-              {
-                id: 'monthly-return',
-                label: 'Retorno mensal esperado',
-                placeholder: 'Ex: R$ 5.000/mês de economia operacional + R$ 3.000/mês de receita adicional = R$ 8.000/mês',
-              },
-              {
-                id: 'period',
-                label: 'Prazo de retorno e vida útil do investimento',
-                placeholder: 'Ex: Vida útil de 5 anos (60 meses). Payback simples: 80.000 ÷ 8.000 = 10 meses',
-              },
-              {
-                id: 'decision',
-                label: 'Decisão: o investimento é viável? Por quê?',
-                placeholder: 'Ex: VPL estimado = R$ 278k (positivo). TIR estimada = ~115% ao ano, muito acima da TMA de 12%. Investimento claramente viável — payback rápido e retorno expressivo.',
-                multiline: true,
-              },
-            ],
-            evaluationCriteria: [
-              'Investimento e retorno são quantificados com valores específicos',
-              'Considerou o valor do dinheiro no tempo (não apenas soma simples)',
-              'Comparou TIR com uma TMA de referência',
-              'A decisão é coerente com os números apresentados',
-            ],
-            expectedConcepts: ['VPL', 'TIR', 'TMA', 'payback', 'valor do dinheiro no tempo'],
-          },
-          {
-            id: 'M2-2-t3',
-            type: 'text',
-            title: 'Indicadores Financeiros: ROI, Liquidez e Endividamento',
-            body: 'Indicadores financeiros transformam dados contábeis em inteligência decisória. Sem eles, balanço e DRE são apenas números — com eles, revelam a saúde do negócio.\n\n**Indicadores de Rentabilidade:**\n\n**ROI** (Retorno sobre Investimento) = (Ganho – Custo) ÷ Custo × 100\n— ROI de 30% significa: para cada R$ 1 investido, retornou R$ 1,30\n— Serve para comparar projetos: qual gera mais retorno por real investido?\n\n**ROE** (Retorno sobre Patrimônio) = Lucro Líquido ÷ Patrimônio Líquido\n— Mede quanto os donos ganham sobre o capital investido\n— ROE > Custo de Capital = empresa gera valor para acionistas\n\n**ROIC** (Retorno sobre Capital Investido) = NOPAT ÷ Capital Investido\n— Mede a eficiência do capital total (próprio + terceiros)\n\n**Indicadores de Liquidez:**\n\n**Liquidez Corrente** = Ativo Circulante ÷ Passivo Circulante\n— > 1.0: empresa cobre obrigações de curto prazo\n— < 1.0: alerta — pode faltar caixa para pagar contas\n\n**Liquidez Seca** = (Ativo Circulante – Estoque) ÷ Passivo Circulante\n— Exclui estoque (que pode não ser vendido rapidamente)\n\n**Indicadores de Endividamento:**\n\n**Grau de Endividamento** = Passivo Total ÷ Ativo Total\n— Mede quanto do ativo é financiado por dívida\n— Indústria: até 0.6 é aceitável | Serviços: até 0.5\n\n**Cobertura de Juros** = EBITDA ÷ Despesas Financeiras\n— < 1.5: empresa mal cobre os juros → risco alto\n— > 3.0: confortável\n\nPergunta-chave: Qual é o ROI do seu principal produto/serviço? Se você não sabe, está operando no escuro.\n\nDica: Analise indicadores em conjunto, nunca isolados. Uma empresa com ROI alto mas liquidez baixa pode ser lucrativa e quebrar por falta de caixa.',
-          },
-          {
-            id: 'M2-2-c4',
-            type: 'concept',
-            term: 'ROI — Retorno sobre Investimento',
-            definition: 'Mede quanto cada real investido gerou de retorno. Fórmula: ROI = (Ganho – Custo) ÷ Custo × 100. ROI de 50% significa que para cada R$ 1 investido, retornou R$ 1,50. Serve para comparar projetos, campanhas, equipamentos — qualquer alocação de capital.',
-            example: 'Campanha de marketing digital custou R$ 10.000 e gerou R$ 35.000 em vendas (com margem de 40% = R$ 14.000 de lucro). ROI = (14.000 – 10.000) ÷ 10.000 = 40%. Cada real investido em marketing retornou R$ 1,40.',
-            antiExample: 'Calcular ROI usando faturamento bruto ao invés de lucro: "Investi R$ 10k e faturei R$ 35k, ROI de 250%!" Errado. Se o custo do produto vendido foi R$ 21k, o lucro foi R$ 14k — o ROI real é 40%, não 250%. Faturamento não é ganho.',
-          },
-          {
-            id: 'M2-2-nc3',
-            type: 'number-crunch',
-            title: 'Calculadora de ROI',
-            scenario: 'Calcule o retorno sobre investimento de qualquer projeto, campanha ou aquisição. Compare o resultado com o custo de capital para saber se valeu a pena.',
-            inputs: [
-              { id: 'investment-cost', label: 'Valor Investido', defaultValue: 10000, unit: 'R$', min: 100, max: 10000000 },
-              { id: 'gross-return', label: 'Retorno Bruto Gerado', defaultValue: 35000, unit: 'R$', min: 0, max: 100000000 },
-              { id: 'cost-of-return', label: 'Custo para Gerar o Retorno (CMV, operação)', defaultValue: 21000, unit: 'R$', min: 0, max: 100000000 },
-            ],
-            formula: '((gross_return - cost_of_return) - investment_cost) / investment_cost * 100',
-            resultLabel: 'ROI (%)',
-            interpretation: [
-              { max: 0, label: 'ROI negativo — o investimento deu prejuízo. Reavalie a estratégia antes de reinvestir', color: 'red' },
-              { max: 30, label: 'ROI positivo mas modesto — lucrativo, mas verifique se supera o custo de oportunidade (Selic, outros projetos)', color: 'amber' },
-              { max: 10000, label: 'ROI forte — investimento gerou retorno expressivo. Considere escalar se for replicável', color: 'green' },
-            ],
-          },
-          {
-            id: 'M2-2-nc4',
-            type: 'number-crunch',
-            title: 'Calculadora de Liquidez Corrente',
-            scenario: 'Verifique se sua empresa consegue pagar as obrigações de curto prazo. A liquidez corrente é o primeiro indicador que um banco ou investidor analisa.',
-            inputs: [
-              { id: 'current-assets', label: 'Ativo Circulante (caixa + recebíveis + estoque)', defaultValue: 300000, unit: 'R$', min: 0, max: 100000000 },
-              { id: 'current-liabilities', label: 'Passivo Circulante (fornecedores + salários + dívidas curto prazo)', defaultValue: 200000, unit: 'R$', min: 1000, max: 100000000 },
-            ],
-            formula: 'current_assets / current_liabilities',
-            resultLabel: 'Índice de Liquidez Corrente',
-            interpretation: [
-              { max: 0.8, label: 'Liquidez crítica — empresa não cobre obrigações de curto prazo. Risco de inadimplência iminente', color: 'red' },
-              { max: 1.2, label: 'Liquidez apertada — cobre as contas, mas sem folga. Qualquer imprevisto vira crise', color: 'amber' },
-              { max: 100, label: 'Liquidez saudável — empresa tem folga para cobrir obrigações e absorver imprevistos', color: 'green' },
-            ],
+            description: 'Compare juros simples e compostos lado a lado com seus números.',
           },
           {
             id: 'M2-2-s2',
             type: 'simulation',
             title: 'Quiz de Indicadores Financeiros — Calcule e Interprete',
             simulationId: 'financial-indicators',
-            description: 'Receba cenários financeiros reais e calcule ROI, margens, liquidez e endividamento. Teste seu domínio dos números que importam.',
+            description: 'Calcule ROI, liquidez e endividamento com dados reais de empresas.',
           },
         ],
       },
+
     ],
   },
   {
