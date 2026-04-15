@@ -5601,168 +5601,428 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Analise Estatistica',
         blocks: [
           {
-            id: 'M4-2-t1',
-            type: 'text',
-            title: 'Estatística — A Ciência de Tomar Decisões sob Incerteza',
-            body: 'Estatística não é sobre números. É sobre decisões. Todo número é um resumo imperfeito da realidade — e a estatística ensina a lidar com essa imperfeição.\n\n**Duas grandes áreas:**\n\n**Estatística Descritiva** — "O que aconteceu?"\nResume dados em medidas compreensíveis: média, mediana, moda, desvio padrão, quartis.\nExemplo: "A receita média mensal é R$ 1.2M, com desvio padrão de R$ 300K."\n\n**Estatística Inferencial** — "O que podemos concluir?"\nUsa amostras para fazer afirmações sobre populações.\nExemplo: "Com 95% de confiança, a satisfação dos clientes está entre 7.2 e 8.1."\n\n**Por que gestores erram com estatística:**\n1. Confundem média com realidade → A média salarial é R$ 5.000, mas metade ganha menos de R$ 3.000 (distribuição assimétrica)\n2. Ignoram dispersão → "Vendas médias de R$ 100K" pode significar R$ 99K-101K (estável) ou R$ 20K-180K (caótico)\n3. Confundem correlação com causalidade → Vendas de sorvete e afogamentos são correlacionados (ambos sobem no verão), mas sorvete não causa afogamento\n4. Usam amostras pequenas para conclusões grandes → "3 clientes reclamaram" não significa nada estatisticamente\n5. Ignoram viés de seleção → Pesquisa de satisfação com quem já comprou ignora quem nem considerou comprar',
-          },
-          {
-            id: 'M4-2-t2',
-            type: 'text',
-            title: 'Medidas de Tendência Central e Dispersão — O Básico que Muda Tudo',
-            body: '**Medidas de Tendência Central — "Onde está o centro?"**\n\n**Média Aritmética** = soma / n\nUso: Quando os dados são simétricos e sem outliers\nArmadilha: Sensível a extremos. Salário médio de (R$ 2K, R$ 3K, R$ 3K, R$ 4K, R$ 100K) = R$ 22.4K. Ninguém na sala ganha isso.\n\n**Mediana** = valor do meio quando os dados estão ordenados\nUso: Quando há outliers ou distribuição assimétrica\nExemplo: Mediana dos salários acima = R$ 3K. Muito mais representativo.\nRegra: Se média ≠ mediana → distribuição é assimétrica. Use mediana.\n\n**Moda** = valor mais frequente\nUso: Dados categóricos (produto mais vendido, horário de pico)\n\n**Medidas de Dispersão — "Quanto os dados variam?"**\n\n**Amplitude** = máximo - mínimo\nUso rápido, mas ignora distribuição interna.\n\n**Variância** = média dos quadrados dos desvios\nSó útil matematicamente — unidade é ao quadrado (R$²).\n\n**Desvio Padrão (σ)** = raiz da variância\nA medida mais usada. Mesma unidade dos dados.\nInterpretação: ~68% dos dados estão entre μ-σ e μ+σ (distribuição normal)\n\nExemplo prático:\nReceita mensal: média R$ 120K, desvio padrão R$ 30K\n→ Em ~68% dos meses, receita ficou entre R$ 90K e R$ 150K\n→ Em ~95% dos meses, entre R$ 60K e R$ 180K\n→ Se em um mês a receita foi R$ 40K → evento atípico (investigar!)\n\n**Coeficiente de Variação (CV)** = σ/μ × 100%\nPermite comparar dispersão de variáveis diferentes.\nExemplo: Empresa A (média R$ 500K, CV = 10%) é mais estável que Empresa B (média R$ 2M, CV = 45%), mesmo faturando menos.',
-          },
-          {
-            id: 'M4-stat-concept1',
-            type: 'concept',
-            term: 'Média vs Mediana',
-            definition: 'A média é sensível a extremos (outliers). A mediana é o valor do meio e resiste a distorções. Se média ≠ mediana, a distribuição é assimétrica — use mediana.',
-            example: 'Salários de uma equipe: R$ 2K, R$ 3K, R$ 3K, R$ 4K, R$ 100K. Média = R$ 22.4K (ninguém ganha isso). Mediana = R$ 3K (muito mais representativo).',
-            antiExample: '"Nosso cliente médio gasta R$ 500/mês" pode esconder que 80% gastam R$ 100 e 20% gastam R$ 2.000. A média mente quando a distribuição é assimétrica.',
-          },
-          {
-            id: 'M4-stat-number1',
-            type: 'number-crunch',
-            title: 'Coeficiente de Variação — Sua Receita é Estável ou Caótica?',
-            scenario: 'O desvio padrão mede variação, mas não permite comparar empresas de tamanhos diferentes. O Coeficiente de Variação (CV = σ/μ × 100%) resolve isso. CV > 30% = alta variabilidade.',
-            inputs: [
-              { id: 'media', label: 'Receita média mensal (R$)', defaultValue: 120000, unit: 'R$', min: 1000, max: 100000000 },
-              { id: 'desvio', label: 'Desvio padrão da receita (R$)', defaultValue: 30000, unit: 'R$', min: 0, max: 50000000 },
+            id: 'M4-2-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Fundamentos de Estatística',
+            subtitle: 'Média, dispersão e probabilidade — a base de toda decisão por dados',
+            opening: {
+              leadText: 'Estatística é a ciência de tomar decisões sob {{incerteza}}. Todo dado de negócio — vendas, churn, NPS, conversão — é estatística. Quem não domina o básico toma decisões por achismo disfarçado de análise.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Medidas de tendência central',
+                pillars: [
+                  { icon: '📊', title: 'Média', description: 'Soma ÷ quantidade. Útil mas {{sensível a outliers}}. Salário médio brasileiro parece alto porque poucos bilionários puxam pra cima.', metric: { value: 'Σx/n', label: 'fórmula' } },
+                  { icon: '📈', title: 'Mediana', description: 'Valor do meio quando ordenado. {{Imune a outliers}}. Mediana salarial é muito mais representativa que média.', metric: { value: '50º percentil', label: 'metade acima, metade abaixo' } },
+                  { icon: '🏆', title: 'Moda', description: 'Valor mais {{frequente}}. Útil em pesquisa de mercado: qual tamanho mais vendido? Qual preço mais escolhido?', metric: { value: 'Max freq', label: 'mais comum' } },
+                ],
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Medidas de dispersão',
+                pillars: [
+                  { icon: '↔️', title: 'Amplitude', description: 'Maior - menor valor. Simples mas {{ignora}} a distribuição no meio. Útil como primeira olhada.' },
+                  { icon: '📉', title: 'Desvio Padrão', description: 'Quanto os dados se afastam da média. Desvio padrão {{pequeno}} = dados concentrados. Grande = espalhados.', metric: { value: 'σ', label: 'símbolo' } },
+                  { icon: '📐', title: 'Variância', description: 'Desvio padrão ao quadrado. Usada em {{fórmulas}} estatísticas. Na prática, use desvio padrão (mais intuitivo).' },
+                  { icon: '📊', title: 'Coeficiente de Variação', description: 'Desvio padrão ÷ média × 100. Permite {{comparar}} dispersão entre datasets com unidades diferentes.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Probabilidade aplicada',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Probabilidade quantifica incerteza. Em negócios: qual a probabilidade de o cliente comprar? De o projeto atrasar? De a receita superar R$ 1M? Sem probabilidade, previsão é chute. Com probabilidade, previsão tem {{intervalo de confiança}}.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Distribuição Normal (curva de Gauss): a maioria dos fenômenos de negócio segue esse padrão — valores concentrados no centro, poucos nos extremos. {{68%}} dos dados ficam a 1 desvio padrão da média. 95% a 2 desvios. 99.7% a 3 desvios. Se um resultado está a 3+ desvios da média, é estatisticamente anômalo.',
+              },
             ],
-            formula: '(desvio / media) * 100',
-            resultLabel: 'Coeficiente de Variação (%)',
-            interpretation: [
-              { max: 15, label: 'Receita estável — previsibilidade alta. Bom para planejamento.', color: 'green' as const },
-              { max: 30, label: 'Variação moderada — investigue sazonalidade e fatores externos.', color: 'amber' as const },
-              { max: 1000, label: 'Alta variabilidade — receita imprevisível. Priorize reserva de caixa e diversificação.', color: 'red' as const },
-            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada medida serve a um propósito diferente. Classifique.',
+              compare: {
+                columnHeaders: ['Média', 'Mediana', 'Desvio Padrão'],
+                rows: [
+                  { label: 'Mede', values: ['Centro (sensível)', 'Centro (robusto)', 'Dispersão'] },
+                  { label: 'Usar quando', values: ['Dados simétricos', 'Outliers presentes', 'Comparar variação'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual medida usar?',
+                zones: [
+                  { id: 'med', label: 'Média' },
+                  { id: 'mdn', label: 'Mediana' },
+                  { id: 'dp', label: 'Desvio Padrão' },
+                ],
+                items: [
+                  { id: 'sal', label: 'Salário típico de uma empresa (CEO ganha 100x)', correctZone: 'mdn', correctFeedback: 'Certo. Outlier (CEO) distorce média. Mediana é robusta.', wrongFeedback: 'Com outlier grande, use mediana.' },
+                  { id: 'nota', label: 'Nota média da turma numa prova', correctZone: 'med', correctFeedback: 'Certo. Sem outliers extremos, média funciona.', wrongFeedback: 'Dados simétricos = média.' },
+                  { id: 'qual', label: 'Consistência de qualidade entre fábricas', correctZone: 'dp', correctFeedback: 'Certo. Dispersão mostra consistência.', wrongFeedback: 'Variação = desvio padrão.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Média mente quando tem outlier — use {{mediana}}. Desvio padrão mede consistência. Distribuição normal: 95% dos dados estão a 2 desvios da média. Fora disso, é {{anomalia}}.',
+              keyInsights: [
+                'Mediana salarial é mais honesta que média — poucos bilionários {{distorcem}} a média.',
+                'Desvio padrão pequeno = dados concentrados = processo {{consistente}}.',
+                'Distribuição Normal: {{68-95-99.7%}} a 1-2-3 desvios padrão. Regra de ouro da estatística.',
+              ],
+              nextChapterHint: 'Capítulo 2 · Regressão e Testes',
+              nextChapterBlurb: 'Previsão, correlação, teste A/B e como saber se um resultado é real.',
+            },
           },
           {
-            id: 'M4-2-t3',
-            type: 'text',
-            title: 'Probabilidade — Quantificando Incerteza para Decisão',
-            body: 'Probabilidade é a linguagem da incerteza. Todo risco empresarial é, no fundo, uma probabilidade.\n\n**Conceitos fundamentais:**\n\n**Probabilidade Simples:** P(A) = casos favoráveis / total de casos\nSe 30 de 100 clientes recompram → P(recompra) = 30% = 0.30\n\n**Probabilidade Condicional:** P(A|B) = probabilidade de A dado que B aconteceu\nP(recompra | atendimento excelente) = 65%\nP(recompra | atendimento ruim) = 8%\nIsso muda completamente a estratégia: investir em atendimento é investir em recompra.\n\n**Teorema de Bayes — Atualizar Crenças com Evidências:**\nP(H|E) = P(E|H) × P(H) / P(E)\n\nExemplo empresarial:\nVocê acha que um produto tem 20% de chance de sucesso (prior: P(H) = 0.20)\nUm teste de mercado positivo acontece em 80% dos produtos que dão certo (P(E|H) = 0.80)\nMas também acontece em 30% dos que falham (P(E|¬H) = 0.30)\n\nApós teste positivo:\nP(sucesso|teste positivo) = (0.80 × 0.20) / (0.80 × 0.20 + 0.30 × 0.80) = 0.16 / 0.40 = 40%\n\nO teste dobrou sua confiança de 20% para 40%. Mas ainda há 60% de chance de falha. Não é certeza.\n\n**Distribuição Normal — A Curva do Sino:**\nA maioria dos fenômenos naturais e de negócios segue (aproximadamente) uma distribuição normal:\n— 68% dentro de ±1σ\n— 95% dentro de ±2σ\n— 99.7% dentro de ±3σ\n\nAplicação direta em negócios:\n— Controle de qualidade: produto fora de 3σ → defeito\n— Gestão de risco: VaR (Value at Risk) usa percentis da distribuição\n— Meta de vendas: se média = R$ 100K e σ = R$ 20K, há 84% de chance de vender acima de R$ 80K',
+            id: 'M4-2-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Regressão, Hipóteses e Teste A/B',
+            subtitle: 'Prever, testar e provar — a estatística que separa dado de achismo',
+            opening: {
+              leadText: 'Regressão prevê o futuro baseada no passado. Testes de hipóteses provam se um resultado é real ou acaso. Teste A/B é o método científico do marketing. Juntos, transformam {{dados em decisões}} defensáveis.',
+            },
+            body: [
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Regressão Linear',
+                    period: 'Previsão',
+                    text: 'Encontra a relação entre variáveis: "quanto mais invisto em marketing, mais vendo?" A reta de regressão prevê Y a partir de X. O {{R²}} mede quanto da variação Y é explicada por X (0 a 1).',
+                    caseStudy: {
+                      company: 'E-commerce',
+                      year: 2024,
+                      story: 'Regressão: investimento em Google Ads × vendas. R² = {{0.82}} — 82% das vendas são explicadas pelo investimento em ads. Os outros 18% são sazonalidade, orgânico, marca.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R² = 0.82', label: '82% da variação explicada' },
+                        { value: 'Y = aX + b', label: 'Equação da reta' },
+                        { value: '18%', label: 'Outros fatores' },
+                      ],
+                      insight: 'R² alto não prova {{causalidade}} — prova correlação. Chuva e vendas de guarda-chuva correlacionam, mas chuva causa vendas (não o contrário).',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Teste de Hipóteses',
+                    period: 'Prova estatística',
+                    text: 'Pergunta: "o resultado é real ou pode ser acaso?" Hipótese nula (H0): não há efeito. Hipótese alternativa (H1): há efeito. Se p-valor < 0.05, rejeitamos H0 — resultado é {{estatisticamente significativo}}.',
+                    caseStudy: {
+                      company: 'Farmacêutica',
+                      year: 2024,
+                      story: 'Novo remédio reduz colesterol em {{15%}} vs placebo. p-valor = 0.003. Como p < 0.05, a diferença é real — não acaso. Se p-valor fosse 0.12, a diferença poderia ser coincidência.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'p < 0.05', label: 'Significativo' },
+                        { value: '0.003', label: 'p-valor do estudo' },
+                        { value: '95%', label: 'Nível de confiança' },
+                      ],
+                      insight: 'p-valor NÃO mede o tamanho do efeito — mede a probabilidade de o resultado ser {{acaso}}. Efeito pequeno pode ser significativo com amostra grande.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Teste A/B',
+                    period: 'Método científico do marketing',
+                    text: 'Duas versões (A e B), mesmas condições, público aleatório. Mede qual performa melhor com {{significância estatística}}. É o padrão ouro de decisão em marketing digital.',
+                    caseStudy: {
+                      company: 'Booking.com',
+                      year: 2023,
+                      story: 'Roda mais de {{1.000 testes A/B simultâneos}}. Cada botão, cor, texto, posição é testado. Resultado: conversão 25% maior que concorrentes que decidem por opinião.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '1.000+', label: 'Testes simultâneos (Booking)' },
+                        { value: '+25%', label: 'Conversão vs concorrentes' },
+                        { value: '95%', label: 'Confiança mínima' },
+                      ],
+                      insight: 'Teste A/B resolve o debate "eu acho que X é melhor" com dados. Opinião do CEO ≠ {{dado}}.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'Correlação ≠ Causalidade. Regressão mostra associação, não causa. Para provar causa: {{experimento controlado}} (teste A/B) ou análise contrafactual. Sem isso, é inferência — não prova.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada ferramenta estatística responde uma pergunta. Classifique.',
+              compare: {
+                columnHeaders: ['Regressão', 'Teste Hipótese', 'Teste A/B'],
+                rows: [
+                  { label: 'Pergunta', values: ['Qual a relação?', 'É real ou acaso?', 'A ou B é melhor?'] },
+                  { label: 'Output', values: ['Equação + R²', 'p-valor', 'Vencedor + confiança'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual ferramenta usar?',
+                zones: [
+                  { id: 'reg', label: 'Regressão' },
+                  { id: 'hip', label: 'Teste Hipótese' },
+                  { id: 'ab', label: 'Teste A/B' },
+                ],
+                items: [
+                  { id: 'prev', label: '"Se investir R$ 50k em ads, quanto vendo?"', correctZone: 'reg', correctFeedback: 'Certo. Prever Y a partir de X = regressão.', wrongFeedback: 'Previsão = regressão.' },
+                  { id: 'real', label: '"A diferença de 5% é real ou acaso?"', correctZone: 'hip', correctFeedback: 'Certo. Real vs acaso = teste de hipótese.', wrongFeedback: 'Significância = teste de hipótese.' },
+                  { id: 'btn', label: '"Botão verde ou azul converte mais?"', correctZone: 'ab', correctFeedback: 'Certo. Comparar versões = teste A/B.', wrongFeedback: 'Versão A vs B = teste A/B.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Regressão {{prevê}}. Teste de hipótese {{prova}}. Teste A/B {{compara}}. Sem essas 3 ferramentas, decisão por dados é ilusão.',
+              keyInsights: [
+                'R² = quanto da variação é explicada. R² de 0.82 = {{82%}} explicado.',
+                'p < 0.05 = resultado significativo. Mas p-valor não mede tamanho do {{efeito}}.',
+                'Booking.com: 1.000+ testes A/B simultâneos. Opinião do CEO ≠ {{dado}}.',
+              ],
+              nextChapterHint: 'Capítulo 3 · KPIs e Data Storytelling',
+              nextChapterBlurb: 'As métricas que o mercado mede, análise de cohort e como transformar números em decisões.',
+            },
+          },
+          {
+            id: 'M4-2-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'KPIs, Cohort e Data Storytelling',
+            subtitle: 'As métricas que importam e como transformar números em narrativa',
+            opening: {
+              leadText: 'KPIs (Key Performance Indicators) são as métricas que determinam se o negócio está {{saudável}}. Mas KPI sem interpretação é número morto. Data storytelling transforma dados em decisões — e cohort separa amadores de profissionais.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'KPIs essenciais por tipo de negócio',
+                pillars: [
+                  { icon: '🛒', title: 'E-commerce', description: 'CAC (Custo Aquisição Cliente), LTV (Lifetime Value), Taxa de Conversão, {{Ticket Médio}}, Churn.', metric: { value: 'LTV/CAC > 3', label: 'saudável' } },
+                  { icon: '📱', title: 'SaaS', description: 'MRR (Receita Recorrente), Churn Rate, NRR (Net Revenue Retention), {{CAC Payback}}, NPS.', metric: { value: 'NRR > 100%', label: 'crescendo' } },
+                  { icon: '🏪', title: 'Varejo Físico', description: 'Vendas/m², Ticket Médio, Giro de Estoque, {{Conversão}} (visitantes → compradores).', metric: { value: 'Giro > 12', label: 'estoque saudável' } },
+                  { icon: '🏭', title: 'Indústria', description: 'OEE (Eficiência Equipamentos), Lead Time, Taxa de Defeito, {{Custo Unitário}}.', metric: { value: 'OEE > 85%', label: 'world-class' } },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Análise de Cohort — a métrica que separa amadores de profissionais',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Cohort agrupa usuários pelo momento em que chegaram e acompanha o comportamento ao longo do tempo. Em vez de "30% dos clientes cancelaram", cohort mostra: "clientes de janeiro cancelaram {{15%}} no mês 3, clientes de março cancelaram 25%." A diferença revela o que mudou entre janeiro e março — e onde agir.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Sem cohort, você vê média. Com cohort, vê {{tendência por grupo}}. É a diferença entre "o barco está afundando" e "há um furo no lado esquerdo que apareceu em março".',
+              },
+              {
+                kind: 'heading',
+                text: 'Data Storytelling — de número a decisão',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Dados sem narrativa não geram ação. Data storytelling combina 3 elementos: {{Dados}} (o que aconteceu), {{Visual}} (gráfico que mostra o padrão) e {{Narrativa}} (o que significa e o que fazer). O erro mais comum: apresentar 30 gráficos sem dizer o que significam. O acerto: 1 gráfico com 1 insight e 1 recomendação.',
+              },
+              {
+                kind: 'step-flow',
+                title: 'Framework de Data Storytelling',
+                steps: [
+                  { number: 1, title: 'Contexto', description: 'O que o público precisa saber? Qual a {{pergunta}} que estamos respondendo?' },
+                  { number: 2, title: 'Dado', description: 'Qual o número-chave? Não 30 métricas — {{1 ou 2}} que respondem a pergunta.' },
+                  { number: 3, title: 'Visual', description: 'Qual gráfico mostra o padrão? Barra para comparar, linha para tendência, pizza {{nunca}} (quase sempre ruim).' },
+                  { number: 4, title: 'Insight', description: 'O que o dado {{significa}}? "Churn subiu 5%" não é insight. "Churn subiu 5% porque o onboarding mudou em março" é.' },
+                  { number: 5, title: 'Recomendação', description: 'O que {{fazer}} com isso? "Reverter onboarding ao modelo anterior e medir por 30 dias."' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Pesquisa de mercado',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Pesquisa quantitativa responde "{{quanto}}?" (amostra grande, questionário). Qualitativa responde "{{por quê}}?" (amostra pequena, entrevista profunda). Vieses a evitar: pergunta indutora ("você não acha que X é bom?"), amostra enviesada (pesquisar só quem já é cliente), e viés de sobrevivência (analisar só empresas que deram certo).',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada métrica conta uma história diferente. Classifique por tipo de negócio.',
+              compare: {
+                columnHeaders: ['SaaS', 'E-commerce', 'Varejo Físico'],
+                rows: [
+                  { label: 'KPI #1', values: ['MRR', 'Conversão', 'Vendas/m²'] },
+                  { label: 'Saúde', values: ['NRR > 100%', 'LTV/CAC > 3', 'Giro > 12'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual KPI para cada situação?',
+                zones: [
+                  { id: 'cac', label: 'CAC' },
+                  { id: 'churn', label: 'Churn' },
+                  { id: 'nps', label: 'NPS' },
+                ],
+                items: [
+                  { id: 'custo', label: '"Quanto custa trazer 1 cliente novo?"', correctZone: 'cac', correctFeedback: 'Certo. Custo de aquisição = CAC.', wrongFeedback: 'Custo por cliente = CAC.' },
+                  { id: 'saem', label: '"Quantos clientes cancelaram este mês?"', correctZone: 'churn', correctFeedback: 'Certo. Taxa de cancelamento = Churn.', wrongFeedback: 'Cancelamento = Churn.' },
+                  { id: 'rec', label: '"O cliente recomendaria a empresa?"', correctZone: 'nps', correctFeedback: 'Certo. Recomendação = NPS.', wrongFeedback: 'Satisfação/recomendação = NPS.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'KPIs sem interpretação são números mortos. Cohort revela {{tendências}} que a média esconde. Data storytelling transforma dado em ação: contexto → dado → visual → insight → recomendação.',
+              keyInsights: [
+                'LTV/CAC > 3 = negócio saudável. Abaixo de 1 = cada cliente dá {{prejuízo}}.',
+                'Cohort: não é "30% cancelaram". É "clientes de janeiro cancelaram 15%, março {{25%}}." A diferença é o insight.',
+                'Data storytelling: 1 gráfico + 1 insight + 1 recomendação > 30 gráficos sem {{contexto}}.',
+              ],
+              nextChapterHint: 'Capítulo 4 · Análise Preditiva e Ferramentas',
+              nextChapterBlurb: 'Machine learning para negócios e o kit de sobrevivência em Excel/Sheets.',
+            },
+          },
+          {
+            id: 'M4-2-cap4',
+            type: 'chapter',
+            number: 4,
+            title: 'Análise Preditiva e Ferramentas',
+            subtitle: 'Machine learning para negócios e Excel como kit de sobrevivência',
+            opening: {
+              leadText: 'Análise preditiva usa dados históricos para prever o futuro. {{Machine learning}} automatiza esse processo — encontra padrões que humanos não veem. Mas a ferramenta mais usada no mundo ainda é o Excel.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Tipos de Machine Learning aplicado a negócios',
+                pillars: [
+                  { icon: '📈', title: 'Regressão', description: 'Prever um {{número}}: receita do próximo mês, preço de ação, demanda de produto. Usa dados históricos para projetar futuro.' },
+                  { icon: '🏷️', title: 'Classificação', description: 'Categorizar: cliente vai {{cancelar}} ou não? E-mail é spam ou não? Lead é quente ou frio? Sim/Não baseado em padrões.' },
+                  { icon: '👥', title: 'Clustering', description: 'Agrupar sem rótulo prévio: quais {{segmentos}} de clientes existem? Descobre grupos que não eram óbvios.' },
+                  { icon: '🔮', title: 'Séries Temporais', description: 'Prever valores ao longo do {{tempo}}: vendas semanais, sazonalidade, tendência. Específico para dados cronológicos.' },
+                ],
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'ML de Churn',
+                    period: 'Classificação',
+                    text: 'Modelo prevê quais clientes vão cancelar nos próximos 30 dias. Variáveis: frequência de uso, reclamações, tempo desde última compra, {{padrão de pagamento}}. Permite ação preventiva.',
+                    caseStudy: {
+                      company: 'Spotify',
+                      year: 2023,
+                      story: 'Modelo de churn identifica usuários em risco {{14 dias antes}} do cancelamento. Dispara playlist personalizada + oferta de desconto. Reduziu churn em 25%.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '14 dias', label: 'Antecedência da predição' },
+                        { value: '-25%', label: 'Redução de churn' },
+                        { value: 'Automático', label: 'Ação preventiva' },
+                      ],
+                      insight: 'ML de churn não substitui bom produto — {{complementa}}. Se o produto é ruim, prever cancelamento não adianta.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'ML de Recomendação',
+                    period: 'Personalização',
+                    text: 'Modelo sugere produtos/conteúdo baseado em comportamento: "quem comprou X também comprou Y." Amazon: {{35%}} das vendas vêm de recomendações algorítmicas.',
+                    caseStudy: {
+                      company: 'Netflix',
+                      year: 2023,
+                      story: 'O algoritmo de recomendação economiza {{US$ 1 bilhão/ano}} em retenção. Sem recomendação personalizada, usuários não encontram o que assistir e cancelam.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '$1B/ano', label: 'Economia Netflix' },
+                        { value: '35%', label: 'Vendas Amazon por recomendação' },
+                        { value: '80%', label: 'Conteúdo Netflix assistido via recomendação' },
+                      ],
+                      insight: 'Recomendação é o maior caso de ROI de ML no mundo. {{Personalização}} em escala = vantagem competitiva.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Excel/Sheets — o kit de sobrevivência',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Apesar do hype de IA e ML, a ferramenta mais usada para análise de dados no mundo ainda é o {{Excel/Google Sheets}}. Dominar o básico resolve 80% dos problemas analíticos de uma PME.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Funções essenciais do Excel para gestores',
+                pillars: [
+                  { icon: '📊', title: 'PROCV / XLOOKUP', description: 'Cruzar dados entre tabelas. "Qual o faturamento do {{cliente X}}?" Busca em outra planilha e retorna valor.' },
+                  { icon: '📈', title: 'Tabela Dinâmica', description: 'Resumir milhares de linhas em {{painel}} interativo. Arrastar campos, filtrar, agrupar. A ferramenta mais poderosa do Excel.' },
+                  { icon: '🔢', title: 'SE / SOMASE / CONT.SE', description: 'Lógica condicional: "se vendas > meta, {{verde}}; senão, vermelho." Contar quantos clientes atendem critério.' },
+                  { icon: '📉', title: 'Gráficos', description: 'Barra para comparar, linha para tendência, dispersão para correlação. {{Pizza nunca}} (quase sempre ruim).' },
+                ],
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada tipo de ML resolve um tipo de problema. Classifique.',
+              compare: {
+                columnHeaders: ['Regressão', 'Classificação', 'Clustering'],
+                rows: [
+                  { label: 'Output', values: ['Número', 'Sim/Não', 'Grupos'] },
+                  { label: 'Exemplo', values: ['Receita prevista', 'Vai cancelar?', 'Segmentos'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual tipo de ML?',
+                zones: [
+                  { id: 'reg', label: 'Regressão' },
+                  { id: 'cls', label: 'Classificação' },
+                  { id: 'clu', label: 'Clustering' },
+                ],
+                items: [
+                  { id: 'rec', label: '"Quanto vamos faturar no próximo trimestre?"', correctZone: 'reg', correctFeedback: 'Certo. Prever número = regressão.', wrongFeedback: 'Prever valor = regressão.' },
+                  { id: 'spam', label: '"Este e-mail é spam?"', correctZone: 'cls', correctFeedback: 'Certo. Sim/Não = classificação.', wrongFeedback: 'Categorizar = classificação.' },
+                  { id: 'seg', label: '"Quais grupos de clientes temos?"', correctZone: 'clu', correctFeedback: 'Certo. Descobrir grupos = clustering.', wrongFeedback: 'Agrupar sem rótulo = clustering.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'ML não é mágica — é {{estatística automatizada}}. Regressão prevê números, classificação categoriza, clustering agrupa. E o Excel resolve 80% dos problemas analíticos de uma PME.',
+              keyInsights: [
+                'Spotify: ML de churn prevê cancelamento {{14 dias}} antes. Ação preventiva reduz 25%.',
+                'Netflix: recomendação economiza {{$1B/ano}} em retenção. 80% do conteúdo assistido via algoritmo.',
+                'Excel: PROCV + Tabela Dinâmica + SE resolvem {{80%}} dos problemas analíticos de PME.',
+              ],
+            },
           },
           {
             id: 'M4-2-s1',
             type: 'simulation',
             title: 'Análise de Dados — Interprete os Números',
             simulationId: 'data-interpretation',
-            description: 'Receba conjuntos de dados reais de empresas. Calcule média, mediana, desvio padrão e coeficiente de variação. Interprete o que os números significam para a decisão de negócio.',
-          },
-          {
-            id: 'M4-2-t4',
-            type: 'text',
-            title: 'Regressão e Correlação — Previsão Baseada em Dados',
-            body: 'Regressão é a ferramenta que permite prever uma variável a partir de outra(s). É a base de toda previsão em negócios.\n\n**Correlação (r) — Medida de associação:**\nr varia de -1 a +1\n— r = +1: correlação positiva perfeita (X sobe, Y sobe proporcionalmente)\n— r = -1: correlação negativa perfeita (X sobe, Y desce proporcionalmente)\n— r = 0: nenhuma correlação linear\n— |r| > 0.7: correlação forte\n— |r| 0.4-0.7: correlação moderada\n— |r| < 0.4: correlação fraca\n\nALERTA CRÍTICO: Correlação ≠ Causalidade\n— Venda de guarda-chuvas e acidentes de trânsito são correlacionados (r ≈ 0.7)\n— Guarda-chuvas não causam acidentes. A variável oculta é a chuva.\n\n**Regressão Linear Simples:**\nY = a + bX\nOnde:\n— Y = variável que queremos prever (vendas, receita, demanda)\n— X = variável explicativa (preço, investimento em marketing, temperatura)\n— b = coeficiente angular (para cada unidade que X muda, Y muda b unidades)\n— a = intercepto (valor de Y quando X = 0)\n\nExemplo:\nVendas = 5.000 + 3.2 × Investimento em Marketing (R$ mil)\nSe investirmos R$ 100K em marketing: Vendas = 5.000 + 320 = R$ 325K\n\n**R² — Coeficiente de Determinação:**\n"Quanto da variação de Y é explicada por X?"\nR² = 0.85 → 85% da variação nas vendas é explicada pelo investimento em marketing\nR² = 0.30 → apenas 30% — outros fatores são mais importantes\n\n**Regressão Múltipla:**\nY = a + b₁X₁ + b₂X₂ + b₃X₃\nExemplo:\nVendas = 2.000 + 2.8×Marketing + 1.5×Equipe - 0.3×Preço\n→ Cada R$ 1K em marketing gera R$ 2.8K em vendas\n→ Cada vendedor adicional gera R$ 1.5K\n→ Cada R$ 1 de aumento no preço reduz vendas em R$ 300\n\n**Na prática — Como usar no Excel/Sheets:**\n1. Organize dados em colunas (X e Y)\n2. Insira gráfico de dispersão\n3. Adicione linha de tendência (trendline)\n4. Marque "exibir equação" e "R²"\n5. Se R² > 0.6, o modelo tem poder preditivo razoável',
-          },
-          {
-            id: 'M4-2-t5',
-            type: 'text',
-            title: 'Testes de Hipóteses — Como Saber se um Resultado é Real',
-            body: 'Teste de hipótese é a ferramenta que responde: "Esse resultado é estatisticamente significativo ou pode ser acaso?"\n\n**O Framework:**\n\n1. Hipótese Nula (H₀): "Não há diferença/efeito"\n— H₀: A campanha de marketing NÃO aumentou as vendas\n\n2. Hipótese Alternativa (H₁): "Há diferença/efeito"\n— H₁: A campanha de marketing AUMENTOU as vendas\n\n3. Defina o nível de significância (α)\n— α = 0.05 (5%) é o padrão — aceita 5% de chance de erro\n— α = 0.01 (1%) para decisões críticas\n\n4. Calcule o p-valor\n— p < α → Rejeita H₀ → O resultado é estatisticamente significativo\n— p ≥ α → Não rejeita H₀ → Não há evidência suficiente\n\n**Exemplo prático — Teste A/B em E-commerce:**\nVersão A do site (atual): taxa de conversão = 3.2% (n = 5.000 visitantes)\nVersão B (novo layout): taxa de conversão = 3.8% (n = 5.000 visitantes)\n\nH₀: Não há diferença entre A e B\nH₁: B é melhor que A\n\nTeste Z → p-valor = 0.03\nComo 0.03 < 0.05 → Rejeitamos H₀ → B é significativamente melhor.\n\n**Erros que gestores cometem:**\n\n— Erro Tipo I (Falso Positivo): Concluir que há efeito quando não há\n"A campanha funcionou!" → Na verdade, foi coincidência sazonal\nControle: Use α baixo (0.05 ou 0.01)\n\n— Erro Tipo II (Falso Negativo): Concluir que não há efeito quando há\n"A campanha não funcionou." → Na verdade, a amostra era pequena demais para detectar\nControle: Use amostras maiores (poder estatístico)\n\n**Significância Estatística ≠ Significância Prática:**\nCom amostra grande o suficiente, qualquer diferença fica "significativa".\nSe a versão B do site converte 3.201% vs 3.200% do A, pode ser p < 0.05 com n = 10 milhões.\nMas a diferença prática é irrelevante — não vale o custo de implementar.\n\nSempre pergunte: "Além de estatisticamente significativo, é economicamente relevante?"',
-          },
-          {
-            id: 'M4-stat-concept2',
-            type: 'concept',
-            term: 'Significância Estatística vs Prática',
-            definition: 'Significância estatística (p < 0.05) significa que o resultado provavelmente não é acaso. Significância prática significa que a diferença é grande o suficiente para justificar ação. São coisas DIFERENTES.',
-            example: 'Teste A/B com 10 milhões de visitantes: versão B converte 3.201% vs 3.200% do A. p < 0.05? Sim. Vale implementar? Não — a diferença prática é irrelevante.',
-            antiExample: '"O resultado é estatisticamente significativo, então devemos mudar!" Não necessariamente. Pergunte: a diferença é economicamente relevante? O custo de implementar justifica o ganho?',
-          },
-          {
-            id: 'M4-stat-exercise1',
-            type: 'inline-exercise',
-            prompt: 'Desenhe um teste A/B para uma decisão real do seu negócio.',
-            context: 'Teste A/B é o método científico aplicado a negócios: hipótese → experimento controlado → análise → decisão. A maioria dos gestores "acha" em vez de testar.',
-            fields: [
-              { id: 'hypothesis', label: 'Qual sua hipótese?', placeholder: 'Ex: "Mudar o CTA de azul para verde aumenta a conversão"' },
-              { id: 'metric', label: 'Qual a métrica-alvo?', placeholder: 'Ex: Taxa de conversão de visitante para lead (atualmente 3.2%)' },
-              { id: 'sample', label: 'Qual o tamanho da amostra e o prazo?', placeholder: 'Ex: 5.000 visitantes por grupo, 14 dias mínimo' },
-              { id: 'success', label: 'Qual o critério de sucesso?', placeholder: 'Ex: p < 0.05 E diferença > 0.5pp (significância estatística + prática)', multiline: true },
-            ],
-            evaluationCriteria: ['Hipótese é falsificável (pode ser refutada por dados)', 'Métrica é acionável (se mudar, a decisão muda)', 'Define critério de sucesso ANTES de rodar o teste', 'Considera tanto significância estatística quanto prática'],
-            expectedConcepts: ['teste A/B', 'hipótese nula', 'significância estatística', 'tamanho da amostra'],
-          },
-          {
-            id: 'M4-2-t6',
-            type: 'text',
-            title: 'KPIs e Métricas de Negócio — O que o Mercado Mede',
-            body: 'Estatística em negócios não é sobre fórmulas — é sobre saber O QUE medir. As métricas certas dirigem decisões certas. As erradas criam ilusão de controle.\n\n**Métricas de Vaidade vs. Métricas Acionáveis:**\n— Vaidade: pageviews, seguidores, downloads (parecem bons, não mudam decisões)\n— Acionáveis: conversão, retenção, LTV, CAC (mudam decisões diretamente)\n\nTeste: "Se essa métrica mudar 20%, minha decisão muda?" Se não → vaidade.\n\n**As 15 Métricas que Todo Gestor Precisa Dominar:**\n\n**RECEITA E CRESCIMENTO**\n1. MRR (Monthly Recurring Revenue) — receita recorrente mensal. O pulso de qualquer SaaS ou assinatura.\n2. ARR (Annual Recurring Revenue) — MRR × 12. É como investidores avaliam.\n3. Revenue Growth Rate — (receita atual - anterior) / anterior × 100%. Crescimento acima de 40%/ano = "T2D3" (triple, triple, double, double, double) — meta para startups VC.\n\n**CLIENTES**\n4. CAC (Customer Acquisition Cost) — quanto custa adquirir 1 cliente. Total gasto em marketing+vendas / novos clientes.\n5. LTV (Lifetime Value) — quanto 1 cliente vale ao longo da relação. Receita média × tempo médio de permanência.\n6. LTV/CAC — a métrica mais importante de unit economics. LTV/CAC > 3 = saudável. < 1 = você PAGA para perder dinheiro.\n7. Churn Rate — % de clientes que cancelam por mês. Churn de 5%/mês = metade dos clientes some em 1 ano.\n8. NPS (Net Promoter Score) — "De 0-10, quanto você recomendaria?" Promotores (9-10) - Detratores (0-6). Acima de 50 = excelente.\n\n**FINANCEIRO**\n9. Margem Bruta — (Receita - CMV) / Receita × 100%. SaaS saudável: >70%. Varejo: 30-50%. Indústria: 20-40%.\n10. EBITDA — Lucro antes de juros, impostos, depreciação e amortização. Proxy de geração de caixa operacional.\n11. Burn Rate — quanto dinheiro a empresa queima por mês (para startups pré-lucro). Runway = caixa / burn rate = meses de sobrevivência.\n\n**OPERACIONAL**\n12. Ticket Médio — receita / número de transações. Subiu = está vendendo mais por transação.\n13. Taxa de Conversão — visitantes que compraram / total de visitantes. E-commerce bom: 2-3%. Ótimo: 5%+.\n14. Ciclo de Vendas — dias entre primeiro contato e fechamento. Quanto menor, mais eficiente.\n15. Produtividade por Funcionário — receita / número de funcionários. Benchmark para comparar com o setor.',
-          },
-          {
-            id: 'M4-2-t7',
-            type: 'text',
-            title: 'Análise de Cohort — A Métrica que Separa Amadores de Profissionais',
-            body: 'A maioria dos gestores olha métricas agregadas: "vendemos R$ 1M este mês". Análise de cohort olha grupos específicos ao longo do tempo — e revela verdades que o agregado esconde.\n\n**O que é um Cohort:**\nGrupo de clientes que compartilham uma característica temporal. Exemplo: "clientes que compraram em janeiro de 2025".\n\n**Por que importa:**\nMétrica agregada: "Retenção de 80%"\nAnálise de cohort revela:\n— Cohort Jan/25: 90% reteve no mês 2, 85% no mês 3, 80% no mês 4\n— Cohort Abr/25: 70% reteve no mês 2, 55% no mês 3, 40% no mês 4\n\nO agregado de 80% ESCONDE que os clientes recentes estão saindo 2x mais rápido. Sem cohort, você descobre o problema quando já perdeu milhares.\n\n**Como construir uma tabela de cohort no Excel:**\n\n1. Crie uma coluna com o mês de aquisição de cada cliente\n2. Para cada mês posterior, marque se o cliente estava ativo\n3. Monte a tabela: linhas = mês de aquisição, colunas = meses desde aquisição\n4. Calcule a % de retenção em cada célula\n\n**O que procurar:**\n— Diagonal: se a retenção do mês 1 está caindo para cohorts recentes → algo piorou (produto? onboarding? expectativa?)\n— Estabilização: se a retenção se estabiliza em 40% após o mês 6 → seus "core users" são 40% dos adquiridos\n— Sazonalidade: cohorts de dezembro podem ter comportamento diferente (Black Friday = clientes de desconto = churn alto)\n\n**Cohort aplicado a diferentes negócios:**\n— E-commerce: recompra por cohort de primeira compra\n— SaaS: retenção de MRR por cohort de signup\n— App: DAU/MAU por cohort de download\n— Varejo físico: frequência de visita por cohort de primeiro registro no programa de fidelidade\n\n**Caso real — Spotify:**\nSpotify analisa cohorts por canal de aquisição. Descobriu que usuários vindos de indicação retêm 37% mais do que vindos de ads pagos. Resultado: investiu 3x mais em programa de referral e reduziu CAC em 22%.',
-          },
-          {
-            id: 'M4-stat-compare1',
-            type: 'compare',
-            title: 'Métricas de Vaidade vs Métricas Acionáveis',
-            question: 'Qual métrica você usaria para tomar decisões? E qual só parece boa mas não muda nada?',
-            dimensions: ['Métrica', 'O que mede', 'Por que é de vaidade ou acionável', 'Alternativa melhor'],
-            items: [
-              { id: 'pageviews', label: 'Pageviews', values: ['Quantas páginas foram vistas', 'Não diz se gerou valor — bots, bounces e curiosos contam', 'Métrica de vaidade'], highlight: 'Use taxa de conversão: visitantes que completaram a ação desejada.' },
-              { id: 'followers', label: 'Seguidores', values: ['Quantas pessoas seguem a marca', 'Seguir ≠ comprar. 100K seguidores com 0.1% de engajamento = irrelevante', 'Métrica de vaidade'], highlight: 'Use engagement rate + conversão por canal + atribuição de receita.' },
-              { id: 'ltv-cac', label: 'LTV/CAC', values: ['Quanto 1 cliente vale vs. quanto custa adquirir', 'Se LTV/CAC < 1, você PAGA para perder dinheiro. Muda decisão imediatamente.', 'Métrica acionável'], highlight: 'LTV/CAC > 3 = saudável. A métrica que investidores mais olham.' },
-              { id: 'churn', label: 'Churn Rate', values: ['% de clientes que cancelam por mês', 'Churn de 5%/mês = metade dos clientes some em 1 ano. Muda prioridade da empresa.', 'Métrica acionável'], highlight: 'Retenção é o multiplicador: sem ela, aquisição é balde furado.' },
-              { id: 'nps', label: 'NPS', values: ['Net Promoter Score (recomendação)', 'Promotores - Detratores. Acima de 50 = excelente. Prediz crescimento orgânico.', 'Métrica acionável'], highlight: 'NPS alto = CAC baixo (indicação reduz custo de aquisição).' },
-            ],
-            insight: 'Teste rápido: "Se essa métrica mudar 20%, minha decisão muda?" Se não → é vaidade. Foque nas métricas que movem decisões, não nas que movem ego.',
+            description: 'Dados reais de empresas. Calcule, interprete e decida.',
           },
           {
             id: 'M4-2-s2',
             type: 'simulation',
             title: 'Dashboard de KPIs — Interprete o Painel de uma Startup',
             simulationId: 'kpi-dashboard',
-            description: 'Receba o dashboard real de 3 startups (SaaS, E-commerce, Marketplace). Analise os KPIs, identifique problemas escondidos nos números e proponha ações.',
-          },
-          {
-            id: 'M4-2-t8',
-            type: 'text',
-            title: 'Teste A/B — O Método Científico do Marketing Digital',
-            body: 'Teste A/B é o experimento controlado aplicado a negócios. É a forma mais confiável de responder: "Essa mudança funciona de verdade ou é coincidência?"\n\n**Como funciona:**\n1. Divida aleatoriamente sua audiência em dois grupos iguais\n2. Grupo A (controle): vê a versão atual\n3. Grupo B (tratamento): vê a versão nova\n4. Meça a métrica-alvo (conversão, clique, receita) por tempo suficiente\n5. Aplique teste estatístico para verificar se a diferença é significativa\n\n**Os 7 Erros Mais Comuns em Testes A/B:**\n\n1. Parar o teste cedo demais\n"Já deu 2 dias e B está ganhando!" → Flutuações estatísticas nos primeiros dias são normais. Espere atingir o tamanho de amostra calculado.\nRegra: mínimo 2 semanas E mínimo 1.000 conversões por grupo.\n\n2. Olhar o resultado todo dia e "decidir quando parece bom"\n→ Isso é p-hacking. Quanto mais vezes você olha, maior a chance de achar significância por acaso. Defina o prazo ANTES e analise SÓ no final.\n\n3. Testar muitas variáveis ao mesmo tempo\n"Mudamos o botão, o título, a cor e o preço." → Se B ganha, o que causou? Não sabe. Teste UMA variável por vez.\n\n4. Amostra muito pequena\nSe você tem 200 visitantes/dia e quer detectar diferença de 5% na conversão → precisa de ~30 dias. A maioria para em 3.\n\n5. Ignorar sazonalidade\nTestar na Black Friday e concluir que "a nova página converte melhor" → Todo mundo converte melhor na Black Friday.\n\n6. Confundir significância estatística com relevância prática\np < 0.05 com diferença de 0.01% na conversão → estatisticamente significativo, praticamente irrelevante.\n\n7. Não documentar e não compartilhar resultados negativos\nTestes que "não funcionaram" são tão valiosos quanto os que funcionaram — impedem que outros repitam o erro.\n\n**Calculando o tamanho da amostra:**\nFórmula simplificada: n = 16 × σ² / δ²\nOnde σ = desvio padrão da métrica, δ = diferença mínima que quer detectar\n\nRegra prática:\n— Conversão base 5%, quer detectar diferença de 1pp → ~3.800 por grupo\n— Conversão base 2%, quer detectar diferença de 0.5pp → ~12.300 por grupo\n\n**Ferramentas para teste A/B:**\n— Google Optimize (grátis, descontinuado mas com alternativas)\n— Optimizely, VWO, AB Tasty (pagos, enterprise)\n— Statsig, GrowthBook (developer-first, freemium)\n— Manualmente: Excel + teste Z de proporções',
-          },
-          {
-            id: 'M4-2-t9',
-            type: 'text',
-            title: 'Análise Preditiva — Machine Learning para Negócios',
-            body: 'Análise preditiva usa dados históricos para prever o futuro. É a evolução natural da estatística descritiva (o que aconteceu?) e inferencial (por quê?) para prescritiva (o que vai acontecer? o que devemos fazer?).\n\n**Os 3 Níveis de Analytics:**\n\n1. Descritivo: "O que aconteceu?"\n→ Dashboards, relatórios, KPIs. Olha para o passado.\n\n2. Preditivo: "O que vai acontecer?"\n→ Modelos de previsão, scoring, classificação. Olha para o futuro.\n\n3. Prescritivo: "O que devemos fazer?"\n→ Otimização, simulação, recomendação. Sugere ação.\n\n**Aplicações Práticas de Análise Preditiva em Negócios:**\n\n**Previsão de Demanda (Forecasting)**\nO que é: Estimar vendas futuras com base em dados históricos + variáveis externas\nMétodos:\n— Média móvel: média dos últimos N períodos (simples mas limitado)\n— Suavização exponencial: pesa mais os dados recentes\n— ARIMA: modelo estatístico que captura tendência + sazonalidade\n— Prophet (Meta): open source, excelente para séries com sazonalidade e feriados\nCaso: Walmart usa previsão de demanda para cada SKU em cada loja. Reduz estoque parado em 15% e rupturas em 30%.\n\n**Scoring de Crédito**\nO que é: Classificar clientes por probabilidade de pagamento\nMétodos: Regressão logística, árvore de decisão, random forest\nVariáveis: histórico de pagamento, renda, tempo de relacionamento, comportamento de compra\nCaso: Nubank usa modelos de ML para aprovar crédito em minutos, com inadimplência menor que bancos tradicionais.\n\n**Churn Prediction**\nO que é: Prever quais clientes vão cancelar antes que cancelem\nSinais preditivos: frequência de uso caindo, tickets de suporte subindo, não abrir emails, downgrade de plano\nAção: Intervenção proativa — oferecer desconto, ligar, enviar conteúdo personalizado\nCaso: Netflix prevê churn e ajusta recomendações. Cada 1% de redução no churn = US$ 800M em receita retida.\n\n**Precificação Dinâmica**\nO que é: Ajustar preço em tempo real com base em demanda, concorrência e perfil do cliente\nExemplos: Uber (surge pricing), companhias aéreas, Amazon (muda preços milhões de vezes/dia)\nMétodo: Modelos de elasticidade + otimização + dados em tempo real\n\n**Detecção de Fraude**\nO que é: Identificar transações suspeitas em tempo real\nMétodo: Anomaly detection — treinar o modelo com transações normais e detectar desvios\nCaso: Visa processa 65.000 transações/segundo com modelos que detectam fraude em 1 milissegundo.\n\n**Para gestores que não são data scientists:**\nVocê não precisa construir modelos. Precisa:\n1. Saber que problemas podem ser resolvidos com predição\n2. Saber quais dados são necessários (e se estão sendo coletados)\n3. Saber fazer as perguntas certas ao time de dados\n4. Saber avaliar se o modelo funciona (acurácia, precision, recall)\n5. Saber que nenhum modelo é perfeito — e o custo do erro importa',
-          },
-          {
-            id: 'M4-2-t10',
-            type: 'text',
-            title: 'Data Storytelling — Transformar Números em Decisões',
-            body: 'Dados sem narrativa são ignorados. 65% dos executivos tomam decisões baseadas em "intuição" mesmo quando dados estão disponíveis (McKinsey). O problema não é falta de dados — é falta de comunicação dos dados.\n\n**Os 3 Elementos do Data Storytelling (Brent Dykes):**\n\n1. Dados: Os fatos quantitativos (o que aconteceu)\n2. Narrativa: O contexto e significado (por que importa)\n3. Visualização: A representação gráfica (como mostrar)\n\nDados + Narrativa (sem visual) = explicação\nDados + Visualização (sem narrativa) = decoração\nNarrativa + Visualização (sem dados) = opinião\nDados + Narrativa + Visualização = Data Storytelling → decisão\n\n**Framework para apresentar dados ao CEO (Pirâmide de Minto):**\n\n1. Comece pela conclusão (não pelo contexto!)\n→ "Devemos investir R$ 500K em marketing de conteúdo. Isso gerará R$ 2.1M em 12 meses."\n\n2. Apresente os 3 argumentos de suporte\n→ "Por 3 razões: (1) CAC de conteúdo é 3x menor que paid, (2) LTV de clientes orgânicos é 2.5x maior, (3) Concorrentes estão investindo e ganhando share."\n\n3. Para cada argumento, mostre o dado\n→ Gráfico 1: CAC por canal. Gráfico 2: LTV por fonte. Gráfico 3: Share of voice vs. concorrentes.\n\n**Os 7 Gráficos que Todo Gestor Precisa Saber Usar:**\n\n1. Barras: Comparar categorias ("Receita por produto")\n2. Linhas: Mostrar tendência ao longo do tempo ("MRR dos últimos 12 meses")\n3. Pizza/Donut: Composição de um todo (máx 5 fatias) ("Market share")\n4. Scatter (dispersão): Correlação entre 2 variáveis ("Investimento em marketing × Receita")\n5. Funil: Conversão em etapas ("Visitante → Lead → Oportunidade → Cliente")\n6. Heatmap: Intensidade em 2 dimensões ("Vendas por dia × hora")\n7. Waterfall: Composição de variação ("Lucro: receita - custos - impostos")\n\n**Regras de ouro da visualização:**\n— Menos é mais: cada gráfico deve comunicar UMA ideia\n— Título = conclusão, não descrição. Não: "Vendas 2024". Sim: "Vendas cresceram 23% em 2024, lideradas pelo segmento premium"\n— Destaque o insight: use cor para chamar atenção para o que importa\n— Elimine chartjunk: sem 3D, sem sombras, sem linhas de grade desnecessárias\n— O eixo Y sempre começa em zero para barras (nunca truncar para exagerar diferença)',
-          },
-          {
-            id: 'M4-2-t11',
-            type: 'text',
-            title: 'Pesquisa de Mercado — Design, Amostragem e Vieses',
-            body: 'Pesquisa de mercado é a ferramenta estatística mais usada em negócios — e a mais mal usada. A maioria das pesquisas empresariais tem vieses que invalidam as conclusões.\n\n**Tipos de Pesquisa:**\n\n**Quantitativa** — números, padrões, generalização\nExemplo: Survey com 500 clientes sobre satisfação (escala 1-10)\nQuando usar: Validar hipóteses, medir tamanho de mercado, quantificar comportamento\nFerramentas: Google Forms, Typeform, SurveyMonkey, Qualtrics\n\n**Qualitativa** — profundidade, compreensão, "por quê?"\nExemplo: 20 entrevistas em profundidade sobre experiência de compra\nQuando usar: Explorar motivações, descobrir insights, entender contexto\nFerramentas: Roteiro semi-estruturado, análise temática\n\n**Amostragem — Quem perguntar?**\n\nAmostra Probabilística (rigorosa):\n— Aleatória simples: cada pessoa tem a mesma chance de ser selecionada\n— Estratificada: divide a população em grupos (ex: faixa etária) e amostra proporcionalmente\n— Por clusters: seleciona grupos inteiros (ex: 10 lojas de 50)\n\nAmostra Não-Probabilística (conveniente):\n— Conveniência: quem está disponível ("clientes que responderam o email")\n— Bola de neve: um indica o outro ("entrevistei 5, cada um indicou mais 2")\n— Intencional: seleção deliberada de perfis específicos\n\nALERTA: Pesquisa por conveniência (a mais comum em empresas) tem viés de seleção. Quem responde survey são os mais engajados — você não ouve os insatisfeitos que já foram embora.\n\n**Tamanho da Amostra — Quanto é Suficiente?**\nPara pesquisa quantitativa com margem de erro de 5% e confiança de 95%:\n— População de 1.000: amostra de 278\n— População de 10.000: amostra de 370\n— População de 100.000: amostra de 383\n— População de 1.000.000: amostra de 384\n\nObserve: a partir de 10K, o tamanho da amostra quase não muda. O que importa é a amostra absoluta, não a proporção.\n\n**Os 8 Vieses que Destroem Pesquisas:**\n\n1. Viés de seleção: Só quem quer responde → opinião enviesada\n2. Viés de desejabilidade social: Pessoas respondem o que é "correto", não o que pensam\n3. Viés de aquiescência: Tendência a concordar com qualquer afirmação\n4. Efeito de ancoragem: A primeira opção influencia as respostas seguintes\n5. Viés de memória: "Quantas vezes você usou nosso app no último mês?" — ninguém lembra com precisão\n6. Viés do sobrevivente: Pesquisar só clientes atuais ignora quem cancelou\n7. Leading questions: "Você concorda que nosso atendimento é excelente?" → induz resposta\n8. Viés de não-resposta: Quem não respondeu pode ter opinião oposta\n\n**Como desenhar uma boa pesquisa:**\n1. Defina a pergunta de negócio ANTES de criar o questionário\n2. Use linguagem neutra (não induza respostas)\n3. Limite a 10-15 perguntas (acima disso, abandono cresce exponencialmente)\n4. Comece fácil, termine com perguntas sensíveis (renda, satisfação)\n5. Teste com 5 pessoas antes de lançar (piloto)\n6. Ofereça incentivo proporcional ao esforço (mas não tão alto que distorça)',
-          },
-          {
-            id: 'M4-2-t12',
-            type: 'text',
-            title: 'Excel/Sheets para Análise de Dados — O Kit de Sobrevivência',
-            body: 'Você não precisa de Python ou R para 80% das análises de negócio. Excel/Google Sheets resolve. Aqui estão as funções e ferramentas essenciais.\n\n**Funções Estatísticas Essenciais:**\n\n— MÉDIA(intervalo) / AVERAGE — média aritmética\n— MED(intervalo) / MEDIAN — mediana\n— MODO(intervalo) / MODE — moda\n— DESVPAD(intervalo) / STDEV — desvio padrão\n— VAR(intervalo) / VAR — variância\n— MÁXIMO / MÍNIMO — extremos\n— CONT.VALORES / COUNTA — contar preenchidos\n— CONT.SE / COUNTIF — contar com condição\n— SOMASE / SUMIF — somar com condição\n— MÉDIASE / AVERAGEIF — média com condição\n— PERCENTIL(intervalo; k) — percentil (ex: 0.25 para Q1)\n\n**Análise de Dados (menu Dados):**\n\n— Tabela Dinâmica (Pivot Table): A ferramenta mais poderosa. Cruza qualquer variável.\nExemplo: Receita por produto × região × mês em 3 cliques.\n\n— Análise de Dados → Regressão: Gera equação, R², p-valores automaticamente.\n\n— Análise de Dados → Histograma: Distribuição visual dos dados.\n\n— CORREL(X; Y): Correlação entre duas variáveis.\n\n**Gráficos que você precisa saber criar:**\n— Gráfico de linhas com eixo secundário (receita + margem no mesmo gráfico)\n— Gráfico de barras empilhadas (composição + comparação)\n— Scatter com linha de tendência + equação + R²\n— Sparklines (mini-gráficos dentro de células)\n\n**Atalhos que economizam horas:**\n— Ctrl+Shift+L: Filtro automático\n— Alt+= : AutoSoma\n— Ctrl+T: Transformar em tabela (formatação dinâmica + referência estruturada)\n— F4: Travar referência ($A$1)\n— Ctrl+;: Data atual / Ctrl+Shift+;: Hora atual\n\n**Google Sheets — Funções exclusivas úteis:**\n— GOOGLEFINANCE("PETR4.SA"; "price") — cotação em tempo real\n— IMPORTDATA(url) — importar dados de CSV/API\n— QUERY(dados; "SELECT A, SUM(B) GROUP BY A") — SQL dentro do Sheets\n— SPARKLINE(intervalo; {"charttype","bar"}) — mini-gráfico na célula',
+            description: 'Dashboard real com KPIs. Identifique problemas e recomende ações.',
           },
           {
             id: 'M4-2-s3',
             type: 'simulation',
             title: 'Análise de Negócio — Do Dado à Decisão',
             simulationId: 'data-to-decision',
-            description: 'Receba datasets reais de 3 empresas. Use as ferramentas estatísticas certas para diagnosticar problemas, identificar oportunidades e recomendar ações com base nos números.',
-          },
-          {
-            id: 'M4-2-t13',
-            type: 'text',
-            title: 'Mapa de Ferramentas Estatísticas — Quando Usar Cada Uma',
-            body: '**Resumo prático — qual ferramenta usar em cada situação:**\n\n**Média, Mediana, Moda**\nQuando: Resumir dados. Regra: assimétrico/outliers → mediana.\n\n**Desvio Padrão / CV**\nQuando: Medir consistência. CV > 30% = alta variabilidade.\n\n**Correlação**\nQuando: Verificar associação. |r| > 0.7 = forte. ≠ causalidade.\n\n**Regressão**\nQuando: Prever. R² > 0.6 = razoável. Checar resíduos.\n\n**Teste A/B / Teste de Hipótese**\nQuando: Verificar se mudança é real. p < 0.05 + relevância prática.\n\n**Análise de Cohort**\nQuando: Entender retenção ao longo do tempo. Revela problemas que agregados escondem.\n\n**KPIs de Negócio**\nQuando: Medir saúde da empresa. LTV/CAC > 3, Churn < 5%/mês, NPS > 50.\n\n**Previsão de Demanda**\nQuando: Planejar estoque, equipe, fluxo de caixa. Prophet para séries com sazonalidade.\n\n**Pesquisa de Mercado**\nQuando: Ouvir o cliente. Mín 300 respostas para quanti. 15-20 para quali.\n\n**Data Storytelling**\nQuando: Apresentar para decisores. Conclusão primeiro, dados depois, gráfico como suporte.\n\n**Excel/Sheets**\nQuando: 80% das análises de negócio. Pivot Table + CORREL + SOMASE + Gráficos.\n\n**Python/R**\nQuando: Modelos preditivos, grandes volumes de dados, automação. Pandas, scikit-learn, Prophet.',
+            description: 'Receba dados brutos e construa a narrativa até a recomendação.',
           },
         ],
       },
+
     ],
   },
   {
