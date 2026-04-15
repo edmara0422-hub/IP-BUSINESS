@@ -1898,7 +1898,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               },
               {
                 kind: 'paragraph',
-                text: 'O rating ESG é feito por agências como MSCI, Sustainalytics, S&P Global e Moody\\'s. Varia de AAA (líder) a CCC (laggard). Empresas com rating alto acessam capital mais barato, atraem talentos e {{reduzem risco regulatório}}. No Brasil, o ISE B3 é o principal índice de sustentabilidade — inclui ~40 empresas que atendem critérios rigorosos em E, S e G.',
+                text: 'O rating ESG é feito por agências como MSCI, Sustainalytics, S&P Global e Moodys. Varia de AAA (líder) a CCC (laggard). Empresas com rating alto acessam capital mais barato, atraem talentos e {{reduzem risco regulatório}}. No Brasil, o ISE B3 é o principal índice de sustentabilidade — inclui ~40 empresas que atendem critérios rigorosos em E, S e G.',
               },
             ],
             application: {
