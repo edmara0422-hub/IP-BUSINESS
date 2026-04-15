@@ -1708,6 +1708,15 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             body: [
               {
                 kind: 'paragraph',
+                text: 'A sustentabilidade nas empresas ganhou tração global a partir da década de 1990. Antes, a gestão era dominada pela visão de Milton Friedman, que pregava que a única responsabilidade social de uma empresa seria {{aumentar seus lucros}}. No entanto, crises ambientais globais e o aumento da desigualdade evidenciaram a insuficiência dessa abordagem.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O entendimento de que os recursos naturais são finitos e de que a estabilidade social é pré-requisito para a continuidade econômica levou à criação de novos modelos de gestão. Em 1994, {{John Elkington}} introduziu o Triple Bottom Line — a premissa de que empresas devem prestar contas não apenas em termos econômicos, mas também sociais e ambientais.',
+              },
+
+              {
+                kind: 'paragraph',
                 text: 'Em 2023, mais de US$ 35 trilhões em ativos globais foram geridos sob critérios ESG (Global Sustainable Investment Alliance). No Brasil, o ISE B3 mostra que empresas sustentáveis superam o Ibovespa em {{retorno ajustado ao risco}} no longo prazo. Sustentabilidade não é custo — é vantagem competitiva mensurável.',
               },
               {
@@ -1788,6 +1797,15 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 kind: 'paragraph',
                 text: 'Em 2018, o próprio Elkington publicou um artigo na Harvard Business Review pedindo o "recall" do TBL. Não porque estava errado, mas porque foi {{cooptado}} por relatórios corporativos que medem os 3Ps sem mudar nada de verdade. O TBL virou ferramenta de relações públicas em vez de ferramenta de transformação.',
               },
+              {
+                kind: 'paragraph',
+                text: 'Elkington identificou falhas específicas: empresas usavam {{trade-offs}} em vez de sinergia (justificando danos ambientais com lucros elevados), métricas sociais e ambientais eram incomensuráveis em relação ao lucro financeiro, e o TBL virou ferramenta de {{greenwashing}} — relatórios proliferaram enquanto degradação ambiental e desigualdade pioraram.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O modelo de Círculos Aninhados inverte a hierarquia: o meio ambiente é o círculo maior que engloba tudo. A sociedade existe dentro do meio ambiente, e a economia é um {{subproduto}} da sociedade. As decisões econômicas tornam-se meios para um fim — o bem-estar social e a integridade ambiental — e não fins em si mesmos.',
+              },
+
             ],
             application: {
               kind: 'compare-and-drag',
@@ -1834,6 +1852,11 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               leadText: 'O ESG transformou sustentabilidade em critério de {{investimento}}. Não é mais "ser bonzinho" — é gestão de risco financeiro. Fundos que aplicam filtro ESG controlam trilhões em ativos globais.',
             },
             body: [
+              {
+                kind: 'paragraph',
+                text: 'Enquanto o TBL nasceu de uma perspectiva de cidadania corporativa e ética, o ESG emergiu do setor financeiro. Lançado formalmente pela ONU em 2004 no relatório "Who Cares Wins", o ESG transformou os pilares do tripé em critérios de análise de {{risco e investimento}}. A relação com os ODS: os ODS são o "quê" deve ser alcançado globalmente, o ESG é o "como" as empresas integram esses objetivos em seus processos.',
+              },
+
               {
                 kind: 'phase-group',
                 cards: [
@@ -2027,7 +2050,16 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   },
                 ],
               },
-            ],
+            
+              {
+                kind: 'paragraph',
+                text: 'Perspectivas complementares: o GRI olha de "{{dentro para fora}}", focando em como a empresa impacta economia, ambiente e sociedade — fala com funcionários, ONGs, governos. O SASB olha de "{{fora para dentro}}", medindo como questões ESG afetam o desempenho financeiro — fala com investidores, credores e analistas.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O CSV (Porter & Kramer, Harvard 2011) difere fundamentalmente da CSR tradicional. A CSR redistribui lucro existente; o CSV {{expande}} o bolo econômico e social simultaneamente. Três níveis: reconceber produtos/mercados (atender necessidades não supridas), redefinir produtividade na cadeia (investir em bem-estar de funcionários e fornecedores), e desenvolver {{clusters locais}} (fortalecer ecossistema de fornecedores e instituições).',
+              },
+],
             application: {
               kind: 'compare-and-drag',
               intro: 'Cada framework serve a um público diferente. Classifique.',
@@ -2131,7 +2163,24 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   { number: 8, title: 'Revisar e iterar', description: 'Metas evoluem. O que era ambicioso em 2023 é {{piso}} em 2025. Revisão anual obrigatória.' },
                 ],
               },
-            ],
+            
+              {
+                kind: 'heading',
+                text: 'Marketing verde e CONAR',
+              },
+              {
+                kind: 'paragraph',
+                text: 'No Brasil, o CONAR (Conselho Nacional de Autorregulamentação Publicitária) estabelece regras para marketing verde. Exige que alegações de sustentabilidade sejam {{precisas, comprováveis}} e não induzam ao erro. Não se pode usar termos vagos como "amigo da natureza" sem especificar qual aspecto justifica a afirmação e sem possuir evidências. A publicidade não deve destacar benefício ambiental marginal se a operação principal causa {{danos significativos}}.',
+              },
+              {
+                kind: 'heading',
+                text: 'Economia regenerativa — a próxima fronteira',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A economia regenerativa busca redesenhar mercados para que empresas sejam motores de {{cura}} para o planeta. Princípios: {{Circularidade Total}} (eliminar conceito de resíduo — todos os materiais retornam ao ciclo), {{Impacto Net-Positive}} (não apenas "neutro em carbono" mas remover ativamente mais CO2 do que emite), {{Resiliência Sistêmica}} (saúde do sistema global sobre otimização de curto prazo) e {{Tecnologia para o Bem}} (IA e biotech para resolver crises climáticas e de saúde com ética).',
+              },
+],
             application: {
               kind: 'compare-and-drag',
               intro: 'Separar greenwashing de sustentabilidade real. Classifique.',
@@ -2166,7 +2215,87 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               ],
             },
           },
-          {
+                    {
+            id: 'M1-2-cap5',
+            type: 'chapter',
+            number: 5,
+            title: 'Política de Sustentabilidade na Prática',
+            subtitle: 'Como criar, implementar e manter — do diagnóstico à comunicação de resultados',
+            opening: {
+              leadText: 'A política de sustentabilidade é um conjunto de normas e diretrizes internas que orientam o manejo sustentável das operações empresariais. Seu objetivo é minimizar impactos negativos no meio ambiente, na sociedade e na economia. Para que seja eficaz, {{não pode ser separada}} da estratégia geral da empresa (Toledo & Farias Filho, 2023).',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Os 3 pilares da política',
+                pillars: [
+                  { icon: '🌿', title: 'Ambiental', description: 'Preservação dos recursos naturais e redução dos impactos negativos no {{planeta}}.' },
+                  { icon: '👥', title: 'Social', description: 'Bem-estar dos colaboradores, práticas justas e apoio às {{comunidades}} locais.' },
+                  { icon: '💰', title: 'Econômico', description: 'Saúde financeira da organização sem comprometer as {{gerações futuras}}.' },
+                ],
+              },
+              {
+                kind: 'step-flow',
+                title: '8 passos para criar e implementar (Toledo & Farias Filho, 2023)',
+                steps: [
+                  { number: 1, title: 'Identifique problemas', description: 'Observe o que prejudica meio ambiente ou sociedade. Envolva o máximo de pessoas. Use {{brainstorming}}. Desperdício, alto consumo de energia são comuns.' },
+                  { number: 2, title: 'Defina objetivos', description: 'Não tente resolver tudo de uma vez. Metas claras e específicas: reduzir desperdício de papel, economizar energia. Ações {{simples mas eficazes}}.' },
+                  { number: 3, title: 'Crie ações', description: 'Partiu prática: materiais recicláveis, LED, redução de plásticos. Traduzir metas em ações {{concretas}}.' },
+                  { number: 4, title: 'Envolva todos', description: 'Ponto crucial: cada colaborador precisa entender seu papel. Envolvimento gera {{engajamento}} e melhores resultados.' },
+                  { number: 5, title: 'Implemente', description: 'Coloque em prática. Comece pelo simples e rápido. Não espere grandes mudanças — foque no {{próximo passo}}.' },
+                  { number: 6, title: 'Monitore', description: 'Acompanhe regularmente. {{Mensurar}} é essencial (Toledo & Farias Filho, 2023). Meça para saber se funciona.' },
+                  { number: 7, title: 'Comunique resultados', description: 'Compartilhe vitórias e contribuições. Seja {{honesto e transparente}} — divulgue inclusive o que não funcionou.' },
+                  { number: 8, title: 'Ajuste se necessário', description: 'Se algo não funciona, ajuste metas ou ações. Mantenha informações {{atualizadas}} para não repetir erros.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Exemplo prático de política',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Uma política de sustentabilidade prática contém: **Visão** (onde queremos chegar em sustentabilidade), **Objetivos** (metas SMART por pilar), **Ações de Educação** (treinar equipe em práticas sustentáveis), **Gestão Ambiental** (processos de redução de impacto), **Monitoramento e Avaliação** (indicadores trimestrais) e **Comunicação** (relatório anual transparente). O primeiro passo é sempre o {{diagnóstico}} profundo das operações.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Nenhuma política terá sucesso se não estiver alinhada à estratégia global da empresa — esse alinhamento é {{imprescindível}} (Toledo & Farias Filho, 2023). Sustentabilidade não é departamento — é princípio que permeia toda a organização.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Classifique cada etapa na fase correta do ciclo.',
+              compare: {
+                columnHeaders: ['Diagnóstico', 'Planejamento', 'Execução', 'Controle'],
+                rows: [
+                  { label: 'Ação', values: ['Identificar problemas', 'Definir objetivos', 'Implementar ações', 'Monitorar e ajustar'] },
+                ],
+              },
+              drag: {
+                instruction: 'Em qual fase está cada atividade?',
+                zones: [
+                  { id: 'diag', label: 'Diagnóstico' },
+                  { id: 'plan', label: 'Planejamento' },
+                  { id: 'exec', label: 'Execução' },
+                  { id: 'ctrl', label: 'Controle' },
+                ],
+                items: [
+                  { id: 'bs', label: 'Brainstorming de problemas ambientais', correctZone: 'diag', correctFeedback: 'Certo. Identificar problemas = diagnóstico.', wrongFeedback: 'Brainstorming de problemas é diagnóstico.' },
+                  { id: 'meta', label: 'Definir meta de redução de energia', correctZone: 'plan', correctFeedback: 'Certo. Meta específica = planejamento.', wrongFeedback: 'Definir meta = planejamento.' },
+                  { id: 'led', label: 'Trocar lâmpadas por LED', correctZone: 'exec', correctFeedback: 'Certo. Ação concreta = execução.', wrongFeedback: 'Trocar lâmpadas = execução.' },
+                  { id: 'kpi', label: 'Medir consumo de energia mensal', correctZone: 'ctrl', correctFeedback: 'Certo. Medir resultados = controle.', wrongFeedback: 'Mensurar = controle.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Política de sustentabilidade sem {{implementação}} é documento morto. Os 8 passos de Toledo & Farias Filho (2023) transformam intenção em ação: diagnosticar, planejar, agir, envolver, implementar, monitorar, comunicar e ajustar.',
+              keyInsights: [
+                'Toledo & Farias Filho (2023): nenhuma política terá sucesso sem alinhamento à {{estratégia global}}.',
+                'Comece pelo simples: LED, reciclagem, redução de plástico. Não espere a mudança {{perfeita}}.',
+                'Mensurar é essencial. Se não mede, não sabe se {{funciona}}.',
+              ],
+            },
+          },
+{
             id: 'M1-2-s1',
             type: 'simulation',
             title: 'Diagnóstico TBL — Avalie uma Empresa nos 3Ps',
