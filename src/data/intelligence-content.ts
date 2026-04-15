@@ -3270,173 +3270,336 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Demonstracoes Contabeis',
         blocks: [
           {
-            id: 'M2-1-t1',
-            type: 'text',
-            title: 'Balanço Patrimonial: Ativos, Passivos e Patrimônio Líquido',
-            body: 'O Balanço Patrimonial é a fotografia financeira da empresa em um determinado momento. Ele responde: "o que a empresa tem, o que ela deve e quanto sobra para os donos?"\n\n**A equação fundamental da contabilidade:**\nAtivo = Passivo + Patrimônio Líquido\n\nSe esta equação não fecha, algo está errado. Sempre.\n\n**Ativo** — tudo que a empresa possui e que tem valor econômico:\n— Ativo Circulante: caixa, contas a receber, estoque, aplicações de curto prazo (conversíveis em até 12 meses)\n— Ativo Não Circulante: imóveis, máquinas, veículos, marcas, patentes (realizáveis após 12 meses)\n\n**Passivo** — tudo que a empresa deve:\n— Passivo Circulante: fornecedores, salários, impostos, empréstimos de curto prazo (vencimento até 12 meses)\n— Passivo Não Circulante: financiamentos de longo prazo, debêntures (vencimento após 12 meses)\n\n**Patrimônio Líquido** — o que sobra para os sócios após pagar todas as dívidas:\n— Capital Social: valor investido pelos sócios\n— Reservas de Lucro: lucros retidos para reinvestimento\n— Lucros/Prejuízos Acumulados: resultado líquido histórico\n\nExemplo prático: Uma empresa com R$ 500k em ativos e R$ 450k em passivos tem PL de R$ 50k. Se o passivo superar o ativo, o PL fica negativo — a empresa está tecnicamente insolvente.\n\nPergunta-chave: Qual é o índice de endividamento da sua empresa? (Passivo Total ÷ Ativo Total). Acima de 0.7 acende o alerta.\n\nDica: O balanço não mostra se a empresa é lucrativa — mostra se ela é solvente. Lucro está na DRE; solvência está no Balanço.',
+            id: 'M2-1-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Balanço Patrimonial',
+            subtitle: 'A fotografia financeira — o que a empresa tem, deve e quanto sobra',
+            opening: {
+              leadText: 'O Balanço Patrimonial é a fotografia financeira da empresa em um determinado momento. Ele responde: "o que a empresa {{tem}}, o que ela {{deve}} e quanto {{sobra}} para os donos?" A equação fundamental da contabilidade: Ativo = Passivo + Patrimônio Líquido.',
+            },
+            body: [
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Ativo — O que a empresa TEM',
+                    period: 'Lado esquerdo',
+                    text: '**Ativo Circulante**: bens e direitos que viram dinheiro em até 12 meses — caixa, banco, contas a receber, estoque. **Ativo Não Circulante**: bens de longo prazo — imóveis, máquinas, veículos, {{investimentos}} de longo prazo, intangíveis (marca, patente).',
+                    caseStudy: {
+                      company: 'Magazine Luiza',
+                      year: 2023,
+                      story: 'Ativo total: {{R$ 35 bilhões}}. Ativo circulante (estoque + recebíveis) = 60%. O marketplace (intangível) vale mais que todas as lojas físicas juntas.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 35B', label: 'Ativo total Magalu' },
+                        { value: '60%', label: 'Circulante' },
+                        { value: 'Intangível', label: 'Marketplace > lojas' },
+                      ],
+                      insight: 'Em empresas digitais, o ativo mais valioso é {{intangível}} — marca, plataforma, base de dados. Não aparece no prédio.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Passivo — O que a empresa DEVE',
+                    period: 'Lado direito (dívidas)',
+                    text: '**Passivo Circulante**: obrigações de até 12 meses — fornecedores, salários, impostos, empréstimos de curto prazo. **Passivo Não Circulante**: dívidas de longo prazo — financiamentos, debêntures, {{provisões}} trabalhistas.',
+                    caseStudy: {
+                      company: 'Americanas',
+                      year: 2023,
+                      story: 'Fraude contábil de {{R$ 20 bilhões}} escondida no passivo. Fornecedores não contabilizados. O balanço "saudável" era mentira. Prova de que ler o balanço é tão importante quanto {{produzi-lo}}.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 20B', label: 'Fraude contábil' },
+                        { value: '-97%', label: 'Queda das ações' },
+                        { value: 'Passivo oculto', label: 'Fornecedores não registrados' },
+                      ],
+                      insight: 'O passivo conta a história real da empresa. Se está {{inflado}} ou oculto, o balanço inteiro é mentira.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Patrimônio Líquido — O que SOBRA',
+                    period: 'Lado direito (donos)',
+                    text: 'PL = Ativo - Passivo. É o que pertence aos sócios/acionistas. Inclui capital social, reservas de lucros e {{lucros acumulados}}. PL negativo = empresa deve mais do que tem = insolvência técnica.',
+                    caseStudy: {
+                      company: 'Nubank',
+                      year: 2022,
+                      story: 'PL negativo por anos — {{estratégia deliberada}}: investir em crescimento antes de lucrar. Em 2023, primeiro ano de lucro: R$ 1 bilhão. PL virou positivo. Investidores financiaram o gap.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 1B', label: 'Primeiro lucro (2023)' },
+                        { value: 'Negativo', label: 'PL por anos (estratégico)' },
+                        { value: '80M', label: 'Clientes que justificaram' },
+                      ],
+                      insight: 'PL negativo não é sempre ruim. Startups em {{hipercrescimento}} queimam caixa de propósito. O que importa é o caminho para o positivo.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A equação Ativo = Passivo + PL SEMPRE fecha. Se não fecha, tem erro contábil (ou fraude). O balanço é auditado anualmente por empresas independentes (Big 4: Deloitte, PwC, EY, KPMG). Ler o balanço é a habilidade financeira mais importante para qualquer {{gestor}} — não só para contadores.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Indicadores-chave do Balanço',
+                pillars: [
+                  { icon: '📊', title: 'Liquidez Corrente', description: 'Ativo Circulante / Passivo Circulante. Acima de 1 = empresa paga dívidas de curto prazo. Abaixo de 1 = {{alerta}}.', metric: { value: '> 1.0', label: 'saudável' } },
+                  { icon: '⚖️', title: 'Endividamento', description: 'Passivo Total / Ativo Total. Quanto do ativo é financiado por {{dívida}}. Acima de 70% = risco.', metric: { value: '< 70%', label: 'confortável' } },
+                  { icon: '💰', title: 'ROE', description: 'Lucro Líquido / PL. Retorno sobre o capital dos {{donos}}. Quanto a empresa gera de lucro para cada real investido.', metric: { value: '> 15%', label: 'bom para BR' } },
+                ],
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada item do balanço tem seu lugar. Classifique.',
+              compare: {
+                columnHeaders: ['Ativo', 'Passivo', 'PL'],
+                rows: [
+                  { label: 'Significa', values: ['O que TEM', 'O que DEVE', 'O que SOBRA'] },
+                  { label: 'Exemplo', values: ['Caixa, estoque, imóvel', 'Fornecedores, empréstimos', 'Capital social, lucros'] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada item:',
+                zones: [
+                  { id: 'ativo', label: 'Ativo' },
+                  { id: 'passivo', label: 'Passivo' },
+                  { id: 'pl', label: 'Patrimônio Líquido' },
+                ],
+                items: [
+                  { id: 'cx', label: 'Dinheiro em caixa', correctZone: 'ativo', correctFeedback: 'Certo. Caixa = ativo circulante.', wrongFeedback: 'Dinheiro é algo que a empresa TEM = ativo.' },
+                  { id: 'forn', label: 'Dívida com fornecedor', correctZone: 'passivo', correctFeedback: 'Certo. Dívida = passivo.', wrongFeedback: 'Dívida = algo que DEVE = passivo.' },
+                  { id: 'lucro', label: 'Lucros acumulados', correctZone: 'pl', correctFeedback: 'Certo. Lucro dos donos = PL.', wrongFeedback: 'Lucro acumulado pertence aos donos = PL.' },
+                  { id: 'maq', label: 'Máquinas da fábrica', correctZone: 'ativo', correctFeedback: 'Certo. Bem físico = ativo não circulante.', wrongFeedback: 'Máquina é bem = ativo.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Balanço = {{fotografia}}. Ativo (tem) = Passivo (deve) + PL (sobra). Sempre fecha. Se não fecha, tem problema. Liquidez, endividamento e ROE são os 3 indicadores que todo gestor deve saber ler.',
+              keyInsights: [
+                'Ativo = Passivo + PL. Se não fecha, tem erro ou {{fraude}} (Americanas R$ 20B).',
+                'Em empresas digitais, o ativo mais valioso é {{intangível}} — marca, plataforma, dados.',
+                'PL negativo pode ser estratégico em startups. O que importa é o {{caminho}} para o positivo.',
+              ],
+              nextChapterHint: 'Capítulo 2 · DRE',
+              nextChapterBlurb: 'A operação gerou lucro ou prejuízo? Da receita bruta ao lucro líquido.',
+            },
           },
           {
-            id: 'M2-1-c1',
-            type: 'concept',
-            term: 'Ativo = Passivo + Patrimônio Líquido',
-            definition: 'A equação fundamental da contabilidade. Tudo que a empresa possui (Ativo) é financiado por dívida com terceiros (Passivo) ou por capital dos sócios (Patrimônio Líquido). Se a equação não fecha, há erro contábil. Se o Passivo supera o Ativo, o PL fica negativo — a empresa está tecnicamente insolvente.',
-            example: 'Startup que recebeu aporte de R$ 2M (PL) e tomou empréstimo de R$ 500k (Passivo) tem R$ 2,5M em Ativos (caixa, equipamentos, estoque). A equação fecha: 2,5M = 0,5M + 2M. Os sócios detêm 80% do financiamento — empresa pouco alavancada.',
-            antiExample: 'Empresa com R$ 1M em ativos e R$ 1,3M em passivos. PL = -R$ 300k. Está insolvente — deve mais do que possui. Mesmo faturando, cada mês aprofunda o buraco se não gerar caixa suficiente para pagar dívidas.',
+            id: 'M2-1-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'DRE — Demonstração do Resultado',
+            subtitle: 'Da receita bruta ao lucro líquido — onde a empresa ganha e onde perde',
+            opening: {
+              leadText: 'A DRE mostra o desempenho financeiro ao longo de um período (mês, trimestre, ano). Ela responde: "a operação gerou {{lucro}} ou {{prejuízo}}?" Diferente do balanço (fotografia), a DRE é um filme — mostra o que aconteceu ao longo do tempo.',
+            },
+            body: [
+              {
+                kind: 'step-flow',
+                title: 'Estrutura da DRE — de cima para baixo',
+                steps: [
+                  { number: 1, title: 'Receita Bruta', description: 'Tudo que a empresa vendeu no período. {{Sem descontos}}, sem devoluções, sem impostos sobre venda.' },
+                  { number: 2, title: '(-) Deduções', description: 'Impostos sobre venda (ICMS, PIS, COFINS), devoluções e descontos concedidos. Receita Bruta - Deduções = {{Receita Líquida}}.' },
+                  { number: 3, title: '(-) CMV / CPV', description: 'Custo da Mercadoria Vendida (comércio) ou Custo do Produto Vendido (indústria). O que custou para {{produzir ou comprar}} o que vendeu. Receita Líquida - CMV = Lucro Bruto.' },
+                  { number: 4, title: '(-) Despesas Operacionais', description: 'Administrativas (aluguel, salários gestão), Comerciais (marketing, comissões), Financeiras (juros). Lucro Bruto - Despesas = {{EBIT}} (Lucro Operacional).' },
+                  { number: 5, title: '(-) IR e CSLL', description: 'Imposto de Renda e Contribuição Social sobre o lucro. EBIT - Impostos = {{Lucro Líquido}}. É o que realmente sobra.' },
+                ],
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Margens — os indicadores que revelam eficiência',
+                pillars: [
+                  { icon: '📊', title: 'Margem Bruta', description: 'Lucro Bruto / Receita Líquida. Mede eficiência na {{produção}}. Magazine Luiza: ~25%. Nubank: ~70%.', metric: { value: '> 30%', label: 'saudável para varejo' } },
+                  { icon: '⚙️', title: 'Margem Operacional (EBIT)', description: 'EBIT / Receita Líquida. Mede eficiência na {{operação}} como um todo. Inclui custos administrativos.', metric: { value: '> 15%', label: 'bom' } },
+                  { icon: '💰', title: 'Margem Líquida', description: 'Lucro Líquido / Receita Líquida. O que realmente {{sobra}} depois de tudo. Ambev: ~20%. Varejo: ~3-5%.', metric: { value: 'Varia', label: 'por setor' } },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A DRE é onde gestores encontram problemas: margem bruta caindo = custos de produção subindo. Margem operacional caindo = empresa inchando (despesas crescendo mais que receita). Margem líquida negativa = empresa operando no {{prejuízo}}. Cada linha da DRE é uma alavanca estratégica.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada margem mede eficiência em nível diferente. Classifique.',
+              compare: {
+                columnHeaders: ['Margem Bruta', 'Margem Operacional', 'Margem Líquida'],
+                rows: [
+                  { label: 'Mede', values: ['Eficiência produção', 'Eficiência operação', 'Resultado final'] },
+                  { label: 'Desconta', values: ['Só custos diretos', '+ despesas', '+ impostos'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual margem é afetada por cada evento?',
+                zones: [
+                  { id: 'mb', label: 'Margem Bruta' },
+                  { id: 'mo', label: 'Margem Operacional' },
+                  { id: 'ml', label: 'Margem Líquida' },
+                ],
+                items: [
+                  { id: 'mat', label: 'Matéria-prima subiu 20%', correctZone: 'mb', correctFeedback: 'Certo. Custo direto afeta margem bruta.', wrongFeedback: 'Matéria-prima = custo direto = margem bruta.' },
+                  { id: 'alug', label: 'Aluguel do escritório dobrou', correctZone: 'mo', correctFeedback: 'Certo. Despesa administrativa afeta operacional.', wrongFeedback: 'Aluguel = despesa operacional.' },
+                  { id: 'ir', label: 'Mudança na alíquota de IR', correctZone: 'ml', correctFeedback: 'Certo. Imposto sobre lucro afeta margem líquida.', wrongFeedback: 'IR impacta o resultado final = líquida.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'A DRE é um {{funil}}: receita entra no topo, custos e despesas são subtraídos, lucro (ou prejuízo) sai embaixo. Cada linha é uma alavanca. Margem caindo = sinal de alerta. Margem subindo = eficiência melhorando.',
+              keyInsights: [
+                'DRE de cima para baixo: Receita → (-) CMV → Lucro Bruto → (-) Despesas → EBIT → (-) IR → {{Lucro Líquido}}.',
+                'Margem bruta alta + margem líquida baixa = empresa eficiente na produção mas {{inchada}} na operação.',
+                'Ambev: margem líquida ~20%. Varejo brasileiro: ~3-5%. O setor define o {{benchmark}}.',
+              ],
+              nextChapterHint: 'Capítulo 3 · Fluxo de Caixa',
+              nextChapterBlurb: 'O oxigênio do negócio — por que empresas lucrativas quebram.',
+            },
           },
           {
-            id: 'M2-1-nc1',
-            type: 'number-crunch',
-            title: 'Índice de Endividamento',
-            scenario: 'Calcule o grau de endividamento da sua empresa. Esse índice mostra quanto do ativo é financiado por dívida — quanto maior, mais alavancada (e arriscada) é a operação.',
-            inputs: [
-              { id: 'total-assets', label: 'Ativo Total', defaultValue: 500000, unit: 'R$', min: 1000, max: 100000000 },
-              { id: 'total-liabilities', label: 'Passivo Total', defaultValue: 300000, unit: 'R$', min: 0, max: 100000000 },
+            id: 'M2-1-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Fluxo de Caixa',
+            subtitle: 'O oxigênio do negócio — por que empresas lucrativas quebram',
+            opening: {
+              leadText: 'Fluxo de caixa é o registro de todas as entradas e saídas de dinheiro. Diferente da DRE (regime de competência), o fluxo usa {{regime de caixa}} — registra quando o dinheiro efetivamente entra ou sai. Empresa lucrativa na DRE pode quebrar por falta de caixa.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'A diferença entre lucro e caixa é o conceito mais importante de finanças empresariais. Vendeu R$ 100 mil em janeiro, mas o cliente paga em 90 dias? Na DRE, o lucro aparece em janeiro. No caixa, o dinheiro só entra em {{abril}}. Se o aluguel vence em fevereiro, a empresa pode estar "lucrativa" e sem dinheiro para pagar.',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Fluxo Operacional',
+                    period: 'O dia a dia',
+                    text: 'Entradas e saídas da {{operação}}: recebimento de vendas, pagamento de fornecedores, salários, impostos. É o coração do negócio. Se o operacional é negativo recorrente, o modelo tem problema.',
+                    caseStudy: {
+                      company: 'iFood',
+                      year: 2020,
+                      story: 'Fluxo operacional negativo por anos — {{queimava caixa}} para crescer (subsídios a entregadores e restaurantes). Estratégia: dominar mercado primeiro, monetizar depois. Em 2023, operacional virou positivo.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'Negativo', label: 'Operacional até 2022' },
+                        { value: 'Positivo', label: 'Operacional a partir de 2023' },
+                        { value: 'R$ 100B', label: 'GMV que justificou a queima' },
+                      ],
+                      insight: 'Queimar caixa é estratégia válida SE tem {{plano}} para virar positivo. Sem plano, é caminho para falência.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Fluxo de Investimento',
+                    period: 'O futuro',
+                    text: 'Compra/venda de ativos de longo prazo: equipamentos, imóveis, {{aquisições}}, investimentos. Normalmente negativo em empresas que crescem (investindo). Positivo pode significar que está vendendo ativos.',
+                    caseStudy: {
+                      company: 'Ambev',
+                      year: 2023,
+                      story: 'Investiu {{R$ 4 bilhões}} em novas fábricas e automação. Fluxo de investimento fortemente negativo. O investimento de hoje é a margem de amanhã.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 4B', label: 'CAPEX anual' },
+                        { value: 'Negativo', label: 'Fluxo (investindo)' },
+                        { value: 'ROI', label: 'Retorno em 3-5 anos' },
+                      ],
+                      insight: 'Fluxo de investimento positivo em empresa que não está crescendo = {{vendendo os móveis}} para pagar o aluguel.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Fluxo de Financiamento',
+                    period: 'De onde vem o dinheiro',
+                    text: 'Captação e pagamento de dívidas, emissão de ações, dividendos. {{Como}} a empresa se financia: capital próprio (ações) ou de terceiros (dívida).',
+                    caseStudy: {
+                      company: 'Nubank',
+                      year: 2021,
+                      story: 'IPO na NYSE captou {{US$ 2.6 bilhões}}. Fluxo de financiamento massivamente positivo. Esse dinheiro financiou o crescimento que gerou 80M de clientes.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'US$ 2.6B', label: 'IPO NYSE' },
+                        { value: 'Ações', label: 'Capital próprio (não dívida)' },
+                        { value: '80M', label: 'Clientes financiados' },
+                      ],
+                      insight: 'Financiar por ação (equity) dilui sócios mas não gera juros. Por dívida não dilui mas gera {{obrigação fixa}}.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: '**Runway** é quanto tempo a empresa sobrevive com o caixa atual, sem nova receita. Fórmula: Caixa ÷ Queima Mensal = meses de sobrevivência. Startups consideram {{6 meses}} o mínimo seguro. Abaixo disso, é emergência de captação.',
+              },
             ],
-            formula: 'total_liabilities / total_assets',
-            resultLabel: 'Índice de Endividamento',
-            interpretation: [
-              { max: 0.5, label: 'Endividamento saudável — empresa financiada majoritariamente por capital próprio', color: 'green' },
-              { max: 0.7, label: 'Endividamento moderado — atenção à capacidade de pagamento e custo da dívida', color: 'amber' },
-              { max: 1.5, label: 'Endividamento alto — risco de insolvência se receita cair. Priorize redução de dívida', color: 'red' },
-            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada tipo de fluxo conta uma história diferente. Classifique.',
+              compare: {
+                columnHeaders: ['Operacional', 'Investimento', 'Financiamento'],
+                rows: [
+                  { label: 'Conta', values: ['Dia a dia', 'Ativos/futuro', 'Dívida/capital'] },
+                  { label: 'Saudável', values: ['Positivo', 'Negativo (crescendo)', 'Depende'] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada movimento no fluxo correto:',
+                zones: [
+                  { id: 'op', label: 'Operacional' },
+                  { id: 'inv', label: 'Investimento' },
+                  { id: 'fin', label: 'Financiamento' },
+                ],
+                items: [
+                  { id: 'venda', label: 'Receber pagamento de cliente', correctZone: 'op', correctFeedback: 'Certo. Receita da operação.', wrongFeedback: 'Receber de cliente = operacional.' },
+                  { id: 'maq', label: 'Comprar máquina nova', correctZone: 'inv', correctFeedback: 'Certo. Ativo de longo prazo.', wrongFeedback: 'Compra de ativo = investimento.' },
+                  { id: 'emp', label: 'Tomar empréstimo bancário', correctZone: 'fin', correctFeedback: 'Certo. Captação de dívida.', wrongFeedback: 'Empréstimo = financiamento.' },
+                  { id: 'sal', label: 'Pagar salários', correctZone: 'op', correctFeedback: 'Certo. Despesa operacional.', wrongFeedback: 'Salário = custo da operação.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Lucro ≠ Caixa. Empresa lucrativa quebra por falta de {{oxigênio}} (caixa). Os 3 fluxos (operacional, investimento, financiamento) contam histórias complementares. Runway = quanto tempo você sobrevive.',
+              keyInsights: [
+                'Vendeu R$ 100k em janeiro, cliente paga em abril. Na DRE = lucro. No caixa = {{zero}}.',
+                'iFood queimou caixa por anos de propósito. Sem plano de virar positivo, queima = {{falência}}.',
+                'Runway < 6 meses = emergência. Acima de 12 meses = {{tranquilidade}} para focar em produto.',
+              ],
+            },
           },
           {
             id: 'M2-1-s1',
             type: 'simulation',
             title: 'Monte um Balanço Patrimonial — Ativo = Passivo + PL',
             simulationId: 'balance-sheet-builder',
-            description: 'Construa um balanço patrimonial equilibrado. Insira ativos, passivos e patrimônio líquido e veja se a equação fundamental fecha.',
-          },
-          {
-            id: 'M2-1-t2',
-            type: 'text',
-            title: 'DRE — Demonstração do Resultado do Exercício',
-            body: 'A DRE mostra o desempenho financeiro da empresa ao longo de um período (mês, trimestre, ano). Ela responde: "a operação gerou lucro ou prejuízo?"\n\n**Estrutura da DRE (de cima para baixo):**\n\n**Receita Bruta** — tudo que a empresa vendeu no período\n(–) Deduções (impostos sobre vendas, devoluções, descontos)\n= **Receita Líquida**\n\n(–) CMV/CPV (Custo da Mercadoria/Produto Vendido)\n= **Lucro Bruto** → mostra a eficiência produtiva\n\n(–) Despesas Operacionais (administrativas, comerciais, P&D)\n= **EBITDA** → lucro antes de juros, impostos, depreciação e amortização\n\n(–) Depreciação e Amortização\n= **EBIT** (Lucro Operacional)\n\n(+/–) Resultado Financeiro (receitas financeiras – despesas financeiras)\n= **Lucro Antes do IR (LAIR)**\n\n(–) IR e CSLL\n= **Lucro Líquido** → o resultado final\n\n**Margens que importam:**\n— Margem Bruta = Lucro Bruto ÷ Receita Líquida (eficiência do produto)\n— Margem EBITDA = EBITDA ÷ Receita Líquida (eficiência operacional)\n— Margem Líquida = Lucro Líquido ÷ Receita Líquida (eficiência total)\n\nExemplo: Empresa com Receita de R$ 1M, CMV de R$ 400k e despesas de R$ 350k tem Margem Bruta de 60% e EBITDA de 25%. Se a margem líquida cai para 5%, o problema está abaixo da linha operacional — juros ou impostos estão corroendo o resultado.\n\nIMPORTANTE: Faturamento alto não significa lucro. Uma empresa pode faturar R$ 10M e ter prejuízo. A DRE revela onde o dinheiro está sendo consumido.',
-          },
-          {
-            id: 'M2-1-c2',
-            type: 'concept',
-            term: 'EBITDA',
-            definition: 'Lucro antes de Juros, Impostos, Depreciação e Amortização (Earnings Before Interest, Taxes, Depreciation and Amortization). Mede a capacidade de geração de caixa operacional da empresa — isolando o resultado da operação sem o efeito de decisões financeiras (dívida), tributárias (regime fiscal) ou contábeis (depreciação). É o indicador mais usado por investidores para comparar empresas.',
-            example: 'Empresa com receita de R$ 1M, CMV de R$ 400k e despesas operacionais de R$ 350k tem EBITDA de R$ 250k (margem EBITDA de 25%). Um investidor usa esse número para calcular o valor da empresa: se o múltiplo do setor é 8x EBITDA, a empresa vale ~R$ 2M.',
-            antiExample: 'Empreendedor que diz "minha empresa tem EBITDA de R$ 500k" mas inclui receita financeira de aplicações e uma venda extraordinária de imóvel no cálculo. EBITDA é resultado OPERACIONAL recorrente — incluir itens não-operacionais distorce completamente a análise.',
-          },
-          {
-            id: 'M2-1-ex1',
-            type: 'inline-exercise',
-            prompt: 'Monte a DRE simplificada do seu negócio (ou de uma empresa que você conhece). Calcule as margens bruta, EBITDA e líquida.',
-            context: 'A DRE vai de cima para baixo: Receita Bruta → (-) Deduções = Receita Líquida → (-) CMV = Lucro Bruto → (-) Despesas Operacionais = EBITDA → (-) Depreciação = EBIT → (+/-) Resultado Financeiro → (-) IR = Lucro Líquido.',
-            fields: [
-              {
-                id: 'revenue',
-                label: 'Receita Bruta Mensal',
-                placeholder: 'Ex: R$ 150.000/mês',
-              },
-              {
-                id: 'cmv',
-                label: 'CMV — Custo da Mercadoria/Serviço Vendido',
-                placeholder: 'Ex: R$ 60.000 (40% da receita — insumos, matéria-prima, mão de obra direta)',
-              },
-              {
-                id: 'opex',
-                label: 'Despesas Operacionais (aluguel, salários admin, marketing)',
-                placeholder: 'Ex: R$ 55.000 (aluguel R$ 8k, folha admin R$ 30k, marketing R$ 10k, outros R$ 7k)',
-              },
-              {
-                id: 'financial',
-                label: 'Despesas Financeiras (juros, tarifas bancárias)',
-                placeholder: 'Ex: R$ 5.000/mês em juros de empréstimo + R$ 1.200 em tarifas',
-              },
-            ],
-            evaluationCriteria: [
-              'Valores são realistas e proporcionais entre si',
-              'CMV é calculado corretamente (custos DIRETOS do produto/serviço)',
-              'Despesas operacionais são separadas de custos diretos',
-              'O aluno consegue identificar onde está a maior "mordida" na margem',
-            ],
-            expectedConcepts: ['margem bruta', 'EBITDA', 'margem líquida', 'CMV', 'despesas operacionais'],
+            description: 'Monte um balanço completo e veja se a equação fecha.',
           },
           {
             id: 'M2-1-s2',
             type: 'simulation',
             title: 'Simulador de DRE — Calcule Suas Margens',
             simulationId: 'dre-analyzer',
-            description: 'Monte uma DRE completa: insira receita, custos e despesas. Veja automaticamente lucro bruto, EBITDA e lucro líquido com margens calculadas.',
-          },
-          {
-            id: 'M2-1-t3',
-            type: 'text',
-            title: 'Fluxo de Caixa: O Oxigênio do Negócio',
-            body: 'Fluxo de caixa é o registro de todas as entradas e saídas de dinheiro da empresa. Diferente da DRE (que usa regime de competência), o fluxo de caixa usa regime de caixa — registra quando o dinheiro efetivamente entra ou sai.\n\n**Por que o fluxo de caixa é mais importante que o lucro?**\nUma empresa pode ter lucro contábil e quebrar por falta de caixa. Isso acontece quando:\n— Vende a prazo mas paga à vista\n— Tem estoque parado (dinheiro imobilizado)\n— Investe em ativos antes de gerar receita suficiente\n\n**Estrutura do Fluxo de Caixa (DFC):**\n\n**Fluxo Operacional** — dinheiro gerado pelas atividades principais: recebimento de vendas, pagamento de fornecedores, salários, impostos. Se este é negativo, a operação não se sustenta.\n\n**Fluxo de Investimento** — dinheiro gasto ou recebido em ativos: compra de equipamentos, aquisições, venda de imóveis. Negativo pode ser sinal de crescimento (investindo).\n\n**Fluxo de Financiamento** — dinheiro de empréstimos, aportes de sócios, pagamento de dívidas, distribuição de dividendos.\n\n**Indicadores críticos:**\n— Burn Rate: quanto a empresa queima de caixa por mês (startups)\n— Runway: quantos meses de operação o caixa atual sustenta (Caixa ÷ Burn Rate)\n— Ciclo Financeiro: tempo entre pagar o fornecedor e receber do cliente\n\nNa prática: Projete o fluxo de caixa para os próximos 6 meses. Se algum mês fica negativo, você precisa agir AGORA — renegociar prazos, antecipar recebíveis ou buscar capital.\n\nPergunta-chave: Quantos meses de runway sua empresa tem hoje? Se a resposta é "não sei", este é o primeiro número que você precisa calcular.',
-          },
-          {
-            id: 'M2-1-c3',
-            type: 'concept',
-            term: 'Runway',
-            definition: 'Quantidade de meses que a empresa consegue operar com o caixa atual, considerando o burn rate (queima de caixa mensal). Fórmula: Runway = Caixa Disponível ÷ (Custo Mensal – Receita Mensal). Se a receita cobre os custos, o runway é infinito. Se não, o relógio está correndo.',
-            example: 'Startup com R$ 600k em caixa, custo mensal de R$ 80k e receita de R$ 30k. Burn rate líquido = R$ 50k/mês. Runway = 600k ÷ 50k = 12 meses. Isso significa: em 12 meses, sem mudanças, o caixa zera. O momento de buscar capital é AGORA — não quando restar 2 meses.',
-            antiExample: 'Fundador que diz "temos runway de 18 meses" mas não inclui o 13o salário, férias e impostos trimestrais no cálculo do custo mensal. O runway real é 11 meses. Omitir custos sazonais é o erro mais comum — e mais perigoso.',
-          },
-          {
-            id: 'M2-1-d1',
-            type: 'decision',
-            scenario: 'Sua empresa tem R$ 200.000 em caixa e burn rate de R$ 50.000/mês (4 meses de runway). A operação ainda não é lucrativa — receita mensal de R$ 30.000 cobrindo apenas 60% dos custos. Um investidor oferece R$ 500.000 por 25% da empresa (valuation de R$ 2M). O que você faz?',
-            options: [
-              {
-                label: 'Aceitar o investimento de R$ 500k por 25%',
-                tradeoffs: {
-                  upside: 'Runway salta de 4 para 14 meses (R$ 700k ÷ R$ 50k). Tempo para ajustar o modelo, crescer receita, e chegar ao breakeven. Investidor traz rede de contatos e credibilidade',
-                  downside: 'Dilui 25% — fundador perde 1/4 do controle. Valuation de R$ 2M pode estar abaixo do potencial real. Investidor terá voz nas decisões estratégicas',
-                  risk: 'low' as const,
-                },
-              },
-              {
-                label: 'Recusar e cortar custos agressivamente para sobreviver',
-                tradeoffs: {
-                  upside: 'Mantém 100% da empresa. Cortar R$ 20k/mês (de R$ 50k para R$ 30k) equilibra com receita atual. Disciplina financeira força eficiência',
-                  downside: 'Cortar R$ 20k provavelmente significa demitir pessoas — perda de capacidade. Crescimento freia. Se cortes afetarem qualidade, receita pode cair ao invés de subir',
-                  risk: 'high' as const,
-                },
-              },
-              {
-                label: 'Negociar: aceitar R$ 300k por 15% e buscar ponte de receita',
-                tradeoffs: {
-                  upside: 'Dilui menos (15% vs 25%). Valuation implícito sobe para R$ 2M. Runway de ~10 meses. Mantém pressão para crescer receita, sem desespero',
-                  downside: 'Investidor pode recusar — 15% por R$ 300k não é o deal original. Se recusar, você perdeu tempo e o runway encolheu. Negociação pode desgastar a relação',
-                  risk: 'medium' as const,
-                },
-              },
-            ],
-            realWorldAnalog: 'A 99 (app de transporte) aceitou diluição para crescer rápido — e vendeu por R$ 2,4 bilhões para a Didi. Muitos founders que recusaram investimento para "não diluir" ficaram sem caixa e fecharam. A diluição inteligente é melhor que 100% de nada.',
-            lesson: 'A decisão não é "aceitar ou recusar investimento" — é "quanto vale 1 mês a mais de runway?" Com 4 meses de runway, o poder de negociação é baixo. Com 12 meses, é alto. Busque capital quando NÃO precisa desesperadamente — é quando o deal é melhor.',
-          },
-          {
-            id: 'M2-1-nc2',
-            type: 'number-crunch',
-            title: 'Calculadora de Runway',
-            scenario: 'Descubra quantos meses sua empresa sobrevive com o caixa atual. Se o resultado for menor que 6 meses, o alerta é vermelho — hora de agir.',
-            inputs: [
-              { id: 'cash', label: 'Caixa Disponível Atual', defaultValue: 200000, unit: 'R$', min: 0, max: 50000000 },
-              { id: 'monthly-revenue', label: 'Receita Mensal', defaultValue: 30000, unit: 'R$', min: 0, max: 10000000 },
-              { id: 'monthly-cost', label: 'Custo Mensal Total', defaultValue: 50000, unit: 'R$', min: 1000, max: 10000000 },
-            ],
-            formula: 'monthly_cost > monthly_revenue ? cash / (monthly_cost - monthly_revenue) : 999',
-            resultLabel: 'Meses de Runway',
-            interpretation: [
-              { max: 6, label: 'Runway crítico — menos de 6 meses. Ação urgente: cortar custos, acelerar receita ou buscar capital AGORA', color: 'red' },
-              { max: 12, label: 'Runway moderado — 6 a 12 meses. Tempo para ajustar, mas comece a planejar próxima rodada ou breakeven', color: 'amber' },
-              { max: 999, label: 'Runway confortável — mais de 12 meses ou operação já é sustentável. Foco em crescimento', color: 'green' },
-            ],
+            description: 'Insira receita e custos e veja as 3 margens (bruta, operacional, líquida).',
           },
           {
             id: 'M2-1-s3',
             type: 'simulation',
             title: 'Projeção de Fluxo de Caixa — 6 Meses',
             simulationId: 'cash-flow-projection',
-            description: 'Projete receitas e custos para 6 meses e veja seu saldo, burn rate e runway. Identifique meses críticos antes que aconteçam.',
+            description: 'Projete entradas e saídas para os próximos 6 meses e veja seu runway.',
           },
         ],
       },
+
       {
         id: 'M2-2',
         title: 'Matematica Financeira',
