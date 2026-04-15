@@ -1068,7 +1068,7 @@ export default function AbaEstudo() {
                                         <div className="flex items-center gap-3 pt-2">
                                           {hasPrev && (
                                             <button
-                                              onClick={(e) => { e.stopPropagation(); setActiveBlockIdx((prev) => ({ ...prev, [subId]: idx - 1 })) }}
+                                              onClick={(e) => { e.stopPropagation(); setActiveBlockIdx((prev) => ({ ...prev, [subId]: idx - 1 })); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                                               className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-[10px] uppercase tracking-[0.22em] text-white/36 transition hover:border-white/18 hover:text-white/60"
                                             >
                                               ← Anterior
@@ -1079,7 +1079,7 @@ export default function AbaEstudo() {
                                           <div className="flex-1" />
                                           {hasNext ? (
                                             <button
-                                              onClick={(e) => { e.stopPropagation(); setActiveBlockIdx((prev) => ({ ...prev, [subId]: idx + 1 })) }}
+                                              onClick={(e) => { e.stopPropagation(); setActiveBlockIdx((prev) => ({ ...prev, [subId]: idx + 1 })); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                                               className="flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-4 py-2 text-[10px] uppercase tracking-[0.22em] text-white/46 transition hover:border-white/20 hover:text-white/72"
                                             >
                                               Continuar →
