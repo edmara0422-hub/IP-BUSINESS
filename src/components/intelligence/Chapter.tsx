@@ -89,8 +89,8 @@ export default function Chapter({ block }: Props) {
       style={{
         background: COLORS.bg,
         border: `1px solid ${COLORS.border}`,
-        borderRadius: 20,
-        padding: '28px 22px',
+        borderRadius: 16,
+        padding: '20px 16px',
         color: COLORS.text,
         marginBottom: 20,
       }}
@@ -108,7 +108,7 @@ export default function Chapter({ block }: Props) {
       />
 
       {/* B — CORPO */}
-      <section style={{ marginTop: 32 }}>
+      <section style={{ marginTop: 22 }}>
         {block.body.map((section, i) => (
           <BodySectionRenderer key={i} section={section} chapterId={block.id} />
         ))}
@@ -162,7 +162,7 @@ function ChapterHeader({
       </span>
       <h1
         style={{
-          fontSize: 20,
+          fontSize: 17,
           fontWeight: 700,
           letterSpacing: '-0.01em',
           color: 'rgba(255,255,255,0.95)',
@@ -176,10 +176,10 @@ function ChapterHeader({
       {subtitle && (
         <p
           style={{
-            fontSize: 13,
-            lineHeight: 1.6,
+            fontSize: 11,
+            lineHeight: 1.5,
             color: 'rgba(255,255,255,0.45)',
-            margin: '8px 0 0 0',
+            margin: '6px 0 0 0',
           }}
         >
           {subtitle}
@@ -221,8 +221,8 @@ function ChapterOpening({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: showTimeline ? 0.5 : 0 }}
         style={{
-          fontSize: 15,
-          lineHeight: 1.8,
+          fontSize: 13,
+          lineHeight: 1.7,
           color: 'rgba(255,255,255,0.8)',
           marginTop: showTimeline ? 8 : 0,
           textAlign: 'justify',
@@ -243,10 +243,10 @@ function BodySectionRenderer({ section, chapterId }: { section: ChapterBodySecti
     return (
       <p
         style={{
-          fontSize: 14,
-          lineHeight: 1.8,
+          fontSize: 12,
+          lineHeight: 1.7,
           color: 'rgba(255,255,255,0.75)',
-          margin: '0 0 18px 0',
+          margin: '0 0 14px 0',
           textAlign: 'justify',
         }}
       >
@@ -369,7 +369,7 @@ function DeepTextSection({ section }: { section: ChapterDeepText }) {
           // Regular paragraph with inline markup
           return (
             <p key={idx} style={{
-              fontSize: 13, lineHeight: 1.75, color: 'rgba(255,255,255,0.85)',
+              fontSize: 11, lineHeight: 1.7, color: 'rgba(255,255,255,0.85)',
               margin: 0, textAlign: 'justify', hyphens: 'auto',
             }}>
               {renderDeepInline(para, conceptMap, refMap, setOpenConcept, setOpenRef)}

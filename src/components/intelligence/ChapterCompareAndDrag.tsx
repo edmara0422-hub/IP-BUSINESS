@@ -109,10 +109,10 @@ export default function ChapterCompareAndDrag({ application }: Props) {
     <div>
       <p
         style={{
-          fontSize: 11,
-          lineHeight: 1.65,
+          fontSize: 10,
+          lineHeight: 1.55,
           color: COLORS.textMuted,
-          margin: '0 0 18px 0',
+          margin: '0 0 14px 0',
           textAlign: 'justify',
           hyphens: 'auto',
         }}
@@ -133,7 +133,7 @@ export default function ChapterCompareAndDrag({ application }: Props) {
       />
 
       {/* ── ETAPA 2: CARDS DE EMPRESAS PARA CLASSIFICAR ──────── */}
-      <div style={{ marginTop: 28 }}>
+      <div style={{ marginTop: 18 }}>
         <div
           style={{
             display: 'flex',
@@ -146,8 +146,8 @@ export default function ChapterCompareAndDrag({ application }: Props) {
         >
           <p
             style={{
-              fontSize: 11,
-              lineHeight: 1.55,
+              fontSize: 10,
+              lineHeight: 1.45,
               fontWeight: 600,
               color: COLORS.text,
               margin: 0,
