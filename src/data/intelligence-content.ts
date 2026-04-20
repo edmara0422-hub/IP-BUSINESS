@@ -8713,8 +8713,6 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             },
           },
         ],
-
-        ],
       },
       {
         id: 'M6-2',
