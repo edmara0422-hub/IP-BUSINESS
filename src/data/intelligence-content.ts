@@ -6703,184 +6703,741 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         id: 'M5-1',
         title: 'Empreendedorismo e Inovacao',
         blocks: [
+          // ── CHAPTER 1 ──────────────────────────────────────────────
           {
-            id: 'M5-1-t1',
-            type: 'text',
-            title: 'Empreendedorismo — O que É e O que Não É',
-            body: 'Empreendedorismo não é "abrir empresa". É identificar oportunidades e criar valor onde antes não existia — com recursos limitados e sob incerteza.\n\n**Definições que importam:**\n— Schumpeter: Empreendedor é o agente da "destruição criativa" — destrói o velho para criar o novo\n— Drucker: Empreendedorismo é a prática de transformar recursos em riqueza por meio de uma nova capacidade de criação\n— Sarasvathy: Empreendedores não preveem o futuro — eles o constroem (Effectuation)\n\n**Mitos do empreendedorismo:**\n\nMito 1: "Empreendedores nascem prontos"\nRealidade: Empreendedorismo é habilidade treinável. Pesquisa do MIT mostra que treinamento formal aumenta probabilidade de sucesso em 2.5x.\n\nMito 2: "Precisa de uma ideia genial"\nRealidade: 90% dos negócios de sucesso não são ideias originais — são execuções superiores de ideias existentes. McDonald\'s não inventou o hambúrguer.\n\nMito 3: "Precisa de muito dinheiro"\nRealidade: 70% das startups do Vale do Silício começaram com menos de US$ 10K. Bootstrapping é a norma, não a exceção.\n\nMito 4: "Empreendedores amam risco"\nRealidade: Bons empreendedores GERENCIAM risco. Calculam, mitigam e assumem risco calculado — não risco cego.\n\n**Tipos de empreendedorismo:**\n— Por oportunidade: identifica gap no mercado e cria solução (startup, inovação)\n— Por necessidade: empreende por falta de emprego (autônomos, MEIs)\n— Intraempreendedorismo: empreender dentro de uma organização existente\n— Social: resolver problemas sociais de forma sustentável (Grameen Bank, Ashoka)\n\n**Empreendedorismo no Brasil — Números reais:**\n— 53 milhões de empreendedores ativos (GEM, 2024) — 1 a cada 3 adultos\n— 70% são empreendedores por necessidade, não por oportunidade\n— Taxa de mortalidade: 29% das empresas fecham em até 5 anos (IBGE)\n— Causas principais de falência: falta de gestão financeira (82%), falta de planejamento (72%), falta de capacitação (55%)\n— MEI: 15 milhões de cadastros ativos — maior programa de formalização do mundo\n\n**Cases brasileiros de empreendedorismo por oportunidade:**\n— Nubank (2013): David Vélez identificou que brasileiros odiavam seus bancos → 100M+ clientes, US$ 45B valuation\n— Hotmart (2011): João Pedro Resende viu que criadores de conteúdo não tinham plataforma de monetização → líder em infoprodutos na AL\n— NotCo (2015): IA para criar alimentos plant-based → presente em 8 países\n— Quinto Andar (2013): alugar imóvel no Brasil era burocrático e inseguro → digitalizou tudo, US$ 5B valuation\n\nPergunta-chave: Você está empreendendo por oportunidade ou por necessidade? A resposta muda completamente a estratégia, o ritmo e o tipo de apoio que você precisa.',
-          },
-          {
-            id: 'M5-emp-concept1',
-            type: 'concept',
-            term: 'Destruição Criativa (Schumpeter)',
-            definition: 'Processo pelo qual inovações destroem modelos de negócio existentes para criar novos. O empreendedor é o agente dessa destruição — transforma o mercado ao criar valor onde antes não existia.',
-            example: 'O Nubank destruiu o modelo de banco com agências ao criar banco 100% digital sem tarifas. Itaú e Bradesco perderam milhões de clientes — a destruição criativa em ação.',
-            antiExample: 'Abrir uma padaria igual às outras do bairro NÃO é destruição criativa. É réplica. Empreendedorismo schumpeteriano exige criar algo que mude a lógica do mercado.',
-          },
-          {
-            id: 'M5-emp-decision1',
-            type: 'decision',
-            scenario: 'Você tem uma ideia para um app de gestão financeira para MEIs. Tem R$ 30K em economias, conhecimento técnico e rede de contatos com pequenos empresários. O que faz primeiro?',
-            options: [
-              { label: 'Escrever business plan detalhado e buscar investidor', tradeoffs: { upside: 'Planejamento completo antes de gastar', downside: 'Meses planejando sem validar se alguém quer o produto', risk: 'medium' as const } },
-              { label: 'Construir MVP em 30 dias e testar com 50 MEIs', tradeoffs: { upside: 'Validação rápida com dados reais de mercado', downside: 'MVP pode estar feio/incompleto e afastar primeiros usuários', risk: 'low' as const } },
-              { label: 'Investir os R$ 30K em produto completo antes de lançar', tradeoffs: { upside: 'Produto polido na primeira impressão', downside: 'Se ninguém quiser, perdeu R$ 30K e meses de trabalho', risk: 'high' as const } },
-              { label: 'Entrevistar 30 MEIs primeiro para validar o problema', tradeoffs: { upside: 'Custo zero, valida se o problema existe antes de construir', downside: 'Entrevistas consomem tempo e não provam que pagarão', risk: 'low' as const } },
+            id: 'M5-1-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Empreender — O que É e Como Pensar',
+            subtitle: 'De Schumpeter à Effectuation — as duas lógicas que separam empreendedores que criam do que os que apenas executam',
+            opening: {
+              leadText: 'Empreendedorismo não é "abrir empresa". É identificar oportunidades e criar valor onde antes não existia — com recursos limitados e sob incerteza. {{53 milhões}} de empreendedores ativos no Brasil (GEM, 2024), mas 70% empreendem por necessidade, não por oportunidade. A diferença muda tudo: estratégia, ritmo, capital e probabilidade de sucesso.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'Três pensadores definiram o que é empreender de formas complementares. Schumpeter: o empreendedor é agente da {{destruição criativa}} — destrói o velho para criar o novo (Nubank destruiu o banco com agências). Drucker: empreendedorismo é a prática de transformar recursos em riqueza por meio de uma nova capacidade. Sarasvathy: empreendedores não preveem o futuro — eles o constroem.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Mitos que precisam morrer',
+                pillars: [
+                  { icon: '🧬', title: '"Nascem prontos"', description: 'Falso. Pesquisa do MIT: treinamento formal aumenta probabilidade de sucesso em {{2,5x}}. É habilidade treinável.' },
+                  { icon: '💡', title: '"Precisa de ideia genial"', description: 'Falso. {{90%}} dos negócios de sucesso não são ideias originais — são execuções superiores. McDonald\'s não inventou o hambúrguer.' },
+                  { icon: '💰', title: '"Precisa de dinheiro"', description: 'Falso. {{70%}} das startups do Vale começaram com menos de US$ 10K. Bootstrapping é a norma, não a exceção.' },
+                  { icon: '🎲', title: '"Amam risco"', description: 'Falso. Bons empreendedores {{gerenciam}} risco — calculam, mitigam, assumem risco calculado. Não risco cego.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'Saras Sarasvathy estudou como empreendedores experientes realmente pensam — e descobriu que a lógica é {{oposta}} ao que se ensina em MBA. Enquanto o planejamento tradicional parte do objetivo e trabalha para trás (Causation), empreendedores experientes partem do que têm e trabalham para frente (Effectuation).',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Causation — Planejamento tradicional',
+                    period: 'Mercados estáveis',
+                    text: '"Defina o objetivo → Planeje → Execute → Meça." Lógica: prever o futuro e se preparar. Ferramentas: business plan, pesquisa de mercado, projeções financeiras. Funciona quando o mercado é {{estável}}, a informação está disponível e a incerteza é baixa.',
+                    caseStudy: {
+                      company: 'Expansão Natura para Europa',
+                      year: 2017,
+                      story: 'Natura usou Causation para expandir internacionalmente: análise de mercado profunda, projeção de 5 anos, entrada faseada por país. Mercado maduro, modelo provado — {{planejar fazia sentido}}.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'Objetivo', label: 'Ponto de partida da Causation' },
+                        { value: 'Recursos', label: 'Alocados para atingir o objetivo' },
+                        { value: 'Previsão', label: 'Base de toda a lógica' },
+                      ],
+                      insight: 'Causation não é ruim — é {{inadequada para alta incerteza}}. Na expansão de negócio existente em mercado maduro, funciona perfeitamente.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Effectuation — Lógica empreendedora',
+                    period: 'Mercados incertos',
+                    text: '"Com o que tenho → O que posso criar? → Teste → Adapte." Os 5 princípios: Pássaro na Mão (comece com o que tem), Perda Aceitável (quanto pode perder sem se destruir?), Colcha de Retalhos (parceiros mudam o rumo), {{Limonada}} (surpresas são oportunidades) e Piloto do Avião (você cria o futuro).',
+                    caseStudy: {
+                      company: 'Airbnb — fundação',
+                      year: 2008,
+                      story: 'Os fundadores tinham: um apartamento com quarto vazio + uma conferência lotando os hotéis de São Francisco. {{Sem plano, sem projeção}} — usaram o que tinham. O produto emergiu das conversas com os primeiros 3 hóspedes.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'Recursos', label: 'Ponto de partida da Effectuation' },
+                        { value: 'Parcerias', label: 'Moldam o produto antes do plano' },
+                        { value: 'Surpresas', label: 'Tratadas como oportunidade (Limonada)' },
+                      ],
+                      insight: 'Post-it nasceu de adesivo que "falhou". Slack nasceu de jogo que fracassou. {{Limonada}} é o princípio mais difícil de aprender — e o mais valioso.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Pivot — Quando aprender muda o rumo',
+                    period: 'Aprendizado aplicado',
+                    text: 'Pivot não é fracasso — é aprendizado que muda a direção. Instagram era Burbn (app de check-in). Twitter era Odeo (plataforma de podcast). Slack era um jogo online. {{O produto certo nasceu do produto errado}} quando os fundadores prestaram atenção no que os usuários realmente usavam.',
+                    caseStudy: {
+                      company: 'Instagram',
+                      year: 2010,
+                      story: 'Burbn tinha {{dezenas de funcionalidades}}. Os usuários só usavam uma: compartilhar fotos com filtros. Kevin Systrom cortou tudo e lançou só essa função. {{13 dias depois}}, 25.000 usuários. Pivot total.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '13 dias', label: 'Para 25.000 usuários após o pivot' },
+                        { value: 'US$ 1B', label: 'Aquisição pelo Facebook em 2012' },
+                        { value: '0', label: 'Funcionalidades originais que sobreviveram' },
+                      ],
+                      insight: 'A diferença entre pivot e desistência: {{pivot mantém a missão e muda o produto}}. Desistência abandona tudo. Kevin Systrom manteve a missão (conectar pessoas por imagem) e mudou tudo o mais.',
+                    },
+                  },
+                ],
+              },
             ],
-            realWorldAnalog: 'Zappos (maior loja de sapatos online) começou SEM estoque: o fundador fotografava sapatos em lojas, postava online e comprava quando alguém pedia. Validou demanda com custo quase zero.',
-            lesson: 'Effectuation: comece com o que tem (quem sou, o que sei, quem conheço). O maior risco não é falhar na execução — é construir algo que ninguém quer. Valide antes de investir.',
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare as três abordagens empreendedoras em 4 dimensões. Depois, classifique as 5 situações no modo de pensar que melhor descreve cada uma.',
+              compare: {
+                columnHeaders: ['Causation', 'Effectuation', 'Pivot'],
+                rows: [
+                  {
+                    label: 'Ponto de partida',
+                    values: ['Objetivo definido', 'Recursos disponíveis', 'Aprendizado real'],
+                    viz: 'icons',
+                    icons: ['◯', '◑', '●'],
+                  },
+                  {
+                    label: 'Incerteza',
+                    values: ['Baixa', 'Alta', 'Confirmada'],
+                    viz: 'icons',
+                    icons: ['▦', '⊞', '◈'],
+                  },
+                  {
+                    label: 'Velocidade',
+                    values: ['Lenta (planeja)', 'Rápida (age)', 'Radical (muda)'],
+                    viz: 'bars',
+                    intensities: [0.25, 0.7, 1.0],
+                  },
+                  {
+                    label: 'Risco de capital',
+                    values: ['Alto (investe antes)', 'Baixo (perda aceitável)', 'Médio (reaproveitado)'],
+                    viz: 'bars',
+                    intensities: [0.85, 0.2, 0.5],
+                  },
+                ],
+              },
+              drag: {
+                instruction: 'Toque na situação, depois toque no modo de pensar que a descreve:',
+                zones: [
+                  { id: 'causation', label: 'Causation' },
+                  { id: 'effectuation', label: 'Effectuation' },
+                  { id: 'pivot', label: 'Pivot' },
+                ],
+                items: [
+                  {
+                    id: 'sit-causation',
+                    label: 'Expansão de rede de franquias',
+                    sublabel: 'Uma rede de 80 lojas planeja abrir mais 30 em 2 anos. Faz pesquisa de mercado por cidade, projeta break-even e define cronograma de expansão.',
+                    correctZone: 'causation',
+                    correctFeedback: 'Correto. Modelo comprovado, mercado conhecido, projeção baseada em dados reais — Causation pura. Quando existe incerteza baixa e modelo validado, planejar antes de agir é a abordagem certa.',
+                    wrongFeedback: 'Repense. A rede já tem 80 lojas com modelo comprovado. Não é incerteza alta — é expansão de algo que funciona. Pesquisa + projeção + cronograma = Causation.',
+                  },
+                  {
+                    id: 'sit-effectuation',
+                    label: 'Primeiro produto com o que tem',
+                    sublabel: 'Designer freelancer começa a vender templates prontos usando seus projetos existentes. Sem plano — testou com a própria rede, ajustou preço pelo feedback.',
+                    correctZone: 'effectuation',
+                    correctFeedback: 'Correto. "Comece com o que tem" é o primeiro princípio da Effectuation (Pássaro na Mão). Usou recursos disponíveis (projetos existentes + rede), testou sem plano prévio, adaptou com feedback real.',
+                    wrongFeedback: 'Repense. Sem plano, sem objetivo pré-definido — só o que tinha disponível (projetos + rede). Isso é Effectuation: partir dos recursos e descobrir o que pode criar com eles.',
+                  },
+                  {
+                    id: 'sit-pivot',
+                    label: 'App que virou outra coisa',
+                    sublabel: 'App de agendamento médico percebia que a funcionalidade mais usada era o prontuário compartilhado. Cortou o agendamento e focou só em prontuário digital.',
+                    correctZone: 'pivot',
+                    correctFeedback: 'Correto. Pivot clássico: dados de uso revelaram que o produto real não era o planejado. Cortaram funcionalidades para focar no que os usuários realmente valorizavam. A missão (saúde digital) permaneceu.',
+                    wrongFeedback: 'Repense. O produto mudou radicalmente com base no comportamento real dos usuários — não no plano original. Isso é pivot: aprendizado que força mudança de direção.',
+                  },
+                  {
+                    id: 'sit-effectuation2',
+                    label: 'Startup fundada numa conferência',
+                    sublabel: 'Dois engenheiros no hackathon resolveram um problema que viram no evento. Sem plano — formaram parceria ali, construíram protótipo em 48h, mostraram para 10 potenciais clientes no corredor.',
+                    correctZone: 'effectuation',
+                    correctFeedback: 'Correto. Colcha de Retalhos + Pássaro na Mão: parceria formada pelo encontro (recurso disponível), protótipo como teste de perda aceitável, feedback imediato. Não houve plano — houve ação.',
+                    wrongFeedback: 'Repense. Parceria improvisada, protótipo em 48h, sem plano prévio — os fundadores usaram o que tinham (habilidades técnicas + oportunidade do evento). Effectuation.',
+                  },
+                  {
+                    id: 'sit-pivot2',
+                    label: 'Plataforma de games que virou Slack',
+                    sublabel: 'Empresa de jogos online percebeu que os jogadores adoravam a ferramenta interna de comunicação que usavam — mais do que o jogo. Abandonaram o jogo e lançaram a ferramenta.',
+                    correctZone: 'pivot',
+                    correctFeedback: 'Correto. Esse é exatamente o caso real do Slack. A ferramenta interna tinha mais tração do que o produto principal. Pivot total: mesma empresa, mesma equipe, produto completamente diferente.',
+                    wrongFeedback: 'Repense. Isso é a história real do Slack — o jogo falhou mas a ferramenta de comunicação criada internamente era o produto real. Abandonar o plano original com base em evidência = pivot.',
+                  },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Não existe lógica certa — existe a lógica {{adequada ao contexto}}. Causation para mercados maduros. Effectuation para mercados incertos. Pivot quando o aprendizado contradiz o plano. O empreendedor competente transita entre as três.',
+              keyInsights: [
+                'Destruição criativa não é sobre destruir — é sobre criar algo que torna o antigo {{desnecessário}}.',
+                'Effectuation: a pergunta não é "o que preciso para atingir X?" — é "o que posso criar com o que tenho {{agora}}?"',
+                'Pivot mantém a missão e muda o produto. Quem muda a missão a cada semana não pivotou — perdeu o rumo.',
+              ],
+              nextChapterHint: 'Capítulo 2 · Validar Antes de Construir',
+              nextChapterBlurb: 'Lean Startup, MVP e Product-Market Fit — como provar que alguém quer o produto antes de gastar o capital todo.',
+            },
           },
+
+          // ── CHAPTER 2 ──────────────────────────────────────────────
           {
-            id: 'M5-1-t2',
-            type: 'text',
-            title: 'Effectuation vs. Causation — Duas Lógicas de Empreender',
-            body: 'Saras Sarasvathy (Universidade de Virginia) estudou como empreendedores experientes realmente pensam. Descobriu que a lógica é OPOSTA ao que se ensina na escola de negócios.\n\n**Causation (Planejamento Tradicional):**\n"Defina o objetivo → Planeje → Execute → Meça"\nLógica: Prever o futuro e se preparar para ele.\nFerramentas: Business plan, pesquisa de mercado, projeções financeiras\nFunciona quando: Mercado estável, informação disponível, baixa incerteza\n\n**Effectuation (Lógica Empreendedora):**\n"Com o que eu tenho → O que posso criar? → Teste → Adapte"\nLógica: Não prever o futuro — construí-lo com os recursos disponíveis.\n\n**Os 5 Princípios do Effectuation:**\n\n1. Pássaro na Mão (Bird-in-Hand)\n— Comece com o que você TEM: quem sou, o que sei, quem conheço\n— Não espere o recurso ideal. Use o recurso disponível.\n— Exemplo: A Airbnb começou porque os fundadores tinham um apartamento com quarto vazio e uma conferência lotando os hotéis da cidade.\n\n2. Perda Aceitável (Affordable Loss)\n— Não pergunte "quanto posso ganhar?" Pergunte: "quanto posso perder sem me destruir?"\n— Invista apenas o que pode perder. Isso elimina a paralisia.\n— Exemplo: Teste um MVP com R$ 5K em vez de investir R$ 500K num produto perfeito.\n\n3. Colcha de Retalhos (Crazy Quilt)\n— Construa parcerias com quem se compromete ANTES de ter o plano pronto\n— Cada parceiro traz novos recursos e muda o rumo do projeto — e isso é bom.\n\n4. Limonada (Lemonade)\n— Surpresas não são falhas — são oportunidades.\n— O Post-it nasceu de um adesivo que "falhou" — não colava permanentemente.\n— Slack nasceu como ferramenta interna de comunicação de um jogo que fracassou.\n\n5. Piloto do Avião (Pilot-in-the-Plane)\n— O futuro não é algo a ser previsto. É algo a ser criado pelas suas ações.\n— Você controla o que faz, não o que o mercado faz.\n\n**Quando usar qual:**\n— Causation: expansão de negócio existente, mercados maduros, decisões com dados\n— Effectuation: novo negócio, mercados incertos, early-stage, inovação radical',
-          },
-          {
-            id: 'M5-1-t3',
-            type: 'text',
-            title: 'Lean Startup — Construir, Medir, Aprender',
-            body: 'Eric Ries (2011) sistematizou o método que a maioria das startups de sucesso usa (conscientemente ou não).\n\n**O Problema que o Lean Resolve:**\nO maior risco de um novo negócio NÃO é falhar na execução. É construir algo que ninguém quer. 42% das startups falham por "falta de necessidade de mercado" (CB Insights).\n\n**O Ciclo Build-Measure-Learn:**\n\n**1. Build (Construir) — MVP**\nMínimo Produto Viável: a versão mais simples que permite testar a hipótese principal.\n— NÃO é o produto final com menos funcionalidades\n— É o experimento mais barato para aprender se a hipótese é verdadeira\n\nExemplos de MVP:\n— Dropbox: vídeo de 3 minutos mostrando como funcionaria. 75.000 inscritos na lista de espera em uma noite. Zero código.\n— Zappos: o fundador foi a lojas, fotografou sapatos, postou online. Quando alguém comprava, ele ia à loja comprar e enviava. Validou a demanda sem estoque.\n— Buffer: uma landing page com preços. Se a pessoa clicava em "assinar", aparecia "ainda não estamos prontos, deixe seu email". Mediu interesse real.\n\n**2. Measure (Medir) — Métricas que Importam**\nMétricas de vaidade: downloads, pageviews, seguidores (parecem bons, não dizem nada)\nMétricas acionáveis: taxa de conversão, retenção D7, LTV/CAC, NPS\n\nA pergunta: "Se essa métrica mudar, minha decisão muda?" Se não → métrica de vaidade.\n\n**3. Learn (Aprender) — Pivotar ou Perseverar**\nCom os dados do experimento:\n— Hipótese validada → Persevere. Escale.\n— Hipótese invalidada → Pivote. Mude a abordagem.\n\nPivot não é fracasso. É aprendizado aplicado. Instagram começou como Burbn (check-in app). Twitter começou como Odeo (plataforma de podcast). Slack começou como jogo online.\n\n**Canvas de Experimento — Template Prático:**\n1. Hipótese: "Acreditamos que [segmento] tem o problema [X]"\n2. Teste: "Vamos testar com [MVP] durante [prazo]"\n3. Métrica: "Sucesso = [métrica acionável] acima de [threshold]"\n4. Resultado: [dados reais]\n5. Decisão: Pivotar / Perseverar / Novo teste',
-          },
-          {
-            id: 'M5-emp-framework1',
-            type: 'framework',
-            frameworkId: 'experiment-canvas',
-            title: 'Canvas de Experimento — Desenhe Seu Primeiro Teste',
-            description: 'Antes de construir, teste. Use este canvas para transformar sua ideia em experimento validável. Se não pode definir o critério de sucesso, não está pronto para testar.',
-            fields: [
-              { id: 'hypothesis', label: 'Hipótese: O que acredita ser verdade?', placeholder: 'Ex: "Acreditamos que MEIs têm dificuldade em controlar fluxo de caixa e pagariam R$ 49/mês por uma solução simples"', helpText: 'A hipótese deve ser falsificável — deve existir um resultado que prove que está errada.' },
-              { id: 'mvp', label: 'MVP: Qual o teste mais simples?', placeholder: 'Ex: Landing page com proposta + botão "Quero testar" + formulário de email', helpText: 'O MVP não é o produto mínimo — é o experimento mais barato para aprender.' },
-              { id: 'metric', label: 'Métrica: Como medir sucesso?', placeholder: 'Ex: >10% de conversão na landing page = interesse real', helpText: 'Métrica de vaidade: "100 pessoas viram". Métrica acionável: "15 deixaram email e 5 agendaram demo".' },
-              { id: 'timeline', label: 'Prazo: Quanto tempo para rodar o teste?', placeholder: 'Ex: 14 dias, investimento máximo de R$ 500 em ads', helpText: 'Se o teste leva mais de 30 dias, simplifique. Velocidade de aprendizado é tudo.' },
-              { id: 'decision', label: 'Decisão: O que faz se validar? E se não validar?', placeholder: 'Ex: Se >10% → construir MVP funcional. Se <5% → pivotar para outro segmento.', helpText: 'Defina a decisão ANTES de ver os dados. Isso evita viés de confirmação.' },
+            id: 'M5-1-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Validar Antes de Construir',
+            subtitle: 'Lean Startup, MVP e Product-Market Fit — o método que evita construir algo que ninguém quer',
+            opening: {
+              leadText: 'O maior risco de um novo negócio não é falhar na execução — é construir algo que ninguém quer. {{42%}} das startups falham por "falta de necessidade de mercado" (CB Insights). O Lean Startup de Eric Ries (2011) sistematizou o método para testar antes de gastar.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'O ciclo Build-Measure-Learn não começa no Build — começa no Learn. Defina primeiro o que precisa aprender (a hipótese mais arriscada), depois o experimento mais barato para aprender isso (o MVP), e só então construa. {{MVP não é o produto mínimo — é o experimento mais barato para validar se a hipótese é verdadeira.}}',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Build — O MVP',
+                    period: 'Construir o mínimo',
+                    text: 'MVP não é o produto final com menos funcionalidades. É o experimento mais barato para aprender se a hipótese é verdadeira. Dropbox: {{vídeo de 3 minutos}} mostrando como funcionaria → 75.000 inscritos em uma noite. Zero código. Zappos: fotografou sapatos em lojas, postou online, comprava quando alguém pedia. Validou demanda {{sem estoque}}.',
+                    caseStudy: {
+                      company: 'Buffer',
+                      year: 2010,
+                      story: 'Joel Gascoigne criou uma landing page com preços. Quando alguém clicava em "assinar", aparecia: "ainda não estamos prontos — deixe seu email." {{Mediu interesse real}} antes de escrever uma linha de código. Hoje: US$ 20M+ em ARR.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '75.000', label: 'Inscritos do MVP em vídeo do Dropbox (1 noite)' },
+                        { value: 'R$ 0', label: 'Custo de código no MVP do Dropbox' },
+                        { value: '3 min', label: 'Duração do vídeo que validou um negócio bilionário' },
+                      ],
+                      insight: 'A pergunta antes de qualquer MVP: "{{qual é a hipótese mais arriscada}} do nosso modelo?" Essa é a hipótese a testar primeiro — não a mais fácil de testar.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Measure — Métricas que importam',
+                    period: 'Medir o certo',
+                    text: 'Métricas de vaidade: downloads, pageviews, seguidores — parecem bons, {{não dizem nada}}. Métricas acionáveis: taxa de conversão, retenção D7, LTV/CAC, NPS. Teste: "se essa métrica mudar, minha decisão muda?" Se não — é vaidade.',
+                    caseStudy: {
+                      company: 'Slack — métrica Aha',
+                      year: 2013,
+                      story: 'Slack descobriu que equipes que trocam {{2.000 mensagens}} nunca cancelam. Isso virou a única métrica que importava no onboarding: fazer a equipe trocar as primeiras 2.000 mensagens o mais rápido possível.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '2.000', label: 'Mensagens = momento aha do Slack (churn ~0%)' },
+                        { value: 'D30', label: 'Retenção D30 < 20% = produto não resolve o problema' },
+                        { value: '40%', label: 'Usuários "muito desapontados" = limiar de PMF (Sean Ellis)' },
+                      ],
+                      insight: '{{Métricas de retenção}} são as mais honestas: se o usuário volta, o produto tem valor. Se não volta, o problema é do produto — não do marketing.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Learn — Pivotar ou Perseverar',
+                    period: 'Decidir com dados',
+                    text: 'Hipótese validada → Persevere. Escale. Hipótese invalidada → Pivote. Mude a abordagem. Marc Andreessen: "{{Product-market fit}} é a única coisa que importa." Teste de Sean Ellis: pergunte aos usuários "Como se sentiria se não pudesse mais usar este produto?" Se {{40%+}} responde "muito desapontado" → PMF. Se <40% → continue iterando.',
+                    caseStudy: {
+                      company: 'WhatsApp',
+                      year: 2009,
+                      story: 'Sem marketing, sem anúncio, sem growth hack. As pessoas baixavam porque {{todo mundo usava}}. Crescimento orgânico explosivo = PMF nítido. Jan Koum não precisou do teste de Sean Ellis — os dados eram óbvios.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '40%', label: '"Muito desapontados" = PMF confirmado (Sean Ellis)' },
+                        { value: 'Orgânico', label: 'Como WhatsApp cresceu — zero marketing' },
+                        { value: 'US$ 19B', label: 'Aquisição pelo Facebook — 5 anos após o lançamento' },
+                      ],
+                      insight: 'PMF não é declaração — é {{comportamento}}. Indicadores reais: crescimento orgânico (pessoas indicam sem você pedir), retenção estável ou crescente, demanda maior que capacidade.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'Os {{4 estágios da validação}}: (1) Problem-Solution Fit — o problema existe e é doloroso o suficiente para alguém pagar? (2) MVP e primeiros usuários — a solução resolve de verdade? (3) Product-Market Fit — o mercado puxa o produto sem precisar ser convencido? (4) Scale — só escale após PMF. Escalar sem PMF é gastar dinheiro para descobrir mais rápido que não funciona.',
+              },
             ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare os 3 momentos da jornada de validação. Depois, classifique as 5 situações no estágio correto.',
+              compare: {
+                columnHeaders: ['Ainda testando', 'Tem PMF', 'Hora de escalar'],
+                rows: [
+                  {
+                    label: 'Retenção',
+                    values: ['Instável / baixa', 'Estável e crescente', 'Alta + orgânica'],
+                    viz: 'icons',
+                    icons: ['◯', '◑', '●'],
+                  },
+                  {
+                    label: 'Crescimento',
+                    values: ['Lento / forçado', 'Orgânico parcial', 'Viral / orgânico'],
+                    viz: 'icons',
+                    icons: ['▦', '⊞', '◈'],
+                  },
+                  {
+                    label: 'Sean Ellis',
+                    values: ['< 20%', '40%+', '60%+'],
+                    viz: 'bars',
+                    intensities: [0.1, 0.55, 1.0],
+                  },
+                  {
+                    label: 'Próx. ação',
+                    values: ['Iterar / pivotar', 'Preparar escala', 'Investir em growth'],
+                    viz: 'bars',
+                    intensities: [0.15, 0.6, 1.0],
+                  },
+                ],
+              },
+              drag: {
+                instruction: 'Toque na situação, depois toque no estágio correto:',
+                zones: [
+                  { id: 'testando', label: 'Ainda testando' },
+                  { id: 'pmf', label: 'Tem PMF' },
+                  { id: 'escalar', label: 'Hora de escalar' },
+                ],
+                items: [
+                  {
+                    id: 'val-testando',
+                    label: 'App com churn alto',
+                    sublabel: 'App de produtividade com 500 usuários. Metade abandona nos primeiros 7 dias. Quem fica adora, mas não indica espontaneamente.',
+                    correctZone: 'testando',
+                    correctFeedback: 'Correto. Churn D7 alto + crescimento não-orgânico = sem PMF. A metade que fica pode indicar que o produto tem potencial para um segmento menor. Itere: entreviste quem saiu e quem ficou.',
+                    wrongFeedback: 'Repense. Metade abandonando em 7 dias é sinal claro: o produto não resolve o problema bem o suficiente para a maioria. Sem PMF — continue testando e iterando.',
+                  },
+                  {
+                    id: 'val-pmf',
+                    label: 'SaaS com 45% "muito desapontados"',
+                    sublabel: 'Software B2B com 300 clientes. 45% diz que seria "muito desapontado" sem ele. Churn mensal de 2%. Crescimento via indicação: 30% dos novos clientes.',
+                    correctZone: 'pmf',
+                    correctFeedback: 'Correto. 45% no teste de Sean Ellis (acima do limiar de 40%), churn baixo e indicações orgânicas expressivas — PMF confirmado. Próximo passo: preparar escala de aquisição.',
+                    wrongFeedback: 'Repense. 45% "muito desapontados" está acima do limiar de PMF (40%), churn de 2% é saudável, 30% de indicações é orgânico. Isso é PMF — não é mais "testando".',
+                  },
+                  {
+                    id: 'val-escalar',
+                    label: 'Fintech crescendo 40% ao mês',
+                    sublabel: 'Fintech com 50.000 usuários. Crescimento de 40% ao mês puxado por indicação. NPS de 72. Demanda maior que capacidade de atendimento.',
+                    correctZone: 'escalar',
+                    correctFeedback: 'Correto. Crescimento viral (40%/mês por indicação), NPS alto (72), demanda > capacidade — PMF confirmado e comprovado. Hora de investir em infraestrutura e aquisição acelerada.',
+                    wrongFeedback: 'Repense. 40%/mês por indicação orgânica + NPS 72 + demanda maior que capacidade. Isso é PMF evidente — e o mercado está pedindo escala. Não fique testando o que já está validado.',
+                  },
+                  {
+                    id: 'val-testando2',
+                    label: 'Marketplace com baixo engajamento',
+                    sublabel: 'Marketplace conecta freelancers a empresas. 200 cadastros. Apenas 12 transações no primeiro mês. Usuários dizem que "é interessante mas não veem urgência em usar".',
+                    correctZone: 'testando',
+                    correctFeedback: 'Correto. "Interessante mas não urgente" é diagnóstico de sem PMF. O problema ou não é doloroso o suficiente, ou a solução não resolve o que importa. Volte ao Problem-Solution Fit — entreviste quem não transacionou.',
+                    wrongFeedback: 'Repense. "Interessante mas não urgente" = o problema não é doloroso o suficiente para gerar uso. 12 transações em 200 cadastros é conversão de 6% — muito baixo. Ainda testando.',
+                  },
+                  {
+                    id: 'val-pmf2',
+                    label: 'EdTech com retenção crescente',
+                    sublabel: 'Plataforma de cursos com 2.000 alunos. Retenção D30 de 55% (crescendo). 60% dos novos alunos chegam por indicação de alunos atuais. Ticket médio subindo.',
+                    correctZone: 'pmf',
+                    correctFeedback: 'Correto. Retenção D30 de 55% é forte para EdTech (média do setor é ~30%), indicação de 60% é orgânica expressiva, ticket médio subindo indica disposição a pagar mais. PMF confirmado.',
+                    wrongFeedback: 'Repense. Retenção D30 de 55% acima da média setorial, 60% de indicações orgânicas e ticket subindo. Os três sinais juntos confirmam PMF — mas escala agressiva ainda pode ser prematura sem mais dados.',
+                  },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'A validação não é uma fase do projeto — é uma {{mentalidade permanente}}. Startups que escalam sem PMF queimam capital para descobrir mais rápido que o produto não funciona. As que têm PMF e escalam devagar desperdiçam a janela de mercado.',
+              keyInsights: [
+                'MVP não é o produto mais simples — é o experimento mais barato para aprender se {{a hipótese principal é verdadeira}}.',
+                'Métricas de vaidade enganam: downloads e pageviews não provam valor. {{Retenção}} é a métrica mais honesta.',
+                'PMF é comportamento, não declaração: crescimento orgânico, retenção crescente e demanda maior que capacidade são os sinais reais.',
+              ],
+              nextChapterHint: 'Capítulo 3 · Modelo de Negócio e Unit Economics',
+              nextChapterBlurb: 'Business Model Canvas, CAC, LTV e Growth Hacking — como saber se a unidade funciona antes de escalar.',
+            },
           },
+
+          // ── CHAPTER 3 ──────────────────────────────────────────────
           {
-            id: 'M5-emp-concept2',
-            type: 'concept',
-            term: 'MVP (Mínimo Produto Viável)',
-            definition: 'A versão mais simples possível que permite testar a hipótese principal do negócio. NÃO é o produto final com menos funcionalidades — é o experimento mais barato para validar se existe demanda real.',
-            example: 'Dropbox: um vídeo de 3 minutos mostrando como funcionaria. 75.000 inscritos na lista de espera em uma noite. Zero código escrito.',
-            antiExample: 'Gastar 6 meses construindo app completo com 50 funcionalidades NÃO é MVP. Se ninguém quiser o produto, você perdeu 6 meses. A pergunta é: qual a maneira mais rápida de descobrir se alguém quer isso?',
-          },
-          {
-            id: 'M5-1-s1',
-            type: 'simulation',
-            title: 'Lean Canvas — Modele um Negócio em 20 Minutos',
-            simulationId: 'lean-canvas',
-            description: 'Preencha o Lean Canvas (9 blocos) para uma ideia de negócio. Receba análise de consistência e sugestões de MVP para validar as hipóteses mais arriscadas.',
-          },
-          {
-            id: 'M5-1-t4',
-            type: 'text',
-            title: 'Business Model Canvas — O Mapa do Modelo de Negócio',
-            body: 'O Business Model Canvas (Osterwalder & Pigneur, 2010) é a ferramenta mais usada no mundo para descrever, analisar e desenhar modelos de negócio.\n\n**Os 9 Blocos do Canvas:**\n\n**1. Segmentos de Clientes** — Para quem criamos valor?\n— Quem são os clientes mais importantes?\n— Existem segmentos distintos com necessidades diferentes?\n— Tipos: massa, nicho, segmentado, diversificado, multilateral (plataforma)\n\n**2. Proposta de Valor** — Que valor entregamos?\n— Qual problema resolvemos? Qual necessidade satisfazemos?\n— Por que o cliente nos escolhe e não o concorrente?\n— Pode ser: novidade, performance, customização, design, preço, redução de risco, conveniência\n\n**3. Canais** — Como alcançamos o cliente?\n— Como o cliente descobre, avalia, compra, recebe e obtém suporte?\n— Direto (site, loja) vs. Indireto (marketplace, revendedor)\n\n**4. Relacionamento com Cliente** — Que tipo de relação cada segmento espera?\n— Assistência pessoal, self-service, automatizado, comunidade, co-criação\n\n**5. Fontes de Receita** — Como o cliente paga?\n— Venda direta, assinatura, licenciamento, freemium, comissão, publicidade\n— Preço fixo vs. dinâmico\n\n**6. Recursos-Chave** — O que precisamos ter?\n— Físicos (fábricas, lojas), intelectuais (patentes, marca), humanos (talentos), financeiros\n\n**7. Atividades-Chave** — O que precisamos fazer?\n— Produção, resolução de problemas, plataforma/rede\n\n**8. Parcerias-Chave** — Quem são nossos parceiros essenciais?\n— Alianças estratégicas, joint ventures, fornecedores críticos\n— Por que terceirizar? Otimização, redução de risco, aquisição de recursos\n\n**9. Estrutura de Custos** — Quanto custa operar?\n— Custos fixos vs. variáveis\n— Economias de escala, economias de escopo\n— Cost-driven (menor custo possível) vs. Value-driven (premium)\n\n**Como usar na prática:**\n1. Imprima o canvas grande (A0 ou quadro branco)\n2. Use post-its — cada hipótese é um post-it\n3. Preencha nesta ordem: Segmento → Proposta de Valor → Canais → Relacionamento → Receita → Recursos → Atividades → Parcerias → Custos\n4. Questione cada post-it: "Isso é fato ou hipótese?" Se hipótese → teste\n5. Atualize mensalmente conforme aprende',
-          },
-          {
-            id: 'M5-1-t5',
-            type: 'text',
-            title: 'Validação de Mercado — Do Problema ao Product-Market Fit',
-            body: 'Product-Market Fit (PMF) é o momento em que o mercado puxa o produto — em vez de você empurrar.\n\nMarc Andreessen: "Product-market fit é a única coisa que importa."\n\n**Os 4 Estágios da Validação:**\n\n**Estágio 1 — Problem-Solution Fit**\nPergunta: "O problema existe e é doloroso o suficiente para alguém pagar para resolvê-lo?"\nComo validar:\n— Entrevistas de descoberta (mínimo 30): "Me conta sobre a última vez que você enfrentou [problema]..."\n— Regra: Se 8 de 10 entrevistados descrevem o mesmo problema com emoção → é real\n— NÃO pergunte: "Você compraria X?" (todo mundo diz sim)\n— PERGUNTE: "Quanto você pagou/perdeu por causa desse problema?" (dor real = valor real)\n\n**Estágio 2 — MVP e Primeiros Usuários**\nPergunta: "A solução resolve o problema de verdade?"\nComo validar:\n— Construa o MVP mais simples possível\n— Coloque nas mãos de 50-100 early adopters\n— Meça: retenção (voltam?), NPS (recomendam?), willingness to pay (pagam?)\n\n**Estágio 3 — Product-Market Fit**\nPergunta: "O mercado quer o produto sem precisar ser convencido?"\nMétrica de Sean Ellis: "Como você se sentiria se não pudesse mais usar este produto?"\n— Se 40%+ responde "muito desapontado" → você tem PMF\n— Se <40% → ainda não. Continue iterando.\n\nOutros sinais de PMF:\n— Crescimento orgânico (pessoas indicam sem você pedir)\n— Taxa de retenção estável ou crescente\n— Demanda maior que capacidade\n\n**Estágio 4 — Scale**\nSÓ escale após PMF. Escalar sem PMF é gastar dinheiro para descobrir mais rápido que não funciona.\n\n**Erro mais comum em startups brasileiras:**\nPular do Estágio 1 direto para o Estágio 4. Investir em marketing, equipe e infraestrutura antes de validar que alguém quer o produto. Resultado: 42% das startups morrem por "falta de necessidade de mercado".',
-          },
-          {
-            id: 'M5-emp-concept3',
-            type: 'concept',
-            term: 'Product-Market Fit (PMF)',
-            definition: 'O momento em que o mercado PUXA o produto — em vez de você empurrar. Métrica de Sean Ellis: se 40%+ dos usuários responderem "muito desapontado" se não pudessem mais usar o produto, você tem PMF.',
-            example: 'WhatsApp: ninguém fez marketing. As pessoas baixavam porque TODO MUNDO usava. Crescimento orgânico explosivo = PMF claro.',
-            antiExample: 'Se você precisa oferecer desconto, insistir, explicar demais e ainda assim as pessoas não voltam — você NÃO tem PMF. Volte para o ciclo Build-Measure-Learn.',
-          },
-          {
-            id: 'M5-emp-exercise1',
-            type: 'inline-exercise',
-            prompt: 'Aplique o Teste de Sean Ellis ao seu produto/serviço (ou a um que você usa).',
-            context: 'Sean Ellis (Growth Hackers): pergunte aos seus usuários "Como você se sentiria se não pudesse mais usar este produto?" Se 40%+ responde "muito desapontado", você tem Product-Market Fit.',
-            fields: [
-              { id: 'product', label: 'Qual o produto ou serviço?', placeholder: 'Ex: App de gestão financeira para MEIs' },
-              { id: 'test', label: 'Se perguntasse a 100 clientes, quantos diriam "muito desapontado"?', placeholder: 'Estime (ou faça a pesquisa real!) a porcentagem', multiline: true },
-              { id: 'signals', label: 'Quais outros sinais de PMF (ou falta dele) você observa?', placeholder: 'Crescimento orgânico? Indicações espontâneas? Ou precisa convencer muito?', multiline: true },
-              { id: 'action', label: 'Se NÃO tem PMF, o que faria para chegar lá?', placeholder: 'Qual feature falta? Qual segmento atende melhor? O que os churned dizem?', multiline: true },
+            id: 'M5-1-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Modelo de Negócio e Unit Economics',
+            subtitle: 'Business Model Canvas, CAC, LTV e o funil AARRR — se a unidade não funciona, escalar é escalar o prejuízo',
+            opening: {
+              leadText: 'Unit economics é a análise financeira de {{uma unidade}} do seu negócio — 1 cliente, 1 transação, 1 produto. Se a unidade não dá lucro, escalar significa escalar o prejuízo. Nubank: CAC de R$ 30, LTV de R$ 1.200. WeWork: cada estação custava mais do que gerava. A diferença foi de bilhões.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'O Business Model Canvas (Osterwalder & Pigneur, 2010) mapeia o negócio inteiro em 9 blocos numa única página. Não substitui o plano de negócio — substitui o plano de negócio de {{200 páginas que ninguém lê}}. Cada bloco é uma hipótese a ser testada, não uma verdade a ser declarada.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Os 9 blocos do Business Model Canvas',
+                pillars: [
+                  { icon: '👥', title: 'Segmentos', description: 'Para quem criamos valor? {{Quem são os clientes mais importantes?}} Massa, nicho, plataforma multilateral?' },
+                  { icon: '💎', title: 'Proposta de Valor', description: 'Que problema resolvemos? Por que o cliente nos escolhe e não o concorrente? {{Por que agora?}}' },
+                  { icon: '📢', title: 'Canais', description: 'Como o cliente descobre, avalia, compra, recebe e obtém suporte? Direto vs. {{indireto}}.' },
+                  { icon: '🤝', title: 'Relacionamento', description: 'Que tipo de relação cada segmento espera? Self-service, automatizado, {{comunidade}}?' },
+                  { icon: '💵', title: 'Receita', description: 'Como o cliente paga? Venda direta, assinatura, freemium, comissão. Preço {{fixo vs. dinâmico}}.' },
+                  { icon: '⚙️', title: 'Recursos-Chave', description: 'O que precisamos ter? Físicos, intelectuais ({{patentes}}, marca), humanos, financeiros.' },
+                  { icon: '🔧', title: 'Atividades-Chave', description: 'O que precisamos fazer? Produção, resolução de problemas, {{plataforma/rede}}.' },
+                  { icon: '🔗', title: 'Parcerias-Chave', description: 'Quem são os parceiros essenciais? Por que terceirizar? Otimização, risco ou {{recursos que não tenho}}.' },
+                  { icon: '📊', title: 'Estrutura de Custos', description: 'Custos fixos vs. variáveis. Cost-driven (menor custo) vs. {{Value-driven}} (premium).' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Unit Economics — os números que provam se funciona',
+              },
+              {
+                kind: 'paragraph',
+                text: 'CAC (Customer Acquisition Cost): total gasto em marketing + vendas ÷ novos clientes. Armadilha: inclua {{todos os custos}} — salários do time, ferramentas, eventos. LTV (Lifetime Value): ticket médio × frequência × tempo de retenção. A métrica das métricas: {{LTV/CAC}}. Abaixo de 1 = cada cliente é prejuízo. Entre 3-5 = saudável. Acima de 5 = excelente — talvez esteja deixando crescimento na mesa.',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'AARRR — Acquisition',
+                    period: 'Como o usuário te descobre?',
+                    text: 'Canais: SEO, ads, indicação, PR, conteúdo, parcerias. Métrica: custo por lead, volume de leads qualificados. Pergunta crítica: "{{qual canal traz mais clientes ao menor CAC?}}" Não escale o canal mais fácil — escale o mais eficiente.',
+                    caseStudy: {
+                      company: 'Nubank',
+                      year: 2014,
+                      story: 'CAC de ~R$ 30 via indicação vs. {{R$ 800+ dos bancos tradicionais}} via TV e agências. A indicação viral não foi acidental — foi construída deliberadamente: produto tão bom que os clientes queriam indicar. Aquisição como consequência de produto.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 30', label: 'CAC Nubank (indicação)' },
+                        { value: 'R$ 800+', label: 'CAC banco tradicional' },
+                        { value: '26x', label: 'Vantagem de custo de aquisição' },
+                      ],
+                      insight: 'O canal mais barato de aquisição é o produto extraordinário que gera {{indicação espontânea}}. Antes de gastar em ads, pergunte: meus clientes indicam hoje? Se não — o problema não é aquisição.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'AARRR — Retention',
+                    period: 'O usuário volta?',
+                    text: 'A métrica mais importante — e a mais ignorada. Sem retenção, aquisição é {{balde furado}}. Regra: se retenção D30 < 20%, o produto não resolve o problema bem o suficiente. Não invista em aquisição antes de resolver retenção. É o erro mais caro das startups.',
+                    caseStudy: {
+                      company: 'iFood',
+                      year: 2023,
+                      story: 'Com pedido médio de R$ 45 e margem por pedido baixa, o modelo só funciona pela {{frequência}}: cliente médio faz 4+ pedidos/mês. A retenção não é "alguém vai usar de novo" — é "vai usar {{esta semana}}".',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'D30', label: 'Retenção 30 dias — a métrica de saúde' },
+                        { value: '4x/mês', label: 'Frequência média iFood (modelo sustentável)' },
+                        { value: '< 20%', label: 'Retenção D30 que indica produto não resolve' },
+                      ],
+                      insight: '{{DAU/MAU}} (usuários diários / mensais) revela a intensidade de uso: 50%+ = hábito formado. 20% = uso ocasional. 5% = produto dispensável.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'AARRR — Referral',
+                    period: 'O usuário indica?',
+                    text: 'O canal mais barato e confiável de aquisição. K > 1: cada cliente traz mais de 1 novo → crescimento viral orgânico. Dropbox: indicação = +500MB para o indicador e o indicado. {{Signups subiram 60%}} com o programa. A indicação não é sorte — é feature.',
+                    caseStudy: {
+                      company: 'Hotmail — 1996',
+                      year: 1996,
+                      story: '"PS: Get your free email at Hotmail" no rodapé de cada email enviado. {{12 milhões de usuários}} em 18 meses. Zero gasto em marketing. O produto se auto-distribuía a cada uso — o viral coefficient mais famoso da história da internet.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '12M', label: 'Usuários em 18 meses (Hotmail)' },
+                        { value: 'K > 1', label: 'Viral coefficient para crescimento orgânico' },
+                        { value: '+60%', label: 'Signups do programa de indicação Dropbox' },
+                      ],
+                      insight: 'Referral não é marketing — é produto. Se seus clientes não indicam, o produto não gerou valor suficiente. {{Corrija o produto antes de criar programa de indicação}}.',
+                    },
+                  },
+                ],
+              },
             ],
-            evaluationCriteria: ['Estima PMF com base em dados/observação, não achismo', 'Identifica sinais reais de PMF (ou falta dele)', 'Propõe ação concreta se PMF ainda não existe'],
-            expectedConcepts: ['product-market fit', 'teste de Sean Ellis', 'retenção', 'crescimento orgânico'],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare 3 perfis de unit economics. Depois, classifique as 5 empresas no perfil que descreve sua situação.',
+              compare: {
+                columnHeaders: ['LTV/CAC ruim', 'LTV/CAC saudável', 'LTV/CAC excelente'],
+                rows: [
+                  {
+                    label: 'Razão LTV/CAC',
+                    values: ['< 1', '3 a 5', '> 5'],
+                    viz: 'icons',
+                    icons: ['◯', '◑', '●'],
+                  },
+                  {
+                    label: 'Cada cliente',
+                    values: ['Gera prejuízo', 'Gera lucro', 'Gera muito lucro'],
+                    viz: 'icons',
+                    icons: ['▦', '⊞', '◈'],
+                  },
+                  {
+                    label: 'Sustentabilidade',
+                    values: ['Inviável', 'Sustentável', 'Excelente'],
+                    viz: 'bars',
+                    intensities: [0.05, 0.55, 1.0],
+                  },
+                  {
+                    label: 'Ação correta',
+                    values: ['Parar / corrigir', 'Otimizar', 'Investir mais em CAC'],
+                    viz: 'bars',
+                    intensities: [0.1, 0.6, 1.0],
+                  },
+                ],
+              },
+              drag: {
+                instruction: 'Toque na empresa, depois toque no perfil correto de unit economics:',
+                zones: [
+                  { id: 'ruim', label: 'LTV/CAC ruim' },
+                  { id: 'saudavel', label: 'LTV/CAC saudável' },
+                  { id: 'excelente', label: 'LTV/CAC excelente' },
+                ],
+                items: [
+                  {
+                    id: 'ue-nubank',
+                    label: 'Nubank (early stage)',
+                    sublabel: 'CAC: ~R$ 30 (indicação viral). LTV estimado: ~R$ 1.200 (cross-sell financeiro ao longo do tempo).',
+                    correctZone: 'excelente',
+                    correctFeedback: 'Correto. LTV/CAC ≈ 40x — excepcional. CAC praticamente zero (produto se vendia por indicação) e LTV crescendo com cross-sell (cartão → conta → empréstimo → investimento). Por isso cresceu sem anúncio.',
+                    wrongFeedback: 'Repense. CAC de R$ 30 ÷ LTV de R$ 1.200 = razão de 40x. Isso é excelente — bem acima do limiar de 5x. O segredo: CAC quase zero por indicação + LTV crescente por cross-sell.',
+                  },
+                  {
+                    id: 'ue-wework',
+                    label: 'WeWork (no auge)',
+                    sublabel: 'Custo por estação (reforma + aluguel): ~US$ 10K. Receita por estação antes do churn: ~US$ 8K.',
+                    correctZone: 'ruim',
+                    correctFeedback: 'Correto. LTV/CAC < 1 — cada estação gerava prejuízo. WeWork pagava mais para ter o espaço do que recebia de volta. Escalar esse modelo só acelerou as perdas. Resultado: US$ 40B → IPO cancelado.',
+                    wrongFeedback: 'Repense. Custo > Receita por unidade = LTV/CAC < 1. Cada nova estação piorava a situação. Esse é o unit economics mais perigoso — parece crescimento, mas é multiplicação de prejuízo.',
+                  },
+                  {
+                    id: 'ue-saas',
+                    label: 'SaaS B2B hipotético',
+                    sublabel: 'CAC: R$ 800 (time de vendas). Ticket: R$ 200/mês. Churn: 3%/mês. LTV = 200/0.03 = R$ 6.666.',
+                    correctZone: 'saudavel',
+                    correctFeedback: 'Correto. LTV/CAC = 6.666 / 800 = 8,3x — excelente tecnicamente. Mas churn de 3%/mês é preocupante (36%/ano). Monitorar: se churn subir para 5%, LTV cai para R$ 4K e o modelo se torna marginal.',
+                    wrongFeedback: 'Repense. LTV = R$ 200 / 0,03 = R$ 6.666. Dividido por CAC de R$ 800 = 8,3x. Tecnicamente excelente, mas o churn de 3%/mês merece atenção — pequenas variações têm impacto enorme no LTV.',
+                  },
+                  {
+                    id: 'ue-ifood',
+                    label: 'iFood',
+                    sublabel: 'CAC por usuário: ~R$ 50 (cupons + ads). Pedido médio: R$ 45. Margem por pedido: ~R$ 5. Frequência: 4 pedidos/mês. Retenção: 18 meses.',
+                    correctZone: 'saudavel',
+                    correctFeedback: 'Correto. LTV = R$ 5 × 4 × 18 = R$ 360. LTV/CAC = 360/50 = 7,2x — saudável. Margem por pedido é apertada, mas frequência alta compensa. O modelo funciona na escala.',
+                    wrongFeedback: 'Repense. Margem por pedido baixa (R$ 5), mas frequência alta (4x/mês) e retenção de 18 meses resultam em LTV de R$ 360 vs CAC de R$ 50 = 7,2x. Saudável a excelente.',
+                  },
+                  {
+                    id: 'ue-startup',
+                    label: 'Startup com CAC alto e churn alto',
+                    sublabel: 'CAC: R$ 1.200 (ads + demos + desconto no primeiro mês). Ticket: R$ 150/mês. Churn: 8%/mês. LTV = 150/0.08 = R$ 1.875.',
+                    correctZone: 'saudavel',
+                    correctFeedback: 'Correto. LTV/CAC = 1.875/1.200 = 1,56x — marginal. Funciona apenas se custos fixos forem muito baixos. O problema é o churn de 8%/mês (vida média de 12,5 meses). Reduzir churn para 4% duplica o LTV e muda tudo.',
+                    wrongFeedback: 'Repense. LTV = R$ 150 / 0,08 = R$ 1.875. Dividido por CAC de R$ 1.200 = 1,56x. Marginal — não é ruim o suficiente para parar, mas não é sustentável sem reduzir CAC ou churn.',
+                  },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'A regra de ouro: {{se a unidade não funciona, escalar não vai salvar — vai acelerar a falência}}. Corrija CAC, retenção ou margem antes de pisar no acelerador.',
+              keyInsights: [
+                'Business Model Canvas: cada bloco é hipótese, não verdade. Teste o mais arriscado primeiro.',
+                'LTV/CAC > 3 = sustentável. > 5 = excelente. < 1 = cada cliente é prejuízo — {{pare de crescer e corrija a unidade}}.',
+                'Retenção é o número mais honesto: se o usuário volta, o produto tem valor. Sem retenção, aquisição é balde furado.',
+              ],
+              nextChapterHint: 'Capítulo 4 · Financiamento, Pitch e Ecossistema',
+              nextChapterBlurb: 'Fontes de capital por estágio, o pitch deck de 12 slides e o mapa do ecossistema de startups no Brasil.',
+            },
           },
+
+          // ── CHAPTER 4 ──────────────────────────────────────────────
           {
-            id: 'M5-1-t6',
-            type: 'text',
-            title: 'Fontes de Financiamento — Do Bootstrap ao IPO',
-            body: 'Cada estágio do negócio tem fontes de capital adequadas. Usar a fonte errada no momento errado é tão perigoso quanto não ter capital.\n\n**Estágio 1 — Ideação / Pré-Revenue**\n— Bootstrapping: capital próprio, economia pessoal\n— FFF: Friends, Family & Fools\n— Aceleradoras: Programa de 3-6 meses com mentoria + capital semente (R$ 50K-500K por 5-10% de equity)\n— Editais e prêmios: FINEP, FAPESP, BNDES Garagem\n\n**Estágio 2 — Validação / Early Revenue**\n— Investidor Anjo: Pessoa física que investe R$ 50K-500K em troca de equity. Traz rede de contatos.\n— Crowdfunding: Equity crowdfunding (Kria, Captable) ou reward-based (Catarse)\n— Revenue-based financing: Empréstimo pago como % da receita\n\n**Estágio 3 — Crescimento / Tração**\n— Venture Capital Seed: R$ 500K-5M. Foco: provar que o modelo escala.\n— Série A: R$ 5M-30M. Foco: escalar aquisição de clientes.\n— Série B+: R$ 30M+. Foco: expansão geográfica, novas linhas, domínio de mercado.\n\n**Estágio 4 — Maturidade**\n— Private Equity: Compra participação majoritária. Reestrutura e busca saída.\n— IPO: Abertura de capital em bolsa. Acesso a capital público.\n— M&A: Venda para empresa maior (exit mais comum para startups).\n\n**Custo de cada fonte:**\n— Bootstrapping: zero custo de capital, mas limita velocidade\n— Anjo/VC: diluição de equity (10-25% por rodada)\n— Dívida/Empréstimo: juros, mas sem diluição\n— IPO: regulação pesada, custos de compliance, pressão trimestral\n\n**Regra prática:**\n— Valide antes de buscar capital externo\n— Não aceite dinheiro de quem não agrega valor além do capital\n— Entenda a tese do investidor — se não está alinhada com sua visão, diga não\n— Diluição: manter 10% de uma empresa de R$ 100M é melhor que 100% de uma de R$ 1M',
-          },
-          {
-            id: 'M5-1-t7',
-            type: 'text',
-            title: 'Unit Economics — Os Números que Provam se o Negócio Funciona',
-            body: 'Unit economics é a análise financeira de UMA unidade do seu negócio (1 cliente, 1 transação, 1 produto). Se a unidade não dá lucro, escalar = escalar prejuízo.\n\n**As Métricas Fundamentais:**\n\n**CAC (Customer Acquisition Cost)**\nFórmula: Total gasto em marketing + vendas / Novos clientes no período\nExemplo: Gastou R$ 50K em marketing, adquiriu 200 clientes → CAC = R$ 250\n\nArmadilha: Incluir TODOS os custos (salários do time de marketing, ferramentas, ads, eventos — não só o ad spend).\n\n**LTV (Lifetime Value)**\nFórmula simplificada: Ticket médio × Frequência de compra × Tempo médio de retenção\nExemplo: R$ 100/mês × 1 compra/mês × 18 meses = LTV de R$ 1.800\n\nFórmula com churn: LTV = ARPU / Churn mensal\nExemplo: ARPU R$ 100/mês, churn 5% → LTV = R$ 100 / 0.05 = R$ 2.000\n\n**LTV/CAC — A Métrica das Métricas**\n— LTV/CAC < 1: Você PAGA para perder dinheiro. Cada cliente é prejuízo.\n— LTV/CAC 1-3: Marginal. Funciona apenas se custos fixos forem baixos.\n— LTV/CAC 3-5: Saudável. Modelo sustentável.\n— LTV/CAC > 5: Excelente. Ou está sendo conservador no marketing (poderia investir mais).\n\n**Payback de CAC** — Em quanto tempo recupero o custo de aquisição?\nFórmula: CAC / Margem bruta mensal por cliente\nExemplo: CAC R$ 250, margem R$ 80/mês → Payback = 3.1 meses\nRegra: Payback de CAC deve ser < 12 meses. Acima disso, precisa de muito capital de giro.\n\n**Margem de Contribuição por Unidade**\n= Preço - Custos variáveis diretos\nExemplo app de delivery: Ticket R$ 45 - Custo do restaurante R$ 32 - Custo do entregador R$ 8 = R$ 5 de margem\nPergunta: Com R$ 5 de margem, quantas entregas para cobrir R$ 200K/mês de custos fixos? 40.000 entregas/mês.\n\n**Casos reais de unit economics:**\n— Uber (early stage): cada corrida dava PREJUÍZO. Subsidiava motoristas e passageiros para ganhar market share. Só funcionou porque tinha US$ 25B em VC.\n— Nubank: CAC de R$ 30 (viral + indicação), LTV de R$ 1.200. LTV/CAC = 40x. Por isso cresceu sem anúncio.\n— WeWork: aluguel + reforma > receita por estação. Unit economics negativo em escala. Implodiu.\n\n**Regra de ouro: Se a unidade não funciona, escalar não vai salvar. Corrija a unidade primeiro.**',
-          },
-          {
-            id: 'M5-emp-number1',
-            type: 'number-crunch',
-            title: 'Calculadora de Unit Economics — LTV/CAC',
-            scenario: 'Descubra se seu negócio é saudável na unidade. Se LTV/CAC < 1, cada cliente é prejuízo. Se > 3, modelo é sustentável. Se > 5, pode investir mais em aquisição.',
-            inputs: [
-              { id: 'ticket', label: 'Ticket médio mensal (R$)', defaultValue: 100, unit: 'R$', min: 1, max: 1000000 },
-              { id: 'retention', label: 'Tempo médio de retenção (meses)', defaultValue: 18, unit: 'meses', min: 1, max: 120 },
-              { id: 'cac', label: 'Custo de Aquisição por Cliente (R$)', defaultValue: 250, unit: 'R$', min: 1, max: 1000000 },
+            id: 'M5-1-cap4',
+            type: 'chapter',
+            number: 4,
+            title: 'Financiamento, Pitch e Ecossistema',
+            subtitle: 'Do bootstrap ao VC — a fonte certa de capital no estágio certo, e como apresentar para investidores',
+            opening: {
+              leadText: 'Cada estágio do negócio tem fontes de capital adequadas. Usar a fonte errada no momento errado é {{tão perigoso quanto não ter capital}}. Um VC que investe em ideação sem validação desperdiça dinheiro. Um fundador que diluiu equity cedo demais perde o controle antes de precisar.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'A jornada de financiamento não é linear — é {{condicionada à validação}}. Não existe cheque para "ideia". Existe cheque para evidência de problema real, produto funcionando, tração mensurável. Cada rodada tem uma tese: o que o dinheiro vai provar?',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Estágio 1 — Ideação',
+                    period: 'Pré-Revenue',
+                    text: 'Fontes: Bootstrap (capital próprio), FFF (Friends, Family & Fools), Aceleradoras (R$ 50K-500K por 5-10% de equity + mentoria), Editais públicos (FINEP, FAPESP, BNDES Garagem). Regra: {{valide antes de buscar capital externo}}. Com dinheiro de aceleradora, você compra tempo para testar — não para construir o produto final.',
+                    caseStudy: {
+                      company: 'Hotmart — origem',
+                      year: 2011,
+                      story: 'João Pedro Resende e João Paulo Trajano criaram o Hotmart com {{recursos próprios}} e sem investidor externo por anos. Bootstrapping total até atingir escala suficiente para captar em condições favoráveis. Hoje: líder em infoprodutos na América Latina.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: 'R$ 50K-500K', label: 'Cheque típico de aceleradora (5-10% equity)' },
+                        { value: '3-6 meses', label: 'Duração de programa de aceleração' },
+                        { value: '0', label: 'Diluição no bootstrap — mas limita velocidade' },
+                      ],
+                      insight: 'Aceleradora não é só dinheiro — é {{rede, credibilidade e pressão produtiva}}. O mentor certo vale mais que o cheque.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Estágio 2-3 — Validação a Crescimento',
+                    period: 'Early Revenue → Tração',
+                    text: 'Anjo (R$ 50K-500K): pessoa física, traz rede de contatos, menos burocracia. Seed VC (R$ 500K-5M): primeiro VC, foco em provar que o modelo escala. Série A (R$ 5-30M): escalar aquisição de clientes. Série B+ (R$ 30M+): expansão geográfica, novas linhas, domínio de mercado. Diluição: {{10-25% por rodada}} — é o preço da aceleração.',
+                    caseStudy: {
+                      company: 'QuintoAndar',
+                      year: 2013,
+                      story: 'Gabriel Braga começou com Anjo → Seed (Kaszek) → Série A → B → C. Cada rodada com {{tese clara}}: Anjo para validar o modelo, Seed para provar escala em SP, Série A para RJ e BH, B para Brasil inteiro. Resultado: US$ 5,1B de valuation.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '10-25%', label: 'Diluição típica por rodada de VC' },
+                        { value: 'US$ 5,1B', label: 'Valuation QuintoAndar (2021)' },
+                        { value: 'Tese', label: 'O que cada rodada precisa provar' },
+                      ],
+                      insight: 'Diluição: manter 10% de empresa de R$ 100M é melhor que 100% de empresa de R$ 1M. {{O bolo maior importa mais do que o tamanho da fatia.}}',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'O Pitch de 12 Slides (Sequoia Capital)',
+                    period: 'Como convencer investidores',
+                    text: 'Um VC vê 200+ decks por mês. Gasta {{3 min 44 seg}} por deck em média (DocSend, 2023). Os 12 slides: Título, Problema (dado impactante + história), Solução (mostre, não conte), Por que agora?, Tamanho de mercado (TAM/SAM/{{SOM — o VC olha o SOM}}), Modelo de negócio, Tração, Competição (nunca diga "não temos concorrente"), Equipe, Go-to-market, Financeiro (3-5 anos com premissas), Ask (o que precisa e para quê).',
+                    caseStudy: {
+                      company: 'Airbnb — primeiro pitch',
+                      year: 2009,
+                      story: 'O pitch original do Airbnb para YCombinator tinha {{10 slides simples}}. Tração real: 10.000 usuários. A equipe já tinha passado por rejeição de 5 fundos antes. Paul Graham aceitou porque a ideia parecia "estranha mas os números eram reais." Tração honesta sempre supera narrativa bonita.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '3m 44s', label: 'Tempo médio de um VC por deck (DocSend 2023)' },
+                        { value: '200+', label: 'Decks que um VC vê por mês' },
+                        { value: 'SOM', label: 'O que o VC realmente quer ver no mercado' },
+                      ],
+                      insight: 'Erros que matam o pitch: TAM de "trilhões" sem SOM realista, "não temos concorrentes" (demonstra ingenuidade), projeção hockey stick sem {{premissas}}.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'O ecossistema brasileiro em 2025: {{~15.000 startups}} ativas, 15 unicórnios, US$ 3,5B em VC. Os principais VCs: Kaszek (maior da AL — Nubank, QuintoAndar), Monashees (Rappi, Loggi), Canary (seed stage — maior deal flow). Programas públicos: BNDES Garagem, FINEP (subvenção econômica = dinheiro não reembolsável), FAPESP PIPE. {{Não aceite dinheiro de quem não agrega valor além do capital.}}',
+              },
             ],
-            formula: '(ticket * retention) / cac',
-            resultLabel: 'Razão LTV/CAC',
-            interpretation: [
-              { max: 1, label: 'PREJUÍZO por cliente. Cada venda piora sua situação. Corrija urgentemente.', color: 'red' as const },
-              { max: 3, label: 'Marginal. Modelo frágil — qualquer aumento de CAC ou churn quebra.', color: 'amber' as const },
-              { max: 5, label: 'Saudável. Modelo sustentável. Continue otimizando.', color: 'green' as const },
-              { max: 1000, label: 'Excelente. Considere investir mais em marketing — pode estar deixando crescimento na mesa.', color: 'green' as const },
-            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare os 3 estágios de financiamento. Depois, classifique as 5 situações na fonte de capital mais adequada.',
+              compare: {
+                columnHeaders: ['Bootstrap / Anjo', 'Seed VC', 'Série A+'],
+                rows: [
+                  {
+                    label: 'Cheque típico',
+                    values: ['Até R$ 500K', 'R$ 500K–5M', 'R$ 5M+'],
+                    viz: 'icons',
+                    icons: ['◯', '◑', '●'],
+                  },
+                  {
+                    label: 'O que prova',
+                    values: ['Problema existe', 'Modelo escala', 'Crescimento acelerado'],
+                    viz: 'icons',
+                    icons: ['▦', '⊞', '◈'],
+                  },
+                  {
+                    label: 'Diluição',
+                    values: ['0-15%', '15-25%', '20-30%'],
+                    viz: 'bars',
+                    intensities: [0.2, 0.55, 1.0],
+                  },
+                  {
+                    label: 'Velocidade',
+                    values: ['Lenta', 'Média', 'Alta'],
+                    viz: 'bars',
+                    intensities: [0.2, 0.6, 1.0],
+                  },
+                ],
+              },
+              drag: {
+                instruction: 'Toque na situação, depois toque na fonte de capital mais adequada:',
+                zones: [
+                  { id: 'bootstrap', label: 'Bootstrap / Anjo' },
+                  { id: 'seed', label: 'Seed VC' },
+                  { id: 'serieA', label: 'Série A+' },
+                ],
+                items: [
+                  {
+                    id: 'fin-bootstrap',
+                    label: 'Ideia validada, sem receita',
+                    sublabel: 'Fundador com protótipo funcional e 50 entrevistas validando o problema. Sem receita ainda. Quer R$ 200K para construir o MVP real e testar com primeiros pagantes.',
+                    correctZone: 'bootstrap',
+                    correctFeedback: 'Correto. Sem receita, problema validado mas modelo não testado — estágio de Anjo ou aceleradora. VC Seed pede tração inicial. Bootstrap ou anjo é a fonte certa para essa fase.',
+                    wrongFeedback: 'Repense. Sem receita e com protótipo, o empreendedor ainda está validando o modelo — não provando escala. VC Seed quer ver primeiros clientes pagantes. Anjo ou aceleradora é a fonte certa.',
+                  },
+                  {
+                    id: 'fin-seed',
+                    label: 'SaaS com R$ 50K de MRR',
+                    sublabel: 'SaaS com 80 clientes, R$ 50K de MRR crescendo 15% ao mês, churn de 3%. Quer provar que o modelo é replicável em 3 estados e precisa de R$ 2M.',
+                    correctZone: 'seed',
+                    correctFeedback: 'Correto. R$ 50K de MRR com crescimento consistente e churn controlado é o perfil clássico de Seed. O objetivo do capital: provar que o modelo funciona em outros mercados além do inicial.',
+                    wrongFeedback: 'Repense. R$ 50K de MRR é tração suficiente para Seed, mas não é a tração que Série A pede (geralmente R$ 500K+ de MRR). O objetivo é provar replicabilidade — Seed VC é a fonte adequada.',
+                  },
+                  {
+                    id: 'fin-serieA',
+                    label: 'Fintech com R$ 5M de ARR',
+                    sublabel: 'Fintech com 15.000 clientes ativos, R$ 5M de ARR, crescendo 30% ao mês. Provada em 2 estados. Quer expandir para todo o Brasil e contratar 40 pessoas em 12 meses.',
+                    correctZone: 'serieA',
+                    correctFeedback: 'Correto. R$ 5M de ARR, crescimento de 30% ao mês e modelo provado em 2 estados é o perfil de Série A. O objetivo: escalar aquisição e expandir geograficamente com capital maior.',
+                    wrongFeedback: 'Repense. R$ 5M de ARR e crescimento de 30%/mês é maturidade além do Seed. A empresa já provou o modelo — agora precisa de capital para escalar. Isso é Série A.',
+                  },
+                  {
+                    id: 'fin-edital',
+                    label: 'Deep tech em fase de pesquisa',
+                    sublabel: 'Startup de biotech desenvolvendo diagnóstico por IA. Equipe de pesquisadores, sem produto ainda. Precisa de R$ 300K para 18 meses de pesquisa e desenvolvimento.',
+                    correctZone: 'bootstrap',
+                    correctFeedback: 'Correto. Deep tech em pesquisa é exatamente o perfil dos editais públicos (FINEP, FAPESP PIPE, BNDES Garagem) — dinheiro não reembolsável para inovação de alto risco. VC não entra em pesquisa sem produto.',
+                    wrongFeedback: 'Repense. Sem produto e em fase de pesquisa, VC Seed não investe — o risco é alto demais sem evidência de produto. Editais públicos (FINEP, FAPESP) são a fonte certa: dinheiro não reembolsável para pesquisa de inovação.',
+                  },
+                  {
+                    id: 'fin-seed2',
+                    label: 'Marketplace com primeiro PMF',
+                    sublabel: 'Marketplace de serviços com R$ 80K de GMV/mês, crescendo após 18 meses de iteração. Quer R$ 1,5M para automatizar matching e expandir para 3 cidades.',
+                    correctZone: 'seed',
+                    correctFeedback: 'Correto. PMF confirmado, GMV crescendo e expansão geográfica como objetivo — Seed VC. O capital vai financiar o crescimento do que já funciona, não validar se funciona.',
+                    wrongFeedback: 'Repense. R$ 80K de GMV/mês com PMF confirmado é tração de Seed — o modelo funciona, precisa de capital para replicar. Série A pediria tração bem maior antes de entrar.',
+                  },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Capital é combustível — mas {{sem direção, acelera na direção errada}}. A fonte certa no momento certo é estratégia. Não aceite dinheiro de quem não agrega valor além do cheque — o investidor errado pode ser mais destrutivo do que a falta de capital.',
+              keyInsights: [
+                'Valide antes de buscar capital externo: sem evidência de problema real, nenhum investidor sério vai entrar.',
+                'Diluição é o preço da velocidade: manter 10% de empresa grande é melhor que 100% de empresa pequena — o tamanho do bolo importa mais.',
+                'O pitch não vende a ideia — vende a {{equipe e a evidência}}. Tração honesta supera narrativa bonita.',
+              ],
+            },
           },
-          {
-            id: 'M5-emp-compare1',
-            type: 'compare',
-            title: 'Unit Economics de Startups Brasileiras — Quem é Saudável?',
-            question: 'Por que algumas startups crescem sustentavelmente e outras implodem?',
-            dimensions: ['CAC', 'LTV estimado', 'LTV/CAC', 'Veredicto'],
-            items: [
-              { id: 'nubank', label: 'Nubank', values: ['~R$ 30 (viral + indicação)', '~R$ 1.200 (cross-sell financeiro)', '~40x', 'Excepcional — cresceu sem anúncio por anos'], highlight: 'Indicação orgânica = CAC quase zero. O sonho de todo negócio.' },
-              { id: 'ifood', label: 'iFood', values: ['~R$ 50 (cupons + ads)', '~R$ 800 (pedidos recorrentes)', '~16x', 'Saudável — margem por pedido é baixa mas frequência é alta'], highlight: 'Volume x frequência compensa margem unitária apertada.' },
-              { id: 'wework', label: 'WeWork', values: ['~US$ 10K (showroom + vendas)', '~US$ 8K (churn alto + margem negativa)', '<1x', 'PREJUÍZO por unidade. Escalar = escalar prejuízo. Implodiu.'], highlight: 'Unit economics negativo + escala agressiva = desastre.' },
-            ],
-            insight: 'Se a unidade não funciona, escalar não vai salvar — vai acelerar a falência. Corrija CAC, retenção ou margem ANTES de pisar no acelerador.',
-          },
-          {
-            id: 'M5-1-t8',
-            type: 'text',
-            title: 'Growth Hacking — Crescimento com Método, Não com Sorte',
-            body: 'Growth hacking não é "truque viral". É aplicação do método científico ao crescimento: hipótese → experimento → dados → decisão.\n\n**O Funil AARRR (Pirate Metrics — Dave McClure):**\n\n**Acquisition (Aquisição)** — Como o usuário descobre você?\n— Canais: SEO, ads, indicação, PR, conteúdo, parcerias\n— Métrica: Custo por lead, volume de leads qualificados\n— Pergunta: "Qual canal traz mais clientes ao menor custo?"\n\n**Activation (Ativação)** — O primeiro uso foi bom?\n— Definir o "momento aha!": quando o usuário percebe valor\n— Slack: aha = equipe troca 2.000 mensagens (depois disso, nunca churn)\n— Dropbox: aha = salvar 1 arquivo na pasta sincronizada\n— Métrica: % que completa onboarding, tempo até primeiro valor\n\n**Retention (Retenção)** — O usuário volta?\n— A métrica mais importante. Sem retenção, aquisição é balde furado.\n— Métrica: DAU/MAU, retenção D1/D7/D30, churn\n— Regra: Se retenção D30 < 20%, seu produto não resolve o problema bem o suficiente.\n\n**Revenue (Receita)** — O usuário paga?\n— Conversão free→paid, ticket médio, expansão de receita (upsell/cross-sell)\n— Métrica: ARPU, MRR, Net Revenue Retention\n\n**Referral (Indicação)** — O usuário indica?\n— O canal mais barato e mais confiável de aquisição\n— Métrica: NPS, viral coefficient (K), % de clientes vindos de indicação\n— K > 1: crescimento viral orgânico (cada cliente traz mais de 1)\n\n**Processo de Growth — Sprint Semanal:**\n1. Segunda: revisar dados da semana anterior\n2. Terça: brainstorm de hipóteses (mínimo 5 ideias)\n3. Quarta: priorizar com ICE Score (Impact × Confidence × Ease)\n4. Quinta-Sexta: implementar e lançar o experimento\n5. Próxima semana: medir resultado e decidir (scale, kill ou iterate)\n\n**Exemplos de growth hacks reais:**\n— Hotmail (1996): "PS: Get your free email at Hotmail" no rodapé de cada email. 12M de usuários em 18 meses.\n— Dropbox: programa de indicação — ganhe 500MB por cada amigo. Signups subiram 60%.\n— LinkedIn: importação de contatos do email. Cada usuário convidava toda a rede.\n— PayPal: US$ 10 por cadastro + US$ 10 por indicação. Queimou dinheiro, conquistou mercado.',
-          },
-          {
-            id: 'M5-1-t9',
-            type: 'text',
-            title: 'Pitch Deck — Como Apresentar para Investidores',
-            body: 'O pitch deck é o documento que decide se você entra na sala ou fica do lado de fora. Um VC vê 200+ decks por mês. Gasta em média 3 minutos e 44 segundos por deck (DocSend, 2023).\n\n**Os 12 Slides do Pitch Deck Clássico (Sequoia Capital):**\n\n**1. Título** — Nome + tagline de 1 frase + logo\n"[Empresa] — [O que faz em 8 palavras]"\n\n**2. Problema** — Qual dor real e urgente o mercado tem?\nDado impactante + história concreta de 1 pessoa que sofre com o problema\n\n**3. Solução** — Como você resolve?\nDemo, screenshot ou fluxo visual. NÃO texto. Mostre, não conte.\n\n**4. Por que agora?** — O que mudou para essa oportunidade existir?\nTecnologia nova, regulação, comportamento, evento de mercado\n\n**5. Tamanho de mercado** — TAM / SAM / SOM\n— TAM (Total Addressable Market): mercado total teórico\n— SAM (Serviceable Addressable Market): quanto você pode alcançar\n— SOM (Serviceable Obtainable Market): quanto vai capturar em 3-5 anos\nINVESTIDOR OLHA O SOM, NÃO O TAM.\n\n**6. Modelo de negócio** — Como ganha dinheiro?\nPreço × quantidade. Simples.\n\n**7. Tração** — O que já conquistou?\nMRR, clientes, crescimento, retenção. GRÁFICO subindo. Se não tem receita: waitlist, LOIs, pilotos.\n\n**8. Competição** — Quem mais resolve o mesmo problema?\nNunca diga "não temos concorrente". Mostre um quadrante com sua diferenciação.\n\n**9. Equipe** — Por que VOCÊS vão conseguir?\nFotos, nomes, cargos e 1 frase de credencial cada. O VC investe em PESSOAS, não em ideias.\n\n**10. Go-to-market** — Como vai adquirir clientes?\nCanais, CAC, funil, parcerias\n\n**11. Financeiro** — Projeção de 3-5 anos\nReceita, margem, break-even, runway. NÃO invente números bonitos — mostre premissas.\n\n**12. Ask** — O que você precisa?\n"Estamos levantando R$ X para [objetivo específico] com prazo de [Y meses]."\n\n**Erros que matam o pitch:**\n— Slide de "solução" sem mostrar o produto (só texto)\n— TAM de "trilhões" sem SOM realista\n— "Não temos concorrentes" (demonstra ingenuidade)\n— Projeção "hockey stick" sem justificativa nas premissas\n— Pedir dinheiro sem dizer PARA QUÊ exatamente',
-          },
-          {
-            id: 'M5-1-s2',
-            type: 'simulation',
-            title: 'Avalie o Pitch — Investiria ou Não?',
-            simulationId: 'pitch-evaluation',
-            description: 'Receba 4 pitch decks resumidos de startups. Analise unit economics, tração, equipe e mercado. Decida: investiria ou não? Veja o que VCs reais pensaram.',
-          },
-          {
-            id: 'M5-1-t10',
-            type: 'text',
-            title: 'Ecossistema de Startups no Brasil — Quem é Quem',
-            body: '**O ecossistema brasileiro em números (2024-2025):**\n— ~15.000 startups ativas (ABStartups)\n— US$ 3.5B investidos em VC em 2024 (após pico de US$ 9.4B em 2021)\n— 15 unicórnios brasileiros (valuation > US$ 1B)\n— São Paulo concentra ~55% do ecossistema, mas hubs regionais crescem\n\n**Os principais players:**\n\n**Aceleradoras:**\n— Endeavor (scale-ups, mentoria de alto nível)\n— ACE Cortex (early stage, vertical tech)\n— Wayra (Telefónica — telecom/tech)\n— InovAtiva Brasil (governo federal — maior aceleradora pública da AL)\n— Cubo Itaú (hub — não acelera, mas conecta)\n\n**VCs brasileiros:**\n— Kaszek (maior da AL — investiu em Nubank, QuintoAndar)\n— Monashees (early/growth — Rappi, Loggi)\n— Valor Capital Group (cross-border Brasil-EUA)\n— Canary (seed stage — maior deal flow do Brasil)\n— KPTL (deep tech e impacto)\n\n**Programas de apoio público:**\n— BNDES Garagem: aceleração + capital para startups early stage\n— FINEP: financiamento de inovação (subvenção econômica = dinheiro não reembolsável)\n— FAPESP PIPE: pesquisa inovativa em PMEs (São Paulo)\n— StartupRS, MinasDigital, CIETEC: ecossistemas regionais\n\n**Hubs regionais emergentes:**\n— Florianópolis: capital com mais startups per capita do Brasil\n— Recife/Porto Digital: 350+ empresas, foco em games e fintech\n— BH/San Pedro Valley: 300+ startups, comunidade forte\n— Curitiba: forte em agtech e healthtech\n— Manaus: Zona Franca + hardware + IoT\n\n**Tendências do ecossistema 2025-2026:**\n— IA generativa: toda startup nova precisa ter IA na proposta de valor\n— Climate tech: investimento ESG puxando capital para energia, carbono, agro sustentável\n— Consolidação: startups comprando startups (M&A > IPO como saída)\n— Revenue-based financing: alternativa a VC sem diluição\n— Regulação: Marco Legal das Startups (LC 182/21) facilitou investimento anjo e sandbox',
-          },
-          {
-            id: 'M5-1-t11',
-            type: 'text',
-            title: 'Mapa do Empreendedor — Quando Usar Cada Ferramenta',
-            body: '**Resumo — ferramenta certa para cada fase:**\n\n**Ideia → Validação:**\n— Effectuation: Comece com o que tem (quem sou, o que sei, quem conheço)\n— Lean Canvas: Modele o negócio em 1 página\n— Entrevistas de descoberta: 30 conversas com o público-alvo\n— MVP: Versão mais simples para testar a hipótese principal\n\n**Validação → Product-Market Fit:**\n— Build-Measure-Learn: Ciclo de experimentação contínua\n— Métricas de Sean Ellis: "Muito desapontado se não tivesse?" > 40%\n— Unit Economics: CAC, LTV, LTV/CAC > 3x\n— Cohort Analysis: Retenção por grupo ao longo do tempo\n\n**PMF → Crescimento:**\n— AARRR (Pirate Metrics): Funil completo de growth\n— Growth Sprints: Experimentação semanal com ICE Score\n— Business Model Canvas: Mapa operacional completo\n— Pitch Deck: Para captar investimento (se necessário)\n\n**Crescimento → Escala:**\n— OKRs: Alinhamento de metas em toda a empresa\n— Hiring plan: Contratar as pessoas certas na ordem certa\n— Processos: Documentar o que funciona para replicar\n— Cultura: Definir valores antes que a empresa fique grande demais\n\n**Financiamento por fase:**\n— Ideia: Bootstrap + FFF (R$ 0-50K)\n— Validação: Anjo + Aceleradoras (R$ 50K-500K)\n— PMF: Seed VC (R$ 500K-5M)\n— Growth: Série A+ (R$ 5M+)\n\n**Regra universal: Nunca escale o que não funciona. Corrija a unidade antes de multiplicar.**',
-          },
-        ],
+
       },
       {
         id: 'M5-2',
