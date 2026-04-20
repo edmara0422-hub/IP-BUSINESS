@@ -326,8 +326,8 @@ function ThreeOrganisms({
         border: `1px solid ${
           selectionActive ? 'rgba(255,255,255,0.22)' : COLORS.border
         }`,
-        borderRadius: 12,
-        padding: '14px 10px',
+        borderRadius: 10,
+        padding: '10px 8px',
         transition: 'border-color 0.25s',
       }}
     >
@@ -357,7 +357,7 @@ function ThreeOrganisms({
       <div
         style={{
           borderTop: `1px solid ${COLORS.border}`,
-          paddingTop: 14,
+          paddingTop: 8,
         }}
       >
         {compare.rows.map((row, ri) => (
@@ -365,9 +365,9 @@ function ThreeOrganisms({
             key={ri}
             style={{
               display: 'grid',
-              gridTemplateColumns: '70px 1fr 1fr 1fr',
-              gap: 4,
-              padding: '7px 0',
+              gridTemplateColumns: '60px 1fr 1fr 1fr',
+              gap: 3,
+              padding: '5px 0',
               borderBottom:
                 ri === compare.rows.length - 1
                   ? 'none'
@@ -377,10 +377,10 @@ function ThreeOrganisms({
           >
             <div
               style={{
-                fontSize: 8,
+                fontSize: 7,
                 fontWeight: 600,
                 color: COLORS.textDim,
-                letterSpacing: '0.04em',
+                letterSpacing: '0.02em',
                 textTransform: 'uppercase',
                 lineHeight: 1.3,
               }}
@@ -391,12 +391,12 @@ function ThreeOrganisms({
               <div
                 key={vi}
                 style={{
-                  fontSize: 9,
-                  lineHeight: 1.35,
+                  fontSize: 8,
+                  lineHeight: 1.3,
                   color: 'rgba(255,255,255,0.78)',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 4,
+                  gap: 3,
                   wordBreak: 'break-word',
                   overflow: 'hidden',
                 }}

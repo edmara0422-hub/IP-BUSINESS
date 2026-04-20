@@ -31,7 +31,7 @@ interface Props {
 }
 
 const SIZE_MAP = {
-  sm: 140,
+  sm: 72,
   md: 200,
   lg: 260,
 }
