@@ -9459,109 +9459,253 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Projeto de Intervencao em Negocios',
         blocks: [
           {
-            id: 'M7-2-t1',
-            type: 'text',
-            title: 'Metodologia de Projeto de Intervenção: Do Diagnóstico à Ação',
-            body: 'Um projeto de intervenção é uma ação planejada para resolver um problema específico identificado em uma organização. Diferente de consultoria (que diagnostica e recomenda), a intervenção executa a mudança.\n\n**Etapas do Projeto de Intervenção:**\n\n**1. Diagnóstico Situacional**\n— Análise SWOT aplicada ao problema específico\n— Entrevistas com stakeholders (gestores, funcionários, clientes)\n— Coleta de dados quantitativos (indicadores, relatórios, pesquisas)\n— Resultado: definição clara do problema e suas causas-raiz\n\n**2. Definição do Problema**\n— O problema deve ser específico, mensurável e relevante\n— Errado: "a empresa precisa melhorar"\n— Certo: "a taxa de inadimplência cresceu de 5% para 12% nos últimos 6 meses, causada pela ausência de análise de crédito nos pedidos acima de R$ 5.000"\n\n**3. Objetivos e Metas**\n— Objetivo geral: o que se pretende alcançar (reduzir inadimplência)\n— Objetivos específicos: como (implantar análise de crédito, treinar equipe comercial)\n— Metas: quantificação (reduzir de 12% para 5% em 90 dias)\n\n**4. Plano de Ação (5W2H)**\n— What: o que será feito?\n— Why: por que será feito?\n— Where: onde será implementado?\n— When: quando começa e termina?\n— Who: quem é responsável?\n— How: como será executado?\n— How much: quanto custará?\n\n**5. Execução e Monitoramento**\n— Cronograma com marcos (milestones)\n— Reuniões semanais de acompanhamento\n— Indicadores de progresso vs meta\n— Ajustes rápidos quando algo não funciona\n\n**6. Avaliação de Resultados**\n— Comparar indicadores antes vs depois\n— Documentar lições aprendidas\n— Identificar sustentabilidade da mudança (vai continuar sem o projeto?)\n\n**Ferramentas úteis:**\n— Diagrama de Ishikawa (espinha de peixe): mapear causas-raiz\n— 5 Porquês: aprofundar a causa real do problema\n— Matriz GUT (Gravidade, Urgência, Tendência): priorizar problemas\n— PDCA (Plan-Do-Check-Act): ciclo de melhoria contínua\n\nDica: O maior erro em projetos de intervenção é resolver o sintoma sem atacar a causa. Dedicar 40% do tempo ao diagnóstico correto economiza 80% do tempo de execução.',
-          },
-          {
-            id: 'M7-intervencao-fw1',
-            type: 'framework',
-            frameworkId: 'intervencao-5w2h',
-            title: 'Plano de Ação 5W2H — Monte Seu Projeto de Intervenção',
-            description: 'Use o framework 5W2H para estruturar um plano de intervenção real. Preencha cada campo pensando em um problema concreto de uma empresa.',
-            fields: [
-              { id: 'what', label: 'WHAT — O que será feito?', placeholder: 'Descreva a ação principal da intervenção', helpText: 'Seja específico: não "melhorar vendas", mas "implantar CRM e treinar equipe comercial em 60 dias".' },
-              { id: 'why', label: 'WHY — Por que será feito?', placeholder: 'Qual problema resolve? Qual evidência sustenta a necessidade?', helpText: 'Use dados: "inadimplência subiu de 5% para 12% em 6 meses".' },
-              { id: 'where', label: 'WHERE — Onde será implementado?', placeholder: 'Qual departamento, filial ou processo?', helpText: 'Foque: não tente mudar a empresa inteira de uma vez.' },
-              { id: 'when', label: 'WHEN — Quando começa e termina?', placeholder: 'Datas de início, marcos intermediários e prazo final', helpText: 'Projetos sem prazo não são projetos — são desejos.' },
-              { id: 'who', label: 'WHO — Quem é responsável?', placeholder: 'Nome/cargo do líder do projeto e equipe envolvida' },
-              { id: 'how', label: 'HOW — Como será executado?', placeholder: 'Etapas principais, ferramentas, método', helpText: 'Pense em 3-5 etapas sequenciais.' },
-              { id: 'howmuch', label: 'HOW MUCH — Quanto custará?', placeholder: 'Orçamento estimado: pessoas, ferramentas, tempo', helpText: 'Inclua custo de oportunidade: tempo da equipe dedicado ao projeto.' },
-            ],
-          },
-          {
-            id: 'M7-intervencao-cmp1',
-            type: 'compare',
-            title: 'Ferramentas de Diagnóstico — Qual Usar em Cada Situação?',
-            question: 'Cada ferramenta ataca o problema de um ângulo diferente. A combinação é mais poderosa que qualquer uma isolada.',
-            dimensions: ['Para que serve', 'Como funciona', 'Quando usar', 'Limitação'],
-            items: [
+            id: 'M7-2-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'As 4 Ferramentas de Diagnóstico — Mapeie Antes de Agir',
+            subtitle: 'Ishikawa, 5 Porquês, Matriz GUT e PDCA: cada ferramenta ataca o problema de um ângulo diferente. Usar a errada é pior que não usar nenhuma.',
+            opening: {
+              leadText: 'A Toyota parou uma linha de produção inteira por uma máquina quebrada. Em vez de trocar a peça e retomar, o engenheiro perguntou "por quê?" cinco vezes. Descobriu que o real problema era falta de um filtro de óleo — que custava R$ 2. Sem diagnóstico correto, você resolve o sintoma e o problema volta em 3 meses, mais caro.',
+            },
+            body: [
               {
-                id: 'ishikawa',
-                label: 'Diagrama de Ishikawa',
-                values: [
-                  'Mapear todas as causas possíveis de um problema',
-                  'Categorias: Método, Máquina, Material, Mão de obra, Meio ambiente, Medida',
-                  'Problema com múltiplas causas possíveis',
-                  'Não prioriza — lista tudo sem filtrar',
+                kind: 'pillar-grid',
+                title: 'As 4 ferramentas de diagnóstico e quando usar cada uma',
+                pillars: [
+                  { icon: '🦴', title: 'Diagrama de Ishikawa (Espinha de Peixe)', description: 'Mapeia {{todas as causas possíveis}} de um problema em 6 categorias: Método, Máquina, Material, Mão de obra, Meio ambiente, Medida. Use quando o problema tem múltiplas causas possíveis e você precisa visualizar todas antes de priorizar.' },
+                  { icon: '❓', title: '5 Porquês', description: 'Encontra a {{causa-raiz profunda}} perguntando "por quê?" cinco vezes consecutivas. Inventado pela Toyota. Use quando a causa aparente é superficial e você suspeita que há algo mais profundo — o que parece óbvio raramente é a causa real.' },
+                  { icon: '📊', title: 'Matriz GUT', description: 'Prioriza problemas por {{Gravidade × Urgência × Tendência}} (cada um de 1 a 5). GUT = G×U×T. Use quando você tem uma lista de problemas e precisa decidir por qual começar. O maior score = ataque primeiro.' },
+                  { icon: '🔄', title: 'Ciclo PDCA', description: 'Melhoria contínua em 4 etapas: {{Plan → Do → Check → Act}}. Repita até atingir o padrão desejado. Use para qualquer processo que precisa melhorar continuamente. Deming trouxe para o Japão após a 2ª Guerra — e o Japão dominou a qualidade industrial por 20 anos.' },
                 ],
               },
               {
-                id: 'cinco-porques',
-                label: '5 Porquês',
-                values: [
-                  'Encontrar a causa-raiz profunda',
-                  'Pergunte "por quê?" 5 vezes consecutivas',
-                  'Problema com causa aparente superficial',
-                  'Pode simplificar demais problemas complexos',
-                ],
-                highlight: 'Toyota inventou os 5 Porquês. "A máquina parou" → "fusível queimou" → "sobrecarga" → "rolamento seco" → "sem manutenção preventiva" = causa-raiz.',
-              },
-              {
-                id: 'gut',
-                label: 'Matriz GUT',
-                values: [
-                  'Priorizar problemas por importância',
-                  'Pontue: Gravidade (1-5), Urgência (1-5), Tendência (1-5). Multiplique.',
-                  'Lista de problemas e precisa decidir por qual começar',
-                  'Pontuação é subjetiva — depende do avaliador',
-                ],
-              },
-              {
-                id: 'pdca',
-                label: 'Ciclo PDCA',
-                values: [
-                  'Melhoria contínua iterativa',
-                  'Plan → Do → Check → Act. Repita.',
-                  'Qualquer processo que precisa melhorar continuamente',
-                  'Lento para problemas urgentes',
-                ],
+                kind: 'paragraph',
+                text: 'A combinação certa é sequencial: use Ishikawa para MAPEAR todas as causas possíveis, 5 Porquês para APROFUNDAR a principal suspeita, GUT para PRIORIZAR qual atacar primeiro, e PDCA para EXECUTAR e AJUSTAR a intervenção. Usar só uma ferramenta é como diagnosticar uma doença sem fazer exame.',
               },
             ],
-            insight: 'Na prática: use Ishikawa para MAPEAR causas, 5 Porquês para APROFUNDAR a principal, GUT para PRIORIZAR ações, e PDCA para EXECUTAR e MELHORAR continuamente.',
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare as 4 ferramentas em dimensões-chave — depois escolha qual usar em cada situação.',
+              compare: {
+                columnHeaders: ['Para que serve', 'Quando usar', 'Limitação principal'],
+                rows: [
+                  { label: 'Ishikawa', values: ['Mapear causas possíveis', 'Problema com múltiplas origens', 'Não prioriza — lista tudo'] },
+                  { label: '5 Porquês', values: ['Encontrar causa-raiz', 'Causa aparente parece superficial', 'Pode simplificar problemas complexos'] },
+                  { label: 'Matriz GUT', values: ['Priorizar por importância', 'Lista de problemas para decidir por qual começar', 'Pontuação é subjetiva'] },
+                  { label: 'PDCA', values: ['Melhoria contínua iterativa', 'Processo que precisa melhorar constantemente', 'Lento para problemas urgentes'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual ferramenta de diagnóstico é mais adequada para cada situação?',
+                zones: [
+                  { id: 'ishikawa', label: 'Ishikawa' },
+                  { id: 'cinco-porques', label: '5 Porquês' },
+                  { id: 'gut', label: 'Matriz GUT' },
+                  { id: 'pdca', label: 'PDCA' },
+                ],
+                items: [
+                  { id: 'diag-1', label: 'Gerente tem 7 problemas na loja e não sabe por onde começar: devolução alta, estoque desorganizado, turnover, atraso nas entregas, sistema lento, conflito entre turnos e reclamação de clientes', sublabel: 'Precisa escolher 1-2 prioridades para o mês', correctZone: 'gut', correctFeedback: 'Correto — Matriz GUT. Quando você tem múltiplos problemas e precisa priorizar, o GUT quantifica Gravidade, Urgência e Tendência de cada um. O maior score define por onde começar.', wrongFeedback: 'Repense. O desafio aqui não é entender um problema — é escolher qual dos 7 atacar primeiro. Qual ferramenta foi criada especificamente para priorizar uma lista de problemas?' },
+                  { id: 'diag-2', label: 'Uma linha de montagem tem taxa de defeito de 12% há 3 meses. A hipótese inicial é "operadores desatentos", mas o gerente suspeita que há algo mais profundo', sublabel: 'A rotatividade da equipe é baixa — os mesmos operadores trabalham há 2+ anos', correctZone: 'cinco-porques', correctFeedback: 'Correto — 5 Porquês. A hipótese superficial ("operadores desatentos") não explica por que o problema persiste com a mesma equipe por 3 meses. O 5 Porquês vai encontrar a causa-raiz real — provavelmente no processo, máquina ou especificação.', wrongFeedback: 'Repense. A causa aparente já existe ("operadores") mas não explica o padrão. O gerente suspeita que há algo mais profundo. Qual ferramenta aprofunda uma hipótese superficial?' },
+                  { id: 'diag-3', label: 'Uma startup reduziu seu tempo de resposta ao cliente de 4h para 2h após uma intervenção. Quer manter essa melhora e seguir otimizando para 45 minutos', sublabel: 'O processo de atendimento já foi mapeado e a equipe está treinada', correctZone: 'pdca', correctFeedback: 'Correto — PDCA. A empresa já fez o diagnóstico e a primeira intervenção. Agora precisa de melhoria contínua: Plan (nova meta), Do (implementar), Check (medir), Act (ajustar). PDCA é para sustentar e progredir.', wrongFeedback: 'Repense. O diagnóstico já foi feito e a intervenção funcionou. O desafio agora é manter e evoluir continuamente. Qual ferramenta foi criada exatamente para isso?' },
+                  { id: 'diag-4', label: 'O NPS de um restaurante caiu de 72 para 41 em 2 meses. A equipe levantou hipóteses: comida fria, espera longa, atendimento ruim, cardápio confuso, preço alto, higiene', sublabel: 'Não há dados históricos para priorizar — todas as hipóteses parecem plausíveis', correctZone: 'ishikawa', correctFeedback: 'Correto — Ishikawa. Quando há múltiplas hipóteses e nenhuma evidência para priorizar, o Ishikawa organiza visualmente todas as causas possíveis por categoria. Isso estrutura a investigação antes de escolher qual aprofundar.', wrongFeedback: 'Repense. O problema aqui é que há muitas hipóteses simultâneas e nenhuma claramente prioritária. Qual ferramenta organiza visualmente todas as causas possíveis antes de você decidir qual aprofundar?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{Diagnóstico correto é metade da solução}}. A maioria dos projetos de intervenção falha porque resolve sintomas com velocidade, em vez de resolver causas com precisão. Cada ferramenta tem seu momento — a sequência certa multiplica o resultado.',
+              keyInsights: [
+                'Sintoma vs. causa-raiz: "avaliações caindo" é sintoma. "Entregadores sem rota otimizada causando atraso" é causa. Só a segunda gera intervenção que resolve o problema permanentemente.',
+                '{{GUT antes de agir}}. Antes de qualquer intervenção, classifique os problemas por Gravidade, Urgência e Tendência. O problema mais urgente raramente é o mais grave — e confundi-los é um erro clássico de gestão.',
+                'PDCA não é projeto — é mentalidade. Uma intervenção que termina sem ciclo de Check e Act é uma aposta, não uma melhoria. Meça sempre, ajuste sempre.',
+              ],
+            },
           },
           {
-            id: 'M7-intervencao-d1',
-            type: 'decision',
-            scenario: 'Você fez o diagnóstico: uma loja de roupas tem taxa de devolução de 25% (média do setor: 8%). O Ishikawa apontou 3 causas: fotos ruins no e-commerce, tabela de medidas imprecisa, e tecido diferente do esperado. Seu orçamento permite atacar apenas 2 causas agora.',
-            options: [
-              { label: 'Fotos + Tabela de medidas', tradeoffs: { upside: 'Resolve expectativa visual e de tamanho — 2 maiores reclamações', downside: 'Tecido continua frustrando. Cliente recebe e se decepciona.', risk: 'low' } },
-              { label: 'Fotos + Qualidade do tecido', tradeoffs: { upside: 'Melhora percepção e realidade do produto', downside: 'Sem tabela correta, devoluções por tamanho errado continuam', risk: 'medium' } },
-              { label: 'Tabela de medidas + Qualidade do tecido', tradeoffs: { upside: 'Produto chega como esperado em tamanho e qualidade', downside: 'Fotos ruins continuam gerando expectativa errada', risk: 'medium' } },
+            id: 'M7-2-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Os 5 Porquês — Da Causa Aparente à Causa Raiz',
+            subtitle: 'A Toyota transformou qualidade industrial com uma técnica simples: pergunte por quê cinco vezes. A causa que parece óbvia é quase sempre apenas o primeiro nível de um problema mais profundo.',
+            opening: {
+              leadText: '"A máquina parou." Por quê? "Fusível queimou." Por quê? "Sobrecarga." Por quê? "Rolamento sem lubrificação." Por quê? "Bomba de óleo com filtro entupido." Por quê? "Ninguém inspecionou em 6 meses." — Esta é a causa-raiz real. A solução: inspeção periódica obrigatória. Custo: R$ 200. Ignorar esse 5º por quê teria gerado falhas recorrentes por anos.',
+            },
+            body: [
+              {
+                kind: 'step-flow',
+                title: 'Como aplicar os 5 Porquês — o método completo',
+                steps: [
+                  { number: 1, title: 'Defina o problema com precisão', description: '{{Um problema mal definido gera diagnóstico errado}}. Não: "atendimento ruim". Sim: "tempo médio de resposta ao cliente passou de 2h para 6h nas últimas 3 semanas no turno da tarde". Dados específicos, período, contexto.' },
+                  { number: 2, title: 'Pergunte o primeiro "por quê?"', description: 'Escreva a causa imediata aparente. {{Não aceite a resposta óbvia sem questioná-la}}. "Por que o tempo de resposta aumentou?" → "Porque a equipe da tarde é menor." — Isso é o sintoma. Continue.' },
+                  { number: 3, title: 'Aprofunde: por quê dessa causa?', description: '{{Cada resposta vira a próxima pergunta}}. "Por que a equipe da tarde é menor?" → "Porque tivemos 3 demissões e não contratamos substitutos." — Por quê? "Porque o processo de aprovação de headcount leva 90 dias." Continue.' },
+                  { number: 4, title: 'Continue até a causa sistêmica', description: 'A causa-raiz é sistêmica quando {{a solução resolve o problema permanentemente, não temporariamente}}. Se você adicionar pessoas e o problema volta quando alguém sai de novo, não chegou à raiz. A raiz aqui: processo de aprovação de 90 dias é inadequado para variações operacionais.' },
+                  { number: 5, title: 'Proponha intervenção na causa-raiz', description: 'A intervenção deve ser na {{causa identificada no passo 4, não no sintoma do passo 2}}. Errado: contratar 3 pessoas (resolve hoje, problema volta). Certo: redesenhar processo de aprovação para <10 dias em reposições operacionais.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'O erro mais comum: parar no 2º ou 3º por quê, quando a resposta "parece suficiente". Outro erro: cada resposta pular para uma causa diferente em vez de aprofundar a anterior. Os 5 Porquês são uma linha, não um mapa de causas. Se você está explorando 3 direções simultaneamente, está usando Ishikawa — não 5 Porquês.',
+              },
             ],
-            realWorldAnalog: 'A Zattini reduziu devoluções de 22% para 11% focando em 2 ações: provador virtual (tabela) e fotos em 360° com modelos reais. Qualidade do tecido foi fase 2.',
-            lesson: 'Em projetos de intervenção, priorize pelo impacto. Use GUT: qual causa é mais grave, mais urgente e com pior tendência? Comece por ela.',
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare análises rasas vs. profundas do mesmo problema — depois classifique se chegou à causa-raiz ou ficou no sintoma.',
+              compare: {
+                columnHeaders: ['Nível', 'O que parece', 'Intervenção gerada', 'Resultado'],
+                rows: [
+                  { label: 'Sintoma (1º por quê)', values: ['Avaliações caindo', 'Treinar atendentes', 'Problema volta em 2 meses'] },
+                  { label: 'Causa intermediária', values: ['Atendentes desmotivados', 'Programa de incentivos', 'Melhora temporária'] },
+                  { label: 'Causa-raiz (4º-5º por quê)', values: ['Metas impossíveis criam pressão', 'Redesenhar metas com equipe', 'Mudança sistêmica e duradoura'] },
+                ],
+              },
+              drag: {
+                instruction: 'Cada análise chegou à causa-raiz ou ficou no sintoma?',
+                zones: [
+                  { id: 'raiz', label: 'Causa-Raiz' },
+                  { id: 'sintoma', label: 'Sintoma / Causa Superficial' },
+                ],
+                items: [
+                  { id: 'pr-1', label: 'Taxa de devolução de 18% → "clientes insatisfeitos com o produto" → solução: melhorar atendimento pós-venda', sublabel: 'A intervenção foi um script de SAC mais amigável', correctZone: 'sintoma', correctFeedback: 'Correto — Sintoma. "Clientes insatisfeitos" não explica POR QUE estão insatisfeitos. O 5 Porquês precisaria continuar: por que estão insatisfeitos? Produto diferente do site? Tamanho errado? A causa-raiz provavelmente está no produto ou na comunicação — não no pós-venda.', wrongFeedback: 'Repense. "Clientes insatisfeitos" é uma descrição do sintoma, não uma causa acionável. A intervenção (script de SAC) não resolve o motivo real da devolução. Isso é aprofundamento suficiente?' },
+                  { id: 'pr-2', label: 'Turnover de 40% → "pessoas saindo por salário" → investigação dos 5 Porquês revelou: processo seletivo contrata perfis errados para a cultura → redesenharam critérios de seleção com teste prático', sublabel: 'Turnover caiu para 15% em 6 meses', correctZone: 'raiz', correctFeedback: 'Correto — Causa-Raiz. O caminho foi: turnover → "salário" (superficial) → aprofundando: por que mesmo quem ganha bem sai? → perfil cultural inadequado → causa-raiz: seleção falha. A intervenção no processo seletivo resolveu sistemicamente.', wrongFeedback: 'Repense. A equipe foi além da resposta óbvia (salário) e encontrou uma causa que, quando resolvida, cortou o turnover pela metade. Isso é sintoma ou causa que gera mudança sistêmica?' },
+                  { id: 'pr-3', label: 'Erros de separação no estoque aumentaram 200% → "equipe nova não sabe onde ficam os produtos" → solução: treinamento de 2 dias', sublabel: 'O problema voltou 3 semanas depois quando mais 2 pessoas novas entraram', correctZone: 'sintoma', correctFeedback: 'Correto — Sintoma. A prova: o problema voltou quando novas pessoas entraram. Isso confirma que a intervenção foi no sintoma (conhecimento individual) não na causa-raiz (sistema de identificação de produtos). A causa-raiz provavelmente é: ausência de endereçamento físico no estoque ou sistema de localização inadequado.', wrongFeedback: 'Repense. Se a intervenção resolveu o problema e ele voltou assim que mudou uma variável simples (pessoas novas), a causa-raiz foi atacada ou o sintoma foi tratado?' },
+                  { id: 'pr-4', label: 'Prazo de entrega aumentou de 3 para 9 dias → 5 Porquês revelou: fornecedor único de componente crítico com capacidade limitada → diversificaram para 3 fornecedores com contrato de SLA', sublabel: 'Prazo voltou a 3 dias e variância de atraso caiu 70%', correctZone: 'raiz', correctFeedback: 'Correto — Causa-Raiz. A dependência de fornecedor único era a causa sistêmica. A intervenção (diversificação com SLA) resolveu o problema estruturalmente — não apenas o episódio pontual. A queda de 70% na variância confirma que a raiz foi atacada.', wrongFeedback: 'Repense. A solução (diversificar fornecedores + SLA) não resolve apenas o atraso atual — resolve a vulnerabilidade estrutural. Quando uma intervenção elimina a causa e o problema não volta, o que isso indica?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{A causa-raiz é identificada quando a intervenção resolve o problema permanentemente — não quando parece convincente}}. O teste real não é "faz sentido?" — é "o problema volta se não mantivermos a intervenção?" Se volta, não chegou à raiz.',
+              keyInsights: [
+                'O 5º por quê é onde mora o dinheiro. Empresas que treinam, treinam e treinam para o mesmo problema nunca perguntaram por que o treinamento não resolve. A raiz está no sistema, não na pessoa.',
+                '{{Causa-raiz vs. sintoma: o teste da recorrência}}. Se o problema volta quando você para a intervenção, você tratou o sintoma. Se não volta, chegou à raiz. Simples — e raramente aplicado.',
+                'Atenção: 5 Porquês pode gerar falsos positivos em problemas complexos. Se você encontra causas completamente diferentes em cada ramo, use Ishikawa primeiro para mapear e depois aprofunde o ramo mais relevante.',
+              ],
+            },
           },
           {
-            id: 'M7-intervencao-ex1',
-            type: 'inline-exercise',
-            prompt: 'Aplique os 5 Porquês a um problema real de negócio.',
-            context: 'Uma empresa de delivery percebeu que as avaliações no iFood caíram de 4.7 para 3.9 nos últimos 3 meses. O dono diz: "os clientes estão exigentes demais".',
-            fields: [
-              { id: 'porques', label: 'Aplique os 5 Porquês — vá além da resposta óbvia', placeholder: '1. Por que as notas caíram? Porque...\n2. Por que isso acontece? Porque...\n3. Por que? ...\n4. Por que? ...\n5. Por que? ...', multiline: true },
-              { id: 'causa-raiz', label: 'Qual é a causa-raiz que você identificou?', placeholder: 'A causa profunda (não o sintoma) é...' },
-              { id: 'intervencao', label: 'Proponha 1 ação de intervenção com prazo e responsável', placeholder: 'Ação: ... | Responsável: ... | Prazo: ... | Meta: ...', multiline: true },
+            id: 'M7-2-cap3',
+            type: 'chapter',
+            number: 3,
+            title: '5W2H — Transforme Diagnóstico em Plano de Ação',
+            subtitle: 'Sete perguntas que transformam uma boa ideia em um projeto executável: o que, por que, onde, quando, quem, como e quanto. Sem qualquer uma delas, o plano tem brechas.',
+            opening: {
+              leadText: 'Um diagnóstico brilhante sem plano de ação é análise acadêmica. Um plano sem as 7 perguntas do 5W2H é um desejo. A diferença entre projetos que entregam e projetos que viram apresentação está aqui: quem é responsável por quê, até quando, com quanto recurso, e como será medido.',
+            },
+            body: [
+              {
+                kind: 'step-flow',
+                title: 'As 7 perguntas do 5W2H — nenhuma é opcional',
+                steps: [
+                  { number: 1, title: 'WHAT — O que será feito?', description: '{{A ação específica, não o objetivo genérico}}. Errado: "melhorar o atendimento". Certo: "implementar sistema de fila digital com aviso por SMS no prazo de 45 dias". Quanto mais específico, mais fácil de executar e avaliar.' },
+                  { number: 2, title: 'WHY — Por que será feito?', description: 'Conecta a intervenção ao {{problema diagnosticado com dados}}. Errado: "porque os clientes reclamam". Certo: "porque o NPS caiu de 68 para 41 e 63% das reclamações mencionam tempo de espera acima de 20 min".' },
+                  { number: 3, title: 'WHERE — Onde será implementado?', description: '{{Define o escopo}} — qual loja, departamento, processo, região. Sem isso, o projeto se expande indefinidamente ou fica vago demais para gerar responsabilização. "Em todas as unidades" sem critério não é resposta.' },
+                  { number: 4, title: 'WHEN — Quando começa e termina?', description: 'Prazo específico com {{marcos intermediários}}, não só data de entrega final. Projetos sem marco intermediário descobrem o problema na última semana. Marco = momento de checar se o projeto está no caminho.' },
+                  { number: 5, title: 'WHO — Quem é responsável?', description: '{{Uma pessoa por ação, não "a equipe"}}. "A equipe vai implementar" não existe na prática — significa que ninguém é responsável. Responsável = quem responde se não acontecer.' },
+                  { number: 6, title: 'HOW — Como será executado?', description: '{{As etapas principais, sequência e método}}. Não precisa ser Gantt completo, mas deve ter clareza suficiente para que outra pessoa execute sem precisar perguntar tudo.' },
+                  { number: 7, title: 'HOW MUCH — Quanto custará?', description: 'Orçamento estimado: {{pessoas × horas + ferramentas + outros custos diretos}}. Projetos sem estimativa de custo não passam por aprovação real e não são comprometimentos sérios.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'O 5W2H não é burocracia — é comprometimento estruturado. Cada pergunta sem resposta é uma brecha onde o projeto vai travar. O WHO sem nome específico é a brecha mais comum: "a equipe vai fazer" distribui responsabilidade tão amplamente que ninguém a sente.',
+              },
             ],
-            evaluationCriteria: [
-              'Não aceitou a resposta superficial ("clientes exigentes")',
-              'Cada "por quê" aprofundou genuinamente — não repetiu a mesma causa com palavras diferentes',
-              'Causa-raiz identificada é acionável (algo que pode ser mudado)',
-              'Intervenção proposta tem responsável, prazo e meta mensuráveis',
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare planos bem estruturados vs. mal estruturados — depois classifique se cada plano passaria no 5W2H.',
+              compare: {
+                columnHeaders: ['Pergunta', 'Resposta fraca (reprova)', 'Resposta forte (aprova)'],
+                rows: [
+                  { label: 'WHAT', values: ['Melhorar o estoque', 'Implementar sistema de endereçamento físico com etiquetas QR em todas as 847 posições do armazém'] },
+                  { label: 'WHO', values: ['A equipe de operações', 'João Silva (Coordenador de Logística) — responsável único, presta contas à diretoria toda 2ª-feira'] },
+                  { label: 'WHEN', values: ['O mais rápido possível', '45 dias: marco 1 (dia 15) = etiquetagem; marco 2 (dia 30) = treinamento; marco 3 (dia 45) = go-live'] },
+                  { label: 'HOW MUCH', values: ['Não deve custar muito', 'R$ 12.400: R$ 3.200 etiquetas, R$ 4.800 sistema, R$ 4.400 (40h × 2 pessoas × R$ 55/h treinamento)'] },
+                ],
+              },
+              drag: {
+                instruction: 'Este plano de intervenção passaria ou seria reprovado no 5W2H?',
+                zones: [
+                  { id: 'aprovado', label: 'Aprovado — 5W2H completo' },
+                  { id: 'reprovado', label: 'Reprovado — brechas críticas' },
+                ],
+                items: [
+                  { id: '5w-1', label: 'Reduzir taxa de devolução de 18% para 10% em 60 dias | Responsável: Carla (Gerente de Produto) | Ação: adicionar tabela de medidas e 3 fotos de ângulo extra nas 200 SKUs mais devolvidas | Custo: R$ 8.000 (fotógrafo) + 40h de Carla', sublabel: 'Marco dia 30: fotos entregues. Marco dia 60: medição de devolução', correctZone: 'aprovado', correctFeedback: 'Correto — Aprovado. O plano tem: o que (fotos + tabela de medidas nos 200 SKUs), por que (devolução de 18%), onde (e-commerce, SKUs prioritários), quando (60 dias + 2 marcos), quem (Carla, responsável única), como (fotógrafo externo + trabalho interno) e quanto (R$ 8.000 + 40h). Todas as 7 perguntas respondidas.', wrongFeedback: 'Repense. Cheque cada um dos 7 elementos: O que fazer? Por que? Onde? Quando (com marcos)? Quem (nome específico)? Como? Quanto? Algum está faltando nesse plano?' },
+                  { id: '5w-2', label: 'Melhorar a comunicação interna da empresa | A equipe de RH vai liderar | Vamos começar o mais rápido possível | Orçamento a definir', sublabel: 'Objetivo: times mais alinhados e colaborativos', correctZone: 'reprovado', correctFeedback: 'Correto — Reprovado. Brechas críticas: WHAT (comunicação interna não é ação específica), WHO (equipe de RH = ninguém é responsável), WHEN (o mais rápido possível = sem prazo), HOW MUCH (a definir = sem comprometimento). Esse plano nunca sai do papel.', wrongFeedback: 'Repense. "Melhorar a comunicação" — o que especificamente? "A equipe de RH" — quem responde se não acontecer? "O mais rápido possível" — quando exatamente? "A definir" — quanto vai custar? Quantas brechas você conta?' },
+                  { id: '5w-3', label: 'Reduzir tempo de onboarding de novos funcionários de 30 para 15 dias | Lucas Mendes (T&D) responsável | Ação: criar trilha digital com 12 módulos no LMS | Prazo: 90 dias', sublabel: 'Sem estimativa de custo documentada e sem marcos intermediários', correctZone: 'reprovado', correctFeedback: 'Correto — Reprovado (parcialmente). O plano tem WHAT, WHY, WHERE, WHO e HOW bem definidos — mas faltam HOW MUCH (custo não estimado) e marcos intermediários no WHEN. Em 90 dias sem marco, o problema é descoberto no dia 89. São brechas que podem travar a aprovação ou a execução.', wrongFeedback: 'Repense. O plano tem WHO (Lucas), WHAT (trilha digital com 12 módulos), WHY (reduzir onboarding) e prazo (90 dias). Mas leia de novo: há estimativa de custo? Há marcos intermediários nos 90 dias? O que está faltando?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{Um projeto de intervenção sem as 7 respostas do 5W2H não é um projeto — é uma intenção}}. A diferença prática: intenções não têm responsável, prazo ou orçamento. Projetos têm. E apenas projetos são executados, medidos e melhorados.',
+              keyInsights: [
+                'O WHO com nome específico é a pergunta mais importante. "A equipe" não é responsável. "Marcos Alves, gerente de operações, responde toda sexta" — esse projeto acontece.',
+                '{{Marcos intermediários salvam projetos}}. Um projeto de 60 dias sem marco intermediário só descobre o problema no dia 59. Dois marcos = duas oportunidades de corrigir o rumo antes do prazo final.',
+                'HOW MUCH não é burocracia — é comprometimento. Estimar custo força o responsável a pensar na execução real, não em um cenário ideal. Projeto sem custo estimado não foi pensado seriamente.',
+              ],
+            },
+          },
+          {
+            id: 'M7-2-cap4',
+            type: 'chapter',
+            number: 4,
+            title: 'PDCA — Execute, Meça e Melhore Continuamente',
+            subtitle: 'Plan → Do → Check → Act: o ciclo que transformou o Japão na potência industrial do século XX. Toda intervenção sem PDCA é um experimento que não aprende com seus resultados.',
+            opening: {
+              leadText: 'W. Edwards Deming levou o PDCA ao Japão em 1950, quando o país ainda produzia produtos baratos e frágeis. Em 20 anos, o Japão estava dominando qualidade industrial global — câmeras, carros, eletrônicos. O segredo não foi genialidade tecnológica: foi um ciclo de melhoria disciplinado, repetido até a perfeição. A Toyota ainda usa hoje.',
+            },
+            body: [
+              {
+                kind: 'step-flow',
+                title: 'O ciclo PDCA aplicado a projetos de intervenção',
+                steps: [
+                  { number: 1, title: 'PLAN — Planeje com dados', description: '{{Defina o problema, a meta e a intervenção}} com o máximo de dados disponíveis. Use o 5W2H para estruturar. Inclua indicador de sucesso mensurável: "NPS de 41 para 65 em 90 dias" — não "melhorar satisfação".' },
+                  { number: 2, title: 'DO — Execute em escala controlada', description: '{{Implemente primeiro em escopo reduzido}} (1 loja, 1 turno, 1 processo) antes de escalar. Isso limita o risco e permite aprender antes de comprometer recursos maiores. "Piloto" não é fraqueza — é inteligência.' },
+                  { number: 3, title: 'CHECK — Meça com rigor', description: '{{Compare resultado com a meta definida no Plan}}. Não apenas "melhorou?" — mas "melhorou o quanto em relação ao que esperávamos?" Sem métrica pré-definida, qualquer resultado parece aceitável.' },
+                  { number: 4, title: 'ACT — Padronize ou ajuste', description: 'Se funcionou: {{padronize e escale}}. Se não funcionou: ajuste o plano com o que aprendeu e reinicie o ciclo. O ACT não termina o projeto — decide se vai escalar ou voltar ao Plan com mais informação.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'O erro mais comum no PDCA: pular o CHECK ou fazer o CHECK sem comparar com a meta. "Melhorou" não é informação suficiente — "melhorou 12% em vez dos 30% planejados" gera ação. Outro erro: executar em escala total antes de validar (pular o piloto no DO). Um piloto mal executado custa R$ 10k; escalar um projeto ruim pode custar R$ 1M.',
+              },
             ],
-            expectedConcepts: ['5 porquês', 'causa-raiz', 'diagnóstico', 'intervenção', '5W2H'],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare execuções com e sem PDCA — depois identifique em qual etapa do ciclo cada situação falhou.',
+              compare: {
+                columnHeaders: ['Com PDCA', 'Sem PDCA'],
+                rows: [
+                  { label: 'Falha detectada', values: ['No piloto (1 loja, 2 semanas)', 'Depois de escalar para 50 lojas'] },
+                  { label: 'Custo da correção', values: ['Baixo — escopo controlado', 'Alto — recursos já comprometidos'] },
+                  { label: 'Aprendizado', values: ['Estruturado e documentado', 'Informal e perdido na próxima troca de gestor'] },
+                  { label: 'Próxima iteração', values: ['Plano melhorado com dados reais', 'Nova tentativa sem base no erro anterior'] },
+                ],
+              },
+              drag: {
+                instruction: 'Em qual etapa do PDCA o projeto falhou?',
+                zones: [
+                  { id: 'plan', label: 'Falhou no PLAN' },
+                  { id: 'do', label: 'Falhou no DO' },
+                  { id: 'check', label: 'Falhou no CHECK' },
+                  { id: 'act', label: 'Falhou no ACT' },
+                ],
+                items: [
+                  { id: 'pdca-1', label: 'Empresa implementou novo sistema de atendimento em todas as 80 unidades simultaneamente sem testar em nenhuma primeiro', sublabel: 'Descobriu um bug crítico no dia 3 que paralisou o atendimento em todas as lojas por 6 horas', correctZone: 'do', correctFeedback: 'Correto — Falhou no DO. O erro foi executar em escala total sem piloto. Um teste em 2-3 lojas por 1 semana teria revelado o bug com impacto mínimo. A etapa DO requer implementação controlada antes de escalar.', wrongFeedback: 'Repense. O problema não foi o plano (ele existia) nem a medição (nunca chegaram lá). Foi a forma de execução. Qual etapa do PDCA define como e em que escala a implementação deve acontecer?' },
+                  { id: 'pdca-2', label: 'Gerente implementou programa de treinamento, mediu satisfação dos funcionários (nota 8,7/10) e declarou sucesso', sublabel: 'Produtividade e taxa de erro continuaram iguais — a meta original do projeto era reduzir erros em 30%', correctZone: 'check', correctFeedback: 'Correto — Falhou no CHECK. A métrica usada (satisfação) não era a do Plan (redução de erros). O CHECK deve comparar resultado com a meta original — não com qualquer métrica positiva. "As pessoas gostaram" ≠ "o problema foi resolvido".', wrongFeedback: 'Repense. O projeto foi executado e os resultados foram medidos — mas a medição usou o indicador errado. O CHECK deve comparar com o indicador definido no Plan. O que foi feito errado nessa etapa?' },
+                  { id: 'pdca-3', label: 'Piloto de nova precificação funcionou perfeitamente em 3 lojas por 60 dias — aumento de margem de 8%. Resultado arquivado em relatório. Nada mudou nas demais 47 lojas.', sublabel: 'O gerente que liderou o piloto foi promovido e o projeto ficou parado por 8 meses', correctZone: 'act', correctFeedback: 'Correto — Falhou no ACT. O piloto foi bem executado e validado — mas o ACT (padronizar e escalar o que funcionou) nunca aconteceu. Projetos que chegam ao CHECK com resultado positivo e não escalam desperdiçam todo o investimento do diagnóstico e piloto.', wrongFeedback: 'Repense. O Plan, Do e Check foram bem executados — o piloto funcionou, foi medido, resultado foi documentado. Qual é a etapa que vem depois de validar que algo funciona? Ela aconteceu?' },
+                  { id: 'pdca-4', label: 'Projeto de redução de desperdício foi lançado com meta de "diminuir custos". Após 90 dias, o gestor não sabia dizer se tinha funcionado porque não havia métrica definida no início', sublabel: 'Relatório final: "acreditamos que houve melhora, mas não temos dados para confirmar"', correctZone: 'plan', correctFeedback: 'Correto — Falhou no PLAN. Sem métrica de sucesso definida no início ("diminuir custos" não é mensurável), o CHECK se torna impossível. O Plan precisa definir o indicador específico que será medido — sem isso, nenhuma outra etapa funciona corretamente.', wrongFeedback: 'Repense. O problema foi detectado no final (não sabem se funcionou), mas a causa está no início. Qual etapa deveria ter definido a métrica de sucesso antes de começar? Sem ela, o projeto nunca pôde ser avaliado.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{PDCA não é metodologia — é disciplina}}. A maioria das empresas faz o Plan (às vezes) e o Do (sempre). Raramente faz o Check com rigor. Quase nunca faz o Act de forma sistemática. O ciclo só funciona completo — e só gera vantagem competitiva quando é repetido consistentemente.',
+              keyInsights: [
+                'Piloto antes de escalar é PDCA na prática. Cada vez que você escala sem testar, está apostando. Cada vez que testa em escopo controlado primeiro, está aprendendo com risco minimizado.',
+                '{{Meça o que importava no Plan, não o que foi fácil de medir}}. "As pessoas gostaram" é fácil de medir. "Erros caíram 30%" é o que importava. O Check que usa a métrica errada é mais perigoso que não medir — porque gera falsa sensação de sucesso.',
+                'O ciclo do PDCA termina no ACT — que recomeça no PLAN. Não há ponto final em melhoria contínua. Empresas que "concluem" o PDCA e param melhoram até o concorrente que não parou superar o padrão atingido.',
+              ],
+            },
           },
         ],
+
       },
     ],
   },
