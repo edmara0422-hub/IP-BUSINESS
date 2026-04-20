@@ -9717,131 +9717,253 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Educacao, Identidade e Solidariedade',
         blocks: [
           {
-            id: 'M8-0-t1',
-            type: 'text',
-            title: 'Educação Corporativa: Aprendizagem como Vantagem Competitiva',
-            body: 'A educação corporativa vai além de treinamento — é a estratégia de desenvolver competências alinhadas aos objetivos do negócio. Empresas que aprendem mais rápido que a concorrência vencem no longo prazo.\n\n**Peter Senge e a Organização que Aprende:**\n5 disciplinas para construir uma learning organization:\n1. Domínio Pessoal — compromisso individual com o aprendizado contínuo\n2. Modelos Mentais — questionar premissas e crenças que limitam a visão\n3. Visão Compartilhada — criar um propósito comum que engaja a equipe\n4. Aprendizagem em Equipe — diálogo > debate. Pensar coletivamente > pensar individualmente\n5. Pensamento Sistêmico — ver o todo, não apenas as partes. Entender como ações em uma área afetam o sistema inteiro\n\n**Andragogia — Como Adultos Aprendem:**\nMalcolm Knowles definiu que adultos aprendem diferente de crianças:\n— Precisam saber POR QUE estão aprendendo\n— Aprendem melhor resolvendo problemas reais\n— Trazem experiência prévia que deve ser respeitada\n— São motivados por aplicação prática, não por nota\n— Precisam de autonomia no processo\n\n**Implicações para empresas:**\n— Treinamentos longos e teóricos não funcionam para adultos\n— Microlearning (conteúdo curto, 5-10min) tem retenção 20% maior\n— Learning by doing: projetos reais > salas de aula\n— Mentoria e coaching: aprendizado contextualizado\n— Comunidades de prática: grupos que compartilham conhecimento\n\n**Universidades Corporativas:**\n— Ambev, Natura, Itaú, Magazine Luiza: investem milhões em educação interna\n— Foco: não é substituir universidade formal, é desenvolver competências específicas do negócio\n— ROI da educação corporativa: R$ 4-8 para cada R$ 1 investido (ATD Research)\n\nPergunta-chave: Quanto sua empresa investe por ano em capacitação? A média brasileira é 1.5% da folha de pagamento. Empresas líderes investem 3-5%.',
-          },
-          {
-            id: 'M8-edu-c1',
-            type: 'concept',
-            term: 'Andragogia vs Pedagogia',
-            definition: 'Pedagogia é a ciência de ensinar crianças (o professor decide o quê, como e quando). Andragogia (Malcolm Knowles) é a ciência de ensinar adultos: precisam de propósito, autonomia, aplicação prática e respeito à experiência prévia.',
-            example: 'Treinamento corporativo eficaz: "Hoje vamos resolver o problema X que vocês enfrentam no dia a dia" (andragogia). Ineficaz: "Abram na página 42, vamos estudar a teoria Y" (pedagogia aplicada a adultos).',
-            antiExample: 'Treinamento de 8 horas em sala com PowerPoint de 200 slides. Adultos retêm <10% nesse formato. Microlearning de 10 minutos com problema real tem retenção 5x maior.',
-          },
-          {
-            id: 'M8-edu-cmp1',
-            type: 'compare',
-            title: '5 Disciplinas da Organização que Aprende (Senge) — Diagnóstico',
-            question: 'Em qual disciplina sua empresa é forte e em qual é fraca?',
-            dimensions: ['O que é', 'Pergunta diagnóstica', 'Sinais de força', 'Sinais de fraqueza'],
-            items: [
+            id: 'M8-0-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Andragogia — Como Adultos Realmente Aprendem',
+            subtitle: 'Malcolm Knowles descobriu que adultos aprendem de forma completamente diferente de crianças. Ignorar isso é a razão pela qual treinamentos corporativos custam caro e não mudam nada.',
+            opening: {
+              leadText: 'A maioria dos treinamentos corporativos usa pedagogia — o modelo de ensinar crianças — em adultos experientes. Resultado: 8 horas de PowerPoint, 200 slides, retenção abaixo de 10%. Malcolm Knowles criou a andragogia em 1968: adultos têm experiência prévia, sabem por que precisam aprender e querem aplicar imediatamente. Ignorar isso é literalmente jogar dinheiro fora.',
+            },
+            body: [
               {
-                id: 'dominio-pessoal',
-                label: 'Domínio Pessoal',
-                values: [
-                  'Compromisso individual com aprendizado contínuo',
-                  'As pessoas buscam aprender por conta própria?',
-                  'Funcionários fazem cursos, leem, pedem feedback',
-                  'Ninguém aprende nada novo há meses',
+                kind: 'pillar-grid',
+                title: 'Os 4 princípios da andragogia que transformam treinamentos',
+                pillars: [
+                  { icon: '🎯', title: 'Orientação para Problema', description: 'Adultos aprendem melhor quando o conteúdo resolve {{um problema real que já enfrentam}}. Errado: "hoje vamos estudar comunicação assertiva". Certo: "vamos resolver aquela situação com cliente difícil que você relatou na semana passada".' },
+                  { icon: '🏗️', title: 'Experiência como Base', description: 'O adulto chega com {{repertório que deve ser aproveitado, não ignorado}}. "Alguém já passou por situação parecida?" ativa mais aprendizado do que qualquer slide. Ignorar a experiência do grupo é desperdiçar o maior ativo da sala.' },
+                  { icon: '🔍', title: 'Prontidão para Aprender', description: 'Adultos aprendem quando {{percebem que precisam daquele conhecimento agora}}, não quando o RH decide que é hora de treinar. Treinamento de compliance obrigatório sem contexto de aplicação = baixo engajamento garantido.' },
+                  { icon: '⚡', title: 'Aplicação Imediata', description: 'O adulto quer {{usar o que aprendeu em horas, não semanas}}. Microlearning (5-15 min de conteúdo aplicável imediatamente) supera aulas longas em retenção e transferência. Conhecimento sem aplicação imediata tem vida curta.' },
                 ],
               },
               {
-                id: 'modelos-mentais',
-                label: 'Modelos Mentais',
-                values: [
-                  'Questionar premissas e crenças limitantes',
-                  'Quando alguém questiona "sempre fizemos assim", o que acontece?',
-                  'Debate saudável, abertura para mudar de ideia',
-                  'Resistência a mudança, "aqui sempre foi assim"',
+                kind: 'paragraph',
+                text: 'A diferença prática: um treinamento pedagógico diz "hoje você vai aprender técnicas de negociação" (o professor decide o que é relevante). Um treinamento andragógico começa com "qual negociação difícil você tem pela frente?" e constrói a partir da necessidade real. A retenção e aplicação são dramaticamente diferentes — e o custo por resultado aprendido cai de 5 a 10 vezes.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare abordagens pedagógica e andragógica em situações reais — depois classifique cada prática.',
+              compare: {
+                columnHeaders: ['Dimensão', 'Pedagógica (para crianças)', 'Andragógica (para adultos)'],
+                rows: [
+                  { label: 'Ponto de partida', values: ['O professor define o que aprender', 'Necessidade real do aprendiz define o conteúdo'] },
+                  { label: 'Formato', values: ['Aulas longas, conteúdo teórico', 'Microlearning, casos reais, prática imediata'] },
+                  { label: 'Experiência prévia', values: ['Ignorada — começa do zero', 'Central — é o ponto de partida do aprendizado'] },
+                  { label: 'Motivação', values: ['Nota, aprovação, punição', 'Resolver problema real, crescer profissionalmente'] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada prática de treinamento — andragógica ou pedagógica:',
+                zones: [
+                  { id: 'andragogica', label: 'Andragógica' },
+                  { id: 'pedagogica', label: 'Pedagógica' },
+                ],
+                items: [
+                  { id: 'and-1', label: 'Treinamento de vendas começa com: "traga 1 objeção real de cliente que você não soube responder essa semana — vamos resolver juntos"', sublabel: 'Conteúdo é construído a partir das situações reais trazidas pelo grupo', correctZone: 'andragogica', correctFeedback: 'Correto — Andragógica. O treinamento parte da experiência real do vendedor (princípio da experiência como base) e resolve um problema imediato (orientação para problema). A retenção será alta porque o conteúdo foi gerado a partir de necessidade real.', wrongFeedback: 'Repense. Esse treinamento começa com o problema real do aprendiz, não com o plano do instrutor. O conteúdo resolve algo que o vendedor já enfrentou. Qual abordagem de aprendizado adulto isso representa?' },
+                  { id: 'and-2', label: 'Curso de liderança de 3 dias com 18 módulos teóricos sobre estilos de liderança, com prova ao final', sublabel: 'Material padronizado, mesmo conteúdo para todos os gestores independente da experiência ou desafio atual', correctZone: 'pedagogica', correctFeedback: 'Correto — Pedagógica. Ignora a experiência prévia dos gestores, não parte de problemas reais e usa avaliação por prova. Esse formato pode ser útil para certificação, mas tem baixa transferência para a prática — especialmente para quem já lidera há anos.', wrongFeedback: 'Repense. Esse treinamento usa conteúdo padronizado independente da realidade de cada líder, com prova ao final. Qual modelo de aprendizado trata o adulto como receptor passivo de conteúdo?' },
+                  { id: 'and-3', label: 'Microlearning de 8 minutos enviado na segunda-feira com 1 técnica de feedback que o gestor deve aplicar até sexta e reportar o resultado', sublabel: 'Na sexta, grupo discute o que funcionou e o que adaptou', correctZone: 'andragogica', correctFeedback: 'Correto — Andragógica. Aplica 3 princípios: microlearning (aplicação imediata), prática real (experiência como base) e ciclo de feedback (aprendizado por reflexão sobre experiência). O formato respeita como adultos realmente aprendem.', wrongFeedback: 'Repense. Esse formato exige aplicação imediata (dentro da semana) e reflexão sobre a experiência real. Qual princípio de aprendizado adulto isso ativa que o treinamento longo em sala não ativa?' },
+                  { id: 'and-4', label: 'Compliance obrigatório de 4 horas sobre LGPD enviado para 800 funcionários com quiz no final para registrar participação', sublabel: 'Conteúdo genérico, sem exemplos do setor da empresa', correctZone: 'pedagogica', correctFeedback: 'Correto — Pedagógica. Motivação externa (obrigatório), conteúdo genérico sem contexto de aplicação, formato longo passivo e avaliação por quiz de confirmação. É compliance, não aprendizado. O funcionário completa para "marcar a caixinha", não para mudar comportamento.', wrongFeedback: 'Repense. O funcionário não escolheu aprender, o conteúdo não é relevante para o seu contexto específico e não há aplicação imediata prevista. Qual modelo de aprendizado isso representa — e por que a retenção será baixa?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{O ROI de treinamento se mede em mudança de comportamento, não em horas assistidas}}. Andragogia não é tendência pedagógica — é respeito pela realidade de como adultos aprendem. Empresas que aplicam isso cortam custo de treinamento e aumentam resultado ao mesmo tempo.',
+              keyInsights: [
+                'A pergunta que transforma qualquer treinamento: "Qual problema real você vai resolver com isso amanhã?". Se o facilitador não consegue responder, o treinamento não tem contexto andragógico.',
+                '{{Microlearning > maratonas}}. 5 sessões de 15 minutos com aplicação imediata entre elas superam 8 horas contínuas em qualquer métrica de retenção e transferência para a prática.',
+                'Experiência prévia é o maior ativo da sala. O instrutor que ignora o que os participantes já sabem e viveram está desperdiçando o recurso mais valioso disponível — e criando ressentimento no processo.',
+              ],
+            },
+          },
+          {
+            id: 'M8-0-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'As 5 Disciplinas da Organização que Aprende',
+            subtitle: 'Peter Senge identificou em 1990 as 5 capacidades que separam empresas que evoluem das que se tornam obsoletas. A mais importante integra todas as outras — e é a mais ignorada.',
+            opening: {
+              leadText: 'Em 1990, Peter Senge publicou "A Quinta Disciplina" e cunhou o conceito de "Learning Organization". A ideia: empresas que aprendem mais rápido que o ambiente muda sobrevivem. As que não aprendem se tornam obsoletas — independente de tamanho ou história. A Kodak dominava fotografia. A Nokia dominava celulares. Ambas falharam na disciplina mais crítica: o pensamento sistêmico.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'As 5 disciplinas da organização que aprende (Senge)',
+                pillars: [
+                  { icon: '🧑', title: 'Domínio Pessoal', description: '{{Comprometimento individual com aprendizado contínuo}}. Pessoas que cultivam maestria pessoal são o combustível da organização que aprende. Sinal positivo: funcionários fazem cursos por conta própria, pedem feedback, têm plano de desenvolvimento claro.' },
+                  { icon: '🧠', title: 'Modelos Mentais', description: 'Capacidade de {{questionar premissas e crenças limitantes}}. "Sempre fizemos assim" é o sinal de modelo mental engessado. Organizações que aprendem criam espaços seguros para questionar o que "todos sabem que é verdade".' },
+                  { icon: '🎯', title: 'Visão Compartilhada', description: '{{Propósito comum que engaja genuinamente}}. Não é o que está no site — é o que 10 funcionários aleatórios respondem quando perguntados "qual nosso objetivo?". Se as respostas divergem, não há visão compartilhada real.' },
+                  { icon: '👥', title: 'Aprendizagem em Equipe', description: 'Times que pensam {{coletivamente produzem insights} que nenhum indivíduo produziria sozinho. Diálogo (explorar juntos) supera debate (convencer o outro). Reunião que só cobra — sem aprender nada — é anti-aprendizagem.' },
+                  { icon: '🔄', title: 'Pensamento Sistêmico (A 5ª Disciplina)', description: 'A {{disciplina que integra todas as outras}}. Ver o sistema completo, não os eventos isolados. Kodak via o declínio como "problema de marketing"; o sistema dizia que o modelo de negócio inteiro estava sendo substituído. Pensamento sistêmico teria revelado isso 10 anos antes.' },
                 ],
               },
               {
-                id: 'visao-compartilhada',
-                label: 'Visão Compartilhada',
-                values: [
-                  'Propósito comum que engaja todos',
-                  'Se perguntar a 10 funcionários "qual nosso objetivo?", quantos respondem igual?',
-                  '8 de 10 respondem a mesma coisa',
-                  'Cada um puxa para um lado. Sem norte.',
+                kind: 'paragraph',
+                text: 'A disciplina mais fraca é o gargalo de toda a organização. Investir na mais forte gera retorno marginal decrescente. O diagnóstico honesto: se perguntar a 10 funcionários qual o objetivo da empresa e 7 derem respostas diferentes, a terceira disciplina (visão compartilhada) é o gargalo — e pouco adianta investir nas outras 4.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare sinais de força e fraqueza em cada disciplina — depois identifique qual disciplina está falhando em cada situação.',
+              compare: {
+                columnHeaders: ['Disciplina', 'Sinal de força', 'Sinal de fraqueza'],
+                rows: [
+                  { label: 'Domínio Pessoal', values: ['Funcionários buscam aprender por iniciativa própria', 'Ninguém aprende nada novo há meses'] },
+                  { label: 'Modelos Mentais', values: ['Debate saudável, abertura para mudar de ideia', '"Sempre foi assim" encerra qualquer discussão'] },
+                  { label: 'Visão Compartilhada', values: ['8 de 10 funcionários descrevem o objetivo igual', 'Cada um puxa para um lado — sem norte'] },
+                  { label: 'Aprendizagem em Equipe', values: ['Times resolvem juntos, compartilham aprendizados', 'Silos, competição interna, "cada um por si"'] },
+                  { label: 'Pensamento Sistêmico', values: ['Buscam causa-raiz, enxergam interdependências', 'Apagam incêndios sem entender a causa'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual das 5 disciplinas está claramente falhando em cada situação?',
+                zones: [
+                  { id: 'dominio', label: 'Domínio Pessoal' },
+                  { id: 'modelos', label: 'Modelos Mentais' },
+                  { id: 'visao', label: 'Visão Compartilhada' },
+                  { id: 'equipe', label: 'Aprendizagem em Equipe' },
+                  { id: 'sistemico', label: 'Pensamento Sistêmico' },
+                ],
+                items: [
+                  { id: 'disc-1', label: 'Uma empresa de varejo perdeu 15% de market share em 2 anos para concorrentes digitais. A resposta da liderança: "precisamos de mais promoções"', sublabel: 'Ninguém na empresa investigou por que os clientes estavam migrando — apenas reagiu ao sintoma de vendas caindo', correctZone: 'sistemico', correctFeedback: 'Correto — Pensamento Sistêmico. A empresa está reagindo ao sintoma (vendas caindo) com a solução habitual (promoções) sem entender o sistema: por que clientes migram para o digital? Qual mudança estrutural está acontecendo? Pensamento sistêmico teria revelado a causa antes da crise.', wrongFeedback: 'Repense. A empresa está vendo eventos isolados (queda de vendas) e reagindo com soluções táticas (promoções) sem entender o sistema maior que está mudando. Qual disciplina conecta os pontos e enxerga as interdependências?' },
+                  { id: 'disc-2', label: 'Departamento de TI e departamento comercial têm reuniões separadas, relatórios separados e nunca compartilham aprendizados. Quando TI implementou um sistema novo, o comercial descobriu no dia do go-live', sublabel: 'Os dois times têm metas conflitantes e nunca criaram soluções juntos', correctZone: 'equipe', correctFeedback: 'Correto — Aprendizagem em Equipe. Silos que nunca aprendem juntos, metas conflitantes e ausência de diálogo interárea são os sinais clássicos de falha nessa disciplina. Aprendizagem em equipe requer que times pensem coletivamente — o oposto de "cada um no seu quadrado".', wrongFeedback: 'Repense. O problema central é a ausência de pensar e aprender juntos entre departamentos que deveriam ser interdependentes. Qual disciplina fala especificamente sobre aprendizado coletivo e diálogo entre times?' },
+                  { id: 'disc-3', label: 'CEO perguntou para 12 gerentes qual a prioridade da empresa para o próximo ano. Recebeu 9 respostas diferentes: crescimento, qualidade, inovação, custo, pessoas, expansão, digital, marca, clientes e sustentabilidade', sublabel: 'Nenhum gerente foi capaz de articular qual dessas tem prioridade real', correctZone: 'visao', correctFeedback: 'Correto — Visão Compartilhada. Nove respostas diferentes para a mesma pergunta sobre prioridade é o diagnóstico mais claro de ausência de visão compartilhada. Cada gerente está "puxando" para um lado porque não há norte comum genuinamente internalizado.', wrongFeedback: 'Repense. O problema não é que as pessoas não querem aprender — é que cada uma aprendeu um objetivo diferente. Quando gerentes da mesma empresa têm 9 versões da prioridade, qual disciplina está falhando?' },
+                  { id: 'disc-4', label: 'Toda vez que alguém propõe um processo diferente, o diretor de operações diz "já tentamos isso em 2018 e não funcionou" — sem analisar se o contexto mudou', sublabel: 'A equipe parou de propor mudanças porque sabe que será bloqueada com o argumento histórico', correctZone: 'modelos', correctFeedback: 'Correto — Modelos Mentais. "Já tentamos em 2018" sem questionar se o contexto atual é diferente é um modelo mental engessado clássico. A organização que aprende questiona premissas — inclusive as que "todos sabem que são verdade". Quando o questionamento é proibido, o aprendizado para.', wrongFeedback: 'Repense. O diretor está usando uma experiência passada como verdade imutável, sem questionar se as condições mudaram. Qual disciplina de Senge fala sobre a capacidade de questionar crenças e premissas limitantes?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{A organização que para de aprender começa a morrer — mesmo que o balanço ainda esteja positivo}}. A Kodak tinha lucro recorde quando ignorou a fotografia digital. A Nokia dominava o mercado quando ignorou os smartphones. Aprender mais rápido que o ambiente muda não é vantagem — é sobrevivência.',
+              keyInsights: [
+                'Identifique a disciplina mais fraca — ela é o gargalo real. Fortalecer as outras sem resolver o gargalo é investimento de baixo retorno. Uma empresa com ótimo domínio pessoal mas sem visão compartilhada tem 200 talentos puxando em 200 direções.',
+                '{{Pensamento sistêmico é a mais ignorada e a mais crítica}}. Eventos isolados (vendas caindo, turnover subindo, custo aumentando) raramente são problemas independentes. São sintomas de dinâmicas sistêmicas. Quem não enxerga o sistema atrás dos eventos está sempre apagando incêndios.',
+                'Aprendizagem em equipe começa com diálogo — suspender julgamento para explorar juntos. Reunião que só debate (cada um defende sua posição) ou só cobra (accountability sem aprendizado) não é aprendizagem em equipe.',
+              ],
+            },
+          },
+          {
+            id: 'M8-0-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Cultura Organizacional — Os 3 Níveis de Schein',
+            subtitle: 'Edgar Schein revelou que a cultura real de uma empresa opera em 3 camadas. As duas primeiras são visíveis. A terceira — a que realmente governa o comportamento — é invisível. E é a mais poderosa.',
+            opening: {
+              leadText: 'Por que empresas com os mesmos valores declarados ("inovação", "pessoas primeiro", "integridade") se comportam de formas completamente diferentes? Schein descobriu a resposta: a cultura real não está nos valores da parede — está nos pressupostos básicos que ninguém questiona. São crenças tão profundas que viram "a forma como as coisas funcionam aqui" — e governam o comportamento mesmo quando contradizem os valores declarados.',
+            },
+            body: [
+              {
+                kind: 'step-flow',
+                title: 'Os 3 níveis de cultura de Schein — do visível ao invisível',
+                steps: [
+                  { number: 1, title: 'Artefatos — o que qualquer visitante percebe', description: '{{Elementos visíveis e tangíveis}}: escritório (aberto ou fechado), dress code, linguagem usada, rituais, cerimônias, como as reuniões funcionam. Fácil de ver, difícil de interpretar sem entender as camadas mais profundas. Um escritório sem paredes pode ser "colaboração" ou "controle disfarçado" — depende do que está abaixo.' },
+                  { number: 2, title: 'Valores Declarados — o que a empresa diz que valoriza', description: 'O que está no {{site, no manual do funcionário, nas paredes}}: "inovação", "pessoas primeiro", "ousadia". Representam o que a organização aspira ser — ou o que quer que o mundo pense que é. O gap entre valores declarados e comportamento real é o diagnóstico mais revelador da cultura.' },
+                  { number: 3, title: 'Pressupostos Básicos — o que realmente governa', description: 'As {{crenças profundas, não questionadas}}, que determinam como as coisas realmente funcionam. "Erros são punidos aqui" (mesmo que o valor seja "inovação"). "Quem faz barulho não cresce" (mesmo que o valor seja "voz ativa"). Esses pressupostos são invisíveis mas onipresentes — e mudam a cultura mais que qualquer comunicado.' },
                 ],
               },
               {
-                id: 'aprendizagem-equipe',
-                label: 'Aprendizagem em Equipe',
-                values: [
-                  'Pensar coletivamente, diálogo > debate',
-                  'Reuniões geram soluções novas ou só cobranças?',
-                  'Times resolvem problemas juntos, compartilham aprendizados',
-                  'Silos, competição interna, "cada um por si"',
+                kind: 'paragraph',
+                text: 'O teste de Schein mais poderoso: o que acontece quando alguém erra? Se o valor declarado é "inovação" e o pressuposto real é "erros são punidos", a inovação não acontece — independente do que está escrito na parede. A Amazon criou o "Just Do It Award" — prêmio para quem tenta algo ousado mesmo falhando — porque entendeu que valores precisam ser suportados por pressupostos reais para existirem.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare o que cada nível de cultura revela — depois classifique se o gap identificado é superficial ou profundo.',
+              compare: {
+                columnHeaders: ['Nível', 'Como identificar', 'Pode ser mudado rapidamente?'],
+                rows: [
+                  { label: 'Artefatos', values: ['Observar fisicamente a empresa', 'Sim — é o mais fácil de alterar'] },
+                  { label: 'Valores Declarados', values: ['Ler documentos, ouvir liderança', 'Moderado — requer comunicação e consistência'] },
+                  { label: 'Pressupostos Básicos', values: ['Observar comportamento sob pressão', 'Não — leva anos e exige coerência radical'] },
+                ],
+              },
+              drag: {
+                instruction: 'O gap cultural identificado é superficial (artefatos/valores) ou profundo (pressupostos)?',
+                zones: [
+                  { id: 'superficial', label: 'Gap Superficial (artefatos/valores)' },
+                  { id: 'profundo', label: 'Gap Profundo (pressupostos básicos)' },
+                ],
+                items: [
+                  { id: 'gap-1', label: 'Empresa mudou o escritório para open space e removeu salas fechadas dos gestores, mas as decisões ainda são tomadas em reuniões de diretoria sem participação das equipes', sublabel: 'Funcionários dizem: "a estrutura mudou, mas nada mudou de verdade"', correctZone: 'profundo', correctFeedback: 'Correto — Gap Profundo. O artefato (escritório) mudou, mas o pressuposto básico ("decisões são dos diretores") permaneceu intacto. Isso é o gap mais perigoso de Schein: aparência de mudança sem transformação real. Funcionários percebem a contradição imediatamente.', wrongFeedback: 'Repense. A mudança física (open space) é um artefato. Mas o que governa o comportamento real (quem decide o quê) não mudou. Qual nível de Schein foi alterado e qual permaneceu igual?' },
+                  { id: 'gap-2', label: 'Empresa atualizou o manual do funcionário com os valores "colaboração" e "transparência" mas não mudou nenhum processo, reunião ou prática de gestão', sublabel: 'Ninguém foi comunicado sobre o que muda na prática — o manual foi enviado por e-mail', correctZone: 'superficial', correctFeedback: 'Correto — Gap Superficial. Alterar documento de valores sem mudar comportamentos é mudança de artefato/valor declarado apenas. É fácil de perceber e de corrigir — basta conectar os novos valores a práticas concretas. O problema é real, mas resolvível com iniciativas focadas.', wrongFeedback: 'Repense. A empresa mudou o que está escrito (nível 2 — valores declarados) sem tocar nos pressupostos básicos. Essa contradição é mais fácil de corrigir do que parece — basta criar práticas que deem vida aos valores. Qual nível foi alterado?' },
+                  { id: 'gap-3', label: 'Em reuniões de avaliação de desempenho, gestores sempre aprovam projetos conservadores e questionam fortemente projetos inovadores — mesmo que a empresa declare "ousadia" como valor', sublabel: 'Esse padrão persiste há 8 anos, através de 3 CEOs diferentes', correctZone: 'profundo', correctFeedback: 'Correto — Gap Profundo. O pressuposto básico ("inovação tem custo político — conservadorismo é mais seguro para a carreira") está tão enraizado que sobrevive a mudanças de CEO. Esse nível de Schein leva anos para mudar e exige que a liderança mude o que é recompensado — não o que é declarado.', wrongFeedback: 'Repense. O padrão persiste há 8 anos e sobreviveu a 3 CEOs diferentes. Um gap que resiste à mudança de toda a liderança por quase uma década não está no nível de artefatos ou valores declarados. Em qual nível ele está operando?' },
+                  { id: 'gap-4', label: 'Empresa trocou logo, cores e nome sem mudar estrutura, processos ou líderes', sublabel: 'A rebrand foi comunicada como "nova fase" e "mudança de cultura"', correctZone: 'superficial', correctFeedback: 'Correto — Gap Superficial. Rebrand é mudança de artefato puro. Não toca em valores declarados, muito menos em pressupostos básicos. É o tipo de mudança mais visível e menos eficaz para transformação cultural real. Funcionários experientes reconhecem isso imediatamente.', wrongFeedback: 'Repense. Logo, cores e nome são elementos visíveis e tangíveis — a primeira camada de Schein. Uma mudança que fica apenas nessa camada é superficial por definição. Qual nível foi alterado aqui?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{Cultura não é o que está escrito — é o que acontece quando ninguém está olhando}}. E mais revelador ainda: o que acontece quando alguém erra, quando há conflito entre valores e resultados, quando a pressão chega. Nesses momentos, os pressupostos básicos emergem com clareza — e mostram a cultura real.',
+              keyInsights: [
+                'O diagnóstico mais rápido de cultura: pergunte "o que acontece quando alguém comete um erro aqui?". A resposta (honesta, não a oficial) revela o pressuposto básico mais importante da empresa.',
+                '{{Mudar cultura começa pelos pressupostos, não pelos artefatos}}. Nova logo, novo escritório, novo manual de valores — nada disso muda cultura. O que muda: o que é recompensado, o que é punido, o que os líderes modelam no dia a dia.',
+                'Gap entre valores declarados e pressupostos reais é percebido pelos funcionários em semanas e pelos clientes em meses. Essa contradição corrói confiança e engajamento — silenciosamente, mas consistentemente.',
+              ],
+            },
+          },
+          {
+            id: 'M8-0-cap4',
+            type: 'chapter',
+            number: 4,
+            title: 'Missão, Visão e Valores — Do Genérico ao Genuíno',
+            subtitle: 'Toda empresa tem missão, visão e valores. Poucas têm os genuínos. O teste: esses elementos orientam decisões difíceis — ou são decoração de parede?',
+            opening: {
+              leadText: 'A Enron tinha como valores declarados: Respeito, Integridade, Comunicação e Excelência. Foi o maior escândalo contábil da história americana. A diferença entre missão/visão/valores genuínos e decorativos não está na redação — está na função: orientam decisões quando é caro fazê-lo, ou existem apenas para parecer bem?',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Os 4 testes para distinguir missão/visão/valores genuínos de decorativos',
+                pillars: [
+                  { icon: '⚡', title: 'Teste da Decisão Difícil', description: 'Quando há conflito entre um valor declarado e uma oportunidade financeira, {{o valor vence}? A Johnson & Johnson retirou o Tylenol (US$ 100M) porque o credo colocava pacientes antes de acionistas. Esse é o teste definitivo — e a maioria das empresas reprova.',
+                  },
+                  { icon: '🔁', title: 'Teste da Consistência', description: '{{Os mesmos valores se aplicam para CEO e estagiário?}} Empresa que prega "integridade" mas permite que executivos violem políticas que são aplicadas ao restante da equipe tem valores decorativos. Consistência vertical é o indicador mais revelador.',
+                  },
+                  { icon: '💰', title: 'Teste do Orçamento', description: 'Onde a empresa {{investe dinheiro}} revela seus valores reais. "Pessoas são nosso maior ativo" + zero budget para desenvolvimento = valor decorativo. "Sustentabilidade é nosso compromisso" + terceirização da poluição = idem. Siga o dinheiro.',
+                  },
+                  { icon: '📢', title: 'Teste do Recrutamento', description: '{{A empresa rejeita candidatos tecnicamente excelentes mas culturalmente desalinhados?}} Se a resposta for "nunca" — os valores não orientam decisões de RH. Empresas com valores genuínos sabem que contratar contra a cultura tem custo maior que manter a vaga aberta.',
+                  },
                 ],
               },
               {
-                id: 'pensamento-sistemico',
-                label: 'Pensamento Sistêmico',
-                values: [
-                  'Ver o todo, entender interdependências',
-                  'Quando algo dá errado, buscam causa-raiz ou culpado?',
-                  'Analisam o sistema, não só o sintoma',
-                  'Apagam incêndios sem entender a causa',
-                ],
-                highlight: 'Pensamento sistêmico é a "quinta disciplina" — integra todas as outras. Sem ele, as 4 anteriores são esforços isolados.',
+                kind: 'paragraph',
+                text: 'Missão poderosa é específica e diferenciadora. "Ser a melhor empresa do setor" não é missão — é ambição genérica que qualquer empresa poderia ter. A missão da Patagonia: "Estamos no negócio para salvar nosso planeta". Isso orientou a decisão de dar a empresa inteira para fundos ambientais em 2022. Quando missão e decisão difícil coincidem — a missão é genuína.',
               },
             ],
-            insight: 'A disciplina mais fraca é o gargalo de toda a organização. Investir na mais forte gera retorno marginal decrescente. Foque no elo mais fraco.',
-          },
-          {
-            id: 'M8-0-t2',
-            type: 'text',
-            title: 'Identidade Organizacional e Cultura: DNA do Negócio',
-            body: 'A identidade organizacional é o conjunto de características que tornam a empresa única — como ela se vê, como quer ser vista e como é percebida de fato.\n\n**Os 3 elementos da identidade:**\n\n**Missão** — por que a empresa existe? Qual problema resolve?\n— Ruim: "Ser a melhor empresa do segmento" (genérico, não diferencia)\n— Bom: "Democratizar o acesso à educação financeira para empreendedores brasileiros" (específico, claro, acionável)\n\n**Visão** — onde a empresa quer chegar?\n— Define a ambição de longo prazo\n— Deve ser inspiradora mas alcançável\n— Deve ser revisada a cada 3-5 anos\n\n**Valores** — o que a empresa não negocia?\n— Valores reais vs valores de parede\n— Teste: sua empresa já demitiu alguém por violar um valor? Se não, eles são decorativos.\n— Valores devem guiar decisões difíceis, não apenas discursos bonitos.\n\n**Cultura Organizacional (Edgar Schein):**\n3 níveis de cultura:\n\n**Artefatos** (visível) — escritório, dress code, linguagem, rituais, ferramentas\n— Open office vs salas fechadas diz muito sobre hierarquia\n— Happy hour vs meditação matinal diz muito sobre valores\n\n**Valores Declarados** (consciente) — o que a empresa diz que valoriza\n— Documentado em código de ética, site, onboarding\n\n**Pressupostos Básicos** (inconsciente) — crenças profundas que governam comportamento\n— "Erro é aprendizado" vs "erro é punição"\n— "Meritocracia" vs "quem manda é quem tem mais tempo"\n— "O cliente tem sempre razão" vs "protegemos nosso time primeiro"\n\nDica: Para descobrir a cultura real de uma empresa, não leia o site — observe como as pessoas se comportam quando o chefe não está olhando. A cultura é o que acontece quando ninguém está monitorando.\n\nPergunta-chave: Se um funcionário novo perguntasse "como as coisas realmente funcionam aqui?", o que os colegas diriam em particular?',
-          },
-          {
-            id: 'M8-cultura-fw1',
-            type: 'framework',
-            frameworkId: 'cultura-schein',
-            title: 'Diagnóstico de Cultura Organizacional (Edgar Schein)',
-            description: 'Analise os 3 níveis de cultura da sua empresa. Seja brutalmente honesto — a cultura real é o que acontece quando ninguém está monitorando.',
-            fields: [
-              { id: 'artefatos', label: 'Artefatos (visível) — o que qualquer visitante perceberia?', placeholder: 'Escritório, dress code, linguagem, rituais, ferramentas, horários...', helpText: 'Open office ou salas fechadas? Slack ou e-mail formal? Happy hour ou hora extra?' },
-              { id: 'valores', label: 'Valores Declarados — o que a empresa DIZ que valoriza?', placeholder: 'O que está no site, no onboarding, no código de ética?', helpText: 'Liste os 3-5 valores oficiais da empresa.' },
-              { id: 'pressupostos', label: 'Pressupostos Básicos — o que REALMENTE governa o comportamento?', placeholder: 'Erro é aprendizado ou punição? Quem cresce: quem entrega ou quem é amigo do chefe?', helpText: 'Pense: se um novo funcionário perguntasse "como as coisas realmente funcionam aqui?", o que diriam?' },
-              { id: 'gap', label: 'Qual o GAP entre valores declarados e pressupostos reais?', placeholder: 'Ex: dizemos "inovação" mas punem quem erra. Dizemos "meritocracia" mas promovem por tempo de casa.', helpText: 'Esse gap é o principal risco cultural.' },
-            ],
-          },
-          {
-            id: 'M8-cultura-d1',
-            type: 'decision',
-            scenario: 'Você é RH de uma empresa que diz valorizar "inovação" e "ousadia". Um funcionário propôs uma mudança radical no processo de vendas. O teste piloto falhou e custou R$ 50 mil. O diretor comercial quer punir o funcionário. O que você recomenda?',
-            options: [
-              { label: 'Punir — dar advertência formal', tradeoffs: { upside: 'Sinaliza responsabilidade com recursos da empresa', downside: 'Mata inovação. Ninguém mais vai arriscar.', risk: 'high' } },
-              { label: 'Ignorar — não fazer nada', tradeoffs: { upside: 'Não pune, mas também não aprende', downside: 'Perda de R$ 50k sem nenhuma lição extraída', risk: 'medium' } },
-              { label: 'Celebrar a tentativa + extrair aprendizados', tradeoffs: { upside: 'Reforça cultura de inovação, transforma erro em case interno', downside: 'Pode parecer que "gastar R$ 50k em erro é ok"', risk: 'low' } },
-            ],
-            realWorldAnalog: 'Na Amazon, Jeff Bezos criou o "Just Do It Award" — prêmio para quem tenta algo ousado, mesmo se falhar. O Fire Phone fracassou (R$ 170M de prejuízo), mas a mesma equipe criou a Alexa.',
-            lesson: 'Cultura é o que acontece quando alguém erra. Se o erro é punido, os valores de parede ("inovação", "ousadia") são mentira. A reação ao fracasso define a cultura real.',
-          },
-          {
-            id: 'M8-cultura-ex1',
-            type: 'inline-exercise',
-            prompt: 'Redija a missão, visão e valores de uma empresa real — e teste se são genuínos.',
-            context: 'Escolha sua empresa ou uma que conhece bem. Muitas empresas têm missão/visão/valores genéricos de parede que ninguém segue.',
-            fields: [
-              { id: 'missao', label: 'Missão — por que a empresa existe? (1 frase)', placeholder: 'Não vale "ser a melhor". Específico e acionável. Teste: se trocar o nome da empresa, a missão ainda funciona? Se sim, é genérica demais.' },
-              { id: 'visao', label: 'Visão — onde quer chegar em 5 anos? (1 frase)', placeholder: 'Deve ser inspiradora mas alcançável' },
-              { id: 'valores', label: 'Liste 3 valores — e para cada um, dê 1 exemplo REAL de quando foi praticado', placeholder: 'Valor 1: Transparência → Exemplo: CEO compartilhou resultados ruins abertamente em reunião all-hands', multiline: true },
-              { id: 'teste', label: 'Teste do fogo: a empresa já demitiu ou puniu alguém por violar algum desses valores?', placeholder: 'Se a resposta é "não", os valores podem ser decorativos...', multiline: true },
-            ],
-            evaluationCriteria: [
-              'Missão é específica (não genérica) e diferencia a empresa',
-              'Cada valor tem exemplo concreto de prática real',
-              'Admitiu honestamente se os valores são praticados ou decorativos',
-              'Reflexão sobre o "teste do fogo" demonstra pensamento crítico',
-            ],
-            expectedConcepts: ['missão', 'visão', 'valores', 'cultura organizacional', 'Edgar Schein'],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare declarações genuínas e decorativas — depois classifique se cada exemplo de missão/visão/valor passa no teste.',
+              compare: {
+                columnHeaders: ['Elemento', 'Decorativo (reprova)', 'Genuíno (aprova)'],
+                rows: [
+                  { label: 'Missão', values: ['"Ser a melhor empresa do setor com excelência e inovação"', '"Democratizar acesso a serviços financeiros para os 60 milhões de desbancarizados do Brasil"'] },
+                  { label: 'Visão', values: ['"Ser reconhecida como líder de mercado com crescimento sustentável"', '"Em 2030: 500k famílias com renda 40% maior graças à nossa plataforma"'] },
+                  { label: 'Valor', values: ['"Integridade" (sem exemplo de quando foi praticado com custo)', '"Integridade: em 2022, recusamos contrato de R$ 8M com cliente que exigia adulteração de relatório"'] },
+                ],
+              },
+              drag: {
+                instruction: 'Este exemplo de missão, visão ou valor passa no teste do genuíno?',
+                zones: [
+                  { id: 'genuino', label: 'Genuíno — passa no teste' },
+                  { id: 'decorativo', label: 'Decorativo — reprova no teste' },
+                ],
+                items: [
+                  { id: 'mvv-1', label: 'Missão: "Conectar pessoas a oportunidades de trabalho digno nas periferias brasileiras, reduzindo o desemprego juvenil de 29% para 15% até 2028"', sublabel: 'A empresa recusou 3 contratos corporativos lucrativos que não atendiam comunidades periféricas', correctZone: 'genuino', correctFeedback: 'Correto — Genuíno. A missão é específica (periferias, desemprego juvenil), mensurável (de 29% para 15%), com prazo (2028) e — mais importante — orientou recusa de contratos lucrativos que não se alinhavam. Esse é o teste definitivo de missão genuína.', wrongFeedback: 'Repense. A missão tem números específicos, prazo definido e — crucialmente — prova comportamental (recusa de contratos). Quando uma missão orienta decisões que custam dinheiro, ela é decorativa ou genuína?' },
+                  { id: 'mvv-2', label: 'Valor "Inovação": declarado no site e nas paredes desde 2019. Nenhum projeto inovador foi aprovado nos últimos 3 anos. A última pessoa que propôs mudança radical foi advertida por "não seguir processos"', sublabel: 'Liderança explica: "somos inovadores no pensamento, mais conservadores na execução"', correctZone: 'decorativo', correctFeedback: 'Correto — Decorativo. O valor "inovação" reprova no teste da decisão difícil (projetos inovadores não são aprovados), no teste da consistência (quem inova é advertido) e no teste do orçamento (nenhum investimento em inovação real). A justificativa da liderança confirma a contradição.', wrongFeedback: 'Repense. Em 3 anos, o valor "inovação" não orientou nenhuma aprovação de projeto inovador e quem tentou inovar foi advertido. Qual dos 4 testes esse valor passa? Qual é o veredicto?' },
+                  { id: 'mvv-3', label: 'Visão: "Em 2027, ser o sistema de saúde mais acessível do Brasil — com tempo de espera máximo de 48h para qualquer brasileiro, independente de renda"', sublabel: 'A empresa opera hoje com tempo médio de 12 dias — e o CEO usa esse gap como driver de todas as decisões de investimento', correctZone: 'genuino', correctFeedback: 'Correto — Genuíno. A visão é específica (tempo máximo de 48h), inclusiva (qualquer brasileiro, independente de renda), com prazo (2027) e orienta decisões de investimento reais. O gap atual (12 dias) sendo usado como driver de decisão confirma que a visão é ferramenta de gestão, não decoração.', wrongFeedback: 'Repense. A visão tem: especificidade (48h), prazo (2027), abrangência (qualquer brasileiro) e — mais importante — orienta decisões de investimento reais. Quando uma visão direciona como o orçamento é alocado, ela é decorativa ou genuína?' },
+                  { id: 'mvv-4', label: 'Missão: "Transformar o mundo através da excelência, inovação e paixão pelo que fazemos, criando valor para todos os stakeholders"', sublabel: 'Qualquer empresa de qualquer setor poderia ter essa missão sem nenhuma alteração', correctZone: 'decorativo', correctFeedback: 'Correto — Decorativo. Uma missão que qualquer empresa do mundo poderia ter não diferencia, não orienta e não compromete. "Transformar o mundo", "excelência", "inovação", "paixão" e "criar valor" são palavras tão genéricas que não informam nenhuma decisão específica. Missão genuína é substituível pela missão de nenhuma outra empresa.', wrongFeedback: 'Repense. Se você substituísse o nome dessa empresa pelo de qualquer concorrente, a missão ainda funcionaria perfeitamente. Uma missão que se encaixa em qualquer negócio não tem valor estratégico real. Qual é o veredicto?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{Missão, visão e valores genuínos são os que você seria capaz de defender quando custam algo}}. Qualquer empresa consegue ter valores quando é conveniente. O teste real é o que a empresa faz quando o valor entra em conflito com a oportunidade — e o custo de honrar o valor é alto.',
+              keyInsights: [
+                'Missão genuína é específica e excludente. Se a missão não exclui clientes, projetos ou parceiros que não se encaixam, ela não está orientando decisão nenhuma. Missão que serve para tudo não serve para nada.',
+                '{{Valores sem consequência são decoração}}. Valor praticado = existe prova de que a empresa tomou decisão custosa para honrá-lo. Sem essa prova, o valor existe apenas no discurso — e os funcionários sabem disso antes da primeira semana.',
+                'A Enron nos ensinou a lição mais cara: palavras bonitas em valores declarados não protegem contra comportamento contraditório. O que protege são sistemas, processos e lideranças que tornam o desvio visível e custoso.',
+              ],
+            },
           },
         ],
+
       },
       {
         id: 'M8-1',
