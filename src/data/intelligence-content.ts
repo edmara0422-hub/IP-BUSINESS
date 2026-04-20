@@ -6032,136 +6032,671 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         id: 'M5-0',
         title: 'Leitura e Escrita Academica',
         blocks: [
+          // ── CHAPTER 1 ──────────────────────────────────────────────
           {
-            id: 'M5-0-t1',
-            type: 'text',
-            title: 'Por que Escrita Acadêmica Importa para Negócios',
-            body: 'Escrever bem não é talento — é método. No mundo corporativo, quem escreve com clareza pensa com clareza. Relatórios, propostas, emails estratégicos, business cases — tudo exige estrutura argumentativa.\n\n**A diferença entre escrita acadêmica e escrita corporativa:**\n— Acadêmica: rigor metodológico, referências, revisão por pares, linguagem formal\n— Corporativa: clareza, objetividade, ação, linguagem acessível\n— O que têm em comum: estrutura lógica, evidências, argumentação fundamentada\n\n**Por que gestores precisam dominar escrita:**\n— 73% do tempo de executivos é gasto lendo e escrevendo (McKinsey, 2023)\n— Propostas mal escritas perdem investimento — não por falta de mérito, por falta de clareza\n— Emails confusos geram retrabalho — cada email mal escrito custa em média 25 minutos de follow-up\n— Relatórios sem estrutura não são lidos — se o CEO não entende na primeira página, ele para de ler\n\n**Os 3 princípios universais da boa escrita:**\n1. Clareza: se pode ser mal interpretado, será mal interpretado. Reescreva.\n2. Concisão: se pode ser dito em menos palavras, deve ser. Corte.\n3. Estrutura: se o leitor precisa reler para entender a lógica, reorganize.',
-          },
-          {
-            id: 'M5-esc-concept1',
-            type: 'concept',
-            term: 'Pirâmide de Minto',
-            definition: 'Estrutura de comunicação executiva que começa pela conclusão/recomendação, seguida de 3 argumentos de suporte e depois dados. Inversa à estrutura acadêmica (que começa pelo contexto).',
-            example: '"Recomendamos investir R$ 2M no Nordeste até Q3 — retorno projetado de R$ 7.5M em 3 anos." → Conclusão na primeira frase. CEO entende em 5 segundos.',
-            antiExample: '"Analisamos o mercado nos últimos 6 meses. Observamos que a demanda cresce. Concorrentes investem. A oportunidade é grande. Recomendamos expandir." → Conclusão só no final — CEO parou de ler na segunda frase.',
-          },
-          {
-            id: 'M5-esc-exercise1',
-            type: 'inline-exercise',
-            prompt: 'Reescreva um texto real usando a Pirâmide de Minto: conclusão primeiro, argumentos depois.',
-            context: 'CEOs leem centenas de documentos por semana. Você tem 30 segundos para capturar atenção. A Pirâmide de Minto (McKinsey) é a estrutura mais usada em consultoria estratégica.',
-            fields: [
-              { id: 'original', label: 'Cole ou descreva um texto/email que você escreveu recentemente', placeholder: 'Ex: um email pedindo aprovação de orçamento, um relatório mensal, uma proposta...', multiline: true },
-              { id: 'rewritten', label: 'Reescreva usando Minto: conclusão → 3 argumentos → dados', placeholder: 'Primeira frase = o que você quer. Depois = por quê (3 razões). Depois = evidência.', multiline: true },
+            id: 'M5-0-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Escrever com Clareza',
+            subtitle: 'Da clareza de pensamento à clareza de texto — como gestores comunicam para quem decide',
+            opening: {
+              leadText: 'Escrever bem não é talento — é método. No mundo corporativo, quem escreve com clareza pensa com clareza. {{73%}} do tempo de executivos é gasto lendo e escrevendo (McKinsey). Propostas mal escritas perdem investimento não por falta de mérito — por falta de clareza.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'Há uma distinção fundamental entre escrita acadêmica e escrita corporativa: a acadêmica preza rigor metodológico, referências e linguagem formal; a corporativa preza clareza, objetividade e ação. O que têm em comum é mais importante do que a diferença — {{estrutura lógica}}, evidências e argumentação fundamentada.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Os 3 princípios universais da boa escrita',
+                pillars: [
+                  { icon: '🔍', title: 'Clareza', description: 'Se pode ser mal interpretado, {{será}} mal interpretado. Reescreva até não restar ambiguidade.' },
+                  { icon: '✂️', title: 'Concisão', description: 'Se pode ser dito em menos palavras, deve ser. Cada palavra extra {{custa}} atenção do leitor.' },
+                  { icon: '🏗️', title: 'Estrutura', description: 'Se o leitor precisa reler para entender a lógica, {{reorganize}} — o problema é seu, não dele.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'CEOs e diretores leem centenas de documentos por semana. Você tem {{30 segundos}} para capturar atenção e 2 minutos para convencer. A Pirâmide de Minto (Barbara Minto, McKinsey) é a estrutura mais poderosa para isso: começa pela conclusão, não pelo contexto.',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Nível 1 — Texto Confuso',
+                    period: 'O jeito errado',
+                    text: '"Analisamos o mercado nos últimos 6 meses. Observamos que a demanda está crescendo. Nossos concorrentes estão investindo. A oportunidade é grande. {{Por isso, recomendamos expandir.}}" — Só chegou na recomendação na última frase. O CEO já parou de ler na segunda.',
+                    caseStudy: {
+                      company: 'Erro comum em relatórios',
+                      year: 2024,
+                      story: 'Emails confusos geram retrabalho — cada email mal escrito custa em média {{25 minutos}} de follow-up. Relatórios sem estrutura não são lidos: se o CEO não entende na primeira página, ele para de ler.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '25 min', label: 'Follow-up por email mal escrito' },
+                        { value: '30 seg', label: 'Janela de atenção do executivo' },
+                        { value: '73%', label: 'Tempo de exec gasto lendo/escrevendo' },
+                      ],
+                      insight: 'O paradoxo: quanto mais longo o texto, {{menos}} ele comunica. Prolixidade não é profundidade — é falta de disciplina para cortar.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Nível 2 — Texto Estruturado',
+                    period: 'O jeito melhorado',
+                    text: 'Contexto → Problema → Análise → Recomendação. A estrutura IMRAD (Introdução → Metodologia → Resultados → Análise → Conclusão) garante que qualquer leitor encontre o que precisa. Funciona para {{relatórios e artigos}} — mas ainda não é o padrão executivo ideal.',
+                    caseStudy: {
+                      company: 'Escrita acadêmica e técnica',
+                      year: 2024,
+                      story: 'A estrutura IMRAD é universal em artigos científicos e white papers. Permite {{replicabilidade}}: outro leitor entende o método e pode validar os resultados. É o padrão da escrita técnica séria.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '5 seções', label: 'Introdução, Método, Resultados, Análise, Conclusão' },
+                        { value: '80%', label: 'Leitores que leem só o abstract e a conclusão' },
+                        { value: '60%', label: 'Economia de tempo lendo fora da ordem' },
+                      ],
+                      insight: 'Para leitura eficiente de artigos: leia Abstract → Conclusão → Figuras → Metodologia → Introdução. {{Nunca}} na ordem linear.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Nível 3 — Pirâmide de Minto',
+                    period: 'O padrão McKinsey',
+                    text: '"Recomendamos investir {{R$ 2M}} no Nordeste até Q3 — retorno projetado de {{R$ 7,5M}} em 3 anos. Três razões: (1) mercado cresceu 22%/ano — 3x a média nacional; (2) zero concorrente premium na região — janela de 18 meses; (3) piloto em Recife validou o modelo em 6 meses." Conclusão na primeira frase. Pronto.',
+                    caseStudy: {
+                      company: 'Barbara Minto / McKinsey',
+                      year: 1973,
+                      story: 'Barbara Minto desenvolveu a estrutura enquanto era consultora da McKinsey. Hoje é padrão em {{todas as grandes consultorias}} do mundo. A regra: o leitor deve entender sua posição antes de ler qualquer evidência.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '1ª frase', label: 'Onde a conclusão deve estar' },
+                        { value: '3', label: 'Argumentos de suporte (máximo)' },
+                        { value: '5 seg', label: 'CEO entende a proposta com Minto' },
+                      ],
+                      insight: 'A Pirâmide de Minto inverte a lógica aristotélica: você não {{constrói}} o argumento para chegar à conclusão. Você parte da conclusão e a sustenta.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'Formato errado = mensagem ignorada. Um email de 3 páginas não é lido. Um memo sobre assunto complexo não convence. Escolha o formato que respeita o tempo do leitor: {{memo}} para decisões rápidas (1 página), executive summary para resumir relatório longo (2-3 páginas), deck para pitch (10-15 slides), email estratégico para ação imediata (5 linhas).',
+              },
             ],
-            evaluationCriteria: ['Conclusão/recomendação na primeira frase', 'No máximo 3 argumentos de suporte estruturados', 'Cada argumento sustentado por dado específico', 'Texto reduzido em pelo menos 30% vs original'],
-            expectedConcepts: ['Pirâmide de Minto', 'comunicação executiva', 'conclusão primeiro'],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Veja como os 3 níveis de escrita diferem em clareza, estrutura e impacto antes de classificar. Depois, identifique qual nível cada texto abaixo representa.',
+              compare: {
+                columnHeaders: ['Nível 1 · Confuso', 'Nível 2 · Estruturado', 'Nível 3 · Minto'],
+                rows: [
+                  {
+                    label: 'Abertura',
+                    values: ['Contexto longo', 'Introdução clara', 'Conclusão direta'],
+                    viz: 'icons',
+                    icons: ['◯', '◑', '●'],
+                  },
+                  {
+                    label: 'Recomendação',
+                    values: ['No final', 'No meio', 'Na 1ª frase'],
+                    viz: 'icons',
+                    icons: ['▦', '⊞', '◈'],
+                  },
+                  {
+                    label: 'Tempo do leitor',
+                    values: ['Alto', 'Médio', 'Mínimo'],
+                    viz: 'bars',
+                    intensities: [0.15, 0.55, 1.0],
+                  },
+                  {
+                    label: 'Taxa de leitura',
+                    values: ['Baixa', 'Média', 'Alta'],
+                    viz: 'bars',
+                    intensities: [0.1, 0.5, 1.0],
+                  },
+                ],
+              },
+              drag: {
+                instruction: 'Toque no texto, depois toque no nível que ele representa:',
+                zones: [
+                  { id: 'nivel1', label: 'Nível 1 · Confuso' },
+                  { id: 'nivel2', label: 'Nível 2 · Estruturado' },
+                  { id: 'nivel3', label: 'Nível 3 · Minto' },
+                ],
+                items: [
+                  {
+                    id: 'texto-confuso',
+                    label: 'Email de aprovação',
+                    sublabel: '"Sabe, analisei bastante. O mercado está aquecido. Temos concorrentes investindo. Acho que deveríamos considerar expandir para o Nordeste talvez."',
+                    correctZone: 'nivel1',
+                    correctFeedback: 'Correto. Nenhuma tese clara, linguagem vaga ("acho", "talvez", "bastante"), conclusão enterrada no final. Quem recebe esse email não sabe o que fazer com ele.',
+                    wrongFeedback: 'Repense. Há linguagem vaga ("acho", "talvez"), nenhuma conclusão clara, nenhum dado. É o padrão mais confuso: o leitor não sabe o que você quer.',
+                  },
+                  {
+                    id: 'texto-imrad',
+                    label: 'Relatório de pesquisa',
+                    sublabel: '"Introdução: o problema de caixa. Metodologia: análise de 24 meses. Resultados: 62% dos problemas vêm de inadimplência. Conclusão: recomendam-se 3 ações."',
+                    correctZone: 'nivel2',
+                    correctFeedback: 'Correto. Estrutura IMRAD completa e lógica — o leitor sabe o que esperar em cada seção. Ótimo para relatório técnico, mas a conclusão ainda vem no final.',
+                    wrongFeedback: 'Repense. O texto tem estrutura clara (Introdução → Metodologia → Resultados → Conclusão), mas a recomendação aparece só no final. Isso é Nível 2 — IMRAD — não Minto.',
+                  },
+                  {
+                    id: 'texto-minto',
+                    label: 'Memo executivo',
+                    sublabel: '"Recomendo aprovar R$ 500K para o projeto X até sexta. Três razões: (1) ROI de 340% em 18 meses; (2) janela de mercado fecha em 60 dias; (3) time está disponível agora."',
+                    correctZone: 'nivel3',
+                    correctFeedback: 'Correto. Pirâmide de Minto perfeita: conclusão na primeira frase, 3 argumentos numerados, dados específicos. O leitor entende tudo em 10 segundos.',
+                    wrongFeedback: 'Repense. Veja a estrutura: conclusão + pedido na primeira frase, 3 argumentos numerados com dados concretos. Isso é exatamente a Pirâmide de Minto — Nível 3.',
+                  },
+                  {
+                    id: 'texto-jargao',
+                    label: 'Relatório com jargão',
+                    sublabel: '"Conforme análise sinérgica dos stakeholders-chave, identificamos oportunidades disruptivas no ecossistema que podem alavancar nossa proposta de valor..."',
+                    correctZone: 'nivel1',
+                    correctFeedback: 'Correto. Excesso de jargão sem substância é Nível 1: o leitor não consegue extrair nenhuma informação acionável. Palavras grandes não substituem ideias claras.',
+                    wrongFeedback: 'Repense. Jargão sem dados, sem tese, sem ação concreta — é o padrão confuso. "Oportunidades disruptivas" não diz nada. Isso é Nível 1.',
+                  },
+                  {
+                    id: 'texto-board',
+                    label: 'Apresentação de board',
+                    sublabel: '"Objetivo: aprovar orçamento de R$ 2M. Contexto: queda de 3pp de market share. Descobertas: 62% da perda vem do segmento jovem. Recomendação: 3 ações com retorno projetado de R$ 7M."',
+                    correctZone: 'nivel2',
+                    correctFeedback: 'Correto. Estrutura clara com objetivo, contexto, dados e recomendação — mas a recomendação vem depois do contexto e dos dados, não antes. Isso é Nível 2.',
+                    wrongFeedback: 'Repense. O texto tem boa estrutura (objetivo → contexto → dados → recomendação), mas a recomendação ainda vem no final. Para Minto, ela deveria ser a primeira coisa.',
+                  },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'A escrita não é sobre mostrar o quanto você sabe — é sobre {{fazer o leitor entender}} o que você quer que ele faça. A Pirâmide de Minto força essa clareza: se você não consegue escrever sua conclusão em uma frase, você ainda não sabe o que quer.',
+              keyInsights: [
+                'Clareza de texto é clareza de pensamento: quem não consegue escrever a tese em uma frase não sabe o que está argumentando.',
+                'A Pirâmide de Minto inverte a lógica: {{conclusão primeiro}}, argumentos depois. Isso respeita o tempo do leitor.',
+                'Formato importa: memo (1 página), executive summary (2-3 páginas), deck (10-15 slides), email (5 linhas) — cada situação tem seu {{veículo}}.',
+              ],
+              nextChapterHint: 'Capítulo 2 · Argumentar com Rigor',
+              nextChapterBlurb: 'Da opinião ao argumento sólido — o Modelo Toulmin e os 6 elementos que tornam qualquer tese defensável.',
+            },
           },
+
+          // ── CHAPTER 2 ──────────────────────────────────────────────
           {
-            id: 'M5-0-t2',
-            type: 'text',
-            title: 'Leitura Crítica — Como Ler Artigos, Relatórios e Dados',
-            body: 'Ler criticamente não é ler mais — é ler melhor. A maioria das pessoas lê para confirmar o que já pensa (viés de confirmação). Leitura crítica é ler para questionar.\n\n**Framework de Leitura Crítica — 5 Perguntas:**\n\n1. Qual é a tese central?\n— Em uma frase: o que o autor está argumentando?\n— Se não consegue resumir, releia. Se ainda não consegue, o texto é confuso (não você).\n\n2. Quais são as evidências?\n— Dados empíricos? Estudo de caso? Opinião de especialista? Teoria?\n— Qual o nível de evidência? (veja hierarquia de evidências em M4-03)\n\n3. Quais são as premissas implícitas?\n— O que o autor assume como verdade sem demonstrar?\n— Exemplo: "O mercado brasileiro vai crescer 5% ao ano" — baseado em quê?\n\n4. Existem contra-argumentos?\n— O autor considera perspectivas opostas ou ignora?\n— Um bom texto acadêmico sempre antecipa objeções.\n\n5. Qual a relevância para minha decisão?\n— Como isso muda o que eu penso ou faço?\n— Se não muda nada, por que estou lendo?\n\n**Técnica SQ3R para Leitura Eficiente:**\n— Survey (Varredura): leia título, subtítulos, resumo e conclusão em 3 minutos\n— Question (Perguntas): o que espero aprender? Quais minhas dúvidas?\n— Read (Leitura): leia buscando respostas para suas perguntas\n— Recite (Recapitule): feche o texto e resuma em voz alta o que entendeu\n— Review (Revisão): releia apenas os trechos que não ficaram claros\n\n**Leitura de artigos científicos — Atalho prático:**\nNão leia na ordem. Leia nesta sequência:\n1. Abstract (resumo) → O que fizeram e o que encontraram?\n2. Conclusão → O que concluem?\n3. Figuras e tabelas → Os dados confirmam a conclusão?\n4. Metodologia → Como chegaram a esses dados? É robusto?\n5. Introdução → Qual o contexto?\n\nIsso economiza 60% do tempo e foca no que importa.',
-          },
-          {
-            id: 'M5-0-t3',
-            type: 'text',
-            title: 'Estrutura Argumentativa — Como Construir um Argumento Sólido',
-            body: 'Todo texto persuasivo — acadêmico ou corporativo — segue uma estrutura argumentativa. Sem estrutura, é opinião. Com estrutura, é argumento.\n\n**O Modelo Toulmin — 6 Elementos do Argumento:**\n\n1. **Claim (Tese):** O que você está afirmando\n→ "A empresa deve investir em energia renovável."\n\n2. **Data (Dados):** Evidências que sustentam a tese\n→ "Empresas com matriz energética renovável têm custo 18% menor em 5 anos (McKinsey, 2024)."\n\n3. **Warrant (Justificativa):** A lógica que conecta dados à tese\n→ "Reduzir custo energético aumenta margem operacional, fortalecendo a competitividade."\n\n4. **Backing (Suporte):** Evidência adicional que reforça a justificativa\n→ "No setor têxtil, 3 dos 5 líderes globais já operam com 70%+ renovável."\n\n5. **Qualifier (Qualificador):** Grau de certeza\n→ "Na maioria dos cenários..." / "Com alta probabilidade..." (evite "sempre" e "nunca")\n\n6. **Rebuttal (Contra-argumento):** Objeções reconhecidas e respondidas\n→ "Embora o investimento inicial seja alto (R$ 2M), o payback ocorre em 3.2 anos."\n\n**Aplicação em documentos corporativos:**\n\nBusiness Case:\n— Tese: "Devemos expandir para o mercado X"\n— Dados: tamanho do mercado, taxa de crescimento, análise competitiva\n— Justificativa: alinhamento com estratégia + retorno projetado\n— Contra-argumento: riscos e mitigações\n\nEmail estratégico:\n— Primeira frase: o que você quer (tese)\n— Segundo parágrafo: por que (dados + justificativa)\n— Terceiro parágrafo: próximos passos (ação)\n\n**A regra de ouro: Se você não consegue escrever sua tese em uma frase, você não sabe o que está argumentando.**',
-          },
-          {
-            id: 'M5-esc-framework1',
-            type: 'framework',
-            frameworkId: 'toulmin-argument',
-            title: 'Construa um Argumento com o Modelo Toulmin',
-            description: 'Pegue uma recomendação que você precisa fazer (investimento, mudança, contratação) e estruture usando os 6 elementos do Modelo Toulmin. Se algum campo ficar vazio, seu argumento tem um buraco.',
-            fields: [
-              { id: 'claim', label: '1. Tese (Claim): O que você está afirmando?', placeholder: 'Ex: "A empresa deve investir em energia renovável"', helpText: 'Se não cabe em uma frase, você não sabe o que está argumentando.' },
-              { id: 'data', label: '2. Dados (Data): Quais evidências sustentam?', placeholder: 'Ex: "Empresas com matriz renovável têm custo 18% menor em 5 anos (McKinsey, 2024)"', helpText: 'Dados > opinião. Números > adjetivos. Fontes > "todo mundo sabe".' },
-              { id: 'warrant', label: '3. Justificativa (Warrant): Qual a lógica que conecta dados à tese?', placeholder: 'Ex: "Reduzir custo energético aumenta margem, fortalecendo competitividade"', helpText: 'Se a conexão não é óbvia, explicite. O leitor não vai fazer o trabalho por você.' },
-              { id: 'qualifier', label: '4. Qualificador: Qual o grau de certeza?', placeholder: 'Ex: "Na maioria dos cenários..." ou "Com 85% de probabilidade..."', helpText: 'Evite "sempre" e "nunca". Qualificar mostra maturidade intelectual.' },
-              { id: 'rebuttal', label: '5. Contra-argumento: Quais objeções reconhece?', placeholder: 'Ex: "Investimento inicial alto (R$ 2M), mas payback em 3.2 anos"', helpText: 'Antecipar objeções FORTALECE seu argumento. Ignorá-las o enfraquece.' },
+            id: 'M5-0-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Argumentar com Rigor',
+            subtitle: 'Do Modelo Toulmin aos 10 erros que destroem credibilidade — como construir teses que convencem',
+            opening: {
+              leadText: 'Todo texto persuasivo segue uma estrutura argumentativa. Sem estrutura, é {{opinião}}. Com estrutura e evidências, é {{argumento}}. A diferença entre os dois não é o conteúdo — é a arquitetura.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'O filósofo Stephen Toulmin (1958) mapeou a anatomia do argumento robusto. O Modelo Toulmin não é só teoria acadêmica — é a estrutura por trás de todo business case, proposta de investimento e relatório estratégico que realmente convence.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Os 6 elementos do argumento (Modelo Toulmin)',
+                pillars: [
+                  { icon: '🎯', title: 'Claim — Tese', description: '"A empresa deve investir em energia renovável." Se não cabe em {{uma frase}}, você não sabe o que está defendendo.' },
+                  { icon: '📊', title: 'Data — Dados', description: '"Custo 18% menor em 5 anos (McKinsey, 2024)." Dados > opinião. {{Números}} > adjetivos. Fontes > "todo mundo sabe".' },
+                  { icon: '🔗', title: 'Warrant — Justificativa', description: 'A lógica que {{conecta}} os dados à tese. Não assuma que o leitor vai fazer esse trabalho por você.' },
+                  { icon: '📐', title: 'Qualifier — Grau de certeza', description: '"Na maioria dos cenários..." Evite "sempre" e "nunca". {{Qualificar}} mostra maturidade intelectual.' },
+                  { icon: '⚖️', title: 'Rebuttal — Contra-arg.', description: 'Antecipar objeções {{fortalece}} o argumento. Ignorá-las enfraquece. "Embora o investimento seja alto, o payback é de 3,2 anos."' },
+                  { icon: '🔩', title: 'Backing — Suporte', description: 'Evidência adicional que reforça a justificativa. "No setor têxtil, {{3 dos 5}} líderes globais já operam com 70%+ renovável."' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A regra de ouro: {{se você não consegue escrever sua tese em uma frase, você não sabe o que está argumentando}}. Muitos relatórios corporativos falham não por falta de dados, mas por falta de tese — são coleções de informações sem posição.',
+              },
+              {
+                kind: 'heading',
+                text: 'Os 10 erros que destroem credibilidade',
+              },
+              {
+                kind: 'step-flow',
+                title: '',
+                steps: [
+                  { number: 1, title: 'Falta de tese clara', description: 'O leitor chega ao final sem saber o que você defende. Correção: primeira frase = sua tese. Sempre.' },
+                  { number: 2, title: 'Parágrafos sem tópico frasal', description: 'Parágrafo que começa com contexto, não com a ideia. Correção: 1ª frase de cada parágrafo = ideia principal.' },
+                  { number: 3, title: 'Citações sem análise', description: '"Conforme Drucker (1985)..." e segue em frente. Correção: Cite → Explique → Conecte com seu argumento.' },
+                  { number: 4, title: 'Linguagem vaga', description: '"Várias empresas", "muitos estudos", "acredita-se que". Correção: especifique — "42 das 100 maiores empresas".' },
+                  { number: 5, title: 'Plágio acidental', description: 'Parafrasear sem citar a fonte. Correção: toda ideia que não é sua precisa de referência. Sempre.' },
+                ],
+              },
             ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare os 3 níveis de argumento — da opinião pura ao argumento Toulmin completo. Depois, classifique os 5 exemplos abaixo no nível correto.',
+              compare: {
+                columnHeaders: ['Nível 1 · Opinião', 'Nível 2 · Argumento básico', 'Nível 3 · Toulmin'],
+                rows: [
+                  {
+                    label: 'Tese',
+                    values: ['Vaga ou ausente', 'Presente, imprecisa', 'Clara e falsificável'],
+                    viz: 'icons',
+                    icons: ['◯', '◑', '●'],
+                  },
+                  {
+                    label: 'Evidências',
+                    values: ['Nenhuma', 'Alguma', 'Dados + fonte'],
+                    viz: 'icons',
+                    icons: ['▦', '⊞', '◈'],
+                  },
+                  {
+                    label: 'Credibilidade',
+                    values: ['Baixa', 'Média', 'Alta'],
+                    viz: 'bars',
+                    intensities: [0.1, 0.5, 1.0],
+                  },
+                  {
+                    label: 'Contra-arg.',
+                    values: ['Nenhum', 'Raramente', 'Sempre presente'],
+                    viz: 'bars',
+                    intensities: [0.05, 0.45, 1.0],
+                  },
+                ],
+              },
+              drag: {
+                instruction: 'Toque no argumento, depois toque no nível que ele representa:',
+                zones: [
+                  { id: 'opiniao', label: 'Nível 1 · Opinião' },
+                  { id: 'basico', label: 'Nível 2 · Básico' },
+                  { id: 'toulmin', label: 'Nível 3 · Toulmin' },
+                ],
+                items: [
+                  {
+                    id: 'arg-opiniao',
+                    label: 'Proposta de expansão',
+                    sublabel: '"Devemos expandir para o Sul porque acho que tem muito potencial e o mercado está aquecido lá."',
+                    correctZone: 'opiniao',
+                    correctFeedback: 'Correto. "Acho que tem potencial" não é evidência — é impressão. Nenhum dado, nenhuma fonte, nenhuma tese falsificável. Isso é opinião pura.',
+                    wrongFeedback: 'Repense. "Acho que tem potencial" não é evidência. Não há dado, não há fonte, a tese é vaga. Esse é o Nível 1 — opinião sem estrutura.',
+                  },
+                  {
+                    id: 'arg-basico',
+                    label: 'Pedido de orçamento',
+                    sublabel: '"Precisamos de R$ 200K para marketing. O mercado cresceu bastante e nossos concorrentes estão investindo mais que nós."',
+                    correctZone: 'basico',
+                    correctFeedback: 'Correto. Há uma tese (precisamos de R$ 200K) e uma justificativa, mas os dados são vagos ("bastante") e não há fonte, qualificador nem contra-argumento. É Nível 2.',
+                    wrongFeedback: 'Repense. Tem uma tese e uma justificativa, mas os dados são vagos ("bastante", sem número). Não há fonte, não há contra-argumento. Isso é Nível 2 — argumento básico.',
+                  },
+                  {
+                    id: 'arg-toulmin',
+                    label: 'Business case completo',
+                    sublabel: '"Recomendo expandir para o Nordeste (tese). Mercado cresceu 22%/ano (dado, ABF 2024). First-mover advantage de 18 meses (justificativa). Embora logística seja desafio, piloto em Recife validou o modelo (contra-arg.)"',
+                    correctZone: 'toulmin',
+                    correctFeedback: 'Correto. Tese clara, dados com fonte, justificativa explícita, contra-argumento antecipado. Esse é o argumento Toulmin completo — o padrão de excelência.',
+                    wrongFeedback: 'Repense. Veja os componentes: tese na primeira frase, dado com fonte (ABF 2024), justificativa conectando dado à tese, e contra-argumento reconhecido e respondido. Isso é Toulmin completo.',
+                  },
+                  {
+                    id: 'arg-jargao',
+                    label: 'Apresentação de resultados',
+                    sublabel: '"Nossa performance foi subótima em virtude de fatores exógenos que impactaram negativamente o ecossistema de negócios no qual estamos inseridos."',
+                    correctZone: 'opiniao',
+                    correctFeedback: 'Correto. Jargão sem substância é o pior tipo de Nível 1: parece sofisticado mas não diz nada. "Fatores exógenos" significa "coisas de fora" — quais? "Subótima" — em quanto? Zero dado, zero tese.',
+                    wrongFeedback: 'Repense. Palavras grandes não são argumentos. "Fatores exógenos que impactaram negativamente" não diz nada — quais fatores? Quanto? Quando? Isso é Nível 1 com fantasia de Nível 3.',
+                  },
+                  {
+                    id: 'arg-parcial',
+                    label: 'Proposta de produto',
+                    sublabel: '"Devemos lançar o app mobile. Pesquisa mostra que 68% dos clientes preferem mobile. Custo de desenvolvimento é R$ 150K."',
+                    correctZone: 'basico',
+                    correctFeedback: 'Correto. Há dado real (68%) e número concreto (R$ 150K), mas falta a justificativa conectando dado à tese, falta qualificador e falta contra-argumento. Bom começo, mas incompleto — Nível 2.',
+                    wrongFeedback: 'Repense. Tem dado bom (68%) e custo concreto, mas falta a lógica que conecta os dados à recomendação, falta qualificador e nenhum contra-argumento é considerado. Isso é Nível 2.',
+                  },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Um argumento sem dados é opinião. Um argumento com dados mas sem justificativa é correlação. Um argumento Toulmin completo — com tese, dados, justificativa, qualificador e contra-argumento — é a {{base da influência}} em qualquer organização.',
+              keyInsights: [
+                'A tese em uma frase é o teste mais simples: se não consegue escrever, não sabe o que está argumentando.',
+                'Antecipar o contra-argumento não enfraquece sua posição — ela {{fortalece}}, porque mostra que você considerou o outro lado.',
+                'Dados vagos são piores que nenhum dado: "bastante", "muito", "sempre" destroem credibilidade.',
+              ],
+              nextChapterHint: 'Capítulo 3 · Ler e Pesquisar',
+              nextChapterBlurb: 'Como ler criticamente, escolher o método de pesquisa certo e construir uma revisão bibliográfica que sustenta qualquer argumento.',
+            },
           },
+
+          // ── CHAPTER 3 ──────────────────────────────────────────────
           {
-            id: 'M5-esc-concept2',
-            type: 'concept',
-            term: 'Modelo Toulmin',
-            definition: 'Estrutura argumentativa com 6 elementos: Tese (o que defende), Dados (evidências), Justificativa (lógica que conecta), Suporte (reforço), Qualificador (grau de certeza) e Contra-argumento (objeções antecipadas).',
-            example: 'Business case: Tese = "expandir para o Nordeste". Dados = "mercado cresceu 22%/ano". Justificativa = "first-mover advantage". Contra-argumento = "logística é desafio, mas piloto em Recife validou em 6 meses".',
-            antiExample: '"Devemos expandir porque eu acho que vai dar certo" — sem dados, sem justificativa, sem contra-argumento. Isso é opinião, não argumento.',
-          },
-          {
-            id: 'M5-0-s1',
-            type: 'simulation',
-            title: 'Construtor de Argumentos — Monte um Business Case',
-            simulationId: 'argument-builder',
-            description: 'Receba 4 cenários empresariais e construa o argumento completo usando o Modelo Toulmin: tese, dados, justificativa, suporte, qualificador e contra-argumento.',
-          },
-          {
-            id: 'M5-0-t4',
-            type: 'text',
-            title: 'Escrita Acadêmica na Prática — Do Fichamento ao Artigo',
-            body: 'A escrita acadêmica segue convenções que garantem rigor e reprodutibilidade. Mesmo que você não vá publicar papers, dominar essas convenções melhora qualquer documento profissional.\n\n**Tipos de texto acadêmico e equivalentes corporativos:**\n— Fichamento → Executive Summary / Resumo Executivo\n— Resenha Crítica → Análise de Mercado / Due Diligence\n— Artigo Científico → White Paper / Relatório de Pesquisa\n— Monografia/TCC → Business Plan / Plano Estratégico\n\n**Estrutura IMRAD — O padrão universal:**\n\n**I — Introdução (Por quê?)**\nO que é o problema? Por que importa? O que já foi estudado? Qual o gap? Qual sua tese?\nCorporativo: "O mercado de X está crescendo 15%/ano, mas nossa participação caiu 3pp. Este relatório propõe..."\n\n**M — Metodologia (Como?)**\nComo você investigou? Quais dados usou? Qual o método de análise?\nCorporativo: "Analisamos dados de vendas de 24 meses + 30 entrevistas com clientes + benchmark de 5 concorrentes."\n\n**R — Resultados (O quê?)**\nO que você encontrou? Apresente dados sem interpretar.\nCorporativo: tabelas, gráficos, números puros.\n\n**A — Análise/Discussão (E daí?)**\nO que os resultados significam? Como se comparam com o esperado? Quais as implicações?\nCorporativo: "Os dados mostram que 62% da perda de market share vem do segmento jovem. Isso sugere..."\n\n**D — Conclusão (Então?)**\nResumo das descobertas + recomendações concretas.\nCorporativo: "Recomendamos 3 ações: (1)... (2)... (3)... com investimento de R$ X e retorno projetado de Y."\n\n**Normas ABNT — O Essencial:**\n— Citação direta curta (até 3 linhas): entre aspas, no corpo do texto, com (AUTOR, ano, p. XX)\n— Citação direta longa (4+ linhas): recuo de 4cm, sem aspas, fonte menor\n— Citação indireta (paráfrase): sem aspas, com (AUTOR, ano)\n— Referências: no final, em ordem alfabética, formato ABNT NBR 6023\n— Formato: Times New Roman 12, espaçamento 1.5, margens 3cm (superior/esquerda) e 2cm (inferior/direita)',
-          },
-          {
-            id: 'M5-0-t5',
-            type: 'text',
-            title: 'Erros de Escrita que Destroem Credibilidade',
-            body: '**Os 10 erros mais comuns em textos corporativos e acadêmicos:**\n\n1. **Falta de tese clara** → O leitor chega ao final sem saber o que você defende\nCorreção: Primeira frase do texto = sua tese. Sempre.\n\n2. **Parágrafos sem tópico frasal** → Parágrafo que começa com contexto em vez da ideia principal\nCorreção: Primeira frase de cada parágrafo = a ideia principal daquele parágrafo.\n\n3. **Citações sem análise** → Jogar citação e seguir em frente\nCorreção: Cite → Explique → Conecte com seu argumento. Nunca cite só para citar.\n\n4. **Linguagem vaga** → "Várias empresas", "muitos estudos", "acredita-se que"\nCorreção: "42 das 100 maiores empresas" (especifique), "Smith (2023) demonstrou" (cite a fonte)\n\n5. **Repetição de ideias** → Dizer a mesma coisa com palavras diferentes 3 vezes\nCorreção: Diga uma vez, com clareza. Se precisa repetir, o primeiro texto está fraco.\n\n6. **Excesso de jargão** → Termos técnicos que o leitor não conhece\nCorreção: Use jargão apenas quando o público é técnico. Na dúvida, explique.\n\n7. **Falta de transições** → Parágrafos soltos, sem conexão lógica\nCorreção: Use conectivos: "No entanto", "Além disso", "Em contraste", "Como resultado"\n\n8. **Conclusão que repete a introdução** → Copiar e colar o que já disse\nCorreção: Conclusão = síntese + implicações + recomendações + próximos passos\n\n9. **Plágio acidental** → Parafrasear sem citar a fonte\nCorreção: Toda ideia que não é sua precisa de referência. Sempre.\n\n10. **Não revisar** → Entregar o primeiro rascunho\nCorreção: Regra dos 3 passes — (1) Estrutura está lógica? (2) Argumento é sólido? (3) Gramática e formatação.',
-          },
-          {
-            id: 'M5-esc-compare1',
-            type: 'compare',
-            title: 'Tipos de Documento Executivo — Qual Usar?',
-            question: 'Você precisa comunicar uma recomendação. Qual formato escolher?',
-            dimensions: ['Para que serve', 'Extensão', 'Estrutura', 'Quando usar'],
-            items: [
-              { id: 'memo', label: 'Memo', values: ['Decisões rápidas', '1 página', 'Contexto (2 linhas) → Recomendação → 3 razões → Próximos passos', 'Aprovação de orçamento, mudança de processo, decisão binária'], highlight: 'Se não cabe em 1 página, você não pensou o suficiente.' },
-              { id: 'exec-summary', label: 'Executive Summary', values: ['Resumir relatório longo', '2-3 páginas', 'Objetivo → Descobertas → Recomendações → Impacto financeiro', 'Relatórios trimestrais, due diligence, pesquisa de mercado'], highlight: 'Quem lê SÓ o summary deve ter 80% da informação.' },
-              { id: 'deck', label: 'Deck/Apresentação', values: ['Pitch, board, planejamento', '10-15 slides', '1 ideia por slide. 10/20/30 (Kawasaki)', 'Board meeting, pitch para investidor, kickoff de projeto'], highlight: 'Nunca leia o slide. Você fala o que NÃO está nele.' },
-              { id: 'email', label: 'Email Estratégico', values: ['Ação imediata', '5 linhas', 'O que quer → Por quê → Próximo passo com data', 'Pedidos, alinhamentos, follow-ups'], highlight: 'Se precisa de mais de 1 scroll, deveria ser documento anexo.' },
+            id: 'M5-0-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Ler e Pesquisar',
+            subtitle: 'Leitura crítica, métodos de pesquisa e revisão bibliográfica — as fundações do conhecimento aplicado',
+            opening: {
+              leadText: 'Ler criticamente não é ler mais — é ler {{melhor}}. A maioria das pessoas lê para confirmar o que já pensa (viés de confirmação). Leitura crítica é ler para questionar, para encontrar o que o texto não diz, para separar evidência de opinião.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'O Framework de Leitura Crítica se resume em {{5 perguntas}} que devem ser feitas a qualquer texto: (1) Qual é a tese central? (2) Quais são as evidências? (3) Quais são as premissas implícitas? (4) Existem contra-argumentos? (5) Qual a relevância para minha decisão? Se não mudou o que você pensa ou faz, por que você estava lendo?',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Técnica SQ3R — leitura eficiente',
+                pillars: [
+                  { icon: '🔭', title: 'Survey', description: 'Varredura: leia título, subtítulos, resumo e conclusão em {{3 minutos}}. Antes de qualquer leitura profunda.' },
+                  { icon: '❓', title: 'Question', description: 'O que espero aprender? Quais minhas dúvidas? {{Formule}} perguntas antes de ler.' },
+                  { icon: '📖', title: 'Read', description: 'Leia {{buscando respostas}} para suas perguntas. Não leia passivamente.' },
+                  { icon: '🗣️', title: 'Recite', description: 'Feche o texto e {{resuma em voz alta}} o que entendeu. Se não consegue, não entendeu.' },
+                  { icon: '🔄', title: 'Review', description: 'Releia apenas os trechos que não ficaram claros. {{Não releia}} o que você já domina.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'Cada pergunta de pesquisa exige um método diferente. Usar o método errado invalida todo o estudo — não importa quão bem executado. A escolha do método começa pela {{natureza da pergunta}}.',
+              },
+              {
+                kind: 'phase-group',
+                cards: [
+                  {
+                    index: 1,
+                    title: 'Pesquisa Exploratória',
+                    period: '"O que está acontecendo?"',
+                    text: 'Objetivo: entender fenômeno pouco conhecido e gerar hipóteses. Métodos: entrevistas em profundidade, grupos focais, observação. Resultado: {{hipóteses}}, não conclusões. Use no início — quando nem sabe as perguntas certas.',
+                    caseStudy: {
+                      company: 'Nubank — pesquisa inicial',
+                      year: 2013,
+                      story: 'Antes de lançar, David Vélez entrevistou {{centenas de brasileiros}} sobre sua relação com bancos. Descobriu o problema real: não era o cartão de crédito — era a {{raiva}} do banco. Isso foi exploratório puro.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '20-30', label: 'Entrevistas para saturação de dados' },
+                        { value: 'Hipóteses', label: 'O que a exploratória gera (não conclusões)' },
+                        { value: 'Qualitativo', label: 'Método dominante na exploratória' },
+                      ],
+                      insight: 'A pesquisa exploratória responde "o quê e por quê" — não "quanto". Misturar exploratória com causal é o erro {{mais comum}} em projetos de pesquisa.',
+                    },
+                  },
+                  {
+                    index: 2,
+                    title: 'Pesquisa Descritiva',
+                    period: '"Qual o tamanho e perfil?"',
+                    text: 'Objetivo: descrever uma população com precisão. Métodos: survey, censo, dados secundários. Resultado: {{números, percentuais, distribuições}}. Use quando já sabe o que perguntar e precisa quantificar.',
+                    caseStudy: {
+                      company: 'IBGE / CETIC.br',
+                      year: 2022,
+                      story: 'A pesquisa CETIC.br TIC Empresas 2022 mostrou que apenas {{5%}} das PMEs brasileiras usam dados para decisão. Survey com 6.000 empresas — descritivo puro: mapeou o estado atual sem testar causa.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '6.000', label: 'Empresas pesquisadas (CETIC 2022)' },
+                        { value: '5%', label: 'PMEs que usam dados para decisão' },
+                        { value: '±2%', label: 'Margem de erro com 95% de confiança' },
+                      ],
+                      insight: 'Correlação não é causalidade — é o mantra da pesquisa descritiva. Descrever que {{X e Y coexistem}} não prova que X causa Y.',
+                    },
+                  },
+                  {
+                    index: 3,
+                    title: 'Pesquisa Causal',
+                    period: '"X realmente causa Y?"',
+                    text: 'Objetivo: estabelecer relação de causa e efeito. Métodos: experimento controlado, teste A/B, quasi-experimento. Resultado: {{evidência causal}} — não só correlação. Use quando precisa provar que uma ação específica gera um resultado específico.',
+                    caseStudy: {
+                      company: 'Amazon — teste A/B',
+                      year: 2024,
+                      story: 'A Amazon roda {{mais de 1.000 testes A/B}} por mês. Cada mudança de layout, cor, preço ou copy é um experimento causal: grupo controle vs. grupo tratamento. Nenhuma mudança vai ao ar sem evidência causal.',
+                    },
+                    deepDive: {
+                      keyNumbers: [
+                        { value: '1.000+', label: 'Testes A/B rodando na Amazon/mês' },
+                        { value: 'Grupo controle', label: 'Elemento essencial do experimento causal' },
+                        { value: 'p < 0,05', label: 'Significância estatística padrão' },
+                      ],
+                      insight: 'O experimento causal é o único método que prova {{causa e efeito}}. Todo o resto prova associação. A diferença importa quando você decide investir R$ 2M numa mudança.',
+                    },
+                  },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A revisão bibliográfica é a fundação de qualquer trabalho acadêmico. Não é listar autores — é mapear o que já se sabe e {{identificar o gap}} que sua pesquisa vai preencher. Use bases como Scopus, Web of Science e Periódicos CAPES. Organize por temas, não por autor. Identifique onde a literatura contradiz, onde há lacunas e onde seu contexto foi pouco estudado.',
+              },
             ],
-            insight: 'Formato errado = mensagem ignorada. Um email de 3 páginas não é lido. Um memo sobre assunto complexo não convence. Escolha o formato que respeita o tempo do leitor.',
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare os 3 tipos de pesquisa em 4 dimensões. Depois, classifique as 5 perguntas de pesquisa no método correto.',
+              compare: {
+                columnHeaders: ['Exploratória', 'Descritiva', 'Causal'],
+                rows: [
+                  {
+                    label: 'Pergunta',
+                    values: ['O quê / Por quê?', 'Quanto / Qual perfil?', 'X causa Y?'],
+                    viz: 'icons',
+                    icons: ['◯', '◑', '●'],
+                  },
+                  {
+                    label: 'Método típico',
+                    values: ['Entrevistas', 'Survey / censo', 'Experimento A/B'],
+                    viz: 'icons',
+                    icons: ['▦', '⊞', '◈'],
+                  },
+                  {
+                    label: 'Rigor estatístico',
+                    values: ['Baixo', 'Médio', 'Alto'],
+                    viz: 'bars',
+                    intensities: [0.2, 0.55, 1.0],
+                  },
+                  {
+                    label: 'Generalização',
+                    values: ['Limitada', 'Alta', 'Alta + causal'],
+                    viz: 'bars',
+                    intensities: [0.15, 0.6, 1.0],
+                  },
+                ],
+              },
+              drag: {
+                instruction: 'Toque na pergunta de pesquisa, depois toque no método correto:',
+                zones: [
+                  { id: 'exploratoria', label: 'Exploratória' },
+                  { id: 'descritiva', label: 'Descritiva' },
+                  { id: 'causal', label: 'Causal' },
+                ],
+                items: [
+                  {
+                    id: 'perg-exploratoria',
+                    label: 'Entendendo o cliente',
+                    sublabel: '"Por que nossos clientes abandonam o carrinho na etapa de pagamento?"',
+                    correctZone: 'exploratoria',
+                    correctFeedback: 'Correto. "Por que" sinaliza pergunta exploratória: você quer entender motivações, não quantificar. O método ideal são entrevistas em profundidade com clientes que abandonaram.',
+                    wrongFeedback: 'Repense. "Por que" é a pergunta da pesquisa exploratória — você quer entender as razões, não medir o tamanho do problema. Entrevistas em profundidade são o caminho.',
+                  },
+                  {
+                    id: 'perg-descritiva',
+                    label: 'Mapeando o mercado',
+                    sublabel: '"Qual a distribuição de faturamento das PMEs de tecnologia no Brasil por porte e região?"',
+                    correctZone: 'descritiva',
+                    correctFeedback: 'Correto. "Qual a distribuição" é clássico de pesquisa descritiva — você quer mapear a realidade com números. Survey com amostra representativa ou dados do IBGE.',
+                    wrongFeedback: 'Repense. "Qual a distribuição" quer descrever uma população com precisão — isso é pesquisa descritiva. Não está testando causa, está mapeando o estado atual.',
+                  },
+                  {
+                    id: 'perg-causal',
+                    label: 'Testando intervenção',
+                    sublabel: '"O novo onboarding de 3 passos reduz o churn nos primeiros 30 dias?"',
+                    correctZone: 'causal',
+                    correctFeedback: 'Correto. "Reduz" implica relação causal: uma mudança específica (onboarding) causa um resultado específico (churn). Teste A/B: grupo com novo onboarding vs. grupo com onboarding antigo.',
+                    wrongFeedback: 'Repense. A pergunta tem uma intervenção (novo onboarding) e um resultado esperado (redução de churn). Isso é pergunta causal — a única forma de responder é com experimento controlado ou teste A/B.',
+                  },
+                  {
+                    id: 'perg-exploratoria2',
+                    label: 'Entendendo resistência',
+                    sublabel: '"Quais são os principais motivos que levam gestores a resistir à adoção de novos sistemas de BI?"',
+                    correctZone: 'exploratoria',
+                    correctFeedback: 'Correto. "Quais são os principais motivos" é exploratório — você quer identificar razões, não medir frequências. Entrevistas semi-estruturadas com gestores que resistiram.',
+                    wrongFeedback: 'Repense. A pergunta busca entender motivações ("motivos que levam") — não quantifica nem testa causa. Isso é exploratório: você quer descobrir o que ainda não sabe.',
+                  },
+                  {
+                    id: 'perg-descritiva2',
+                    label: 'Perfil de uso',
+                    sublabel: '"Qual percentual das empresas do setor varejista utiliza algum sistema de CRM integrado com e-commerce?"',
+                    correctZone: 'descritiva',
+                    correctFeedback: 'Correto. "Qual percentual" e "utiliza" são marcadores de pesquisa descritiva — você quer medir a prevalência de um comportamento numa população. Survey com amostra do setor varejista.',
+                    wrongFeedback: 'Repense. "Qual percentual" quer um número — uma medida de prevalência. Isso é pesquisa descritiva: mapear o estado atual com precisão estatística.',
+                  },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Ler criticamente e pesquisar com rigor são as duas faces da mesma moeda: {{separar o que se sabe do que se acredita}}. Todo argumento forte começa por saber em qual tipo de evidência ele está ancorado.',
+              keyInsights: [
+                'Viés de confirmação é o inimigo da leitura crítica: leia para questionar, não para confirmar.',
+                'Método de pesquisa errado invalida o estudo inteiro — não importa a qualidade da execução.',
+                'Correlação não é causalidade: {{só o experimento}} prova causa e efeito.',
+              ],
+              nextChapterHint: 'Capítulo 4 · Apresentar com Impacto',
+              nextChapterBlurb: 'Storytelling com dados, design de slides e a estrutura Duarte — como apresentações que movem pessoas à ação.',
+            },
           },
+
+          // ── CHAPTER 4 ──────────────────────────────────────────────
           {
-            id: 'M5-0-t6',
-            type: 'text',
-            title: 'Comunicação Executiva — Como Escrever para Quem Decide',
-            body: 'CEOs e diretores leem centenas de documentos por semana. Eles não vão ler o seu inteiro. Você tem 30 segundos para capturar atenção e 2 minutos para convencer.\n\n**Pirâmide de Minto (Barbara Minto, McKinsey):**\nA estrutura mais poderosa para comunicação executiva. Começa pela conclusão, não pelo contexto.\n\n**Estrutura:**\n1. Conclusão/Recomendação (primeira frase!)\n2. 3 argumentos-chave de suporte\n3. Dados que sustentam cada argumento\n\n**Exemplo ruim:**\n"Analisamos o mercado nos últimos 6 meses. Observamos que a demanda está crescendo. Nossos concorrentes estão investindo. A oportunidade é grande. Por isso, recomendamos expandir."\n→ Só chegou na recomendação na última frase. O CEO já parou de ler na segunda.\n\n**Exemplo bom (Minto):**\n"Recomendamos investir R$ 2M na expansão para o Nordeste até Q3, com retorno projetado de R$ 7.5M em 3 anos.\n\nTrês razões:\n1. Mercado nordestino cresceu 22%/ano — 3x a média nacional (ABF 2024)\n2. Zero concorrente premium na região-alvo — janela de first-mover de ~18 meses\n3. Modelo operacional de SP é replicável com ajustes mínimos — piloto em Recife validou em 6 meses"\n\n→ Conclusão na primeira frase. Argumentos estruturados. Dados específicos.\n\n**Tipos de documento executivo:**\n\n**Memo (1 página):**\nPara: decisões rápidas\nEstrutura: Contexto (2 linhas) → Recomendação → 3 razões → Próximos passos\nRegra: Se não cabe em 1 página, você não pensou o suficiente.\n\n**Executive Summary (2-3 páginas):**\nPara: resumir relatório longo\nEstrutura: Objetivo → Principais descobertas (bullets) → Recomendações → Impacto financeiro\nRegra: Alguém que leia SÓ o summary deve ter 80% da informação.\n\n**Deck/Apresentação (10-15 slides):**\nPara: pitch, board meeting, planejamento\nEstrutura (Guy Kawasaki 10/20/30): 10 slides, 20 minutos, fonte mínima 30pt\nRegra: 1 ideia por slide. Se precisa de animação para explicar, o slide é complexo demais.\n\n**Email estratégico (5 linhas):**\nLinha 1: O que você quer\nLinha 2-3: Por que (1 frase por razão)\nLinha 4: Próximo passo com data\nLinha 5: Agradecimento\nRegra: Se o email tem mais de 1 scroll, deveria ser um documento anexo.',
+            id: 'M5-0-cap4',
+            type: 'chapter',
+            number: 4,
+            title: 'Apresentar com Impacto',
+            subtitle: 'Storytelling com dados, design de slides e a estrutura que move pessoas à ação',
+            opening: {
+              leadText: 'Apresentar não é ler slides — é {{conduzir uma narrativa}} que move pessoas à ação. A diferença entre uma apresentação que convence e uma que é esquecida não está nos dados — está na estrutura da história.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'Nancy Duarte estudou as apresentações mais impactantes da história — de Steve Jobs ao discurso "I Have a Dream" de Martin Luther King. Encontrou um padrão universal: todas alternam entre {{o que é}} (a realidade atual) e {{o que poderia ser}} (a visão), criando tensão narrativa que move à ação.',
+              },
+              {
+                kind: 'step-flow',
+                title: 'Estrutura Duarte — A narrativa de alto impacto',
+                steps: [
+                  { number: 1, title: 'O que é', description: '"Hoje, 65% das PMEs fazem gestão financeira em planilha." — A realidade atual, com dado concreto.' },
+                  { number: 2, title: 'O que poderia ser', description: '"Imagine se cada decisão fosse baseada em dados em tempo real." — A visão possível.' },
+                  { number: 3, title: 'O que é', description: '"Mas 73% dos empresários descobrem problemas de caixa quando já é tarde." — A tensão que mantém.' },
+                  { number: 4, title: 'O que poderia ser', description: '"Com nossa plataforma, veem o problema 30 dias antes." — A solução concreta.' },
+                  { number: 5, title: 'Call to action', description: '"Junte-se a nós." — O que você quer que o público faça AGORA. Encerre com ação, não com "obrigado".' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'Design não é estética — é {{clareza visual}}. A regra dos 3 segundos: se o público não entende o slide em 3 segundos, refaça. Um slide = uma ideia = um visual. Texto: máximo 6 palavras no título. Números: destaque o número, não a frase — "{{340%}}" deve ser grande, o contexto é pequeno.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Os 7 slides essenciais',
+                pillars: [
+                  { icon: '🎯', title: 'Título', description: '1 frase impactante + sua proposta. Quem você é e {{por que importa}}.' },
+                  { icon: '⚡', title: 'Problema', description: 'Estatística chocante + visual. O problema que você {{resolve}}.' },
+                  { icon: '✅', title: 'Solução', description: 'Antes/depois ou demonstração. O que {{muda}} com você.' },
+                  { icon: '📊', title: 'Dados', description: '1 gráfico, 1 insight, 1 conclusão. Sem mais que isso por slide.' },
+                  { icon: '🏆', title: 'Prova social', description: 'Logos de clientes, métricas reais, depoimentos. {{Evidência}} de que funciona.' },
+                  { icon: '📅', title: 'Timeline', description: '3-5 marcos com datas. {{Quando} as coisas acontecem.' },
+                  { icon: '🚀', title: 'Call to action', description: 'O que você quer que o público faça {{agora}}. Específico e com data.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'Os primeiros {{30 segundos}} ganham ou perdem a audiência. Comece com dado surpreendente, pergunta provocativa ou história — nunca com "bom dia, meu nome é X e hoje vou falar sobre...". Nunca leia o slide: o slide é para o público, você fala o que {{não está}} no slide. Silêncio é poder: pause 2 segundos após um dado impactante.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare os 3 formatos de apresentação em 4 dimensões. Depois, identifique qual formato se encaixa em cada situação.',
+              compare: {
+                columnHeaders: ['Email Estratégico', 'Deck / Slides', 'Business Case'],
+                rows: [
+                  {
+                    label: 'Duração',
+                    values: ['30 seg de leitura', '10-20 minutos', '30-60 minutos'],
+                    viz: 'icons',
+                    icons: ['◯', '◑', '●'],
+                  },
+                  {
+                    label: 'Estrutura',
+                    values: ['5 linhas', '10-15 slides', 'IMRAD completo'],
+                    viz: 'icons',
+                    icons: ['▦', '⊞', '◈'],
+                  },
+                  {
+                    label: 'Profundidade',
+                    values: ['Mínima', 'Média', 'Alta'],
+                    viz: 'bars',
+                    intensities: [0.15, 0.55, 1.0],
+                  },
+                  {
+                    label: 'Urgência',
+                    values: ['Imediata', 'Média', 'Planejada'],
+                    viz: 'bars',
+                    intensities: [1.0, 0.6, 0.25],
+                  },
+                ],
+              },
+              drag: {
+                instruction: 'Toque na situação, depois toque no formato mais adequado:',
+                zones: [
+                  { id: 'email', label: 'Email Estratégico' },
+                  { id: 'deck', label: 'Deck / Slides' },
+                  { id: 'business-case', label: 'Business Case' },
+                ],
+                items: [
+                  {
+                    id: 'situ-email',
+                    label: 'Aprovação urgente',
+                    sublabel: 'Você precisa que o diretor aprove R$ 15K para um treinamento até amanhã. Ele está viajando.',
+                    correctZone: 'email',
+                    correctFeedback: 'Correto. Urgência + decisão simples = email estratégico. Linha 1: o que você quer. Linha 2-3: por quê. Linha 4: próximo passo com data. Máximo 5 linhas.',
+                    wrongFeedback: 'Repense. Decisão simples, urgente, diretor viajando — o email é o único canal que respeita isso. Um deck para R$ 15K é excesso; um business case leva dias.',
+                  },
+                  {
+                    id: 'situ-deck',
+                    label: 'Pitch para investidor',
+                    sublabel: 'Você vai apresentar sua startup para 3 investidores em reunião de 20 minutos.',
+                    correctZone: 'deck',
+                    correctFeedback: 'Correto. 20 minutos, audiência ao vivo, decisão de investimento — é o cenário clássico do deck. Use a estrutura Guy Kawasaki 10/20/30: 10 slides, 20 minutos, fonte 30pt.',
+                    wrongFeedback: 'Repense. Apresentação presencial de 20 minutos para convencer = deck. Email não tem impacto visual; business case é para depois da reunião.',
+                  },
+                  {
+                    id: 'situ-bc',
+                    label: 'Proposta de expansão',
+                    sublabel: 'Você quer propor ao board a abertura de 3 filiais no Nordeste — investimento de R$ 5M.',
+                    correctZone: 'business-case',
+                    correctFeedback: 'Correto. R$ 5M de investimento, decisão de board, risco alto — exige business case completo: metodologia, dados de mercado, projeções financeiras, análise de risco, contra-argumentos.',
+                    wrongFeedback: 'Repense. R$ 5M e decisão de board exigem rigor total: metodologia clara, projeções detalhadas, análise de risco. Isso é business case — não cabe em email nem em 10 slides.',
+                  },
+                  {
+                    id: 'situ-deck2',
+                    label: 'Kickoff de projeto',
+                    sublabel: 'Você vai apresentar o novo projeto de CRM para 15 pessoas da equipe na reunião de segunda.',
+                    correctZone: 'deck',
+                    correctFeedback: 'Correto. Reunião com equipe, apresentação presencial, objetivo de engajar — deck é o formato. Use os 7 tipos essenciais: problema, solução, timeline, responsáveis, call to action.',
+                    wrongFeedback: 'Repense. 15 pessoas, reunião presencial, objetivo de engajar e alinhar a equipe — isso é deck. Business case é para aprovação de investimento, não para kickoff.',
+                  },
+                  {
+                    id: 'situ-email2',
+                    label: 'Follow-up de reunião',
+                    sublabel: 'A reunião terminou. Você precisa resumir as 3 decisões tomadas e os responsáveis para todo o time.',
+                    correctZone: 'email',
+                    correctFeedback: 'Correto. Resumo pós-reunião = email direto: decisões tomadas (bullets), responsáveis, prazos. Não precisa de slide, não precisa de documento — 5-10 linhas com clareza Minto.',
+                    wrongFeedback: 'Repense. Follow-up de reunião com 3 decisões e responsáveis é exatamente o caso do email estratégico: curto, direto, acionável. Ninguém abre um deck de follow-up.',
+                  },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Comunicação eficaz não é sobre você — é sobre o seu {{leitor ou audiência}}. Escolha o formato que respeita o tempo deles. Use a estrutura que organiza o seu pensamento. E lembre: clareza é respeito.',
+              keyInsights: [
+                'A estrutura Duarte cria tensão narrativa alternando realidade e possibilidade — é o padrão de {{todas as apresentações que movem pessoas}}.',
+                'Um slide = uma ideia = um visual. Qualquer coisa além disso divide a atenção e dilui a mensagem.',
+                'Os primeiros 30 segundos são decisivos — comece com impacto, nunca com apresentação pessoal.',
+              ],
+            },
           },
-          {
-            id: 'M5-0-t7',
-            type: 'text',
-            title: 'Tipos de Pesquisa Acadêmica — Qual Método Usar?',
-            body: 'Cada pergunta de pesquisa exige um método diferente. Usar o método errado invalida todo o estudo.\n\n**Pesquisa Exploratória — "O que está acontecendo?"**\nObjetivo: Entender fenômeno pouco conhecido. Gerar hipóteses.\nMétodos: Entrevistas em profundidade, observação participante, grupos focais, revisão bibliográfica\nQuando usar: Início de projeto. Não sabe nem as perguntas certas.\nExemplo: "Por que clientes abandonam o carrinho?" → Entrevistar 20 clientes que abandonaram.\nResultado: Hipóteses, não conclusões.\n\n**Pesquisa Descritiva — "Qual o tamanho, perfil e comportamento?"**\nObjetivo: Descrever uma população ou fenômeno com precisão.\nMétodos: Survey (questionário), censo, dados secundários\nQuando usar: Quando já sabe o que perguntar. Precisa quantificar.\nExemplo: "Qual a taxa de abandono de carrinho por faixa etária?" → Survey com 2.000 clientes.\nResultado: Números, percentuais, distribuições.\n\n**Pesquisa Causal (Experimental) — "X causa Y?"**\nObjetivo: Estabelecer relação de causa e efeito.\nMétodos: Experimento controlado, teste A/B, quasi-experimento\nQuando usar: Precisa provar que uma mudança específica gera um resultado específico.\nExemplo: "Frete grátis reduz abandono?" → Teste A/B com grupo controle.\nResultado: Evidência causal (não apenas correlação).\n\n**Pesquisa-Ação — "Como resolver este problema enquanto estudo?"**\nObjetivo: Resolver problema prático E gerar conhecimento acadêmico simultaneamente.\nMétodos: Ciclos de ação-reflexão com a organização.\nQuando usar: TCC, MBA, projetos de consultoria-acadêmica.\nExemplo: Implementar Lean numa fábrica, medir resultados e documentar aprendizados.\n\n**Estudo de Caso — "Como funciona este caso específico?"**\nObjetivo: Análise profunda de um caso (empresa, projeto, evento).\nMétodos: Entrevistas, documentos, observação, triangulação de fontes.\nQuando usar: Fenômenos complexos que não podem ser isolados em laboratório.\nExemplo: "Como a Nubank democratizou o crédito no Brasil?" → Análise profunda de estratégia, dados e contexto.\n\n**Revisão Sistemática / Meta-análise — "O que a ciência já sabe?"**\nObjetivo: Sintetizar TODOS os estudos existentes sobre um tema.\nMétodos: Busca em bases (Scopus, Web of Science), critérios de inclusão/exclusão, síntese.\nQuando usar: Antes de qualquer pesquisa primária. Evita reinventar a roda.',
-          },
-          {
-            id: 'M5-0-t8',
-            type: 'text',
-            title: 'Apresentações de Alto Impacto — Storytelling com Dados',
-            body: 'Apresentar não é ler slides. É conduzir uma narrativa que move pessoas à ação.\n\n**Estrutura Narrativa para Apresentações (Nancy Duarte, TED):**\n\n**O que é → O que poderia ser → O que é → O que poderia ser → Call to action**\n\nAlterna entre o status quo (realidade) e a possibilidade (visão), criando tensão e desejo de mudança.\n\nExemplo — Pitch de produto:\n— "Hoje, 65% das PMEs fazem gestão financeira em planilha." (o que é)\n— "Imagine se cada decisão financeira fosse baseada em dados em tempo real." (o que poderia ser)\n— "Mas a realidade é que 73% dos empresários descobrem problemas de caixa quando já é tarde." (o que é)\n— "Com nossa plataforma, eles veem o problema 30 dias antes de acontecer." (o que poderia ser)\n— "Junte-se a nós. Estamos abrindo rodada de R$ 5M para levar isso a 10.000 empresas." (call to action)\n\n**Design de Slides — Menos é Exponencialmente Mais:**\n\n— Regra 1×1: 1 ideia por slide, 1 visual por slide\n— Regra dos 3 segundos: se o público não entende o slide em 3 segundos, refaça\n— Texto: máximo 6 palavras no título. Resto é visual ou bullet curto.\n— Números: destaque O NÚMERO, não a frase. "Crescemos 340%" deve ter 340% grande e o resto pequeno.\n— Cores: máximo 3. Fundo escuro para apresentação presencial, claro para documento.\n\n**Os 7 Tipos de Slide que Você Precisa:**\n1. Título: 1 frase impactante + sua proposta\n2. Problema: estatística chocante + visual\n3. Solução: antes/depois ou demonstração\n4. Dados: 1 gráfico, 1 insight, 1 conclusão\n5. Prova social: logos de clientes, depoimentos, métricas\n6. Timeline: 3-5 marcos com datas\n7. Call to action: o que você quer que o público faça AGORA\n\n**Dicas de performance:**\n— Primeiros 30 segundos: ganhe ou perca a audiência. Comece com dado surpreendente, pergunta provocativa ou história.\n— Nunca leia o slide. O slide é para o público. Você fala o que NÃO está no slide.\n— Contato visual: 3-5 segundos por pessoa. Não fale para a tela.\n— Silêncio é poder: pause 2 segundos após um dado impactante. Deixe absorver.\n— Encerre com ação, não com "obrigado". "Obrigado" é passivo. "Vamos começar na segunda?" é ativo.',
-          },
-          {
-            id: 'M5-0-t9',
-            type: 'text',
-            title: 'Revisão Bibliográfica — Como Fazer em 7 Passos',
-            body: 'A revisão bibliográfica é a fundação de qualquer trabalho acadêmico. Não é listar autores — é mapear o que já se sabe e identificar o que falta.\n\n**Os 7 Passos da Revisão Bibliográfica:**\n\n**1. Defina a pergunta de pesquisa**\n— Não: "Inovação nas empresas" (vago demais)\n— Sim: "Como a cultura organizacional influencia a adoção de inovação aberta em PMEs brasileiras?" (específico)\n\n**2. Escolha as bases de dados**\n— Internacionais: Scopus, Web of Science, Google Scholar, PubMed (saúde)\n— Brasileiras: SciELO, Periódicos CAPES, BDTD (teses e dissertações)\n— Negócios: SSRN, Harvard Business Review, MIT Sloan Management Review\n\n**3. Defina os termos de busca**\n— Use operadores booleanos: AND, OR, NOT\n— Exemplo: ("open innovation" OR "inovação aberta") AND ("organizational culture" OR "cultura organizacional") AND ("SME" OR "PME" OR "small business")\n— Teste em inglês E português — a maioria dos estudos relevantes está em inglês\n\n**4. Aplique critérios de inclusão/exclusão**\n— Período: últimos 10 anos (salvo clássicos)\n— Idioma: português e inglês\n— Tipo: artigos revisados por pares, teses, livros\n— Excluir: editoriais, notas de congresso sem peer review, blogs\n\n**5. Leia e fichare sistematicamente**\nPara cada artigo:\n— Referência completa (ABNT)\n— Objetivo do estudo\n— Metodologia usada\n— Principais resultados\n— Como se conecta com sua pesquisa\n— Citação relevante (com página)\n\n**6. Organize por temas, não por autor**\n— Errado: "Fulano (2020) diz X. Ciclano (2021) diz Y. Beltrano (2022) diz Z."\n— Certo: "A relação entre cultura e inovação é mediada por 3 fatores: autonomia (Fulano, 2020; Ciclano, 2021), tolerância ao erro (Beltrano, 2022) e comunicação aberta (Silva, 2023)."\n\n**7. Identifique o gap**\n— O que a literatura NÃO respondeu?\n— Onde há contradição entre autores?\n— Qual contexto foi pouco estudado?\n— Este gap justifica sua pesquisa.\n\n**Ferramentas essenciais:**\n— Mendeley ou Zotero: gerenciador de referências (gratuitos)\n— Connected Papers: mapa visual de artigos relacionados\n— Semantic Scholar: busca por relevância semântica\n— Elicit: IA que encontra e resume artigos acadêmicos',
-          },
-          {
-            id: 'M5-0-s2',
-            type: 'simulation',
-            title: 'Revisão e Correção — Melhore Este Texto',
-            simulationId: 'text-review',
-            description: 'Receba 4 trechos de textos corporativos com erros de argumentação, estrutura e clareza. Identifique os problemas e reescreva aplicando as técnicas aprendidas.',
-          },
-          {
-            id: 'M5-0-t10',
-            type: 'text',
-            title: 'Mapa de Ferramentas — Escrita e Comunicação',
-            body: '**Resumo — quando usar cada ferramenta:**\n\n**Modelo Toulmin (Argumentação)**\nQuando: Construir qualquer argumento — business case, proposta, relatório\nComo: Tese + Dados + Justificativa + Suporte + Qualificador + Contra-argumento\n\n**Pirâmide de Minto (Comunicação Executiva)**\nQuando: Escrever para quem decide — CEO, board, investidor\nComo: Conclusão primeiro → 3 argumentos → dados de suporte\n\n**IMRAD (Escrita Acadêmica)**\nQuando: Artigo, relatório de pesquisa, white paper\nComo: Introdução → Metodologia → Resultados → Análise → Conclusão\n\n**SQ3R (Leitura Eficiente)**\nQuando: Ler artigo, relatório ou livro técnico com eficiência\nComo: Survey → Question → Read → Recite → Review\n\n**Nancy Duarte (Apresentações)**\nQuando: Apresentar para convencer — pitch, board, conferência\nComo: O que é → O que poderia ser → alternância → Call to action\n\n**ABNT (Formatação Acadêmica)**\nQuando: TCC, artigo, dissertação no Brasil\nComo: Citações diretas/indiretas + Referências em ordem alfabética\n\n**Revisão em 3 Passes**\nQuando: Antes de entregar QUALQUER texto\nComo: (1) Estrutura lógica? (2) Argumento sólido? (3) Gramática e formato\n\n**Regra do email de 5 linhas**\nQuando: Email que precisa de ação\nComo: O que quer → Por quê (2 frases) → Próximo passo com data → Fechamento',
-          },
+
         ],
       },
       {
