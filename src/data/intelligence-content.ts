@@ -8719,116 +8719,208 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Etica',
         blocks: [
           {
-            id: 'M6-2-t1',
-            type: 'text',
-            title: 'Ética Empresarial: Fundamentos e Frameworks Decisórios',
-            body: 'Ética empresarial não é filantropia nem compliance — é o sistema de princípios que orienta decisões quando a lei não dá resposta clara ou quando o legal não coincide com o correto.\n\n**Por que ética importa para negócios?**\n— Reputação é o ativo mais valioso e mais frágil de uma empresa\n— 73% dos consumidores deixam de comprar de marcas envolvidas em escândalos éticos (Edelman Trust Barometer)\n— Processos trabalhistas, ambientais e de consumidor custam em média 8% do faturamento anual\n— ESG e governança exigem postura ética documentada e praticada\n\n**4 Frameworks Éticos para Decisão:**\n\n**Utilitarismo** (Bentham, Mill)\n— Pergunta: "Qual decisão gera o maior bem para o maior número de pessoas?"\n— Aplicação: análise custo-benefício social\n— Limite: pode justificar sacrificar uma minoria pelo bem da maioria\n\n**Deontologia** (Kant)\n— Pergunta: "Eu aceitaria que essa ação fosse uma regra universal?"\n— Aplicação: princípios invioláveis (não mentir, não explorar, cumprir contratos)\n— Limite: pode ser rígido em situações de trade-off complexo\n\n**Ética das Virtudes** (Aristóteles)\n— Pergunta: "Uma pessoa de caráter exemplar faria isso?"\n— Aplicação: cultura organizacional, formação de líderes\n— Limite: subjetivo — depende do que se considera "virtuoso"\n\n**Contratualismo** (Rawls)\n— Pergunta: "Se eu não soubesse qual papel ocuparia nessa situação, aceitaria essa decisão?"\n— Aplicação: políticas de diversidade, equidade salarial, justiça organizacional\n— Limite: abstrato para decisões operacionais rápidas\n\nNa prática: Quando enfrentar um dilema ético, passe a decisão pelos 4 filtros. Se todos apontam na mesma direção, a resposta é clara. Se divergem, o dilema é real e merece deliberação coletiva.\n\nPergunta-chave: Sua empresa tem um código de ética? Se sim, os funcionários sabem que ele existe? Se sabem, já viram ele ser aplicado em uma situação real?',
-          },
-          {
-            id: 'M6-etica-c1',
-            type: 'concept',
-            term: 'Utilitarismo vs Deontologia',
-            definition: 'Utilitarismo julga ações pelo resultado ("o maior bem para o maior número"). Deontologia julga pela intenção e pelo princípio ("existem regras invioláveis, independente do resultado").',
-            example: 'Demitir 100 para salvar 1.000 empregos: o utilitarista aprova (resultado líquido positivo). O deontologista questiona: tratar pessoas como meio para um fim viola a dignidade.',
-            antiExample: 'Usar análise custo-benefício para decidir se vale esconder um defeito de produto. O utilitarista pode calcular que recall custa mais que indenizações. O deontologista diz: mentir é errado, ponto.',
-          },
-          {
-            id: 'M6-etica-d1',
-            type: 'decision',
-            scenario: 'Sua empresa descobriu que um lote de produto tem defeito que causa risco baixo (1 em 10.000) de lesão leve. O recall custaria R$ 2 milhões. Não fazer nada e pagar indenizações eventuais custaria ~R$ 300 mil. O que você faz?',
-            options: [
-              { label: 'Fazer o recall imediato', tradeoffs: { upside: 'Protege consumidores, fortalece reputação, evita processo coletivo', downside: 'Custo de R$ 2M e possível pânico desnecessário', risk: 'low' } },
-              { label: 'Não fazer recall, lidar caso a caso', tradeoffs: { upside: 'Economiza R$ 1.7M no curto prazo', downside: 'Se vazar, escândalo destrói a marca. Risco legal pessoal do gestor', risk: 'high' } },
-              { label: 'Recall silencioso — trocar apenas se cliente reclamar', tradeoffs: { upside: 'Custo moderado, menos exposição', downside: 'Não protege quem não sabe do defeito. Se descoberto, piora a crise', risk: 'medium' } },
-            ],
-            realWorldAnalog: 'Ford Pinto (1970s): a Ford calculou que era mais barato pagar indenizações por mortes do que fazer recall. Quando o memo vazou, a marca sofreu dano bilionário e o caso virou símbolo de antiética corporativa.',
-            lesson: 'O cálculo utilitarista puro pode ser legalmente correto e moralmente catastrófico. O teste do jornal: se essa decisão saísse na Folha de São Paulo amanhã, você ficaria confortável?',
-          },
-          {
-            id: 'M6-2-t2',
-            type: 'text',
-            title: 'Dilemas Éticos Contemporâneos: IA, Dados e Trabalho',
-            body: 'A tecnologia criou novos dilemas éticos que não existiam há 10 anos. Gestores precisam navegar essas questões sem precedentes claros.\n\n**IA e Viés Algorítmico:**\n— Algoritmos de RH que discriminam por gênero, raça ou idade\n— IA de crédito que nega empréstimos baseada em CEP (proxy para raça/classe)\n— Reconhecimento facial com taxas de erro 10x maiores para pessoas negras\n— Pergunta ética: quem é responsável quando a IA erra — o desenvolvedor, a empresa que contratou, ou o gestor que aprovou?\n\n**Privacidade e Dados:**\n— LGPD/GDPR: consentimento informado para coleta e uso de dados\n— Dark patterns: interfaces que manipulam o usuário para compartilhar mais dados\n— Venda de dados para terceiros sem transparência\n— Monitoramento de funcionários (câmeras, keyloggers, rastreamento de produtividade)\n— Pergunta ética: até onde a empresa pode monitorar sem invadir a privacidade?\n\n**Trabalho e Dignidade:**\n— Gig economy: motoristas e entregadores sem direitos trabalhistas\n— Precarização disfarçada de "empreendedorismo"\n— Automação que elimina postos — a empresa tem responsabilidade com os demitidos?\n— Disparidade salarial: CEO ganha 300x mais que operário médio (nos EUA)\n— Pergunta ética: eficiência justifica qualquer forma de relação de trabalho?\n\n**Greenwashing e Socialwashing:**\n— Empresas que vendem imagem sustentável sem práticas reais\n— Marketing de diversidade sem diversidade no board\n— Relatórios ESG com métricas escolhidas a dedo\n— Certificações compradas sem mudança de comportamento\n\nDica: A ética empresarial não é sobre ter respostas certas — é sobre fazer as perguntas certas antes de agir. O teste do jornal: "Se essa decisão saísse na capa do jornal amanhã, eu ficaria confortável?"',
-          },
-          {
-            id: 'M6-etica-cmp1',
-            type: 'compare',
-            title: '4 Frameworks Éticos — Qual Guia Sua Decisão?',
-            question: 'Diante de um dilema ético, cada framework aponta para uma direção. Quando divergem, o dilema é real.',
-            dimensions: ['Pergunta central', 'Foco', 'Força', 'Limite', 'Exemplo de aplicação'],
-            items: [
+            id: 'M6-2-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Os 4 Frameworks — A Bússola das Decisões Éticas',
+            subtitle: 'Quando a lei não dá resposta, a filosofia entra em cena. Quatro lentes para não decidir no escuro.',
+            opening: {
+              leadText: 'Ética empresarial não é filantropia nem compliance — é o sistema de princípios que guia decisões quando o manual não ajuda. Gestores que dominam os 4 frameworks éticos tomam decisões mais sólidas, constroem reputação mais duradoura e dormem melhor à noite.',
+            },
+            body: [
               {
-                id: 'utilitarismo',
-                label: 'Utilitarismo',
-                values: [
-                  'Qual decisão gera o maior bem?',
-                  'Resultado/consequência',
-                  'Prático, mensurável',
-                  'Pode sacrificar minoria',
-                  'Análise custo-benefício de recall',
+                kind: 'pillar-grid',
+                title: 'Os 4 frameworks filosóficos aplicados a negócios',
+                pillars: [
+                  { icon: '⚖️', title: 'Utilitarismo', description: 'Pergunta: qual decisão gera o {{maior bem para o maior número}}? Prático e mensurável. Risco: pode justificar sacrificar uma minoria pelo bem coletivo. Base de análises custo-benefício.' },
+                  { icon: '📜', title: 'Deontologia', description: 'Pergunta: isso seria aceitável como {{regra universal}}? Kant: aja só segundo princípios que você universalizaria. Princípios invioláveis — independente do resultado financeiro.' },
+                  { icon: '🌟', title: 'Ética das Virtudes', description: 'Pergunta: uma {{pessoa de caráter exemplar}} faria isso? Foco no agente, não na ação. Base para culturas organizacionais e formação de líderes éticos.' },
+                  { icon: '🤝', title: 'Contratualismo', description: 'Rawls: se você não soubesse seu papel na situação, {{aceitaria essa decisão}}? Base para políticas de equidade, diversidade e justiça salarial nas organizações.' },
                 ],
               },
               {
-                id: 'deontologia',
-                label: 'Deontologia',
-                values: [
-                  'Isso seria aceitável como regra universal?',
-                  'Princípio/dever',
-                  'Princípios invioláveis',
-                  'Rígido em trade-offs',
-                  'Nunca mentir em relatório, mesmo que beneficie',
+                kind: 'paragraph',
+                text: 'Na prática, esses 4 frameworks funcionam como filtros em série. Se todos apontam na mesma direção, a resposta é clara. Se divergem, o dilema é genuíno e merece deliberação coletiva. O erro mais comum: usar apenas um filtro e chamar isso de "decisão ética".',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada framework leva a conclusões diferentes para o mesmo dilema. Veja a diferença — depois classifique os casos pelo raciocínio dominante.',
+              compare: {
+                left: { label: 'Raciocínio Utilitarista', traits: ['Calcula o maior bem agregado', 'Mensura consequências e resultados', 'Aceita custo para minoria se gera bem maior', 'Base: análise custo-benefício social'] },
+                right: { label: 'Raciocínio Deontológico', traits: ['Aplica princípio inviolável', 'Independente do resultado financeiro', 'Nunca mente mesmo que convenha', 'Regra vale para todos sempre'] },
+              },
+              drag: {
+                instruction: 'Qual framework melhor explica o raciocínio de cada decisão abaixo?',
+                items: [
+                  { id: 'util-1', label: 'Demitir 100 funcionários para salvar 1.000 empregos na crise', sublabel: 'CEO decide pela preservação da empresa como um todo', correctZone: 'left', correctFeedback: 'Correto — raciocínio utilitarista. Maximiza o bem coletivo (1.000 empregos salvos). O deontologista questionaria: tratar pessoas como meio para um fim viola a dignidade.', wrongFeedback: 'Repense. A lógica é "maior bem para o maior número" — cálculo de consequências agregadas. Isso é utilitarismo clássico, não princípio inviolável.' },
+                  { id: 'deont-1', label: 'Recusar propina de fornecedor mesmo perdendo contrato lucrativo', sublabel: 'Gestor mantém integridade mesmo com prejuízo financeiro direto', correctZone: 'right', correctFeedback: 'Correto — deontologia em ação. O princípio "não corromper" vale independente do resultado financeiro. A consequência (perder o contrato) não altera o princípio.', wrongFeedback: 'Repense. A decisão ignora as consequências financeiras e aplica um princípio inviolável. Isso é deontologia — o resultado não importa, a regra importa.' },
+                  { id: 'util-2', label: 'Fazer recall de produto com risco baixo que custa R$ 2 milhões', sublabel: 'Afeta 1 em 10.000 usuários com lesão leve', correctZone: 'left', correctFeedback: 'Correto — análise utilitarista: bem coletivo (segurança dos consumidores) supera o custo financeiro. O deontologista diria que proteger o consumidor é dever — não cálculo.', wrongFeedback: 'Repense. A decisão pondera o bem gerado para os consumidores vs o custo da empresa. Cálculo de consequências = utilitarismo.' },
+                  { id: 'deont-2', label: 'Divulgar dado negativo no relatório mesmo reduzindo o valor da ação', sublabel: 'CFO insiste em transparência total com acionistas', correctZone: 'right', correctFeedback: 'Correto — princípio deontológico: a verdade é um dever, independente do impacto no preço da ação. Transparência como regra universal inviolável.', wrongFeedback: 'Repense. A decisão descarta as consequências financeiras e aplica transparência como princípio. Deontologia: a regra vale independente do resultado.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{Ética não é sobre ter respostas certas — é sobre fazer as perguntas certas antes de agir}}. O gestor que conhece os 4 frameworks tem vocabulário para argumentar, escutar e decidir com consistência. O que não tem framework decide por instinto — e às vezes acerta, mas não sabe por quê nem consegue replicar.',
+              keyInsights: [
+                'Se os 4 frameworks convergem: a decisão é clara. Se divergem: o dilema é real — reserve deliberação coletiva antes de agir.',
+                '{{Compliance é o mínimo}}. Seguir a lei é obrigação. Ética começa onde a lei termina — na zona cinzenta que define a cultura real de uma empresa.',
+                'O teste do jornal: "Se essa decisão saísse na capa do jornal amanhã, eu ficaria confortável?" — filtro rápido e poderoso antes de qualquer escolha importante.',
+              ],
+            },
+          },
+          {
+            id: 'M6-2-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Dilemas do Século XXI — IA, Dados e Trabalho',
+            subtitle: 'A tecnologia criou dilemas éticos sem precedentes. Gestores precisam navegar sem mapa pronto.',
+            opening: {
+              leadText: 'Algoritmos discriminam sem intenção. Dados vazam sem alerta. Plataformas precarizam sem contrato. Os dilemas éticos do século XXI não têm respostas no código de ética de 2010 — exigem novas perguntas e coragem para respondê-las.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Os 4 dilemas contemporâneos que todo gestor vai enfrentar',
+                pillars: [
+                  { icon: '🤖', title: 'IA e Viés Algorítmico', description: 'Algoritmos de crédito, RH e precificação reproduzem vieses históricos. Reconhecimento facial com erro 10× maior para pessoas negras. {{Quem responde quando a IA erra: o desenvolvedor, a empresa ou o gestor que aprovou?}}' },
+                  { icon: '🔒', title: 'Privacidade e Dados', description: 'LGPD/GDPR: consentimento informado é obrigatório. Dark patterns: interfaces que manipulam para ceder dados. Monitoramento de funcionários (câmeras, keyloggers): {{até onde a empresa pode vigiar sem invadir?}}' },
+                  { icon: '👷', title: 'Trabalho e Dignidade', description: 'Gig economy: motoristas e entregadores sem direitos trabalhistas. Precarização disfarçada de "empreendedorismo". Automação elimina postos — {{a empresa tem responsabilidade com os demitidos por robôs?}}' },
+                  { icon: '🌿', title: 'Greenwashing e Socialwashing', description: 'Marketing verde sem práticas reais. Relatórios ESG com métricas selecionadas a dedo. Diversidade no Instagram sem diversidade no board. {{Certificação comprada não é cultura — é risco reputacional acumulado}}.' },
                 ],
               },
               {
-                id: 'virtudes',
-                label: 'Ética das Virtudes',
-                values: [
-                  'Uma pessoa exemplar faria isso?',
-                  'Caráter/integridade',
-                  'Forma líderes éticos',
-                  'Subjetivo',
-                  'Cultura organizacional e formação de líderes',
+                kind: 'paragraph',
+                text: 'O traço comum desses dilemas: todos envolvem assimetria de poder e informação. A empresa sabe mais que o usuário, o trabalhador e o regulador. Essa assimetria cria responsabilidade — e empresas que a ignoram acumulam passivo reputacional, legal e humano que vai cobrar um preço.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Práticas iguais podem ser éticas ou antiéticas dependendo de como são implementadas. Veja a diferença — depois classifique os casos.',
+              compare: {
+                left: { label: 'Prática Ética', traits: ['Transparência com usuário e funcionário', 'Consentimento informado real', 'Auditoria de viés periódica e divulgada', 'Aceita o custo de fazer o certo'] },
+                right: { label: 'Prática Antiética', traits: ['Informação escondida ou omitida', 'Consentimento forçado por dark pattern', 'Viés ignorado por conveniência financeira', 'Externaliza custo para o mais fraco'] },
+              },
+              drag: {
+                instruction: 'Classifique cada prática: ética ou antiética?',
+                items: [
+                  { id: 'etica-1', label: 'Empresa audita algoritmo de crédito semestralmente e divulga taxa de aprovação por gênero e renda', sublabel: 'Relatório público com metodologia auditada por terceiros', correctZone: 'left', correctFeedback: 'Correto — transparência e auditoria ativa são marcas de IA responsável. Empresas que fazem isso antecipam problemas e constroem confiança com reguladores.', wrongFeedback: 'Repense. Auditar e divulgar resultados — inclusive os negativos — é o padrão de IA responsável. Não é perfeição, é honestidade sobre limitações.' },
+                  { id: 'antietica-1', label: 'App pede "aceite todos os cookies" em botão verde grande e "personalizar" em cinza pequeno', sublabel: 'Aceite padrão captura dados de navegação, localização e comportamento', correctZone: 'right', correctFeedback: 'Correto — dark pattern clássico. O design força consentimento sem informação real. Proibido pela GDPR, investigado pela ANPD no Brasil.', wrongFeedback: 'Repense. Esse design propositalmente dificulta a recusa. Consentimento obtido por manipulação de interface não é consentimento informado — é coerção por design.' },
+                  { id: 'etica-2', label: 'Empresa anuncia automação e cria programa de requalificação de 18 meses para funcionários afetados', sublabel: 'Custo de R$ 3M. 85% dos funcionários recolocados internamente ou no mercado', correctZone: 'left', correctFeedback: 'Correto — responsabilidade corporativa com quem perde emprego para automação. Não é obrigação legal — é postura ética e contratualismo em ação.', wrongFeedback: 'Repense. Investir na requalificação dos demitidos por automação não é exigido por lei — mas é ética das virtudes e contratualismo em ação.' },
+                  { id: 'antietica-2', label: 'Relatório ESG destaca redução de emissões de 3% na operação própria, omite que fornecedores cresceram 40%', sublabel: 'Empresa terceirizou a parte suja da cadeia produtiva', correctZone: 'right', correctFeedback: 'Correto — greenwashing por omissão. A melhoria na operação própria pode ser real, mas esconde o impacto total da cadeia. Reguladores e investidores estão cada vez mais atentos ao Scope 3.', wrongFeedback: 'Repense. Selecionar só as métricas que parecem bem, ocultando o impacto da cadeia, é greenwashing — independente da melhoria pontual ser real.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'A empresa que navega dilemas éticos tecnológicos com transparência {{constrói ativo que não aparece no balanço: reputação de integridade}}. Consumidores, funcionários e reguladores escolhem com quem ficam — e a ética virou critério de seleção tão importante quanto preço.',
+              keyInsights: [
+                '{{LGPD não é burocracia — é lei}}. Multa por violação chega a 2% do faturamento no Brasil, limitado a R$ 50M por infração. Ignorar tem preço definido.',
+                'Viés algorítmico é risco jurídico real. Nos EUA, empresas pagaram bilhões por discriminação via IA em crédito e contratação nos últimos 5 anos.',
+                'O teste de Rawls para tecnologia: se você fosse o usuário mais vulnerável do seu produto, aceitaria como ele é tratado agora?',
+              ],
+            },
+          },
+          {
+            id: 'M6-2-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'O Método das Decisões Éticas — 4 Passos para Não Errar',
+            subtitle: 'Ética sem método é intenção. Com método, é prática replicável em qualquer pressão.',
+            opening: {
+              leadText: 'Boas intenções não bastam. Gestores íntegros tomam más decisões éticas quando pressionados, apressados ou desinformados. O método das 4 etapas transforma ética de valor abstrato em protocolo de decisão concreto — aplicável mesmo sob pressão.',
+            },
+            body: [
+              {
+                kind: 'step-flow',
+                title: 'As 4 etapas para decisões éticas sólidas',
+                steps: [
+                  { number: 1, title: 'Mapeie as partes afetadas', description: 'Quem é impactado — direta ou indiretamente? Funcionários, clientes, fornecedores, comunidade, concorrentes, meio ambiente? Decisões éticas ruins geralmente ignoram stakeholders invisíveis.' },
+                  { number: 2, title: 'Passe pelos 4 filtros filosóficos', description: 'Utilitarismo: qual decisão gera mais bem agregado? Deontologia: viola algum princípio inviolável? Virtudes: um líder exemplar faria isso? Contratualismo: aceitaria se não soubesse meu papel?' },
+                  { number: 3, title: 'Mapeie os trade-offs reais', description: 'Toda decisão ética envolve perdas. Não existe opção sem custo — existe clareza sobre quem paga o custo. Defina: o que ganhamos, o que perdemos, quem absorve o ônus da decisão.' },
+                  { number: 4, title: 'Aplique o Teste do Jornal', description: '"Se essa decisão saísse na capa do jornal amanhã, eu ficaria confortável?" Se não — reavalie. Se sim, documente o raciocínio: decisões éticas documentadas resistem ao tempo e à pressão externa.' },
                 ],
               },
               {
-                id: 'contratualismo',
-                label: 'Contratualismo',
-                values: [
-                  'Se eu não soubesse meu papel, aceitaria?',
-                  'Justiça/equidade',
-                  'Promove justiça social',
-                  'Abstrato demais',
-                  'Política salarial, diversidade, equidade',
-                ],
+                kind: 'paragraph',
+                text: 'O método não garante decisões perfeitas — garante decisões conscientes. A diferença entre uma empresa com cultura ética e uma sem é que a primeira tem processo: reuniões onde essas perguntas são feitas, canais onde denúncias chegam, líderes que praticam o que pregam.',
               },
             ],
-            insight: 'Na prática empresarial: se os 4 frameworks apontam na mesma direção, a decisão é clara. Se divergem, reserve tempo para deliberação coletiva — o dilema é genuíno.',
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'A mesma empresa, a mesma situação — mas com e sem método ético. Veja a diferença — depois classifique os comportamentos.',
+              compare: {
+                left: { label: 'Com Método Ético', traits: ['Mapeia stakeholders antes de decidir', 'Documenta raciocínio da decisão', 'Canal de denúncia ativo e seguro', 'Liderança pratica o que prega no discurso'] },
+                right: { label: 'Sem Método Ético', traits: ['Decide por instinto ou pressão do momento', 'Decisão não documentada nem justificada', 'Denúncias chegam via jornal ou processo', 'Discurso ético ≠ comportamento real'] },
+              },
+              drag: {
+                instruction: 'Cada comportamento indica cultura ética presente ou ausente. Classifique:',
+                items: [
+                  { id: 'com-1', label: 'Empresa tem canal de denúncias anônimo com comitê independente que investiga inclusive lideranças', sublabel: '12% dos casos investigados resultaram em demissão de gestores sêniores', correctZone: 'left', correctFeedback: 'Correto — canal de denúncias com governança independente é marca de cultura ética real. O dado de demissão de lideranças mostra que o canal funciona de verdade.', wrongFeedback: 'Repense. Canal de denúncias com investigação real — inclusive de líderes — é o padrão de organizações com cultura ética institucionalizada.' },
+                  { id: 'sem-1', label: 'CEO fala que integridade é valor central. Equipe de vendas ganha bônus por fechar contratos com cláusulas abusivas', sublabel: 'Discurso e incentivo financeiro apontam em direções opostas', correctZone: 'right', correctFeedback: 'Correto — quando o sistema de incentivos contradiz o discurso ético, o comportamento real segue o incentivo. Cultura é o que você premia, não o que você fala.', wrongFeedback: 'Repense. O problema não é o discurso — é que o incentivo financeiro o contradiz. Cultura ética exige alinhamento entre valores declarados e sistema de recompensa.' },
+                  { id: 'com-2', label: 'Gerente recusa pressão do cliente para alterar data em contrato já assinado e documenta a conversa', sublabel: 'Escala para o jurídico e registra a tentativa de alteração contratual', correctZone: 'left', correctFeedback: 'Correto — integridade sob pressão e documentação adequada são sinais de cultura ética funcionando na prática, não só no discurso corporativo.', wrongFeedback: 'Repense. Recusar pressão, documentar e escalar corretamente é o método ético em ação. Não é perfeccionismo burocrático — é proteção para todos.' },
+                  { id: 'sem-2', label: 'Empresa descobre irregularidade interna, corrige silenciosamente sem notificar as partes afetadas', sublabel: '"Já resolvemos internamente, não precisa comunicar"', correctZone: 'right', correctFeedback: 'Correto — corrigir sem notificar viola a confiança das partes afetadas. Transparência após erro é um dos marcadores mais fortes de integridade organizacional real.', wrongFeedback: 'Repense. Corrigir sem comunicar é autointeresse disfarçado de pragmatismo. Partes afetadas têm direito de saber — independente do custo reputacional para a empresa.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{Ética sem processo é promessa. Processo sem cultura é teatro}}. O que sustenta uma empresa íntegra não é o código de conduta na parede — é o gestor que aplica o método quando ninguém está olhando, especialmente quando custa dinheiro e posição.',
+              keyInsights: [
+                'Decisões éticas documentadas resistem a processos judiciais, escândalos e rotatividade de liderança. Escreva o raciocínio, não só a conclusão.',
+                '{{Cultura é o que você tolera}}. Toda irregularidade ignorada comunica ao time que aquele comportamento é aceitável — mesmo sem nenhuma palavra dita.',
+                'Versão moderna do Teste do Jornal: "Eu ficaria confortável se um funcionário júnior tweetasse exatamente o que aconteceu aqui?" Se não — reavalie antes de agir.',
+              ],
+            },
           },
           {
-            id: 'M6-etica-ex1',
-            type: 'inline-exercise',
-            prompt: 'Aplique os 4 frameworks éticos a um dilema real de negócios.',
-            context: 'Sua empresa de tecnologia usa IA para aprovar crédito. Você descobre que o algoritmo aprova 85% dos pedidos de bairros ricos e apenas 40% de bairros periféricos — mesmo quando renda e score são iguais. O algoritmo usa CEP como variável.',
-            fields: [
-              { id: 'utilitarista', label: 'Análise Utilitarista — qual decisão gera mais bem?', placeholder: 'Considere: manter reduz inadimplência, mas exclui milhares de pessoas...', multiline: true },
-              { id: 'deontologica', label: 'Análise Deontológica — isso seria aceitável como regra universal?', placeholder: 'Discriminar por local de moradia é um princípio que você universalizaria?', multiline: true },
-              { id: 'virtudes', label: 'Ética das Virtudes — um líder exemplar manteria esse algoritmo?', placeholder: '', multiline: true },
-              { id: 'decisao', label: 'Sua decisão final — o que fazer e por quê?', placeholder: 'Considere: remover CEP, auditar viés, compensar os prejudicados...', multiline: true },
+            id: 'M6-2-cap4',
+            type: 'chapter',
+            number: 4,
+            title: 'ESG e Governança — Ética que Aparece no Balanço',
+            subtitle: 'ESG deixou de ser tendência e virou critério de investimento, contratação e reputação de mercado.',
+            opening: {
+              leadText: 'ESG não é altruísmo corporativo — é gestão de risco de longo prazo. Empresas com boa governança ambiental, social e corporativa captam capital mais barato, retêm talentos melhores e sofrem menos crises. A ética tem retorno financeiro mensurável.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Os 3 pilares do ESG e o que significam na prática',
+                pillars: [
+                  { icon: '🌱', title: 'E — Ambiental', description: 'Emissões de CO₂, consumo de água e energia, gestão de resíduos, cadeia de fornecimento sustentável. {{Não é só "plante árvores" — é risco físico, regulatório e reputacional mensurável}}, incluindo toda a cadeia (Scope 3).' },
+                  { icon: '👥', title: 'S — Social', description: 'Diversidade no board e na liderança, condições de trabalho na cadeia produtiva, impacto nas comunidades onde opera, política salarial e bem-estar. {{Inclui fornecedores — não só a operação direta da empresa}}.' },
+                  { icon: '🏛️', title: 'G — Governança', description: 'Transparência, conselho independente, política de remuneração executiva, canal de denúncias, auditoria externa. {{Governança fraca é o maior preditor de escândalo corporativo}} — 80% das crises têm falha de G como raiz.' },
+                  { icon: '📋', title: 'Compliance como Diferencial', description: 'Empresas com compliance robusto pagam menos por crédito, atraem mais investidores institucionais e sofrem multas menores em caso de irregularidade. {{Compliance não é custo — é seguro e vantagem competitiva}}.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'O mercado precificou ESG. Fundos ESG movimentam +US$ 35 trilhões globalmente. Empresas com rating ESG alto têm custo de capital 1,5–2% menor. No Brasil, o ISE (Índice de Sustentabilidade Empresarial) da B3 historicamente supera o Ibovespa em períodos de crise. Ética deixou de ser custo e virou vantagem competitiva mensurável.',
+              },
             ],
-            evaluationCriteria: [
-              'Identificou que usar CEP como proxy funciona como discriminação indireta',
-              'Aplicou pelo menos 2 frameworks com profundidade',
-              'Reconheceu o trade-off entre eficiência do modelo e justiça social',
-              'Propôs ação concreta (não apenas "melhorar o algoritmo")',
-            ],
-            expectedConcepts: ['viés algorítmico', 'discriminação indireta', 'LGPD', 'frameworks éticos'],
-          },
-          {
-            id: 'M6-2-s1',
-            type: 'simulation',
-            title: 'Árvore de Decisão Ética — Navegue os Dilemas',
-            simulationId: 'ethics-decision-tree',
-            description: 'Enfrente 5 dilemas éticos empresariais e descubra qual framework filosófico mais alinha com suas decisões.',
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'ESG genuíno e ESG de marketing têm aparência similar mas consequências opostas. Veja a diferença — depois classifique as práticas.',
+              compare: {
+                left: { label: 'ESG Genuíno', traits: ['Metas quantificadas e auditadas externamente', 'Inclui cadeia de fornecimento (Scope 3)', 'Governança independente real e ativa', 'Aceita custo financeiro para fazer o certo'] },
+                right: { label: 'ESG de Marketing', traits: ['Métricas selecionadas para parecer bem', 'Foco só na operação própria visível', 'Conselho controlado por fundadores', 'Relatório bonito, mudança comportamental mínima'] },
+              },
+              drag: {
+                instruction: 'ESG genuíno ou ESG de marketing? Classifique:',
+                items: [
+                  { id: 'esg-real-1', label: 'Empresa divulga metas de carbono com linha de base auditada e relatório de progresso trimestral', sublabel: 'Inclui emissões Scope 3 — toda a cadeia de fornecimento', correctZone: 'left', correctFeedback: 'Correto — ESG genuíno. Auditoria externa, Scope 3 e relatório periódico são marcas de seriedade. Scope 3 é onde a maioria das empresas esconde suas emissões reais.', wrongFeedback: 'Repense. Auditoria externa + Scope 3 + relatório periódico = transparência real com custo real. Isso não é marketing — tem accountability.' },
+                  { id: 'esg-mkt-1', label: 'Relatório ESG destaca 0% de plástico nos escritórios e omite que a fábrica descarta resíduo no rio', sublabel: 'Empresa premiada 3 anos seguidos por "sustentabilidade"', correctZone: 'right', correctFeedback: 'Correto — greenwashing clássico. Destacar o escritório, ignorar a operação principal. O prêmio baseado no relatório é tanto vítima quanto cúmplice da seleção de métricas.', wrongFeedback: 'Repense. Destacar práticas menores (plástico no escritório) enquanto omite impacto real (descarte industrial) é a definição de greenwashing.' },
+                  { id: 'esg-real-2', label: 'Empresa de moda audita fábricas terceirizadas na Ásia e publica lista de fornecedores com condições de trabalho', sublabel: 'Encerrou contratos com 3 fornecedores após auditoria revelar condições inadequadas', correctZone: 'left', correctFeedback: 'Correto — ESG genuíno no pilar Social. A coragem de publicar e encerrar contratos problemáticos é o que diferencia: a maioria das empresas de moda nunca revela sua cadeia.', wrongFeedback: 'Repense. Auditar, publicar e encerrar contratos problemáticos na cadeia de fornecimento é ESG S real. Tem custo financeiro — e por isso é genuíno.' },
+                  { id: 'esg-mkt-2', label: 'CEO recebe bônus de R$ 50M enquanto empresa corta benefícios de saúde de funcionários operacionais', sublabel: 'Relatório ESG do mesmo ano destaca "política de remuneração responsável"', correctZone: 'right', correctFeedback: 'Correto — governança ESG de fachada. Disparidade extrema combinada com corte de benefícios básicos é o oposto de G genuíno — independente do que o relatório declare.', wrongFeedback: 'Repense. O relatório diz uma coisa, a prática diz outra. ESG de marketing é exatamente isso: discurso descolado da realidade operacional.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{ESG não é o futuro dos negócios — é o presente dos negócios que querem sobreviver}}. Investidores, consumidores, reguladores e os melhores talentos do mercado já tomam decisões baseados nisso. A empresa que ignora essa mudança não está sendo pragmática — está acumulando passivo que vai cobrar um preço.',
+              keyInsights: [
+                'Custo de capital: empresas com rating ESG elevado tomam crédito 1,5–2% mais barato. Em um financiamento de R$ 100M, isso é R$ 1,5–2M por ano de diferença real.',
+                '{{G é o pilar mais negligenciado e o mais impactante}}. 80% dos escândalos corporativos têm falha de governança como causa raiz, não de intenção individual.',
+                'O teste prático de ESG: pergunte ao funcionário da linha de produção o que a empresa faz pelo meio ambiente e pela comunidade. A resposta diz tudo.',
+              ],
+            },
           },
         ],
       },
