@@ -8964,132 +8964,248 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Empreendedorismo Social',
         blocks: [
           {
-            id: 'M7-0-t1',
-            type: 'text',
-            title: 'Empreendedorismo Social: Lucro com Propósito',
-            body: 'Empreendedorismo social aplica a lógica empresarial para resolver problemas sociais e ambientais. Diferente de ONG (que depende de doações) e de empresa tradicional (que maximiza lucro), o negócio social busca sustentabilidade financeira COM impacto positivo.\n\n**Muhammad Yunus** (Nobel da Paz, 2006) — fundou o Grameen Bank em Bangladesh: microcrédito para pessoas em extrema pobreza sem garantias. Provou que os mais pobres são bons pagadores (inadimplência < 2%) e que negócios podem existir para resolver problemas sociais.\n\n**Tipos de Empreendedorismo Social:**\n\n**Negócio Social (Yunus)** — empresa que cobre custos e gera lucro moderado, mas reinveste tudo na missão social. Não distribui dividendos.\n\n**Empresa B (B Corp)** — empresa tradicional com compromisso formal de gerar benefício social/ambiental. Certificada pelo B Lab. Distribui lucro, mas equilibra retorno financeiro com impacto.\n\n**Organização Híbrida** — combina receita de mercado com doações/grants. Modelo comum em educação e saúde.\n\n**Negócio de Impacto** — qualquer negócio que resolve um problema social/ambiental de forma sustentável financeiramente.\n\n**Exemplos brasileiros:**\n— Gerando Falcões: ecossistema de impacto social em favelas (educação, emprego, moradia)\n— Badu Design: transforma resíduos têxteis em produtos de moda em comunidades\n— Geekie: tecnologia educacional adaptativa para escolas públicas\n— Vivenda: reforma de moradias precárias com financiamento acessível\n— BrazilFoundation: conecta doadores internacionais a projetos sociais brasileiros\n\n**Teoria da Mudança (Theory of Change):**\nFramework que conecta:\n1. Recursos (inputs) → o que você investe\n2. Atividades → o que você faz\n3. Produtos (outputs) → o que você entrega\n4. Resultados (outcomes) → o que muda na vida das pessoas\n5. Impacto → a mudança sistêmica de longo prazo\n\nPergunta-chave: Qual problema social ou ambiental sua empresa poderia resolver como parte do modelo de negócio — não como filantropia, mas como estratégia?',
-          },
-          {
-            id: 'M7-social-c1',
-            type: 'concept',
-            term: 'Negócio Social vs Empresa B vs ONG',
-            definition: 'Negócio Social (Yunus) reinveste todo lucro na missão. Empresa B (B Corp) distribui lucro mas equilibra com impacto. ONG depende de doações e não visa lucro. Os três resolvem problemas sociais, mas com modelos financeiros diferentes.',
-            example: 'Grameen Bank (Yunus): microcrédito para extrema pobreza, reinveste tudo. Natura (B Corp): distribui dividendos mas se compromete com impacto ambiental certificado pelo B Lab.',
-            antiExample: 'Empresa que doa 1% do lucro para caridade NÃO é negócio social. É filantropia corporativa. O impacto social precisa estar no MODELO de negócio, não no destino de uma fração do lucro.',
-          },
-          {
-            id: 'M7-social-cmp1',
-            type: 'compare',
-            title: 'Modelos de Impacto Social — Qual Estrutura Escolher?',
-            question: 'Cada modelo tem implicações diferentes para governança, financiamento e escala.',
-            dimensions: ['Objetivo principal', 'Distribuição de lucro', 'Fonte de receita', 'Exemplo brasileiro', 'Escalabilidade'],
-            items: [
+            id: 'M7-0-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Os 3 Modelos de Impacto Social — Qual Estrutura Escolher?',
+            subtitle: 'Negócio Social, Empresa B e ONG: três caminhos para resolver problemas reais com sustentabilidade financeira.',
+            opening: {
+              leadText: 'Empreendedorismo social aplica a lógica empresarial para resolver problemas sociais e ambientais. Muhammad Yunus provou com o Grameen Bank: os mais pobres pagam suas dívidas (inadimplência < 2%) e negócios podem existir para resolver problemas — não só para lucrar.',
+            },
+            body: [
               {
-                id: 'negocio-social',
-                label: 'Negócio Social',
-                values: [
-                  'Resolver problema social',
-                  'Reinveste 100%',
-                  'Venda de produtos/serviços',
-                  'Vivenda (reforma de moradias)',
-                  'Alta — modelo autossustentável',
+                kind: 'pillar-grid',
+                title: 'Os 4 modelos de impacto social',
+                pillars: [
+                  { icon: '🏦', title: 'Negócio Social (Yunus)', description: 'Cobre custos e gera lucro moderado, mas {{reinveste tudo na missão}}. Não distribui dividendos. Modelo: Grameen Bank, Vivenda (reforma de moradias precárias). Completamente autossustentável.' },
+                  { icon: '🌿', title: 'Empresa B (B Corp)', description: 'Empresa tradicional com {{compromisso formal de gerar impacto}}. Certificada pelo B Lab. Distribui lucro, mas equilibra retorno com impacto social/ambiental. Natura: primeira B Corp listada em bolsa na América Latina.' },
+                  { icon: '🤝', title: 'ONG / OSCIP', description: '{{Impacto social puro}}. Não distribui lucro, não existe. Depende de doações, grants e editais. Escala limitada pela captação. Exemplo: Gerando Falcões — ecossistema de impacto em favelas.' },
+                  { icon: '🔀', title: 'Organização Híbrida', description: '{{Combina receita de mercado com doações}} e grants. Comum em educação e saúde. Exemplo: Geekie (edtech para escolas públicas) — parte da receita via mercado, parte via setor público e fundações.' },
                 ],
               },
               {
-                id: 'empresa-b',
-                label: 'Empresa B (B Corp)',
-                values: [
-                  'Lucro + impacto equilibrados',
-                  'Distribui, com compromisso social',
-                  'Mercado tradicional',
-                  'Natura, Fazenda Futuro',
-                  'Alta — atrai investidores tradicionais',
+                kind: 'paragraph',
+                text: 'A tendência global é convergência: empresas tradicionais incorporam impacto (ESG), e negócios sociais adotam práticas de mercado. O modelo "puro" de cada tipo está ficando raro. A pergunta não é "qual modelo é melhor" — é "qual modelo serve melhor ao problema que você quer resolver".',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada modelo tem implicações diferentes para governança, financiamento e escala. Compare os dois principais — depois classifique cada caso.',
+              compare: {
+                columnHeaders: ['Distribuição de lucro', 'Fonte de receita', 'Escalabilidade'],
+                rows: [
+                  { label: 'Negócio Social', values: ['Reinveste 100% na missão', 'Venda de produtos/serviços', 'Alta — modelo autossustentável'] },
+                  { label: 'Empresa B', values: ['Distribui com compromisso social', 'Mercado tradicional', 'Alta — atrai investidores tradicionais'] },
+                  { label: 'ONG', values: ['Não há lucro a distribuir', 'Doações, grants, editais', 'Limitada — depende de captação'] },
+                  { label: 'Org. Híbrida', values: ['Parcial ou nenhuma', 'Mercado + doações/grants', 'Média — depende do mix de receita'] },
                 ],
-                highlight: 'Natura: primeira empresa B Corp listada em bolsa na América Latina.',
+              },
+              drag: {
+                instruction: 'Classifique cada iniciativa no modelo de impacto mais adequado:',
+                zones: [
+                  { id: 'negocio-social', label: 'Negócio Social' },
+                  { id: 'empresa-b', label: 'Empresa B' },
+                  { id: 'ong', label: 'ONG' },
+                  { id: 'hibrido', label: 'Modelo Híbrido' },
+                ],
+                items: [
+                  { id: 'ns-1', label: 'Microcrédito para agricultores sem garantia, com juros abaixo do mercado', sublabel: 'Toda receita de juros é reinvestida em novas concessões de crédito', correctZone: 'negocio-social', correctFeedback: 'Correto — Negócio Social clássico. Sustentável via receita própria, mas sem distribuição de dividendos. É exatamente o modelo do Grameen Bank de Yunus.', wrongFeedback: 'Repense. O modelo é autossustentável (receita própria) e reinveste tudo — sem dividendos. Isso define o Negócio Social de Yunus.' },
+                  { id: 'eb-1', label: 'Rede de cosméticos com cadeia de fornecimento sustentável e relatório de impacto auditado', sublabel: 'Distribui dividendos para acionistas, mas tem metas de carbono vinculadas à remuneração da diretoria', correctZone: 'empresa-b', correctFeedback: 'Correto — Empresa B. Distribui lucro para acionistas mas com compromissos formais de impacto. Esse é exatamente o modelo da Natura (B Corp listada na B3).', wrongFeedback: 'Repense. A empresa distribui dividendos (não é negócio social puro) mas tem compromissos formais de impacto ambiental. Isso é o modelo B Corp.' },
+                  { id: 'ong-1', label: 'Instituto que capacita jovens de favelas com cursos gratuitos financiados por doações empresariais', sublabel: 'Não cobra dos alunos, não gera receita própria, depende de editais e doadores', correctZone: 'ong', correctFeedback: 'Correto — ONG. Sem receita própria, dependência total de captação. Escalabilidade limitada, mas impacto profundo enquanto tem financiamento.', wrongFeedback: 'Repense. Sem receita de mercado e dependência total de doações = ONG. O impacto pode ser real, mas a estrutura financeira é vulnerável.' },
+                  { id: 'hib-1', label: 'Escola de programação: 70% das vagas patrocinadas por empresas de tecnologia, 30% pagas pelos alunos', sublabel: 'Alunos de baixa renda recebem bolsa integral financiada pelas empresas contratantes', correctZone: 'hibrido', correctFeedback: 'Correto — Modelo Híbrido. Combina receita de mercado (alunos pagantes e empresas patrocinadoras) com impacto social (bolsas integrais). É o modelo do Gerando Falcões.', wrongFeedback: 'Repense. O modelo mistura fontes: alunos pagantes + patrocínio empresarial + bolsas sociais. Isso define o Modelo Híbrido — não depende de uma única fonte.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{Empreendedorismo social não é filantropia com CNPJ — é inovação no modelo de negócio}}. A pergunta não é "podemos fazer bem ao mundo?" — é "como construímos um modelo financeiro que sustente o bem que queremos fazer por décadas?"',
+              keyInsights: [
+                'Empresa que doa 1% do lucro para caridade NÃO é negócio social. O impacto precisa estar no {{modelo}} — não no destino de uma fração do lucro.',
+                'Grameen Bank: inadimplência < 2% entre os mais pobres de Bangladesh. O mercado subestimou um segmento — Yunus viu uma oportunidade onde todos viam risco.',
+                'Natura: prova de que impacto e retorno financeiro não são opostos. {{Primeira B Corp listada em bolsa na América Latina}} e entre as maiores empresas de cosméticos do mundo.',
+              ],
+            },
+          },
+          {
+            id: 'M7-0-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Teoria da Mudança — Da Ideia ao Impacto Real',
+            subtitle: 'Sem conectar ação a resultado, qualquer projeto é bem-intencionado mas não comprovado.',
+            opening: {
+              leadText: 'A Teoria da Mudança é o mapa que conecta o que você investe ao que muda na vida das pessoas. Sem ela, você pode estar formando 100 pessoas e achando que gerou 100 empregos — quando na realidade gerou 30. A diferença entre output e outcome é a diferença entre dado e impacto.',
+            },
+            body: [
+              {
+                kind: 'step-flow',
+                title: 'Os 5 níveis da Teoria da Mudança',
+                steps: [
+                  { number: 1, title: 'Inputs — o que você investe', description: 'Recursos financeiros, humanos, tecnológicos e de tempo investidos no projeto. Exemplo: R$ 200k, 5 instrutores, parceria com 10 empresas de tecnologia, 6 meses de operação.' },
+                  { number: 2, title: 'Atividades — o que você faz', description: 'As ações que transformam inputs em resultados. Exemplo: bootcamp de 3 meses em programação, mentoria individual semanal, simulação de processos seletivos, conexão com recrutadores.' },
+                  { number: 3, title: 'Outputs — o que você entrega', description: '{{Mensuráveis e imediatos}}. O que foi produzido diretamente pelas atividades. Exemplo: 100 jovens formados, 300 horas de aula ministradas, 50 entrevistas simuladas. Fácil de medir — mas não é impacto.' },
+                  { number: 4, title: 'Outcomes — o que muda na vida das pessoas', description: '{{A mudança real que interessa}}. Exemplo: 70 dos 100 formados empregados em 6 meses, renda média de R$ 3.500/mês (vs R$ 1.200 antes), 60% dos empregados com contrato CLT. Mais difícil de medir, mas é o que justifica o projeto.' },
+                  { number: 5, title: 'Impacto — a mudança sistêmica', description: 'A transformação de longo prazo no sistema. Exemplo: redução da taxa de desemprego juvenil no bairro em 15% em 5 anos, criação de polo tecnológico na comunidade. Requer anos de acompanhamento para medir.' },
+                ],
               },
               {
-                id: 'ong',
-                label: 'ONG / OSCIP',
-                values: [
-                  'Impacto social puro',
-                  'Não há lucro',
-                  'Doações, grants, editais',
-                  'Gerando Falcões',
-                  'Limitada — depende de captação',
+                kind: 'paragraph',
+                text: 'A armadilha mais comum: confundir outputs com outcomes. "Formamos 100 pessoas" é output. "70 das 100 estão empregadas ganhando 3x mais" é outcome. Doadores, investidores e governos cada vez mais financiam outcomes — não outputs. Quem não mede a mudança real perde competitividade por recursos.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Medir o que é fácil vs medir o que importa — a diferença define se seu projeto tem impacto ou só aparência de impacto. Compare — depois classifique cada indicador.',
+              compare: {
+                columnHeaders: ['O que mede', 'Dificuldade', 'Valor para financiadores'],
+                rows: [
+                  { label: 'Output (saída)', values: ['O que foi entregue diretamente', 'Fácil — dados imediatos', 'Baixo — não prova mudança'] },
+                  { label: 'Outcome (resultado)', values: ['O que mudou na vida das pessoas', 'Médio — requer acompanhamento', 'Alto — prova que o projeto funciona'] },
+                ],
+              },
+              drag: {
+                instruction: 'Cada indicador abaixo é output ou outcome? Classifique:',
+                zones: [
+                  { id: 'output', label: 'Output (saída)' },
+                  { id: 'outcome', label: 'Outcome (resultado)' },
+                ],
+                items: [
+                  { id: 'out-1', label: '500 jovens receberam capacitação em empreendedorismo', sublabel: 'Dado registrado ao final do programa de 3 meses', correctZone: 'output', correctFeedback: 'Correto — output. Quantifica o que foi entregue, não o que mudou. A pergunta que falta: quantos abriram negócios? Quantos aumentaram renda? Isso seria outcome.', wrongFeedback: 'Repense. "Quantos receberam" mede o que foi entregue — não o que mudou na vida deles. Isso é output, não outcome.' },
+                  { id: 'oc-1', label: '68% dos participantes aumentaram renda em 40% nos 12 meses após o programa', sublabel: 'Pesquisa de acompanhamento 1 ano depois da formatura', correctZone: 'outcome', correctFeedback: 'Correto — outcome. Mede a mudança real na vida das pessoas, com dados concretos de acompanhamento. É isso que prova que o programa funciona.', wrongFeedback: 'Repense. Medir o que mudou na vida dos participantes após o programa — com dados de acompanhamento — é outcome. É a prova de impacto.' },
+                  { id: 'out-2', label: '12.000 refeições distribuídas em 6 meses', sublabel: 'Programa de combate à insegurança alimentar em favela', correctZone: 'output', correctFeedback: 'Correto — output. Mede o volume entregue, não o impacto nutricional ou na saúde das famílias. Importante para operação, mas não comprova impacto.', wrongFeedback: 'Repense. Contar refeições distribuídas mede atividade — não mudança. Outcome seria: redução de desnutrição infantil em X%, ou melhora nos índices de saúde das famílias atendidas.' },
+                  { id: 'oc-2', label: 'Taxa de evasão escolar entre beneficiários caiu de 22% para 8% em 2 anos', sublabel: 'Programa de reforço escolar com acompanhamento familiar', correctZone: 'outcome', correctFeedback: 'Correto — outcome. Mede uma mudança real e mensurável no sistema. Esse dado justifica financiamento, prova causalidade e compara com o baseline.', wrongFeedback: 'Repense. Redução de evasão escolar é uma mudança real e documentada na vida das pessoas — não só o que foi entregue. Isso é outcome.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{Sem medir, não há como provar impacto. Sem provar, não há como escalar.}} A mensuração de impacto social é o equivalente ao DRE para negócios tradicionais — não é burocracia, é o instrumento que conecta ação a resultado e resultado a financiamento.',
+              keyInsights: [
+                'Comece simples: 3-5 indicadores que conectam sua atividade ao resultado na vida das pessoas. Meça trimestralmente. Relate com transparência — inclusive os fracassos.',
+                '{{Deadweight}}: o que teria acontecido sem o seu projeto? Se 40% dos jovens teriam se empregado de qualquer forma, seu impacto real é nos outros 60% — não em todos.',
+                'Financiadores estão migrando para financiamento por outcomes: só pagam se o resultado for comprovado. Quem não mede fica fora dessa corrida por capital de impacto.',
+              ],
+            },
+          },
+          {
+            id: 'M7-0-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'SROI e Métricas — Quanto Vale o Impacto que Você Gera?',
+            subtitle: 'O que não é medido não é gerenciado — e no impacto social, o que não é provado não é financiado.',
+            opening: {
+              leadText: 'SROI de 3:1 significa que cada R$ 1 investido gera R$ 3 em valor social. Esse número faz toda a diferença na hora de captar recursos, justificar políticas públicas e comparar projetos. Medir impacto não é burocracia — é a linguagem que conecta propósito a capital.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Os 4 pilares da mensuração de impacto social',
+                pillars: [
+                  { icon: '📊', title: 'SROI — Retorno Social', description: 'Para cada R$ 1 investido, quanto valor social é gerado? {{SROI = Valor Social Líquido ÷ Investimento Total}}. Combina dados quantitativos (econômicos) com qualitativos. SROI > 1 = gera mais valor do que consome.' },
+                  { icon: '📋', title: 'IRIS+ (GIIN)', description: 'Catálogo padronizado com 500+ indicadores organizados por tema: educação, saúde, meio ambiente, emprego. Permite {{comparabilidade entre organizações}} e é referência para investidores de impacto globais.' },
+                  { icon: '🌍', title: 'ODS como Framework', description: '17 Objetivos de Desenvolvimento Sustentável da ONU. Conectar métricas aos ODS {{facilita comunicação com governos, empresas e financiadores internacionais}}. Exemplo: capacitação profissional → ODS 4, 8 e 10.' },
+                  { icon: '⚠️', title: 'Armadilhas Comuns', description: 'Confundir outputs com outcomes. Não considerar deadweight. {{Cherry-picking de métricas favoráveis}}. Ignorar efeitos negativos não-intencionais. Projeto que só divulga o que vai bem não tem credibilidade com financiadores sérios.' },
                 ],
               },
               {
-                id: 'hibrida',
-                label: 'Organização Híbrida',
-                values: [
-                  'Sustentabilidade + impacto',
-                  'Parcial ou nenhuma',
-                  'Mercado + doações/grants',
-                  'Geekie (edtech para escolas públicas)',
-                  'Média — depende de mix de receita',
-                ],
+                kind: 'paragraph',
+                text: 'O cálculo do SROI em 5 passos: (1) identifique os stakeholders afetados; (2) mapeie as mudanças para cada grupo; (3) atribua valor monetário às mudanças (proxy financeiro); (4) deduza o deadweight — o que teria acontecido sem o projeto; (5) divida o valor social líquido pelo investimento total.',
               },
             ],
-            insight: 'A tendência global é convergência: empresas tradicionais incorporam impacto (ESG), e negócios sociais adotam práticas de mercado. O modelo "puro" de cada tipo está ficando raro.',
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Projeto com boa mensuração vs sem mensuração — o impacto pode ser idêntico, mas as consequências para financiamento são opostas. Compare — depois classifique cada prática.',
+              compare: {
+                columnHeaders: ['Transparência', 'Credibilidade', 'Acesso a capital'],
+                rows: [
+                  { label: 'Com mensuração robusta', values: ['Divulga resultados — bons e ruins', 'Alta — prova o que entrega', 'Preferencial para investidores de impacto'] },
+                  { label: 'Sem mensuração', values: ['Relata só histórias e intenções', 'Baixa — não comprova nada', 'Depende de doadores menos exigentes'] },
+                ],
+              },
+              drag: {
+                instruction: 'Prática de mensuração robusta ou problemática? Classifique:',
+                zones: [
+                  { id: 'robusta', label: 'Mensuração Robusta' },
+                  { id: 'problematica', label: 'Prática Problemática' },
+                ],
+                items: [
+                  { id: 'rob-1', label: 'ONG divulga relatório anual com taxa de empregabilidade dos formandos comparada ao grupo de controle', sublabel: 'Inclui os anos em que a taxa foi abaixo da meta — com análise das causas', correctZone: 'robusta', correctFeedback: 'Correto — mensuração robusta. Comparar com grupo de controle isola o impacto real. Divulgar anos negativos com análise é o padrão de credibilidade com financiadores sérios.', wrongFeedback: 'Repense. Grupo de controle + transparência sobre anos ruins = mensuração séria. Isso é o que separa projetos financiáveis por investidores de impacto dos que dependem de doadores menos exigentes.' },
+                  { id: 'prob-1', label: 'Projeto divulga 50 histórias de sucesso individuais mas não tem dado agregado de quantos participantes melhoraram de vida', sublabel: 'Relatório anual tem 40 páginas de fotos e depoimentos, sem nenhuma tabela de resultado', correctZone: 'problematica', correctFeedback: 'Correto — cherry-picking clássico. Histórias são poderosas, mas não substituem dados. Financiadores sérios pedem taxas de resultado, não seleção dos melhores casos.', wrongFeedback: 'Repense. Divulgar só histórias de sucesso sem dados agregados é cherry-picking. O que aconteceu com os outros 90% dos participantes? Mensuração robusta responde isso.' },
+                  { id: 'rob-2', label: 'SROI calculado com proxy financeiro documentado e dedução de 30% de deadweight', sublabel: 'Metodologia auditada pelo GIIN e publicada com código de acesso para verificação', correctZone: 'robusta', correctFeedback: 'Correto — SROI com deadweight e auditoria externa é o padrão internacional. Documentar a metodologia permite verificação independente — critério essencial para capital de impacto.', wrongFeedback: 'Repense. Calcular SROI com deadweight + auditoria externa + metodologia pública é o padrão mais robusto de mensuração. Poucos projetos chegam a esse nível — os que chegam acessam mais capital.' },
+                  { id: 'prob-2', label: 'Relatório de impacto menciona contribuição para 7 ODS diferentes sem nenhuma métrica específica para nenhum deles', sublabel: '"Nosso projeto impacta educação, saúde, igualdade, trabalho, redução de pobreza..."', correctZone: 'problematica', correctFeedback: 'Correto — ODS-washing. Conectar-se a muitos ODS sem métricas específicas é uma bandeira vermelha para investidores. Foque em 2-3 ODS com indicadores reais e acompanhamento documentado.', wrongFeedback: 'Repense. Vincular-se a 7 ODS sem nenhuma métrica específica não é mensuração — é marketing. Financiadores sérios pedem: qual ODS, qual indicador, qual baseline, qual resultado.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{O mercado de capital de impacto está crescendo — e cada vez mais seletivo}}. Fundos de impacto globais movimentam trilhões de dólares, mas exigem mensuração séria. Projetos que medem outcomes com rigor têm acesso a capital de qualidade. Os que não medem competem só por doações.',
+              keyInsights: [
+                'SROI > 3:1 é o benchmark mínimo para capital de impacto competitivo. Gerando Falcões reporta SROI de 6:1 — cada R$ 1 investido gera R$ 6 em valor social mensurável.',
+                '{{Deadweight é honestidade}}. Todo projeto tem impacto que teria acontecido sem ele. Quem não desconta o deadweight superestima o SROI e perde credibilidade com auditores.',
+                'Comece com 3 indicadores: 1 de output (o que entregamos), 1 de outcome (o que mudou) e 1 de contexto (o que aconteceria sem nós). Simples, mas suficiente para começar a provar valor.',
+              ],
+            },
           },
           {
-            id: 'M7-social-d1',
-            type: 'decision',
-            scenario: 'Você criou uma startup de educação que ensina programação para jovens de comunidades. O projeto atende 500 alunos gratuitamente. Um investidor oferece R$ 2 milhões, mas exige que 30% dos alunos paguem mensalidade para gerar receita. Isso excluiria os mais vulneráveis.',
-            options: [
-              { label: 'Aceitar o investimento e cobrar dos 30%', tradeoffs: { upside: 'Capital para escalar de 500 para 5.000 alunos', downside: 'Exclui justamente quem mais precisa. Missão comprometida.', risk: 'medium' } },
-              { label: 'Recusar e buscar grants/doações', tradeoffs: { upside: 'Mantém 100% gratuito, missão intacta', downside: 'Crescimento lento, depende de doadores', risk: 'medium' } },
-              { label: 'Negociar modelo híbrido: empresas patrocinam vagas', tradeoffs: { upside: 'Empresas pagam, alunos não. Win-win-win.', downside: 'Complexo de operar. Depende de parcerias corporativas.', risk: 'low' } },
+            id: 'M7-0-cap4',
+            type: 'chapter',
+            number: 4,
+            title: 'Escalando o Impacto — Financiamento e Dilemas Reais',
+            subtitle: 'O dilema "escala vs missão" é falso — quando você inova no modelo de financiamento.',
+            opening: {
+              leadText: 'O maior gargalo dos negócios de impacto não é falta de boas ideias — é falta de modelos financeiros que sustentem crescimento sem comprometer a missão. Escala sem sustentabilidade é crescimento falso. Sustentabilidade sem escala é impacto insuficiente.',
+            },
+            body: [
+              {
+                kind: 'step-flow',
+                title: 'Os 4 caminhos de financiamento para impacto social',
+                steps: [
+                  { number: 1, title: 'Doações e Grants', description: 'Fundações, editais públicos e doadores individuais. {{Vantagem: sem pressão de retorno financeiro}}. Desvantagem: instável, burocrático e com escala limitada ao tamanho da captação. Ideal para fase inicial e projetos sem modelo de receita viável.' },
+                  { number: 2, title: 'Investimento de Impacto', description: 'Capital que exige retorno financeiro E impacto social mensurável. {{Vantagem: escala rápida}}. Desvantagem: pressão de retorno pode distorcer missão se não estiver bem protegida em governança. Aceleradoras: SITAWI, Vox Capital, Mov Investimentos.' },
+                  { number: 3, title: 'Modelo Híbrido', description: 'Empresas patrocinam vagas, bolsas ou beneficiários em troca de impacto mensurável e associação de marca. {{Vantagem: terceiro paga pelo impacto}}. Exemplo: empresas de tecnologia financiam vagas em bootcamps para contratar talentos formados. Win-win-win.' },
+                  { number: 4, title: 'Receita de Mercado', description: 'O projeto se paga via venda de produtos/serviços. {{Vantagem: máxima independência e escalabilidade}}. Desvantagem: pode excluir os mais vulneráveis se o preço for barreira. Solução: modelo freemium, subsídio cruzado ou tiered pricing por capacidade de pagamento.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'O dilema clássico: investidor oferece capital mas exige que parte do público-alvo pague mensalidade. Isso excluiria os mais vulneráveis — exatamente quem o projeto nasceu para atender. Gerando Falcões resolveu esse dilema com o modelo híbrido: grandes empresas financiam programas sociais em troca de impacto mensurável. Escala sem cobrar do público-alvo.',
+              },
             ],
-            realWorldAnalog: 'Gerando Falcões usa modelo híbrido: grandes empresas financiam programas sociais em troca de impacto mensurável e associação de marca. Escala sem cobrar do público-alvo.',
-            lesson: 'O dilema "escala vs missão" é falso quando você inova no MODELO DE FINANCIAMENTO. A criatividade não é só no produto — é em como pagar por ele.',
-          },
-          {
-            id: 'M7-0-t2',
-            type: 'text',
-            title: 'Medindo Impacto Social: SROI e Métricas de Resultado',
-            body: 'Sem medir, não há como provar impacto — e sem provar, não há como escalar. A mensuração de impacto social é o equivalente ao DRE para negócios sociais.\n\n**SROI — Social Return on Investment:**\nConceito: para cada R$ 1 investido, quanto valor social é gerado?\n— SROI de 3:1 significa que cada real investido gera R$ 3 em valor social\n— Combina dados quantitativos (econômicos) com qualitativos (bem-estar, dignidade)\n\n**Cálculo simplificado:**\n1. Identificar stakeholders afetados\n2. Mapear mudanças (outcomes) para cada grupo\n3. Atribuir valor monetário às mudanças (proxy financeiro)\n4. Deduzir o que teria acontecido sem a intervenção (deadweight)\n5. Calcular: SROI = Valor Social Líquido ÷ Investimento Total\n\n**Outras Métricas de Impacto:**\n\n**IRIS+** (GIIN — Global Impact Investing Network)\n— Catálogo padronizado de métricas de impacto\n— 500+ indicadores organizados por tema (educação, saúde, meio ambiente, emprego)\n— Permite comparabilidade entre organizações\n\n**ODS como framework de impacto:**\n— Conectar suas métricas aos 17 Objetivos de Desenvolvimento Sustentável da ONU\n— Exemplo: programa de capacitação profissional → ODS 4 (educação), ODS 8 (trabalho), ODS 10 (redução de desigualdades)\n\n**Armadilhas da mensuração:**\n— Confundir outputs com outcomes (formar 100 pessoas ≠ 100 pessoas empregadas)\n— Não considerar deadweight (o que teria acontecido sem a intervenção)\n— Cherry-picking de métricas favoráveis\n— Ignorar efeitos negativos não-intencionais\n\nNa prática: Comece simples. Defina 3-5 indicadores-chave que conectam sua atividade ao resultado na vida das pessoas. Meça trimestralmente. Relate com transparência — inclusive fracassos.',
-          },
-          {
-            id: 'M7-social-nc1',
-            type: 'number-crunch',
-            title: 'Calculadora de SROI — Retorno Social sobre Investimento',
-            scenario: 'Calcule quanto valor social seu projeto gera para cada real investido. SROI > 1 significa que o projeto gera mais valor do que consome.',
-            inputs: [
-              { id: 'investimento', label: 'Investimento total no projeto', defaultValue: 100000, unit: 'R$', min: 1000, max: 10000000 },
-              { id: 'beneficiarios', label: 'Número de beneficiários diretos', defaultValue: 200, unit: 'pessoas', min: 1, max: 100000 },
-              { id: 'valorPessoa', label: 'Valor social gerado por pessoa (proxy)', defaultValue: 1500, unit: 'R$', min: 100, max: 50000 },
-              { id: 'deadweight', label: 'Deadweight — % que aconteceria sem o projeto', defaultValue: 20, unit: '%', min: 0, max: 80 },
-            ],
-            formula: '((beneficiarios * valorPessoa * (1 - deadweight / 100)) / investimento)',
-            resultLabel: 'SROI (valor social por R$ investido)',
-            interpretation: [
-              { max: 1, label: 'SROI < 1 — projeto consome mais do que gera. Reavalie.', color: 'red' },
-              { max: 3, label: 'SROI moderado — há espaço para otimizar impacto', color: 'amber' },
-              { max: 999, label: 'SROI forte — cada real gera múltiplos em valor social!', color: 'green' },
-            ],
-          },
-          {
-            id: 'M7-social-ex1',
-            type: 'inline-exercise',
-            prompt: 'Desenhe a Teoria da Mudança de um negócio de impacto social.',
-            context: 'Escolha um problema social brasileiro (educação, saúde, moradia, emprego, meio ambiente) e projete um negócio que o resolva de forma sustentável financeiramente.',
-            fields: [
-              { id: 'problema', label: 'Problema social escolhido (1 frase específica)', placeholder: 'Ex: 40% dos jovens de 18-24 anos em favelas de SP estão desempregados' },
-              { id: 'inputs', label: 'Recursos (inputs) — o que você investiria?', placeholder: 'Ex: R$ 200k, 5 instrutores, parceria com empresas de tecnologia...', multiline: true },
-              { id: 'atividades', label: 'Atividades — o que seu negócio faria?', placeholder: 'Ex: bootcamp de 3 meses em programação, mentoria individual, conexão com empresas...' },
-              { id: 'outcomes', label: 'Resultados (outcomes) — o que muda na vida das pessoas?', placeholder: 'Ex: 70% empregados em 6 meses, renda média de R$ 3.500/mês...', multiline: true },
-              { id: 'modelo', label: 'Como o negócio se sustenta financeiramente?', placeholder: 'Ex: empresas pagam fee por cada contratação, governo subsidia vagas...' },
-            ],
-            evaluationCriteria: [
-              'Problema é específico e mensurável (não genérico)',
-              'Teoria da Mudança conecta inputs → atividades → outputs → outcomes → impacto',
-              'Modelo financeiro é viável e não depende 100% de doações',
-              'Outcomes são mensuráveis e conectados ao problema original',
-            ],
-            expectedConcepts: ['teoria da mudança', 'negócio de impacto', 'SROI', 'outcomes vs outputs'],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Mesmas situações, modelos de financiamento diferentes — e consequências opostas para a missão. Compare — depois classifique cada dilema.',
+              compare: {
+                columnHeaders: ['Independência de missão', 'Velocidade de escala', 'Risco principal'],
+                rows: [
+                  { label: 'Doações/Grants', values: ['Alta — sem pressão de retorno', 'Baixa — limitada à captação', 'Dependência de doadores'] },
+                  { label: 'Investimento de Impacto', values: ['Média — governança define', 'Alta — capital alavanca crescimento', 'Distorção de missão por retorno'] },
+                  { label: 'Modelo Híbrido', values: ['Alta — terceiro paga', 'Média-alta — depende de parcerias', 'Complexidade operacional'] },
+                  { label: 'Receita de Mercado', values: ['Máxima — autossustentável', 'Alta — cresce com demanda', 'Exclusão dos mais vulneráveis'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual modelo de financiamento resolve melhor cada situação?',
+                zones: [
+                  { id: 'doacao', label: 'Doações / Grants' },
+                  { id: 'investimento', label: 'Investimento de Impacto' },
+                  { id: 'hibrido', label: 'Modelo Híbrido' },
+                  { id: 'mercado', label: 'Receita de Mercado' },
+                ],
+                items: [
+                  { id: 'fin-1', label: 'Projeto piloto de saneamento em comunidade remota sem capacidade de pagamento', sublabel: 'Objetivo: provar conceito e documentar impacto antes de escalar', correctZone: 'doacao', correctFeedback: 'Correto — Doações/Grants. Fase piloto sem público pagante e sem modelo de receita comprovado é exatamente onde grants e doações fazem sentido. O objetivo é aprender e provar, não lucrar.', wrongFeedback: 'Repense. Projeto piloto em comunidade sem capacidade de pagamento, em fase de prova de conceito, encaixa perfeitamente em financiamento via doações ou grants.' },
+                  { id: 'fin-2', label: 'Plataforma de telemedicina para áreas rurais com modelo de assinatura para prefeituras', sublabel: 'Já tem 5 prefeituras como clientes e quer expandir para 50 em 2 anos', correctZone: 'investimento', correctFeedback: 'Correto — Investimento de Impacto. Modelo de receita provado (prefeituras pagam), meta de escala ambiciosa e impacto social mensurável. Exatamente o perfil que fundos de impacto buscam financiar.', wrongFeedback: 'Repense. Receita provada via prefeituras + escala ambiciosa + impacto mensurável = perfil ideal para investimento de impacto. Grants seriam lentos demais para essa velocidade de crescimento.' },
+                  { id: 'fin-3', label: 'Bootcamp de tecnologia: empresas de TI pagam fee por acesso a talentos formados', sublabel: 'Jovens de comunidades estudam gratuitamente — as empresas cobrem os custos do programa', correctZone: 'hibrido', correctFeedback: 'Correto — Modelo Híbrido. Terceiro (empresas de TI) financia o impacto em troca de acesso a talentos. Jovens não pagam. É o modelo win-win-win que o Gerando Falcões popularizou no Brasil.', wrongFeedback: 'Repense. Empresas pagam para acessar talentos formados, jovens estudam de graça. Isso é modelo híbrido clássico: beneficiário não paga, terceiro interessado no impacto financia.' },
+                  { id: 'fin-4', label: 'Aplicativo de saúde mental com plano gratuito básico e plano premium para empresas e planos de saúde', sublabel: 'Receita B2B subsidia acesso gratuito para usuários de baixa renda', correctZone: 'mercado', correctFeedback: 'Correto — Receita de Mercado com subsídio cruzado. B2B paga mais, individual de baixa renda acessa gratuitamente. Modelo sustentável que não depende de doadores ou investidores de impacto.', wrongFeedback: 'Repense. Receita de empresas e planos de saúde (B2B) subsidia acesso gratuito para usuários de baixa renda. Isso é receita de mercado com subsídio cruzado — o modelo mais sustentável.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{O dilema "escala vs missão" é falso quando você inova no modelo de financiamento}}. A criatividade no negócio de impacto não é só no produto — é em como pagar por ele sem comprometer quem você nasceu para servir. Gerando Falcões prova que é possível crescer rápido sem cobrar do público mais vulnerável.',
+              keyInsights: [
+                'Modelo híbrido resolve o dilema clássico: quem tem capacidade de pagar (empresas) financia quem não tem (beneficiários). O impacto acontece, o beneficiário não paga, a empresa ganha acesso e associação de marca.',
+                '{{Subsídio cruzado é estratégia, não filantropia}}. Cobrar mais de quem pode pagar para subsidiar quem não pode é o modelo do Nubank, da Natura e de centenas de negócios de impacto pelo mundo.',
+                'Governança protege a missão quando chega o investidor. Antes de aceitar capital, defina por escrito: quais aspectos da missão são não-negociáveis independente de pressão financeira.',
+              ],
+            },
           },
         ],
+
       },
       {
         id: 'M7-1',
