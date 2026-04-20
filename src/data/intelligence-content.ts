@@ -7437,7 +7437,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
               ],
             },
           },
-
+        ],
       },
       {
         id: 'M5-2',
