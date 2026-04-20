@@ -9970,148 +9970,250 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Pesquisa Aplicada a Negocios',
         blocks: [
           {
-            id: 'M8-1-t1',
-            type: 'text',
-            title: 'Pesquisa Aplicada: Métodos para Decisão Empresarial',
-            body: 'Pesquisa aplicada a negócios usa métodos científicos para responder perguntas práticas do dia a dia empresarial. Diferente da pesquisa acadêmica (que busca conhecimento), a pesquisa aplicada busca solução.\n\n**Quando usar pesquisa no negócio?**\n— Antes de lançar um produto: o mercado quer isso?\n— Para entender churn: por que clientes estão saindo?\n— Para precificar: quanto o cliente pagaria?\n— Para expandir: qual região tem maior potencial?\n— Para inovar: quais dores não estão sendo atendidas?\n\n**Pesquisa Quantitativa:**\n— Dados numéricos, amostras grandes, análise estatística\n— Ferramentas: questionários (Google Forms, Typeform), analytics, A/B testing\n— Vantagem: generalizável, objetiva, comparável\n— Quando usar: validar hipóteses, medir satisfação, dimensionar mercado\n\n**Pesquisa Qualitativa:**\n— Dados descritivos, amostras pequenas, análise interpretativa\n— Ferramentas: entrevistas em profundidade, grupos focais, observação, etnografia\n— Vantagem: profundidade, nuance, descoberta de insights não óbvios\n— Quando usar: explorar motivações, entender comportamentos, gerar hipóteses\n\n**Métodos Mistos (Mixed Methods):**\n— Combinar quanti + quali para visão completa\n— Exemplo: pesquisa com 500 clientes (quanti) + 15 entrevistas em profundidade (quali)\n— O quanti diz O QUE acontece; o quali explica POR QUE acontece\n\n**Ferramentas práticas para gestores:**\n— NPS (Net Promoter Score): "de 0-10, recomendaria?" — simples e poderoso\n— Customer Discovery (Steve Blank): sair do escritório e conversar com 100 potenciais clientes\n— Design Thinking: empatizar → definir → idear → prototipar → testar\n— Jobs to Be Done: qual "trabalho" o cliente está "contratando" seu produto para fazer?\n\nNa prática: Não precisa de PhD para fazer pesquisa útil. 10 entrevistas de 30 minutos com clientes reais revelam mais do que qualquer relatório de mercado comprado.\n\nPergunta-chave: Quando foi a última vez que alguém da sua empresa conversou diretamente com um cliente insatisfeito para entender o porquê?',
-          },
-          {
-            id: 'M8-pesquisa-c1',
-            type: 'concept',
-            term: 'Pesquisa Quantitativa vs Qualitativa',
-            definition: 'Quantitativa usa números e amostras grandes para responder "O QUE" e "QUANTO" (ex: 73% dos clientes estão insatisfeitos). Qualitativa usa entrevistas e observação para responder "POR QUE" e "COMO" (ex: clientes saem porque o suporte demora 48h).',
-            example: 'NPS de 32 (quanti) diz que há problema. 15 entrevistas com detratores (quali) revelam que o problema é o prazo de entrega, não o produto. Sem o quali, você corrigiria a coisa errada.',
-            antiExample: 'Fazer pesquisa com 10 pessoas e generalizar para o mercado inteiro. Amostra pequena não é pesquisa quantitativa — é anedota com formulário.',
-          },
-          {
-            id: 'M8-pesquisa-d1',
-            type: 'decision',
-            scenario: 'Você quer lançar um novo produto (assinatura de snacks saudáveis). Tem R$ 15.000 e 30 dias para pesquisar. O que faz?',
-            options: [
-              { label: 'Pesquisa quantitativa — questionário online para 500 pessoas', tradeoffs: { upside: 'Dados robustos, generalizável, dimensiona mercado', downside: 'Não revela motivações profundas. Pessoas dizem que compram saudável mas compram Doritos.', risk: 'medium' } },
-              { label: 'Pesquisa qualitativa — 20 entrevistas em profundidade', tradeoffs: { upside: 'Entende POR QUE compraria, descobre dores ocultas', downside: 'Não dimensiona mercado. 20 pessoas podem ser atípicas.', risk: 'medium' } },
-              { label: 'Método misto — 10 entrevistas + questionário com 200 pessoas', tradeoffs: { upside: 'Entende o POR QUE (quali) e valida com O QUANTO (quanti)', downside: 'Menos profundidade em cada método. Mais trabalho em 30 dias.', risk: 'low' } },
-            ],
-            realWorldAnalog: 'Steve Blank (Customer Discovery): "Nenhum plano de negócio sobrevive ao primeiro contato com o cliente." As 10 primeiras entrevistas mudam tudo — inclusive o produto.',
-            lesson: 'Método misto é quase sempre a resposta certa. O quali gera as hipóteses, o quanti valida. Fazer só quanti é como atirar no escuro com mira laser — preciso, mas na direção errada.',
-          },
-          {
-            id: 'M8-pesquisa-ex1',
-            type: 'inline-exercise',
-            prompt: 'Desenhe uma pesquisa para resolver um problema real de negócio.',
-            context: 'Uma academia de bairro perdeu 30% dos alunos nos últimos 6 meses. O dono acha que é preço. Os professores acham que é concorrência. Ninguém perguntou aos alunos.',
-            fields: [
-              { id: 'hipoteses', label: 'Liste 3 hipóteses para a perda de alunos', placeholder: '1. Preço alto em relação aos concorrentes\n2. Horários inconvenientes\n3. ...', multiline: true },
-              { id: 'metodo', label: 'Qual método usaria? (Quanti, Quali ou Misto) Justifique.', placeholder: 'Método: ... Justificativa: ...', multiline: true },
-              { id: 'instrumento', label: 'Desenhe o instrumento — 5 perguntas que faria', placeholder: '1. Em escala de 0-10, quanto recomendaria a academia?\n2. O que mais motivou sua saída?\n3. ...', multiline: true },
-              { id: 'amostra', label: 'Para quem aplicaria e quantas pessoas?', placeholder: 'Ex: 50 ex-alunos que cancelaram + 30 alunos atuais para comparar' },
-            ],
-            evaluationCriteria: [
-              'Hipóteses vão além do óbvio (não só preço)',
-              'Método escolhido é justificado com lógica',
-              'Perguntas do instrumento são objetivas e acionáveis',
-              'Amostra inclui ex-alunos E alunos atuais para comparação',
-            ],
-            expectedConcepts: ['pesquisa quantitativa', 'pesquisa qualitativa', 'NPS', 'amostra', 'hipótese'],
-          },
-          {
-            id: 'M8-1-t2',
-            type: 'text',
-            title: 'Análise de Dados para Negócios: Do Excel ao BI',
-            body: 'A análise de dados é a competência mais valorizada do mercado atual. Não se trata de ser cientista de dados — trata-se de saber fazer as perguntas certas e interpretar as respostas.\n\n**4 Níveis de Análise de Dados:**\n\n**Descritiva** — O que aconteceu?\n— Dashboards, relatórios, KPIs\n— Ferramentas: Excel, Google Sheets, Power BI, Google Data Studio\n— Exemplo: "Vendas caíram 15% no último trimestre"\n\n**Diagnóstica** — Por que aconteceu?\n— Drill-down, correlações, análise de causa-raiz\n— Ferramentas: tabelas dinâmicas, filtros cruzados, segmentação\n— Exemplo: "Vendas caíram porque o produto X perdeu share para concorrente Y na região Sul"\n\n**Preditiva** — O que vai acontecer?\n— Modelos estatísticos, machine learning, séries temporais\n— Ferramentas: Python, R, AutoML, forecasting\n— Exemplo: "Com base na tendência, vendas cairão mais 8% se nenhuma ação for tomada"\n\n**Prescritiva** — O que devemos fazer?\n— Otimização, simulação, cenários\n— Ferramentas: solver, simulação Monte Carlo, árvores de decisão\n— Exemplo: "Recomendação: desconto de 10% no produto X + campanha focada na região Sul"\n\n**Métricas que todo negócio deveria acompanhar:**\n\n**Receita:**\n— MRR (Monthly Recurring Revenue): receita recorrente mensal\n— ARR (Annual Recurring Revenue): MRR × 12\n— Ticket Médio: receita ÷ número de vendas\n\n**Clientes:**\n— CAC (Custo de Aquisição): quanto custa trazer um novo cliente\n— LTV (Lifetime Value): quanto um cliente gera ao longo da relação\n— Churn Rate: % de clientes que cancelam por período\n— Regra de ouro: LTV > 3 × CAC\n\n**Operação:**\n— Margem de contribuição por produto/serviço\n— Ponto de equilíbrio atualizado mensalmente\n— Ciclo financeiro (prazo de recebimento – prazo de pagamento)\n\nIMPORTANTE: Dados sem ação são custo, não investimento. A pergunta não é "quais dados temos?" — é "quais decisões precisamos tomar e quais dados as informam?"',
-          },
-          {
-            id: 'M8-dados-cmp1',
-            type: 'compare',
-            title: '4 Níveis de Análise de Dados — Onde Sua Empresa Está?',
-            question: 'Cada nível adiciona mais valor à decisão. Qual nível sua empresa pratica hoje?',
-            dimensions: ['Pergunta', 'O que faz', 'Ferramentas', 'Complexidade', 'Valor para decisão'],
-            items: [
+            id: 'M8-1-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Quanti vs Quali — Escolha o Método Certo para Cada Pergunta',
+            subtitle: 'Pesquisa quantitativa diz O QUE e QUANTO. Qualitativa diz POR QUÊ. Usar o método errado é mais prejudicial do que não pesquisar — gera falsa certeza.',
+            opening: {
+              leadText: 'Steve Blank ficou famoso por uma frase: "Nenhum plano de negócio sobrevive ao primeiro contato com o cliente." Empresas quebram não por falta de pesquisa — mas por usar o método errado e tomar a resposta como verdade. Pesquisa com 10 pessoas não é quantitativa. Focus group não valida demanda. Cada método tem uma pergunta para a qual é a resposta certa — e perguntas para as quais é a resposta errada.',
+            },
+            body: [
               {
-                id: 'descritiva',
-                label: 'Descritiva',
-                values: [
-                  'O que aconteceu?',
-                  'Dashboards e relatórios',
-                  'Excel, Power BI, Google Sheets',
-                  'Baixa',
-                  'Base — sem isso não há nada',
+                kind: 'pillar-grid',
+                title: 'Os 4 métodos de pesquisa aplicada e quando usar cada um',
+                pillars: [
+                  { icon: '📊', title: 'Pesquisa Quantitativa', description: 'Usa {{números e amostras grandes}} para responder "O QUE" e "QUANTO". Questionários, NPS, surveys com 100+ respondentes. Gera dados generalizáveis e estatisticamente válidos. Use quando já tem hipóteses e quer validar com escala.' },
+                  { icon: '🎙️', title: 'Pesquisa Qualitativa', description: '{{Entrevistas em profundidade, observação, grupos focais}}. Responde "POR QUÊ" e "COMO". Amostra pequena (10-30 pessoas) com análise interpretativa. Use quando não sabe ainda o que está causando o problema — ou quando os números dizem o quê mas não o porquê.' },
+                  { icon: '🔀', title: 'Método Misto', description: '{{Combina quali + quanti}} em sequência estratégica. O quali gera as hipóteses; o quanti valida em escala. É o método mais robusto para decisões importantes — e o mais subestimado. 10 entrevistas + 200 questionários superam 500 questionários sozinhos.' },
+                  { icon: '🧪', title: 'Pesquisa Experimental (A/B Test)', description: '{{Testa uma variável de cada vez com grupos de controle}}. Elimina viés de opinião — mede comportamento real, não intenção declarada. Padrão em digital (e-commerce, apps). "Pessoas dizem que preferem X; quando testamos, escolhem Y" é a lição mais cara do marketing.' },
                 ],
               },
               {
-                id: 'diagnostica',
-                label: 'Diagnóstica',
-                values: [
-                  'Por que aconteceu?',
-                  'Drill-down, correlações',
-                  'Tabelas dinâmicas, filtros cruzados',
-                  'Média',
-                  'Explica causas — evita repetir erros',
+                kind: 'paragraph',
+                text: 'O erro mais caro: confundir intenção declarada com comportamento real. Em pesquisa qualitativa, 90% das pessoas dizem que pagariam por produto sustentável. No teste real, 15% pagam. Focus group é excelente para entender motivações — péssimo para prever demanda. Pesquisa experimental (A/B test) mede o que as pessoas fazem, não o que dizem que fariam.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare os 4 métodos em dimensões críticas — depois escolha o método correto para cada situação.',
+              compare: {
+                columnHeaders: ['Responde', 'Amostra', 'Maior risco'],
+                rows: [
+                  { label: 'Quantitativa', values: ['O quê? Quanto?', '100+ respondentes', 'Generalizar sem entender o porquê'] },
+                  { label: 'Qualitativa', values: ['Por quê? Como?', '10-30 pessoas', 'Amostra pequena não representa o mercado'] },
+                  { label: 'Misto', values: ['O quê + por quê', 'Ambas combinadas', 'Custo e tempo maiores'] },
+                  { label: 'Experimental', values: ['O que as pessoas fazem (não dizem)', 'Dois grupos controlados', 'Só testa 1 variável por vez'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual método de pesquisa é mais adequado para cada situação?',
+                zones: [
+                  { id: 'quantitativa', label: 'Quantitativa' },
+                  { id: 'qualitativa', label: 'Qualitativa' },
+                  { id: 'misto', label: 'Misto' },
+                  { id: 'experimental', label: 'Experimental (A/B)' },
+                ],
+                items: [
+                  { id: 'met-1', label: 'E-commerce quer saber se mudar o botão "Comprar" de verde para laranja aumenta a taxa de conversão', sublabel: 'Já têm 50.000 visitas/mês — volume suficiente para teste', correctZone: 'experimental', correctFeedback: 'Correto — Experimental (A/B). Testar uma variável isolada (cor do botão) com grupos de controle em escala é exatamente o que o A/B test resolve. Perguntar em survey "você prefere botão verde ou laranja?" seria inútil — o comportamento real diverge da opinião declarada.', wrongFeedback: 'Repense. O objetivo é medir comportamento real (clique) não opinião. A empresa tem volume suficiente para dividir o tráfego em dois grupos. Qual método mede o que as pessoas fazem — não o que dizem que fariam?' },
+                  { id: 'met-2', label: 'Startup quer entender por que 40% dos usuários abandonam o app após o onboarding — analytics mostra O QUÊ mas não o motivo', sublabel: 'Precisam entender as barreiras antes de redesenhar o fluxo', correctZone: 'qualitativa', correctFeedback: 'Correto — Qualitativa. O problema já foi identificado quantitativamente (40% abandono). O próximo passo é entender POR QUÊ — o que exige entrevistas em profundidade com usuários que abandonaram. 10-15 entrevistas revelarão padrões que o analytics não mostra.', wrongFeedback: 'Repense. A empresa já tem o dado quantitativo (40% abandono). O que falta é entender o motivo. Qual método é projetado para responder "por que" através de conversas aprofundadas com os usuários?' },
+                  { id: 'met-3', label: 'Rede de academias quer saber em qual das 5 cidades brasileiras tem maior potencial de expansão e qual perfil demográfico é o público-alvo', sublabel: 'Decisão de investimento de R$ 2M — precisam de dados robustos e generalizáveis', correctZone: 'quantitativa', correctFeedback: 'Correto — Quantitativa. Para decisão de R$ 2M de expansão, precisam de dados estatisticamente válidos e generalizáveis: tamanho de mercado, perfil demográfico, renda, concorrência. Questionário com amostras representativas em cada cidade é o método adequado.', wrongFeedback: 'Repense. A decisão envolve comparar 5 cidades com dados objetivos (tamanho de mercado, perfil demográfico, potencial de receita). Qual método gera dados estatisticamente confiáveis e comparáveis entre mercados?' },
+                  { id: 'met-4', label: 'Empresa de SaaS B2B quer lançar nova funcionalidade. NPS atual é 42 e sabe que clientes estão insatisfeitos — mas não sabe com o quê nem o que desenvolveria mais valor', sublabel: 'Tem R$ 20k e 45 dias para pesquisar antes da decisão de roadmap', correctZone: 'misto', correctFeedback: 'Correto — Misto. Com NPS de 42, já tem o sinal quantitativo (há problema). O próximo passo: 10-15 entrevistas qualitativas com clientes insatisfeitos para entender o porquê, depois survey quantitativo para validar quais problemas são mais comuns. O quali gera hipóteses; o quanti prioriza.', wrongFeedback: 'Repense. A empresa já tem um dado quantitativo (NPS 42) mas não sabe o motivo. Precisa primeiro entender o porquê (quali) e depois validar em escala (quanti). Qual método combina os dois em sequência estratégica?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{Pesquisa ruim é mais perigosa que nenhuma pesquisa}}. Ela gera certeza falsa. A empresa que pesquisa 10 amigos e conclui que há mercado, ou que faz focus group e projeta demanda — está tomando decisão de risco com sensação de segurança. Método correto primeiro, dados depois.',
+              keyInsights: [
+                'A sequência correta: quali (entende o problema) → quanti (valida a escala) → experimental (testa a solução). Pular etapas economiza tempo no curto prazo e cria erros caros no médio.',
+                '{{Intenção declarada ≠ comportamento real}}. Esse é o viés mais caro da pesquisa de mercado. As pessoas dizem o que acham que deveriam dizer — ou o que imaginam que fariam. O A/B test e a observação revelam o que realmente fazem.',
+                'Amostra importa mais que tamanho. 20 entrevistas com o público correto superam 500 questionários com o público errado. A questão não é quantos responderam — é se os que responderam representam quem você precisa entender.',
+              ],
+            },
+          },
+          {
+            id: 'M8-1-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Desenhando Pesquisa de Qualidade — Do Problema à Conclusão',
+            subtitle: 'Uma pesquisa mal desenhada produz dados que confirmam o que você já acredita. Cinco etapas para construir pesquisa que revela o que você precisa saber — não o que quer ouvir.',
+            opening: {
+              leadText: 'Uma academia perdeu 30% dos alunos em 6 meses. O dono estava certo que era preço. Os professores achavam que era qualidade. Sem pesquisa estruturada, cada um teria "provado" sua hipótese com os dados que escolheu coletar. Com pesquisa correta: 60% dos ex-alunos citaram horários incompatíveis com nova rotina de trabalho híbrido — algo ninguém havia considerado.',
+            },
+            body: [
+              {
+                kind: 'step-flow',
+                title: 'As 5 etapas de uma pesquisa aplicada rigorosa',
+                steps: [
+                  { number: 1, title: 'Defina a pergunta de pesquisa', description: '{{Uma pergunta clara e específica}} que a pesquisa deve responder. Errado: "entender melhor os clientes". Certo: "Por que 30% dos alunos cancelaram nos últimos 6 meses — e o que os manteria?" A pergunta de pesquisa define tudo que vem depois.' },
+                  { number: 2, title: 'Formule hipóteses testáveis', description: '{{Liste suas hipóteses antes de pesquisar}} — isso evita que você "encontre" o que já acreditava. "H1: preço é o principal motivo. H2: distância é relevante. H3: mudança de rotina impacta." Boas hipóteses são falsificáveis: pode ser provado que estão erradas.' },
+                  { number: 3, title: 'Escolha o método e a amostra', description: '{{Método (quanti/quali/misto) e quem pesquisar}}. Quem cancelou? Quem ficou? Quem nunca assinou? Cada grupo responde uma parte da pergunta. Amostra sem critério gera dados sem validade.' },
+                  { number: 4, title: 'Desenhe o instrumento sem viés', description: '{{Perguntas neutras que não induzem resposta}}. Errado: "Você não acha o preço caro?" (induz). Certo: "Como você avalia o custo-benefício em uma escala de 0 a 10?". Pergunta fechada dá dado; pergunta aberta dá contexto.' },
+                  { number: 5, title: 'Analise e aja com os dados', description: 'Dados sem ação são custo. {{Cada insight deve gerar uma decisão ou hipótese para próximo ciclo}}. "60% citaram horários → testar turma às 12h e 21h → medir adesão em 30 dias." Esse é o PDCA da pesquisa.' },
                 ],
               },
               {
-                id: 'preditiva',
-                label: 'Preditiva',
-                values: [
-                  'O que vai acontecer?',
-                  'Modelos, machine learning',
-                  'Python, R, AutoML',
-                  'Alta',
-                  'Antecipa problemas e oportunidades',
+                kind: 'paragraph',
+                text: 'O maior erro no design de pesquisa: perguntar o que confirma a hipótese favorita. Se você já decidiu que o problema é preço, as perguntas que você escreve tendem a revelar problemas de preço. Hipóteses explícitas escritas antes da pesquisa são o principal antídoto contra esse viés — elas te forçam a testar o que acredita, não só a confirmar.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare perguntas bem e mal desenhadas — depois classifique se cada pergunta é adequada ou problemática.',
+              compare: {
+                columnHeaders: ['Problema', 'Pergunta com viés', 'Pergunta neutra'],
+                rows: [
+                  { label: 'Preço', values: ['"O preço não é muito alto?"', '"Como você avalia o custo-benefício? (0=péssimo, 10=ótimo)"'] },
+                  { label: 'Atendimento', values: ['"Você ficou insatisfeito com o atendimento?"', '"Descreva sua experiência mais recente com nossa equipe"'] },
+                  { label: 'Cancelamento', values: ['"Você cancelou por preço?"', '"Qual foi o principal motivo do cancelamento? (lista sem sugestão prioritária)"'] },
+                ],
+              },
+              drag: {
+                instruction: 'Esta pergunta de pesquisa é adequada (neutra, acionável) ou problemática (com viés ou vaga)?',
+                zones: [
+                  { id: 'adequada', label: 'Adequada' },
+                  { id: 'problematica', label: 'Problemática' },
+                ],
+                items: [
+                  { id: 'perg-1', label: '"Em uma escala de 0 a 10, qual a probabilidade de você recomendar nosso produto para um amigo ou colega?"', sublabel: 'Seguida de: "O que motivou sua nota?"', correctZone: 'adequada', correctFeedback: 'Correto — Adequada. É a metodologia NPS clássica: pergunta quantitativa (0-10) + qualitativa (motivação). É neutra, padronizada, comparável ao longo do tempo e gera tanto dado quanto contexto. A pergunta de follow-up abre o porquê sem induzir resposta.', wrongFeedback: 'Repense. Essa pergunta é o padrão NPS: escala numérica neutra (0-10) seguida de pergunta aberta sem sugestão de resposta. Ela induz alguma resposta específica? Gera dado comparável ao longo do tempo?' },
+                  { id: 'perg-2', label: '"Você concorda que nosso produto é melhor do que os concorrentes?"', sublabel: 'Com opções de resposta: Concordo totalmente / Concordo / Neutro', correctZone: 'problematica', correctFeedback: 'Correto — Problemática. Dois vieses simultâneos: (1) pergunta induz concordância ("você concorda que..."), (2) opções não incluem discordância — "Discordo" e "Discordo totalmente" estão ausentes. O resultado será artificialmente positivo e não confiável para decisão.', wrongFeedback: 'Repense. Observe dois problemas: a pergunta começa com "você concorda que" (induz concordância) e as opções de resposta não incluem discordância. Um dado coletado assim pode ser usado para decisão de negócio?' },
+                  { id: 'perg-3', label: '"Quais são os 3 principais fatores que influenciam sua decisão de compra nessa categoria?" (pergunta aberta, sem sugestão de fatores)', sublabel: 'Aplicada em entrevista qualitativa, antes de mostrar qualquer produto', correctZone: 'adequada', correctFeedback: 'Correto — Adequada. Pergunta aberta sem sugestão de resposta, aplicada antes de qualquer contato com o produto (evita ancoragem). Revela o que o cliente realmente valoriza — não o que a empresa quer ouvir que ele valoriza. Excelente para pesquisa exploratória.', wrongFeedback: 'Repense. A pergunta é aberta (não induz resposta), sem lista de opções (o cliente articula o que importa para ele) e aplicada antes de qualquer contato com o produto. Onde está o viés?' },
+                  { id: 'perg-4', label: '"Você já considerou que nossos horários podem ser mais convenientes do que você imagina?"', sublabel: 'Pergunta feita para ex-alunos que cancelaram a academia', correctZone: 'problematica', correctFeedback: 'Correto — Problemática. É uma pergunta de marketing disfarçada de pesquisa. "Você já considerou que X pode ser Y do que você imagina?" pressupõe que o cliente estava errado e induz reconsideração. Não é pesquisa — é argumentação. Os dados gerados serão inúteis para entender por que cancelaram.', wrongFeedback: 'Repense. Essa pergunta pressupõe que a resposta do cliente ("horários inconvenientes") estava errada e tenta convencê-lo de que estava enganado. Isso é pesquisar a realidade do cliente ou defender uma posição?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{Pesquisa que confirma o que você já acredita não é pesquisa — é validação de viés}}. O valor real da pesquisa está em revelar o que você não sabe e potencialmente não quer saber. Hipóteses escritas antes da coleta e perguntas neutras são os dois principais antídotos contra pesquisa que confirma em vez de investigar.',
+              keyInsights: [
+                'Escreva as hipóteses antes de escrever as perguntas. Se você escrever as perguntas primeiro, elas já estarão enviesadas pelo que você acredita. A hipótese explícita te força a testar — não a confirmar.',
+                '{{Pergunta de pesquisa ≠ pergunta de instrumento}}. "Por que alunos cancelam?" é a pergunta de pesquisa. "Qual foi o principal motivo do cancelamento?" é a pergunta do instrumento. Confundir as duas gera pesquisa que responde a si mesma.',
+                'Inclua na amostra quem você menos quer ouvir. Ex-clientes, detratores, quem recusou comprar. São eles que revelam o que precisa mudar — não os fãs que já compraram.',
+              ],
+            },
+          },
+          {
+            id: 'M8-1-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Os 4 Níveis de Análise de Dados — Onde Sua Empresa Está?',
+            subtitle: 'Descritiva, diagnóstica, preditiva e prescritiva: cada nível adiciona mais valor à decisão. A maioria das empresas brasileiras está presa no primeiro nível — e chama isso de "análise de dados".',
+            opening: {
+              leadText: 'Um dashboard bonito com gráficos de vendas é análise descritiva: diz o que aconteceu. Mas não diz por que aconteceu, o que vai acontecer ou o que fazer. A diferença entre uma empresa que usa dados para otimizar e uma que usa dados para reportar é de três níveis — e cada nível adiciona valor exponencialmente maior à decisão.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Os 4 níveis de análise de dados e o valor que cada um gera',
+                pillars: [
+                  { icon: '📋', title: 'Descritiva — O que aconteceu?', description: 'Dashboards e relatórios. {{A base sem a qual nada funciona}}. Excel, Power BI, Google Data Studio. Fácil de implementar, baixo valor isolado — mas pré-requisito para todos os outros níveis. A maioria das empresas fica aqui e pensa que está "usando dados".' },
+                  { icon: '🔍', title: 'Diagnóstica — Por que aconteceu?', description: 'Drill-down, correlações, análise de causa. {{Explica os eventos do nível descritivo}}. "Vendas caíram 20% em março" → descritiva. "Porque o churn aumentou em clientes com menos de 3 meses de uso" → diagnóstica. Tabelas dinâmicas e filtros cruzados são as ferramentas.' },
+                  { icon: '🔮', title: 'Preditiva — O que vai acontecer?', description: 'Modelos estatísticos e machine learning que {{antecipam eventos futuros com base em padrões históricos}}. "Esses 200 clientes têm 73% de probabilidade de cancelar nos próximos 30 dias." Python, R, ferramentas de AutoML. Alto valor — alto custo de implementação.' },
+                  { icon: '⚙️', title: 'Prescritiva — O que devemos fazer?', description: '{{Recomenda ações específicas}} com base nas análises anteriores. "Ofereça desconto de 20% para esses 200 clientes de alto risco esta semana — simulação indica que salva 60% deles." Otimização, simulação, IA generativa. Máximo valor — requer os 3 níveis anteriores funcionando.'},
                 ],
               },
               {
-                id: 'prescritiva',
-                label: 'Prescritiva',
-                values: [
-                  'O que devemos fazer?',
-                  'Otimização, simulação',
-                  'Solver, Monte Carlo, IA',
-                  'Muito alta',
-                  'Máximo — recomenda ações concretas',
-                ],
+                kind: 'paragraph',
+                text: 'A sequência é obrigatória: você não pula níveis. Não há preditiva sem descritiva confiável. Não há prescritiva sem diagnóstica sólida. Empresas que tentam implementar machine learning sem dados históricos limpos e sem entender o porquê dos eventos estão construindo sobre areia. O diagnóstico correto do nível atual evita investimento no nível errado.',
               },
             ],
-            insight: 'A maioria das empresas brasileiras está presa no nível descritivo — gera relatórios bonitos mas não sabe explicar POR QUE as coisas acontecem. O salto de descritiva para diagnóstica já transforma decisões.',
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare os 4 níveis em dimensões práticas — depois classifique em qual nível cada situação opera.',
+              compare: {
+                columnHeaders: ['Nível', 'Pergunta', 'Ferramenta típica', 'Valor para decisão'],
+                rows: [
+                  { label: 'Descritiva', values: ['O que aconteceu?', 'Excel, Power BI', 'Base — sem ela não há nada'] },
+                  { label: 'Diagnóstica', values: ['Por que aconteceu?', 'Tabelas dinâmicas, filtros cruzados', 'Evita repetir erros'] },
+                  { label: 'Preditiva', values: ['O que vai acontecer?', 'Python, R, AutoML', 'Antecipa problemas'] },
+                  { label: 'Prescritiva', values: ['O que devemos fazer?', 'Otimização, IA', 'Máximo — recomenda ação'] },
+                ],
+              },
+              drag: {
+                instruction: 'Em qual nível de análise de dados cada situação se enquadra?',
+                zones: [
+                  { id: 'descritiva', label: 'Descritiva' },
+                  { id: 'diagnostica', label: 'Diagnóstica' },
+                  { id: 'preditiva', label: 'Preditiva' },
+                  { id: 'prescritiva', label: 'Prescritiva' },
+                ],
+                items: [
+                  { id: 'nivel-1', label: 'Relatório mensal que mostra: receita total R$ 2,3M, 1.847 clientes ativos, ticket médio R$ 245, top 10 produtos por volume', sublabel: 'Distribuído toda primeira segunda-feira do mês para a diretoria', correctZone: 'descritiva', correctFeedback: 'Correto — Descritiva. O relatório mostra O QUE aconteceu: números de receita, clientes e produto. Não explica por que esses números são o que são, não projeta o futuro e não recomenda ação. É o nível 1 — indispensável, mas isolado, tem valor limitado para decisão.', wrongFeedback: 'Repense. O relatório responde: "o que aconteceu neste mês?" — receita, clientes, ticket médio. Ele explica por que esses números são esses? Prevê o que vai acontecer? Recomenda alguma ação? Qual nível responde "o que aconteceu?"' },
+                  { id: 'nivel-2', label: 'Sistema identifica automaticamente os 150 clientes com maior probabilidade de cancelar no próximo mês com base em padrão de uso, frequência de login e histórico de tickets abertos', sublabel: 'Score de risco de 0-100 atualizado diariamente para cada conta', correctZone: 'preditiva', correctFeedback: 'Correto — Preditiva. O sistema usa padrões históricos para prever um evento futuro (cancelamento) antes que aconteça. Isso é machine learning aplicado a dados comportamentais — o nível 3. A predição ainda não diz o que fazer (isso seria prescritiva), mas antecipa o problema.', wrongFeedback: 'Repense. O sistema está prevendo um evento futuro (cancelamento) que ainda não aconteceu, com base em padrões do passado. Não está reportando o passado nem recomendando ação específica. Qual nível responde "o que vai acontecer?"' },
+                  { id: 'nivel-3', label: 'Análise cruzando os 150 cancelamentos do trimestre com dados de onboarding revelou: 78% não tinham completado os 3 primeiros módulos de configuração nos primeiros 14 dias', sublabel: 'Correlação negativa entre conclusão de onboarding e churn confirmada com p<0,05', correctZone: 'diagnostica', correctFeedback: 'Correto — Diagnóstica. A análise não reporta apenas o cancelamento (descritiva) — ela explica POR QUÊ ele ocorreu: clientes que não completam o onboarding inicial têm muito maior probabilidade de cancelar. Isso é drill-down com correlação — o nível 2 em ação.', wrongFeedback: 'Repense. A análise está respondendo: "por que esses 150 clientes cancelaram?" — encontrou um padrão explicativo (onboarding incompleto) com validação estatística. Isso é reportar o que aconteceu ou explicar por que aconteceu?' },
+                  { id: 'nivel-4', label: 'Após identificar os 150 clientes de alto risco, o sistema recomenda: "contate os 40 com ticket >R$800/mês com oferta de onboarding dedicado gratuito — simulação indica ROI de 4,2x; ignore os 110 restantes com ticket <R$200"', sublabel: 'Recomendação baseada em modelo de custo-benefício de retenção vs. LTV por segmento', correctZone: 'prescritiva', correctFeedback: 'Correto — Prescritiva. O sistema vai além de identificar o risco (preditiva) — ele recomenda a ação específica (qual segmento contatar, com qual oferta) e estima o ROI da intervenção. Isso é o nível 4: dados guiando a decisão, não apenas informando.', wrongFeedback: 'Repense. O sistema identificou os clientes de risco (preditiva) — mas essa situação vai além: ele recomenda uma ação específica para um segmento específico com estimativa de retorno. Qual nível transforma análise em recomendação de ação concreta?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{A maioria das empresas investe em BI e recebe relatórios mais bonitos do mesmo nível descritivo}}. O salto de valor está na progressão: descritiva → diagnóstica → preditiva → prescritiva. Cada nível requer o anterior funcionando bem. Antes de contratar cientista de dados, certifique-se que os dados do nível 1 são confiáveis.',
+              keyInsights: [
+                'Dado sem decisão é custo. Para cada análise produzida, exija: "qual decisão isso habilita?" Se a resposta for "nenhuma — é só informação", o nível ainda é descritivo independente da complexidade do modelo.',
+                '{{O gargalo mais comum é a qualidade dos dados básicos}}. Machine learning treinado em dados inconsistentes gera predições piores que intuição humana. Antes de subir de nível, limpe e valide os dados do nível atual.',
+                'Diagnóstica é o nível de maior ROI para a maioria das empresas brasileiras. A passagem de "vendas caíram" para "vendas caíram porque X" já habilita decisões muito melhores — sem precisar de Python ou IA.',
+              ],
+            },
           },
           {
-            id: 'M8-dados-nc1',
-            type: 'number-crunch',
-            title: 'Calculadora de LTV vs CAC — Saúde do Negócio',
-            scenario: 'A regra de ouro é LTV > 3x CAC. Se o custo de adquirir um cliente é maior que o valor que ele gera, o negócio está queimando dinheiro.',
-            inputs: [
-              { id: 'ticketMedio', label: 'Ticket médio mensal', defaultValue: 200, unit: 'R$', min: 10, max: 50000 },
-              { id: 'mesesRetencao', label: 'Meses médios de retenção', defaultValue: 18, unit: 'meses', min: 1, max: 120 },
-              { id: 'margemBruta', label: 'Margem bruta (%)', defaultValue: 60, unit: '%', min: 5, max: 95 },
-              { id: 'cac', label: 'Custo de Aquisição (CAC)', defaultValue: 500, unit: 'R$', min: 10, max: 50000 },
+            id: 'M8-1-cap4',
+            type: 'chapter',
+            number: 4,
+            title: 'LTV, CAC e Churn — As 3 Métricas que Definem a Saúde do Negócio',
+            subtitle: 'Um negócio saudável tem LTV > 3× CAC e churn abaixo de 3% ao mês. Fora desses parâmetros, crescimento é aceleração para o buraco. Entenda por que e como calcular.',
+            opening: {
+              leadText: 'Uma startup cresceu 40% ao mês por 18 meses e faliu. Cada novo cliente custava R$ 800 para adquirir (CAC) e gerava R$ 600 em receita antes de cancelar (LTV). Quanto mais crescia, mais dinheiro perdia. A regra de ouro: LTV deve ser pelo menos 3× o CAC. Abaixo disso, crescimento é um problema — não uma solução.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'As 3 métricas essenciais de saúde do negócio e o que revelam',
+                pillars: [
+                  { icon: '💰', title: 'LTV — Lifetime Value', description: '{{Receita total que um cliente gera durante todo o relacionamento}}. LTV = Ticket Médio × Meses de Retenção × Margem Bruta. Se um cliente paga R$ 200/mês, fica 18 meses e sua margem é 60%: LTV = 200 × 18 × 0,60 = R$ 2.160. É o teto do quanto você pode gastar para adquiri-lo.' },
+                  { icon: '🎯', title: 'CAC — Custo de Aquisição de Cliente', description: '{{Quanto custa trazer um novo cliente}}. CAC = Total gasto em vendas e marketing ÷ Novos clientes no período. Se gastou R$ 50.000 em marketing e conquistou 100 clientes: CAC = R$ 500. A regra: LTV deve ser >3× CAC. Se LTV = R$ 2.160 e CAC = R$ 500: ratio = 4,3× — saudável.' },
+                  { icon: '🚪', title: 'Churn Rate — Taxa de Cancelamento', description: '{{Percentual de clientes que cancela a cada mês}}. Churn de 5%/mês parece pequeno — mas significa perder metade da base em 14 meses. Churn de 2% ao mês dobra o tempo de retenção. {{Reduzir churn de 5% para 3% tem mais impacto no LTV do que qualquer ação de marketing}}.' },
+                  { icon: '📈', title: 'MRR — Receita Recorrente Mensal', description: '{{Receita previsível que o negócio gera mensalmente}}. MRR = Número de clientes × Ticket médio. MRR crescente com churn controlado = negócio saudável. MRR crescendo com churn acelerado = balde furado — você está enchendo e esvaziando ao mesmo tempo.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A matemática do churn é contraintuitiva: churn de 8% ao mês parece manejável. Mas significa: em 1 mês, perde 8% da base. Em 3 meses, perdeu ~23%. Em 6 meses, perdeu ~40%. Em 12 meses, quase 63% da base que existia no início foi substituída. Se a aquisição não supera esse ritmo, a empresa está encolhendo enquanto parece ocupada. A alternativa correta: atacar o churn antes de escalar aquisição.',
+              },
             ],
-            formula: '((ticketMedio * mesesRetencao * margemBruta / 100) / cac)',
-            resultLabel: 'Ratio LTV/CAC',
-            interpretation: [
-              { max: 1, label: 'Crítico — você paga mais para adquirir do que o cliente gera', color: 'red' },
-              { max: 3, label: 'Atenção — ratio abaixo do ideal (meta: >3x)', color: 'amber' },
-              { max: 999, label: 'Saudável — LTV supera 3x o CAC. Escale com confiança!', color: 'green' },
-            ],
-          },
-          {
-            id: 'M8-dados-ex1',
-            type: 'inline-exercise',
-            prompt: 'Defina o painel de métricas essenciais para um negócio real.',
-            context: 'Imagine que você acabou de assumir como gestor de uma loja online de moda feminina com 2.000 clientes ativos, ticket médio de R$ 180, e churn de 8% ao mês. O CEO quer um dashboard com as métricas mais importantes.',
-            fields: [
-              { id: 'metricas-receita', label: 'Métricas de Receita — quais 3 você acompanharia?', placeholder: 'Ex: MRR, ticket médio, taxa de recompra...', multiline: true },
-              { id: 'metricas-cliente', label: 'Métricas de Cliente — quais 3 são prioritárias?', placeholder: 'Ex: CAC, LTV, churn rate...', multiline: true },
-              { id: 'acao-churn', label: 'Churn de 8%/mês é grave? Que ação você tomaria primeiro?', placeholder: 'Calcule: quantos clientes perde por mês? Em quanto tempo perde metade da base?', multiline: true },
-            ],
-            evaluationCriteria: [
-              'Escolheu métricas relevantes e justificou por que cada uma importa',
-              'Calculou impacto do churn: 8% de 2.000 = 160 clientes/mês perdidos',
-              'Identificou que sem aquisição, a base cai pela metade em ~8 meses',
-              'Propôs ação concreta para reduzir churn (não genérica)',
-            ],
-            expectedConcepts: ['LTV', 'CAC', 'churn rate', 'MRR', 'análise de dados'],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare situações de negócios com diferentes combinações de LTV, CAC e churn — depois classifique a saúde de cada empresa.',
+              compare: {
+                columnHeaders: ['Métrica', 'Negócio saudável', 'Negócio em risco'],
+                rows: [
+                  { label: 'LTV/CAC ratio', values: ['>3× (ex: LTV R$3.000, CAC R$800)', '<1× (LTV menor que o custo de aquisição)'] },
+                  { label: 'Churn mensal', values: ['<2% — retenção alta, LTV alto', '>5% — cliente médio dura menos de 20 meses'] },
+                  { label: 'MRR', values: ['Crescendo + churn controlado', 'Crescendo + churn acelerando (balde furado)'] },
+                ],
+              },
+              drag: {
+                instruction: 'Com base nas métricas, esta empresa está saudável ou em situação crítica?',
+                zones: [
+                  { id: 'saudavel', label: 'Saudável' },
+                  { id: 'critica', label: 'Situação Crítica' },
+                ],
+                items: [
+                  { id: 'ltv-1', label: 'SaaS B2B: ticket médio R$ 1.500/mês, retenção média 24 meses, margem 70%, CAC R$ 8.000', sublabel: 'LTV = 1.500 × 24 × 0,70 = R$ 25.200 | Ratio LTV/CAC = 25.200 / 8.000 = 3,15×', correctZone: 'saudavel', correctFeedback: 'Correto — Saudável. Ratio LTV/CAC de 3,15× está exatamente no limite mínimo saudável (>3×). Com ticket alto, retenção de 2 anos e margem de 70%, esse é um negócio com economics sólidos. O CAC de R$ 8.000 é alto em valor absoluto mas justificado pelo LTV de R$ 25.200.', wrongFeedback: 'Repense. Calcule o ratio: LTV (R$ 25.200) dividido pelo CAC (R$ 8.000) = 3,15×. A regra de ouro é LTV > 3× CAC. Esse negócio está acima ou abaixo do limite mínimo saudável?' },
+                  { id: 'ltv-2', label: 'Marketplace de serviços: cresceu 60% nos últimos 6 meses, MRR de R$ 400k. Churn de 11% ao mês. CAC R$ 120, ticket médio R$ 80/mês, margem 45%', sublabel: 'LTV = 80 × (1/0,11) × 0,45 = 80 × 9,1 × 0,45 ≈ R$ 327 | Ratio = 327/120 = 2,7×', correctZone: 'critica', correctFeedback: 'Correto — Situação Crítica. Dois problemas simultâneos: (1) churn de 11%/mês significa que o cliente médio dura 9 meses — muito baixo para um marketplace. (2) Ratio LTV/CAC de 2,7× está abaixo do mínimo saudável de 3×. O crescimento de 60% é um balde furado acelerando — quanto mais cresce, mais perde.', wrongFeedback: 'Repense. Olhe o churn de 11% ao mês: o cliente médio dura ~9 meses. O ratio LTV/CAC é 2,7× — abaixo do mínimo de 3×. O crescimento de 60% está escondendo um problema fundamental: a empresa está adquirindo mais rápido do que consegue reter.' },
+                  { id: 'ltv-3', label: 'Escola online: 3.000 alunos ativos, ticket R$ 150/mês, churn 1,5%/mês, margem 65%, CAC R$ 420', sublabel: 'LTV = 150 × (1/0,015) × 0,65 = 150 × 66,7 × 0,65 ≈ R$ 6.500 | Ratio = 6.500/420 = 15,5×', correctZone: 'saudavel', correctFeedback: 'Correto — Saudável (e muito). Churn de 1,5%/mês gera retenção média de ~67 meses (5,5 anos) — excelente para educação. Com ratio LTV/CAC de 15,5×, cada R$ 1 investido em aquisição gera R$ 15,50 em valor. Esse negócio pode escalar investimento em aquisição com confiança.', wrongFeedback: 'Repense. Com churn de apenas 1,5%/mês, o cliente médio fica ~5,5 anos. O ratio LTV/CAC de 15,5× significa que cada real gasto em aquisição gera 15 reais em valor. Esse negócio está acima ou bem acima do threshold saudável de 3×?' },
+                  { id: 'ltv-4', label: 'Startup de entrega: MRR crescendo 25%/mês, já no noticiário de startups. CAC R$ 95, ticket médio R$ 35/pedido, 4 pedidos/mês por cliente, margem 18%, churn 22%/mês', sublabel: 'LTV = 140 × (1/0,22) × 0,18 = 140 × 4,5 × 0,18 ≈ R$ 113 | Ratio = 113/95 = 1,19×', correctZone: 'critica', correctFeedback: 'Correto — Situação Crítica. Ratio LTV/CAC de 1,19× significa que a startup ganha R$ 0,19 de valor para cada R$ 1 gasto em aquisição — quase empate. Com churn de 22%/mês, o cliente médio fica 4,5 meses. O crescimento de 25%/mês está destruindo valor em escala. O modelo de negócio precisa ser revisado antes de qualquer aporte.', wrongFeedback: 'Repense. Churn de 22%/mês = cliente fica em média 4,5 meses. LTV de R$ 113, CAC de R$ 95, ratio de 1,19×. Para cada cliente que entra, a empresa mal cobre o custo de adquiri-lo. O crescimento de 25%/mês está acelerando esse problema ou resolvendo?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{LTV > 3× CAC é a regra de ouro — não uma aspiração}}. Abaixo dela, crescimento é aceleração do problema. Churn é o multiplicador invisível: reduzir churn de 5% para 2% ao mês dobra o LTV sem tocar em nenhum outro parâmetro. Em negócios recorrentes, a batalha mais importante é retenção — não aquisição.',
+              keyInsights: [
+                'Churn é o vilão silencioso. Uma empresa com churn de 8%/mês que cresce 10% ao mês está encolhendo — só não percebe porque novos clientes mascaram a perda dos antigos. Calcule sempre: novos clientes > clientes perdidos?',
+                '{{LTV/CAC < 1 significa que o modelo de negócio está errado — não a execução}}. Se você gasta mais para adquirir do que ganha com o cliente, nenhuma melhoria operacional resolve. O modelo precisa mudar antes de qualquer escala.',
+                'A alavanca de maior ROI geralmente é o churn, não o CAC. Reduzir CAC em 20% melhora o ratio em 25%. Reduzir churn em 50% pode dobrar o LTV. Onde você investe primeiro define o resultado.',
+              ],
+            },
           },
         ],
+
       },
     ],
   },
