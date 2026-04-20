@@ -327,7 +327,7 @@ function ThreeOrganisms({
           selectionActive ? 'rgba(255,255,255,0.22)' : COLORS.border
         }`,
         borderRadius: 12,
-        padding: '20px 14px',
+        padding: '14px 10px',
         transition: 'border-color 0.25s',
       }}
     >
@@ -336,8 +336,8 @@ function ThreeOrganisms({
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 8,
-          marginBottom: 18,
+          gap: 5,
+          marginBottom: 14,
         }}
       >
         {phases.map((p, i) => (
@@ -365,9 +365,9 @@ function ThreeOrganisms({
             key={ri}
             style={{
               display: 'grid',
-              gridTemplateColumns: '90px 1fr 1fr 1fr',
-              gap: 8,
-              padding: '8px 0',
+              gridTemplateColumns: '70px 1fr 1fr 1fr',
+              gap: 4,
+              padding: '7px 0',
               borderBottom:
                 ri === compare.rows.length - 1
                   ? 'none'
@@ -377,11 +377,12 @@ function ThreeOrganisms({
           >
             <div
               style={{
-                fontSize: 9,
+                fontSize: 8,
                 fontWeight: 600,
                 color: COLORS.textDim,
-                letterSpacing: '0.06em',
+                letterSpacing: '0.04em',
                 textTransform: 'uppercase',
+                lineHeight: 1.3,
               }}
             >
               {row.label}
@@ -390,19 +391,21 @@ function ThreeOrganisms({
               <div
                 key={vi}
                 style={{
-                  fontSize: 10,
-                  lineHeight: 1.4,
+                  fontSize: 9,
+                  lineHeight: 1.35,
                   color: 'rgba(255,255,255,0.78)',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 6,
+                  gap: 4,
+                  wordBreak: 'break-word',
+                  overflow: 'hidden',
                 }}
               >
                 {/* indicador visual de intensidade quando viz=bars */}
                 {row.viz === 'bars' && row.intensities && (
                   <div
                     style={{
-                      width: 18,
+                      width: 14,
                       height: 3,
                       background: 'rgba(255,255,255,0.06)',
                       borderRadius: 1.5,
@@ -428,8 +431,9 @@ function ThreeOrganisms({
                   <span
                     style={{
                       color: phaseColors[vi],
-                      fontSize: 12,
+                      fontSize: 10,
                       lineHeight: 1,
+                      flexShrink: 0,
                     }}
                   >
                     {row.icons[vi]}
