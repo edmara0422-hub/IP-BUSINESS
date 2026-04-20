@@ -476,19 +476,21 @@ function OrganismTarget({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 6,
+        gap: 4,
       }}
     >
       <LivingCompany phase={phase} size="sm" extras={extras} />
       <div
         style={{
-          fontSize: 9,
-          fontWeight: 700,
-          letterSpacing: '0.12em',
+          fontSize: 8,
+          fontWeight: 600,
+          letterSpacing: '0.02em',
           color: phaseColor,
-          textTransform: 'uppercase',
           textAlign: 'center',
-          lineHeight: 1.35,
+          lineHeight: 1.3,
+          wordBreak: 'break-word',
+          overflow: 'hidden',
+          width: '100%',
         }}
       >
         {label}
@@ -531,7 +533,7 @@ function OrganismTarget({
         background: bgAlpha,
         border: `1.5px dashed ${phaseColor}`,
         borderRadius: 12,
-        padding: '10px 6px 8px 6px',
+        padding: '8px 4px 6px 4px',
         cursor: 'pointer',
         width: '100%',
       }}
