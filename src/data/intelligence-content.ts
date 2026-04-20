@@ -8745,18 +8745,27 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             ],
             application: {
               kind: 'compare-and-drag',
-              intro: 'Cada framework leva a conclusões diferentes para o mesmo dilema. Veja a diferença — depois classifique os casos pelo raciocínio dominante.',
+              intro: 'Cada framework leva a conclusões diferentes para o mesmo dilema. Compare os dois raciocínios — depois classifique cada caso.',
               compare: {
-                left: { label: 'Raciocínio Utilitarista', traits: ['Calcula o maior bem agregado', 'Mensura consequências e resultados', 'Aceita custo para minoria se gera bem maior', 'Base: análise custo-benefício social'] },
-                right: { label: 'Raciocínio Deontológico', traits: ['Aplica princípio inviolável', 'Independente do resultado financeiro', 'Nunca mente mesmo que convenha', 'Regra vale para todos sempre'] },
+                columnHeaders: ['Pergunta central', 'Foco', 'Risco'],
+                rows: [
+                  { label: 'Utilitarismo', values: ['Qual decisão gera o maior bem?', 'Consequência e resultado', 'Pode sacrificar minoria pelo coletivo'] },
+                  { label: 'Deontologia', values: ['Isso seria regra universal?', 'Princípio e dever', 'Rígido em trade-offs complexos'] },
+                  { label: 'Ética das Virtudes', values: ['Pessoa exemplar faria isso?', 'Caráter e integridade', 'Subjetivo — depende do modelo de virtude'] },
+                  { label: 'Contratualismo', values: ['Aceitaria sem saber meu papel?', 'Justiça e equidade', 'Abstrato para decisões rápidas'] },
+                ],
               },
               drag: {
                 instruction: 'Qual framework melhor explica o raciocínio de cada decisão abaixo?',
+                zones: [
+                  { id: 'utilitarista', label: 'Utilitarismo' },
+                  { id: 'deontologico', label: 'Deontologia' },
+                ],
                 items: [
-                  { id: 'util-1', label: 'Demitir 100 funcionários para salvar 1.000 empregos na crise', sublabel: 'CEO decide pela preservação da empresa como um todo', correctZone: 'left', correctFeedback: 'Correto — raciocínio utilitarista. Maximiza o bem coletivo (1.000 empregos salvos). O deontologista questionaria: tratar pessoas como meio para um fim viola a dignidade.', wrongFeedback: 'Repense. A lógica é "maior bem para o maior número" — cálculo de consequências agregadas. Isso é utilitarismo clássico, não princípio inviolável.' },
-                  { id: 'deont-1', label: 'Recusar propina de fornecedor mesmo perdendo contrato lucrativo', sublabel: 'Gestor mantém integridade mesmo com prejuízo financeiro direto', correctZone: 'right', correctFeedback: 'Correto — deontologia em ação. O princípio "não corromper" vale independente do resultado financeiro. A consequência (perder o contrato) não altera o princípio.', wrongFeedback: 'Repense. A decisão ignora as consequências financeiras e aplica um princípio inviolável. Isso é deontologia — o resultado não importa, a regra importa.' },
-                  { id: 'util-2', label: 'Fazer recall de produto com risco baixo que custa R$ 2 milhões', sublabel: 'Afeta 1 em 10.000 usuários com lesão leve', correctZone: 'left', correctFeedback: 'Correto — análise utilitarista: bem coletivo (segurança dos consumidores) supera o custo financeiro. O deontologista diria que proteger o consumidor é dever — não cálculo.', wrongFeedback: 'Repense. A decisão pondera o bem gerado para os consumidores vs o custo da empresa. Cálculo de consequências = utilitarismo.' },
-                  { id: 'deont-2', label: 'Divulgar dado negativo no relatório mesmo reduzindo o valor da ação', sublabel: 'CFO insiste em transparência total com acionistas', correctZone: 'right', correctFeedback: 'Correto — princípio deontológico: a verdade é um dever, independente do impacto no preço da ação. Transparência como regra universal inviolável.', wrongFeedback: 'Repense. A decisão descarta as consequências financeiras e aplica transparência como princípio. Deontologia: a regra vale independente do resultado.' },
+                  { id: 'util-1', label: 'Demitir 100 para salvar 1.000 empregos na crise', sublabel: 'CEO decide pela preservação da empresa como um todo', correctZone: 'utilitarista', correctFeedback: 'Correto — raciocínio utilitarista. Maximiza o bem coletivo (1.000 empregos salvos). O deontologista questionaria: tratar pessoas como meio para um fim viola a dignidade.', wrongFeedback: 'Repense. A lógica é "maior bem para o maior número" — cálculo de consequências agregadas. Isso é utilitarismo clássico, não princípio inviolável.' },
+                  { id: 'deont-1', label: 'Recusar propina mesmo perdendo contrato lucrativo', sublabel: 'Gestor mantém integridade mesmo com prejuízo financeiro direto', correctZone: 'deontologico', correctFeedback: 'Correto — deontologia em ação. O princípio "não corromper" vale independente do resultado financeiro. A consequência (perder o contrato) não altera o princípio.', wrongFeedback: 'Repense. A decisão ignora as consequências e aplica um princípio inviolável. Isso é deontologia — o resultado não importa, a regra importa.' },
+                  { id: 'util-2', label: 'Fazer recall de produto com risco baixo que custa R$ 2M', sublabel: 'Afeta 1 em 10.000 usuários com lesão leve', correctZone: 'utilitarista', correctFeedback: 'Correto — análise utilitarista: bem coletivo supera o custo financeiro. O deontologista diria que proteger o consumidor é dever — não cálculo.', wrongFeedback: 'Repense. A decisão pondera o bem gerado para os consumidores vs o custo da empresa. Cálculo de consequências = utilitarismo.' },
+                  { id: 'deont-2', label: 'Divulgar dado negativo mesmo reduzindo o valor da ação', sublabel: 'CFO insiste em transparência total com acionistas', correctZone: 'deontologico', correctFeedback: 'Correto — princípio deontológico: a verdade é um dever, independente do impacto no preço da ação. Transparência como regra universal inviolável.', wrongFeedback: 'Repense. A decisão descarta as consequências e aplica transparência como princípio. Deontologia: a regra vale independente do resultado.' },
                 ],
               },
             },
@@ -8783,10 +8792,10 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 kind: 'pillar-grid',
                 title: 'Os 4 dilemas contemporâneos que todo gestor vai enfrentar',
                 pillars: [
-                  { icon: '🤖', title: 'IA e Viés Algorítmico', description: 'Algoritmos de crédito, RH e precificação reproduzem vieses históricos. Reconhecimento facial com erro 10× maior para pessoas negras. {{Quem responde quando a IA erra: o desenvolvedor, a empresa ou o gestor que aprovou?}}' },
-                  { icon: '🔒', title: 'Privacidade e Dados', description: 'LGPD/GDPR: consentimento informado é obrigatório. Dark patterns: interfaces que manipulam para ceder dados. Monitoramento de funcionários (câmeras, keyloggers): {{até onde a empresa pode vigiar sem invadir?}}' },
-                  { icon: '👷', title: 'Trabalho e Dignidade', description: 'Gig economy: motoristas e entregadores sem direitos trabalhistas. Precarização disfarçada de "empreendedorismo". Automação elimina postos — {{a empresa tem responsabilidade com os demitidos por robôs?}}' },
-                  { icon: '🌿', title: 'Greenwashing e Socialwashing', description: 'Marketing verde sem práticas reais. Relatórios ESG com métricas selecionadas a dedo. Diversidade no Instagram sem diversidade no board. {{Certificação comprada não é cultura — é risco reputacional acumulado}}.' },
+                  { icon: '🤖', title: 'IA e Viés Algorítmico', description: 'Algoritmos de crédito, RH e precificação reproduzem vieses históricos. Reconhecimento facial com erro 10× maior para pessoas negras. {{Quem responde quando a IA erra: o desenvolvedor, a empresa ou o gestor?}}' },
+                  { icon: '🔒', title: 'Privacidade e Dados', description: 'LGPD/GDPR: consentimento informado é obrigatório. Dark patterns: interfaces que manipulam para ceder dados. {{Até onde a empresa pode vigiar funcionários sem invadir a privacidade?}}' },
+                  { icon: '👷', title: 'Trabalho e Dignidade', description: 'Gig economy: motoristas e entregadores sem direitos trabalhistas. Precarização disfarçada de "empreendedorismo". {{A empresa tem responsabilidade com os demitidos por automação?}}' },
+                  { icon: '🌿', title: 'Greenwashing e Socialwashing', description: 'Marketing verde sem práticas reais. Relatórios ESG com métricas selecionadas a dedo. Diversidade no Instagram sem diversidade no board. {{Certificação comprada não é cultura — é risco reputacional}}.' },
                 ],
               },
               {
@@ -8796,18 +8805,25 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             ],
             application: {
               kind: 'compare-and-drag',
-              intro: 'Práticas iguais podem ser éticas ou antiéticas dependendo de como são implementadas. Veja a diferença — depois classifique os casos.',
+              intro: 'Práticas iguais podem ser éticas ou antiéticas dependendo de como são implementadas. Compare os perfis — depois classifique cada caso.',
               compare: {
-                left: { label: 'Prática Ética', traits: ['Transparência com usuário e funcionário', 'Consentimento informado real', 'Auditoria de viés periódica e divulgada', 'Aceita o custo de fazer o certo'] },
-                right: { label: 'Prática Antiética', traits: ['Informação escondida ou omitida', 'Consentimento forçado por dark pattern', 'Viés ignorado por conveniência financeira', 'Externaliza custo para o mais fraco'] },
+                columnHeaders: ['Transparência', 'Consentimento', 'Responsabilidade'],
+                rows: [
+                  { label: 'Prática Ética', values: ['Divulga limitações e riscos', 'Consentimento real e informado', 'Aceita o custo de fazer o certo'] },
+                  { label: 'Prática Antiética', values: ['Esconde ou omite informação', 'Dark pattern — consentimento forçado', 'Externaliza custo para o mais fraco'] },
+                ],
               },
               drag: {
                 instruction: 'Classifique cada prática: ética ou antiética?',
+                zones: [
+                  { id: 'etica', label: 'Prática Ética' },
+                  { id: 'antietica', label: 'Prática Antiética' },
+                ],
                 items: [
-                  { id: 'etica-1', label: 'Empresa audita algoritmo de crédito semestralmente e divulga taxa de aprovação por gênero e renda', sublabel: 'Relatório público com metodologia auditada por terceiros', correctZone: 'left', correctFeedback: 'Correto — transparência e auditoria ativa são marcas de IA responsável. Empresas que fazem isso antecipam problemas e constroem confiança com reguladores.', wrongFeedback: 'Repense. Auditar e divulgar resultados — inclusive os negativos — é o padrão de IA responsável. Não é perfeição, é honestidade sobre limitações.' },
-                  { id: 'antietica-1', label: 'App pede "aceite todos os cookies" em botão verde grande e "personalizar" em cinza pequeno', sublabel: 'Aceite padrão captura dados de navegação, localização e comportamento', correctZone: 'right', correctFeedback: 'Correto — dark pattern clássico. O design força consentimento sem informação real. Proibido pela GDPR, investigado pela ANPD no Brasil.', wrongFeedback: 'Repense. Esse design propositalmente dificulta a recusa. Consentimento obtido por manipulação de interface não é consentimento informado — é coerção por design.' },
-                  { id: 'etica-2', label: 'Empresa anuncia automação e cria programa de requalificação de 18 meses para funcionários afetados', sublabel: 'Custo de R$ 3M. 85% dos funcionários recolocados internamente ou no mercado', correctZone: 'left', correctFeedback: 'Correto — responsabilidade corporativa com quem perde emprego para automação. Não é obrigação legal — é postura ética e contratualismo em ação.', wrongFeedback: 'Repense. Investir na requalificação dos demitidos por automação não é exigido por lei — mas é ética das virtudes e contratualismo em ação.' },
-                  { id: 'antietica-2', label: 'Relatório ESG destaca redução de emissões de 3% na operação própria, omite que fornecedores cresceram 40%', sublabel: 'Empresa terceirizou a parte suja da cadeia produtiva', correctZone: 'right', correctFeedback: 'Correto — greenwashing por omissão. A melhoria na operação própria pode ser real, mas esconde o impacto total da cadeia. Reguladores e investidores estão cada vez mais atentos ao Scope 3.', wrongFeedback: 'Repense. Selecionar só as métricas que parecem bem, ocultando o impacto da cadeia, é greenwashing — independente da melhoria pontual ser real.' },
+                  { id: 'etica-1', label: 'Empresa audita algoritmo de crédito e divulga taxa de aprovação por gênero e renda', sublabel: 'Relatório público com metodologia auditada por terceiros', correctZone: 'etica', correctFeedback: 'Correto — transparência e auditoria ativa são marcas de IA responsável. Empresas que fazem isso antecipam problemas e constroem confiança com reguladores.', wrongFeedback: 'Repense. Auditar e divulgar resultados — inclusive os negativos — é o padrão de IA responsável. Não é perfeição, é honestidade sobre limitações.' },
+                  { id: 'antietica-1', label: 'App pede "aceite todos os cookies" em botão verde grande e "personalizar" em cinza pequeno', sublabel: 'Aceite padrão captura dados de navegação, localização e comportamento', correctZone: 'antietica', correctFeedback: 'Correto — dark pattern clássico. O design força consentimento sem informação real. Proibido pela GDPR, investigado pela ANPD no Brasil.', wrongFeedback: 'Repense. Esse design propositalmente dificulta a recusa. Consentimento obtido por manipulação de interface não é consentimento informado.' },
+                  { id: 'etica-2', label: 'Empresa anuncia automação e cria programa de requalificação de 18 meses para afetados', sublabel: 'Custo de R$ 3M. 85% dos funcionários recolocados internamente ou no mercado', correctZone: 'etica', correctFeedback: 'Correto — responsabilidade corporativa com quem perde emprego para automação. Não é obrigação legal — é postura ética e contratualismo em ação.', wrongFeedback: 'Repense. Investir na requalificação dos demitidos por automação não é exigido por lei — mas é ética das virtudes e contratualismo em ação.' },
+                  { id: 'antietica-2', label: 'Relatório ESG destaca redução de emissões de 3% na operação e omite que fornecedores cresceram 40%', sublabel: 'Empresa terceirizou a parte mais poluente da cadeia produtiva', correctZone: 'antietica', correctFeedback: 'Correto — greenwashing por omissão. A melhoria pode ser real, mas esconde o impacto total da cadeia. Reguladores e investidores estão cada vez mais atentos ao Scope 3.', wrongFeedback: 'Repense. Selecionar só as métricas que parecem bem, ocultando o impacto da cadeia, é greenwashing — independente da melhoria pontual ser real.' },
                 ],
               },
             },
@@ -8847,18 +8863,25 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             ],
             application: {
               kind: 'compare-and-drag',
-              intro: 'A mesma empresa, a mesma situação — mas com e sem método ético. Veja a diferença — depois classifique os comportamentos.',
+              intro: 'A mesma situação — mas com e sem método ético, o resultado é muito diferente. Compare os perfis — depois classifique cada comportamento.',
               compare: {
-                left: { label: 'Com Método Ético', traits: ['Mapeia stakeholders antes de decidir', 'Documenta raciocínio da decisão', 'Canal de denúncia ativo e seguro', 'Liderança pratica o que prega no discurso'] },
-                right: { label: 'Sem Método Ético', traits: ['Decide por instinto ou pressão do momento', 'Decisão não documentada nem justificada', 'Denúncias chegam via jornal ou processo', 'Discurso ético ≠ comportamento real'] },
+                columnHeaders: ['Como decide?', 'Documentação', 'Quando dá errado?'],
+                rows: [
+                  { label: 'Com Método Ético', values: ['Mapeia stakeholders e aplica filtros', 'Registra raciocínio e conclusão', 'Tem canal de denúncia ativo e seguro'] },
+                  { label: 'Sem Método Ético', values: ['Decide por instinto ou pressão', 'Decisão não documentada', 'Denúncias chegam via jornal ou processo'] },
+                ],
               },
               drag: {
-                instruction: 'Cada comportamento indica cultura ética presente ou ausente. Classifique:',
+                instruction: 'Empresa com método ético ou sem? Classifique cada comportamento:',
+                zones: [
+                  { id: 'com', label: 'Com Método Ético' },
+                  { id: 'sem', label: 'Sem Método Ético' },
+                ],
                 items: [
-                  { id: 'com-1', label: 'Empresa tem canal de denúncias anônimo com comitê independente que investiga inclusive lideranças', sublabel: '12% dos casos investigados resultaram em demissão de gestores sêniores', correctZone: 'left', correctFeedback: 'Correto — canal de denúncias com governança independente é marca de cultura ética real. O dado de demissão de lideranças mostra que o canal funciona de verdade.', wrongFeedback: 'Repense. Canal de denúncias com investigação real — inclusive de líderes — é o padrão de organizações com cultura ética institucionalizada.' },
-                  { id: 'sem-1', label: 'CEO fala que integridade é valor central. Equipe de vendas ganha bônus por fechar contratos com cláusulas abusivas', sublabel: 'Discurso e incentivo financeiro apontam em direções opostas', correctZone: 'right', correctFeedback: 'Correto — quando o sistema de incentivos contradiz o discurso ético, o comportamento real segue o incentivo. Cultura é o que você premia, não o que você fala.', wrongFeedback: 'Repense. O problema não é o discurso — é que o incentivo financeiro o contradiz. Cultura ética exige alinhamento entre valores declarados e sistema de recompensa.' },
-                  { id: 'com-2', label: 'Gerente recusa pressão do cliente para alterar data em contrato já assinado e documenta a conversa', sublabel: 'Escala para o jurídico e registra a tentativa de alteração contratual', correctZone: 'left', correctFeedback: 'Correto — integridade sob pressão e documentação adequada são sinais de cultura ética funcionando na prática, não só no discurso corporativo.', wrongFeedback: 'Repense. Recusar pressão, documentar e escalar corretamente é o método ético em ação. Não é perfeccionismo burocrático — é proteção para todos.' },
-                  { id: 'sem-2', label: 'Empresa descobre irregularidade interna, corrige silenciosamente sem notificar as partes afetadas', sublabel: '"Já resolvemos internamente, não precisa comunicar"', correctZone: 'right', correctFeedback: 'Correto — corrigir sem notificar viola a confiança das partes afetadas. Transparência após erro é um dos marcadores mais fortes de integridade organizacional real.', wrongFeedback: 'Repense. Corrigir sem comunicar é autointeresse disfarçado de pragmatismo. Partes afetadas têm direito de saber — independente do custo reputacional para a empresa.' },
+                  { id: 'com-1', label: 'Canal de denúncias anônimo com comitê independente que investiga inclusive lideranças', sublabel: '12% dos casos resultaram em demissão de gestores sêniores', correctZone: 'com', correctFeedback: 'Correto — canal com governança independente é marca de cultura ética real. O dado de demissão de lideranças mostra que funciona de verdade.', wrongFeedback: 'Repense. Canal de denúncias com investigação real — inclusive de líderes — é o padrão de organizações com cultura ética institucionalizada.' },
+                  { id: 'sem-1', label: 'CEO fala que integridade é valor central. Equipe de vendas ganha bônus por contratos com cláusulas abusivas', sublabel: 'Discurso e incentivo financeiro apontam em direções opostas', correctZone: 'sem', correctFeedback: 'Correto — quando o sistema de incentivos contradiz o discurso ético, o comportamento real segue o incentivo. Cultura é o que você premia, não o que você fala.', wrongFeedback: 'Repense. O problema não é o discurso — é que o incentivo financeiro o contradiz. Cultura ética exige alinhamento entre valores declarados e sistema de recompensa.' },
+                  { id: 'com-2', label: 'Gerente recusa pressão do cliente para alterar data em contrato assinado e documenta a conversa', sublabel: 'Escala para o jurídico e registra a tentativa de alteração contratual', correctZone: 'com', correctFeedback: 'Correto — integridade sob pressão e documentação adequada são sinais de cultura ética funcionando na prática, não só no discurso corporativo.', wrongFeedback: 'Repense. Recusar pressão, documentar e escalar corretamente é o método ético em ação. É proteção para todos — empresa e funcionário.' },
+                  { id: 'sem-2', label: 'Empresa descobre irregularidade interna, corrige silenciosamente sem notificar as partes afetadas', sublabel: '"Já resolvemos internamente, não precisa comunicar"', correctZone: 'sem', correctFeedback: 'Correto — corrigir sem notificar viola a confiança das partes afetadas. Transparência após erro é um dos marcadores mais fortes de integridade organizacional real.', wrongFeedback: 'Repense. Corrigir sem comunicar é autointeresse disfarçado de pragmatismo. Partes afetadas têm direito de saber — independente do custo reputacional.' },
                 ],
               },
             },
@@ -8888,7 +8911,7 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                   { icon: '🌱', title: 'E — Ambiental', description: 'Emissões de CO₂, consumo de água e energia, gestão de resíduos, cadeia de fornecimento sustentável. {{Não é só "plante árvores" — é risco físico, regulatório e reputacional mensurável}}, incluindo toda a cadeia (Scope 3).' },
                   { icon: '👥', title: 'S — Social', description: 'Diversidade no board e na liderança, condições de trabalho na cadeia produtiva, impacto nas comunidades onde opera, política salarial e bem-estar. {{Inclui fornecedores — não só a operação direta da empresa}}.' },
                   { icon: '🏛️', title: 'G — Governança', description: 'Transparência, conselho independente, política de remuneração executiva, canal de denúncias, auditoria externa. {{Governança fraca é o maior preditor de escândalo corporativo}} — 80% das crises têm falha de G como raiz.' },
-                  { icon: '📋', title: 'Compliance como Diferencial', description: 'Empresas com compliance robusto pagam menos por crédito, atraem mais investidores institucionais e sofrem multas menores em caso de irregularidade. {{Compliance não é custo — é seguro e vantagem competitiva}}.' },
+                  { icon: '📋', title: 'Compliance como Diferencial', description: 'Empresas com compliance robusto pagam menos por crédito, atraem mais investidores institucionais e sofrem multas menores. {{Compliance não é custo — é seguro e vantagem competitiva mensurável}}.' },
                 ],
               },
               {
@@ -8898,18 +8921,25 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             ],
             application: {
               kind: 'compare-and-drag',
-              intro: 'ESG genuíno e ESG de marketing têm aparência similar mas consequências opostas. Veja a diferença — depois classifique as práticas.',
+              intro: 'ESG genuíno e ESG de marketing têm aparência similar mas consequências opostas. Compare os perfis — depois classifique cada prática.',
               compare: {
-                left: { label: 'ESG Genuíno', traits: ['Metas quantificadas e auditadas externamente', 'Inclui cadeia de fornecimento (Scope 3)', 'Governança independente real e ativa', 'Aceita custo financeiro para fazer o certo'] },
-                right: { label: 'ESG de Marketing', traits: ['Métricas selecionadas para parecer bem', 'Foco só na operação própria visível', 'Conselho controlado por fundadores', 'Relatório bonito, mudança comportamental mínima'] },
+                columnHeaders: ['Metas', 'Escopo', 'Governança'],
+                rows: [
+                  { label: 'ESG Genuíno', values: ['Quantificadas e auditadas externamente', 'Inclui cadeia de fornecimento (Scope 3)', 'Conselho independente, canal de denúncia real'] },
+                  { label: 'ESG de Marketing', values: ['Selecionadas para parecer bem', 'Só a operação própria visível', 'Conselho controlado, relatório bonito'] },
+                ],
               },
               drag: {
                 instruction: 'ESG genuíno ou ESG de marketing? Classifique:',
+                zones: [
+                  { id: 'genuino', label: 'ESG Genuíno' },
+                  { id: 'marketing', label: 'ESG de Marketing' },
+                ],
                 items: [
-                  { id: 'esg-real-1', label: 'Empresa divulga metas de carbono com linha de base auditada e relatório de progresso trimestral', sublabel: 'Inclui emissões Scope 3 — toda a cadeia de fornecimento', correctZone: 'left', correctFeedback: 'Correto — ESG genuíno. Auditoria externa, Scope 3 e relatório periódico são marcas de seriedade. Scope 3 é onde a maioria das empresas esconde suas emissões reais.', wrongFeedback: 'Repense. Auditoria externa + Scope 3 + relatório periódico = transparência real com custo real. Isso não é marketing — tem accountability.' },
-                  { id: 'esg-mkt-1', label: 'Relatório ESG destaca 0% de plástico nos escritórios e omite que a fábrica descarta resíduo no rio', sublabel: 'Empresa premiada 3 anos seguidos por "sustentabilidade"', correctZone: 'right', correctFeedback: 'Correto — greenwashing clássico. Destacar o escritório, ignorar a operação principal. O prêmio baseado no relatório é tanto vítima quanto cúmplice da seleção de métricas.', wrongFeedback: 'Repense. Destacar práticas menores (plástico no escritório) enquanto omite impacto real (descarte industrial) é a definição de greenwashing.' },
-                  { id: 'esg-real-2', label: 'Empresa de moda audita fábricas terceirizadas na Ásia e publica lista de fornecedores com condições de trabalho', sublabel: 'Encerrou contratos com 3 fornecedores após auditoria revelar condições inadequadas', correctZone: 'left', correctFeedback: 'Correto — ESG genuíno no pilar Social. A coragem de publicar e encerrar contratos problemáticos é o que diferencia: a maioria das empresas de moda nunca revela sua cadeia.', wrongFeedback: 'Repense. Auditar, publicar e encerrar contratos problemáticos na cadeia de fornecimento é ESG S real. Tem custo financeiro — e por isso é genuíno.' },
-                  { id: 'esg-mkt-2', label: 'CEO recebe bônus de R$ 50M enquanto empresa corta benefícios de saúde de funcionários operacionais', sublabel: 'Relatório ESG do mesmo ano destaca "política de remuneração responsável"', correctZone: 'right', correctFeedback: 'Correto — governança ESG de fachada. Disparidade extrema combinada com corte de benefícios básicos é o oposto de G genuíno — independente do que o relatório declare.', wrongFeedback: 'Repense. O relatório diz uma coisa, a prática diz outra. ESG de marketing é exatamente isso: discurso descolado da realidade operacional.' },
+                  { id: 'esg-real-1', label: 'Empresa divulga metas de carbono com linha de base auditada e relatório de progresso trimestral', sublabel: 'Inclui emissões Scope 3 — toda a cadeia de fornecimento', correctZone: 'genuino', correctFeedback: 'Correto — ESG genuíno. Auditoria externa, Scope 3 e relatório periódico são marcas de seriedade. Scope 3 é onde a maioria das empresas esconde suas emissões reais.', wrongFeedback: 'Repense. Auditoria externa + Scope 3 + relatório periódico = transparência real com custo real. Isso não é marketing — tem accountability.' },
+                  { id: 'esg-mkt-1', label: 'Relatório ESG destaca 0% de plástico nos escritórios e omite que a fábrica descarta resíduo no rio', sublabel: 'Empresa premiada 3 anos seguidos por "sustentabilidade"', correctZone: 'marketing', correctFeedback: 'Correto — greenwashing clássico. Destacar o escritório, ignorar a operação principal. O prêmio baseado no relatório é tanto vítima quanto cúmplice da seleção de métricas.', wrongFeedback: 'Repense. Destacar práticas menores enquanto omite impacto real é a definição de greenwashing.' },
+                  { id: 'esg-real-2', label: 'Empresa de moda audita fábricas terceirizadas na Ásia e publica lista de fornecedores com condições de trabalho', sublabel: 'Encerrou contratos com 3 fornecedores após auditoria revelar condições inadequadas', correctZone: 'genuino', correctFeedback: 'Correto — ESG genuíno no pilar Social. A coragem de publicar e encerrar contratos problemáticos é o que diferencia: a maioria das empresas de moda nunca revela sua cadeia.', wrongFeedback: 'Repense. Auditar, publicar e encerrar contratos problemáticos na cadeia é ESG S real. Tem custo financeiro — e por isso é genuíno.' },
+                  { id: 'esg-mkt-2', label: 'CEO recebe bônus de R$ 50M enquanto empresa corta benefícios de saúde de funcionários operacionais', sublabel: 'Relatório ESG do mesmo ano destaca "política de remuneração responsável"', correctZone: 'marketing', correctFeedback: 'Correto — governança ESG de fachada. Disparidade extrema combinada com corte de benefícios básicos é o oposto de G genuíno — independente do que o relatório declare.', wrongFeedback: 'Repense. O relatório diz uma coisa, a prática diz outra. ESG de marketing é exatamente isso: discurso descolado da realidade operacional.' },
                 ],
               },
             },
