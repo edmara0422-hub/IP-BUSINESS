@@ -9212,51 +9212,247 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
         title: 'Teologia e Sociedade',
         blocks: [
           {
-            id: 'M7-1-t1',
-            type: 'text',
-            title: 'Fé, Valores e Liderança: A Dimensão Espiritual nos Negócios',
-            body: 'A interseção entre espiritualidade e gestão é um campo crescente na academia e na prática empresarial. Não se trata de religião institucional — trata-se de propósito, valores e sentido do trabalho.\n\n**Por que isso importa para gestores?**\n— 87% dos brasileiros se declaram religiosos ou espirituais (Datafolha, 2023)\n— Funcionários que encontram sentido no trabalho são 3x mais engajados (Gallup)\n— Empresas com propósito definido superam S&P 500 em 400% em 10 anos (Firms of Endearment)\n— A geração Z prioriza propósito sobre salário na escolha de emprego\n\n**Doutrina Social da Igreja e Negócios:**\nA Doutrina Social da Igreja Católica, desenvolvida desde a Rerum Novarum (1891), oferece princípios aplicáveis à gestão:\n\n**Dignidade da Pessoa Humana** — todo trabalho deve preservar a dignidade. Implicação: condições de trabalho, salário justo, respeito à diversidade.\n\n**Bem Comum** — a empresa existe não apenas para o acionista, mas para contribuir com a sociedade. Implicação: stakeholder capitalism vs shareholder capitalism.\n\n**Subsidiariedade** — decisões devem ser tomadas no nível mais próximo possível de quem é afetado. Implicação: descentralização, empowerment, liderança servidora.\n\n**Solidariedade** — interdependência entre as pessoas. Implicação: cadeia de valor justa, comércio justo, responsabilidade com comunidades.\n\n**Destino Universal dos Bens** — os bens da Terra são para todos. Implicação: acesso, inclusão, combate à concentração excessiva.\n\n**Liderança Servidora (Robert Greenleaf):**\nO líder existe para servir a equipe, não o contrário. Características:\n— Escuta ativa antes de decidir\n— Empatia como ferramenta de gestão\n— Compromisso com o crescimento das pessoas\n— Construção de comunidade no ambiente de trabalho\n\nPergunta-chave: Se sua empresa fechasse amanhã, além do impacto financeiro, qual vazio ela deixaria na comunidade? Se a resposta é "nenhum", há uma oportunidade de propósito não explorada.',
+            id: 'M7-1-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Os 4 Princípios da Doutrina Social — A Base Ética dos Negócios',
+            subtitle: 'Dignidade humana, bem comum, subsidiariedade e solidariedade: o framework ético que governa decisões quando o lucro e as pessoas entram em conflito.',
+            opening: {
+              leadText: 'A Doutrina Social não é teoria religiosa — é filosofia aplicada. Bob Chapman (Barry-Wehmiller) aplicou esses princípios em 2008: ao invés de demitir 1.000 pessoas para cortar custos, fez licenças não-remuneradas rotativas. Resultado: ninguém foi demitido, a empresa sobreviveu, e a moral subiu. "Cada pessoa importa" não é slogan — foi estratégia.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Os 4 princípios da Doutrina Social aplicados a negócios',
+                pillars: [
+                  { icon: '👤', title: 'Dignidade da Pessoa Humana', description: '{{Pessoas não são recursos descartáveis}}. Cada funcionário, cliente ou fornecedor tem dignidade intrínseca que não pode ser violada em nome da eficiência. Exemplo: demissão em massa sem aviso vs. plano de transição com apoio.' },
+                  { icon: '🤝', title: 'Bem Comum', description: 'Decisões devem considerar o impacto no {{conjunto da sociedade}}, não só nos acionistas. Uma empresa que polui para reduzir custos privatiza ganhos e socializa prejuízos — o oposto do bem comum.' },
+                  { icon: '🏛️', title: 'Subsidiariedade', description: 'Decisões devem ser tomadas {{no nível mais próximo possível do problema}}. Micro-gerência viola subsidiariedade. Times autônomos que resolvem seus próprios problemas honram esse princípio.' },
+                  { icon: '🌍', title: 'Solidariedade', description: '{{Interdependência reconhecida como responsabilidade mútua}}. Empresas que prosperam em comunidades empobrecidas violam solidariedade. Cadeias de fornecimento com preços justos honram esse princípio.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A tensão real não é entre ética e lucro — é entre curto e longo prazo. Empresas que violam esses princípios sistematicamente acumulam passivos invisíveis: desmotivação, turnover, reputação, litígios. A Johnson & Johnson retirou o Tylenol das prateleiras em 1982 (custo: US$ 100M) porque o credo da empresa colocava pacientes antes de acionistas. Resultado: recuperou 100% do market share em 1 ano.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare como os 4 princípios se traduzem em práticas concretas — depois classifique cada situação.',
+              compare: {
+                columnHeaders: ['Violação típica', 'Prática alinhada', 'Risco de ignorar'],
+                rows: [
+                  { label: 'Dignidade', values: ['Demissão por WhatsApp, avaliações humilhantes', 'Plano de desligamento, feedback respeitoso', 'Passivo trabalhista, reputação'] },
+                  { label: 'Bem Comum', values: ['Terceirizar poluição para países sem lei', 'Operação dentro de padrões ambientais globais', 'Regulação futura, custo de compliance'] },
+                  { label: 'Subsidiariedade', values: ['CEO aprova toda compra acima de R$ 500', 'Times com orçamento e autonomia delegados', 'Lentidão, perda de talentos'] },
+                  { label: 'Solidariedade', values: ['Pressionar fornecedor pequeno por margem', 'Contratos justos com fornecedores locais', 'Cadeia frágil, risco de ruptura'] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique qual princípio está sendo violado em cada situação:',
+                zones: [
+                  { id: 'dignidade', label: 'Dignidade' },
+                  { id: 'bem-comum', label: 'Bem Comum' },
+                  { id: 'subsidiariedade', label: 'Subsidiariedade' },
+                  { id: 'solidariedade', label: 'Solidariedade' },
+                ],
+                items: [
+                  { id: 'sit-1', label: 'Empresa exige que gerentes de loja aprovem qualquer desconto acima de R$ 10 diretamente com a diretoria', sublabel: 'Vendedores perdem clientes enquanto esperam aprovação por e-mail', correctZone: 'subsidiariedade', correctFeedback: 'Correto — Subsidiariedade. Decisões devem ser tomadas no nível mais próximo do problema. Travar o gerente de loja em decisões operacionais é micro-gerência que viola esse princípio.', wrongFeedback: 'Repense. A questão aqui é sobre quem toma decisões — o nível organizacional. Esse é o princípio que define que decisões devem ser delegadas ao nível mais próximo do problema.' },
+                  { id: 'sit-2', label: 'Frigorífico despeja efluentes não tratados em rio próximo para evitar custo de tratamento de R$ 80k/mês', sublabel: 'Comunidade ribeirinha usa o rio para pesca e consumo', correctZone: 'bem-comum', correctFeedback: 'Correto — Bem Comum. A empresa privatiza a economia e socializa o prejuízo ambiental e de saúde pública. Isso é exatamente o oposto do bem comum.', wrongFeedback: 'Repense. A empresa está gerando um custo que recai sobre toda a sociedade (pesca, saúde, meio ambiente) para benefício próprio. Qual princípio fala sobre o impacto no conjunto da sociedade?' },
+                  { id: 'sit-3', label: 'Startup demite 40 funcionários via e-mail automático às 23h sem aviso prévio ou plano de transição', sublabel: 'Funcionários descobrem o desligamento tentando acessar sistemas na manhã seguinte', correctZone: 'dignidade', correctFeedback: 'Correto — Dignidade da Pessoa Humana. Independente da necessidade econômica, a forma como pessoas são tratadas em momentos de vulnerabilidade revela o real sistema de valores da empresa.', wrongFeedback: 'Repense. A questão central aqui não é o mérito da demissão, mas como o ser humano foi tratado nesse processo. Qual princípio protege o valor intrínseco de cada pessoa?' },
+                  { id: 'sit-4', label: 'Varejista pressiona fornecedor familiar a reduzir preço em 30% ou perde contrato — fornecedor opera com margem de 8%', sublabel: 'Fornecedor teria que demitir metade da equipe para atender', correctZone: 'solidariedade', correctFeedback: 'Correto — Solidariedade. Usar poder de barganha para inviabilizar parceiros economicamente frágeis viola a responsabilidade mútua entre agentes interdependentes.', wrongFeedback: 'Repense. A relação entre varejista e fornecedor é de interdependência. Qual princípio fala sobre responsabilidade mútua entre partes que dependem umas das outras?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{Princípios éticos são ativos estratégicos de longo prazo}}. Empresas que os tratam como "custo" acumulam passivos invisíveis que eventualmente se tornam visíveis — em litígios, desengajamento ou colapso reputacional.',
+              keyInsights: [
+                'A pergunta não é "ética ou lucro" — é "que tipo de empresa quero ser em 10 anos?". Curto prazo recompensa violações; longo prazo penaliza.',
+                '{{Dignidade é inegociável}}. Você pode negociar preço, prazo, escopo. Não pode negociar como trata seres humanos sem pagar um preço invisível.',
+                'Subsidiariedade é eficiência: equipes que resolvem seus próprios problemas são mais rápidas e comprometidas do que hierarquias que centralizam tudo.',
+              ],
+            },
           },
           {
-            id: 'M7-valores-c1',
-            type: 'concept',
-            term: 'Liderança Servidora vs Liderança Tradicional',
-            definition: 'Na liderança tradicional, a equipe serve o líder. Na liderança servidora (Robert Greenleaf), o líder serve a equipe — removendo obstáculos, desenvolvendo pessoas e priorizando o bem comum sobre o ego.',
-            example: 'Luiza Helena Trajano (Magazine Luiza): visita lojas, ouve vendedores, remove burocracias que atrapalham o atendimento. O líder existe para facilitar o trabalho de quem está na ponta.',
-            antiExample: 'Líder que centraliza decisões, cobra resultados sem dar recursos, e toma crédito pelo trabalho da equipe. Isso é liderança de poder, não de serviço.',
+            id: 'M7-1-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Liderança Servidora — Poder a Serviço das Pessoas',
+            subtitle: 'Robert Greenleaf inverteu a pirâmide: o líder existe para servir a equipe, não o contrário. As 5 características que separam líderes servidores de líderes tradicionais.',
+            opening: {
+              leadText: 'Em 1970, Robert Greenleaf publicou "The Servant as Leader" depois de ler Herman Hesse: um grupo de viajantes perde o rumo quando Leo, o servidor do grupo, desaparece. Leo era, na verdade, o líder real. Greenleaf concluiu: o melhor líder é aquele que outros mal percebem — e cuja ausência é sentida imediatamente.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'As 5 características da liderança servidora (Greenleaf)',
+                pillars: [
+                  { icon: '👂', title: 'Escuta Ativa', description: '{{Ouve antes de decidir}}. Busca entender, não apenas responder. Faz perguntas antes de dar soluções. Líder tradicional fala 70% do tempo em reuniões; líder servidor fala 30%.' },
+                  { icon: '❤️', title: 'Empatia', description: 'Assume intenção positiva nas pessoas. {{Não pune erros — aprende com eles}}. Cria ambiente onde admitir falha é seguro. Psicológica: Amy Edmondson (Harvard) provou que segurança psicológica dobra a inovação.' },
+                  { icon: '🌱', title: 'Comprometimento com Crescimento', description: '{{Investe no desenvolvimento das pessoas além do que é útil para a empresa}}. Mentoria, treinamento, autonomia progressiva. Sinal: equipe cresce mesmo que saia da empresa.' },
+                  { icon: '🏘️', title: 'Construção de Comunidade', description: 'Cria {{senso de pertencimento e propósito coletivo}}. A equipe não é apenas um grupo de pessoas fazendo tarefas — é uma comunidade com identidade e missão.' },
+                  { icon: '🎯', title: 'Consciência e Visão', description: 'Tem clareza sobre valores e não os negocia por pressão. {{Consegue enxergar além do curto prazo}}. Age de acordo com princípios mesmo quando é inconveniente.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'Luiza Helena Trajano (Magazine Luiza) aplicou isso: visitava lojas pessoalmente, ouvia vendedores, removia burocracias. Resultado: a empresa cresceu 10x em 10 anos com cultura reconhecida como diferencial competitivo. O oposto: líder que centraliza decisões, toma crédito pelo sucesso da equipe e distribui culpa pelo fracasso. Esse padrão destrói times silenciosamente.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare liderança servidora e tradicional em situações concretas — depois classifique cada comportamento.',
+              compare: {
+                columnHeaders: ['Situação de pressão', 'Líder Tradicional', 'Líder Servidor'],
+                rows: [
+                  { label: 'Meta não batida', values: ['Cobra resultado em reunião pública', 'Pergunta o que bloqueou e o que precisa'], },
+                  { label: 'Erro da equipe', values: ['Atribui culpa, documenta para demissão', 'Analisa causa-raiz, protege a equipe'], },
+                  { label: 'Sucesso do time', values: ['Apresenta resultado como próprio ao board', 'Nomeia quem fez acontecer publicamente'], },
+                  { label: 'Conflito interno', values: ['Resolve decidindo unilateralmente', 'Facilita diálogo, equipe chega à solução'], },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada comportamento — liderança servidora ou tradicional:',
+                zones: [
+                  { id: 'servidora', label: 'Liderança Servidora' },
+                  { id: 'tradicional', label: 'Liderança Tradicional' },
+                ],
+                items: [
+                  { id: 'ls-1', label: 'Diretora cancela sua apresentação no board para dar espaço ao gerente que liderou o projeto', sublabel: 'Diz ao CEO: "Quem entende melhor é ela — prefiro que apresente diretamente"', correctZone: 'servidora', correctFeedback: 'Correto — Liderança Servidora. Abrir mão do holofote para dar visibilidade a quem realmente fez o trabalho é uma das marcas mais concretas da liderança servidora.', wrongFeedback: 'Repense. Essa ação vai contra o instinto de autopromoção. Quem abdica do próprio reconhecimento para empoderar um subordinado está servindo — não liderando pelo poder.' },
+                  { id: 'ls-2', label: 'CEO envia e-mail listando os 3 funcionários com pior desempenho do trimestre para toda a empresa', sublabel: 'Argumenta que "transparência é um valor nosso"', correctZone: 'tradicional', correctFeedback: 'Correto — Liderança Tradicional (e prejudicial). Expor pessoas publicamente viola dignidade e segurança psicológica. "Transparência" não justifica humilhação — isso é uso de poder sobre pessoas.', wrongFeedback: 'Repense. Independente da justificativa, expor falhas individuais publicamente cria medo, não melhoria. Esse comportamento usa pessoas como instrumento — o oposto de servir.' },
+                  { id: 'ls-3', label: 'Gerente protege sua equipe quando o VP questiona publicamente a qualidade do trabalho em reunião', sublabel: 'Depois conversa com a equipe em privado sobre os pontos a melhorar', correctZone: 'servidora', correctFeedback: 'Correto — Liderança Servidora. Proteger a equipe de ataques externos enquanto mantém accountability em privado é o equilíbrio exato da liderança servidora.', wrongFeedback: 'Repense. Esse comportamento combina proteção (pública) com accountability (privada). Quem age assim está servindo à dignidade da equipe enquanto mantém padrão de qualidade.' },
+                  { id: 'ls-4', label: 'Líder exige aprovação prévia em todos os e-mails que a equipe envia para outros departamentos', sublabel: '"Preciso saber tudo que sai daqui antes de sair"', correctZone: 'tradicional', correctFeedback: 'Correto — Liderança Tradicional. Controle excessivo viola subsidiariedade e sinaliza desconfiança. Equipes controladas assim perdem iniciativa e autonomia — e eventualmente, os melhores talentos saem.', wrongFeedback: 'Repense. Controlar cada comunicação da equipe não é cuidado — é desconfiança. Liderança servidora dá autonomia e confia. Esse comportamento centraliza poder em vez de servir.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{A pergunta do líder servidor não é "como posso usar minha equipe para atingir resultados?" — é "como posso servir minha equipe para que ela entregue o melhor que pode?"}}. A diferença parece sutil; os resultados de longo prazo são dramáticos.',
+              keyInsights: [
+                'Segurança psicológica é pré-requisito da inovação. Times com medo de errar param de tentar. Times onde o erro é aprendizado experimentam mais — e inovam mais.',
+                '{{O teste real da liderança servidora}}: sua equipe cresce com você? Se os melhores talentos estão saindo, a resposta é não — independente do que você acredita sobre si mesmo.',
+                'Liderança servidora não é fraqueza. Greenleaf foi claro: o servidor-líder tem visão clara e coragem de defender princípios. Servir não é ceder — é colocar o outro antes do ego.',
+              ],
+            },
           },
           {
-            id: 'M7-valores-d1',
-            type: 'decision',
-            scenario: 'Você é CEO de uma empresa com 200 funcionários. A crise econômica exige corte de 15% nos custos. Você pode: (A) demitir 30 pessoas, (B) reduzir salário de todos em 15% temporariamente, ou (C) cortar bônus da diretoria + reduzir 8% geral.',
-            options: [
-              { label: 'Demitir 30 pessoas (15% do quadro)', tradeoffs: { upside: 'Corte rápido, atinge a meta imediata', downside: 'Destrói moral, perde talentos, custo de rescisão', risk: 'high' } },
-              { label: 'Reduzir salário de todos em 15%', tradeoffs: { upside: 'Ninguém perde emprego, solidariedade coletiva', downside: 'Desmotivação geral, melhores talentos podem sair', risk: 'medium' } },
-              { label: 'Cortar bônus da diretoria + redução de 8% geral', tradeoffs: { upside: 'Liderança dá o exemplo, corte é mais justo', downside: 'Pode não atingir os 15% necessários', risk: 'medium' } },
+            id: 'M7-1-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Decisões Éticas em Crise — Quando Não Há Resposta Fácil',
+            subtitle: 'Três frameworks para navegar dilemas reais: quando demitir viola dignidade, mas não demitir ameaça a empresa. Como decidir com ética quando tudo parece errado.',
+            opening: {
+              leadText: 'Em agosto de 2008, Barry-Wehmiller precisava cortar US$ 10M. A escolha óbvia: demitir 1.000 pessoas. Bob Chapman fez diferente: pediu que todos — inclusive a diretoria — tirassem 4 semanas de licença não-remunerada. "Prefiro que todos sofram um pouco a alguns sofrerem muito." A empresa economizou US$ 14M. Ninguém foi demitido. O engajamento aumentou.',
+            },
+            body: [
+              {
+                kind: 'step-flow',
+                title: 'Os 3 filtros éticos para decisões difíceis',
+                steps: [
+                  { number: 1, title: 'Filtro da Dignidade', description: 'Essa decisão trata cada pessoa afetada como {{fim em si mesma ou como meio}}? (Kant). Pergunte: "Estou usando alguém como instrumento para um objetivo?" Se sim, a decisão precisa ser repensada.' },
+                  { number: 2, title: 'Filtro das Consequências', description: 'Qual o impacto {{total}} da decisão — em todos os stakeholders, não só nos acionistas? (Utilitarismo). A decisão que maximiza o bem-estar geral, considerando todos os afetados, é eticamente mais robusta.' },
+                  { number: 3, title: 'Filtro do Espelho', description: '{{Você se sentiria orgulhoso se essa decisão fosse publicada no jornal amanhã}}? (Teste da transparência). Se você precisaria esconder a decisão ou sua forma de execução, ela provavelmente tem um problema ético.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A Johnson & Johnson aplicou os 3 filtros em 1982: quando cápsulas de Tylenol foram adulteradas (7 mortes em Chicago), retiraram 31 milhões de unidades das prateleiras sem hesitar. Custo: US$ 100M. O credo da empresa dizia explicitamente que médicos e pacientes vinham antes de acionistas. Em 1 ano, recuperaram 100% do market share. O filtro do espelho funcionou ao contrário: a decisão ficou famosa como modelo ético — não como escândalo.',
+              },
             ],
-            realWorldAnalog: 'Durante a crise de 2008, a Barry-Wehmiller (CEO Bob Chapman) optou por licenças não-remuneradas rotativas em vez de demissões. Ninguém perdeu emprego. A empresa se recuperou mais rápido que concorrentes.',
-            lesson: 'O princípio da Dignidade da Pessoa Humana (Doutrina Social) diz: pessoas não são "recursos" descartáveis. O princípio da Subsidiariedade diz: pergunte aos afetados qual solução preferem.',
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare como os 3 filtros revelam a qualidade ética de uma decisão — depois classifique cada cenário.',
+              compare: {
+                columnHeaders: ['Filtro da Dignidade', 'Filtro das Consequências', 'Filtro do Espelho'],
+                rows: [
+                  { label: 'Decisão ética robusta', values: ['Trata afetados como fins', 'Maximiza bem-estar geral', 'Pode ser publicada com orgulho'] },
+                  { label: 'Decisão eticamente frágil', values: ['Usa pessoas como meio', 'Externaliza custo para poucos', 'Exige sigilo ou eufemismo'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual filtro ético cada decisão está violando principalmente?',
+                zones: [
+                  { id: 'dignidade', label: 'Filtro da Dignidade' },
+                  { id: 'consequencias', label: 'Filtro das Consequências' },
+                  { id: 'espelho', label: 'Filtro do Espelho' },
+                ],
+                items: [
+                  { id: 'dec-1', label: 'Empresa comunica reestruturação chamando demissões de "otimização de talentos" em nota para imprensa', sublabel: 'Internamente, o CEO disse à equipe: "não podemos chamar de demissão porque vai afetar o preço da ação"', correctZone: 'espelho', correctFeedback: 'Correto — Filtro do Espelho. O eufemismo deliberado é o sinal: a empresa sabe que a decisão não passaria no teste da transparência. Quando você precisa disfarçar o que está fazendo, a forma (no mínimo) tem um problema ético.', wrongFeedback: 'Repense. A questão aqui não é quem foi afetado, mas o que a empresa está escondendo e por quê. Quando uma decisão precisa de disfarce linguístico, qual filtro ela não passa?' },
+                  { id: 'dec-2', label: 'Mineradora obtém licença ambiental pagando consultoria vinculada a funcionário do órgão regulador', sublabel: 'A operação polui lençol freático de 3 municípios aguas abaixo', correctZone: 'consequencias', correctFeedback: 'Correto — Filtro das Consequências (e também corrupção). O custo real da decisão é socializado (3 municípios, lençol freático) enquanto o benefício é privado. O impacto total sobre todos os stakeholders revela a fragilidade ética.', wrongFeedback: 'Repense. Além da corrupção, o problema ético central é: quem paga o custo real dessa decisão? Quando você mapeia todos os afetados, qual filtro essa decisão claramente não passa?' },
+                  { id: 'dec-3', label: 'Gestor atribui resultado de projeto a si mesmo em apresentação para o board, omitindo os 4 membros da equipe', sublabel: 'Depois diz à equipe: "vocês sabem que eu os valorizo — isso foi só estratégia de carreira"', correctZone: 'dignidade', correctFeedback: 'Correto — Filtro da Dignidade. O gestor usou as pessoas como instrumento para seu próprio avanço de carreira. "Vocês sabem que os valorizo" não cancela o ato — confirma a instrumentalização.', wrongFeedback: 'Repense. A decisão foi tomada sem considerar as pessoas como fins — elas foram usadas como meio para um objetivo pessoal. Qual filtro detecta esse tipo de instrumentalização?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{Ética não é ausência de dilemas — é a qualidade do processo de decisão quando os dilemas aparecem}}. Os 3 filtros não eliminam a dificuldade; estruturam a reflexão para que decisões difíceis sejam tomadas com consciência e responsabilidade.',
+              keyInsights: [
+                'Dilemas éticos reais não têm resposta perfeita — têm respostas melhores e piores. Os 3 filtros revelam qual opção tem mais integridade no processo de decisão.',
+                '{{O filtro do espelho é prático}}: se você precisaria esconder a decisão, a forma ou o raciocínio — algo está errado. Transparência é o proxy mais simples de integridade.',
+                'Decisões éticas custam no curto prazo (Tylenol custou US$ 100M). O retorno vem em confiança, reputação e cultura — ativos que levam anos para construir e dias para destruir.',
+              ],
+            },
           },
           {
-            id: 'M7-valores-ex1',
-            type: 'inline-exercise',
-            prompt: 'Avalie se sua empresa (ou uma que conhece) pratica liderança servidora.',
-            context: 'Robert Greenleaf definiu 5 características da liderança servidora: escuta ativa, empatia, compromisso com crescimento das pessoas, construção de comunidade, e decisão ética.',
-            fields: [
-              { id: 'empresa', label: 'Qual empresa você está analisando?', placeholder: 'Nome da empresa e seu papel nela' },
-              { id: 'escuta', label: 'Escuta ativa — líderes ouvem antes de decidir?', placeholder: 'Dê exemplo concreto: reuniões, pesquisas internas, 1:1...', multiline: true },
-              { id: 'crescimento', label: 'Compromisso com crescimento — investe no desenvolvimento das pessoas?', placeholder: 'Treinamentos, mentoria, plano de carreira...', multiline: true },
-              { id: 'gap', label: 'Qual a maior lacuna e o que mudaria?', placeholder: 'Identifique 1 área fraca e proponha 1 ação concreta', multiline: true },
+            id: 'M7-1-cap4',
+            type: 'chapter',
+            number: 4,
+            title: 'Propósito Organizacional — Do Discurso à Prática',
+            subtitle: 'Toda empresa tem um propósito declarado. Poucas têm um propósito real. Como identificar a diferença — e o que construir quando há desalinhamento.',
+            opening: {
+              leadText: 'Simon Sinek popularizou o "Golden Circle": toda empresa sabe O QUÊ faz; algumas sabem COMO; poucas sabem POR QUÊ. A Apple não vende computadores — vende o desafio ao status quo. A Natura não vende cosméticos — vende bem-estar. Mas propósito sem comportamento consistente é marketing. A verdade é revelada em como a empresa toma decisões quando ninguém está olhando.',
+            },
+            body: [
+              {
+                kind: 'pillar-grid',
+                title: 'Os 4 indicadores de propósito real vs. propósito declarado',
+                pillars: [
+                  { icon: '⚡', title: 'Decisões sob pressão', description: '{{O propósito real aparece quando a decisão custa algo}}. Empresa que diz valorizar pessoas mas demite para proteger bônus de diretoria revela seu propósito real. Propósito genuíno é o que guia quando é inconveniente.' },
+                  { icon: '💰', title: 'Alocação de recursos', description: 'O orçamento não mente. {{Onde a empresa investe revela o que realmente importa}}. "Pessoas são nosso maior ativo" + zero budget para desenvolvimento = propósito falso. Siga o dinheiro, não o discurso.' },
+                  { icon: '🔁', title: 'Consistência de longo prazo', description: 'Propósito real {{persiste através de mudanças de liderança e pressão de mercado}}. Se o propósito muda quando muda o CEO, era pessoal — não institucional. Cultura que depende de 1 pessoa é fragilidade estratégica.' },
+                  { icon: '📢', title: 'Comportamento dos líderes', description: '{{Líderes são o propósito em ação}}. A equipe não ouve o que a empresa diz — observa o que os líderes fazem. Um CEO que fala em sustentabilidade e viaja de jato particular sem compensação revela o propósito real.' },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'A Patagonia deu a empresa inteira para o planeta em 2022. O fundador Yvon Chouinard transferiu a propriedade para fundos ambientais. Esse ato — irreversível, custoso — foi a prova de propósito mais clara possível. Antes disso, a empresa já recusava ser vendida a fundos que não mantivessem seus valores. Propósito não é o que você escreve no site — é o que você protege quando o custo de proteger é alto.',
+              },
             ],
-            evaluationCriteria: [
-              'Analisou com exemplos concretos, não genéricos',
-              'Diferenciou discurso (o que dizem) de prática (o que fazem)',
-              'Identificou pelo menos 1 lacuna real com honestidade',
-              'Propôs ação viável e específica (não "melhorar a comunicação")',
-            ],
-            expectedConcepts: ['liderança servidora', 'dignidade humana', 'bem comum', 'subsidiariedade'],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Compare sinais de propósito genuíno e propósito performático — depois classifique cada caso.',
+              compare: {
+                columnHeaders: ['Propósito Genuíno', 'Propósito Performático'],
+                rows: [
+                  { label: 'Decisões sob pressão', values: ['Mantém valores quando custa algo', 'Abandona valores quando inconveniente'] },
+                  { label: 'Recursos', values: ['Orçamento alinhado com valores declarados', 'Discurso sem investimento correspondente'] },
+                  { label: 'Liderança', values: ['Líderes exemplificam o propósito', 'Líderes pregam o que não praticam'] },
+                  { label: 'Longo prazo', values: ['Propósito persiste através de crises', 'Propósito muda com pressão externa'] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada situação — propósito genuíno ou performático:',
+                zones: [
+                  { id: 'genuino', label: 'Propósito Genuíno' },
+                  { id: 'performatico', label: 'Propósito Performático' },
+                ],
+                items: [
+                  { id: 'prop-1', label: 'Empresa de alimentos rejeita aquisição por fundo de private equity que exigiria redução de 40% nos padrões ambientais', sublabel: 'Fundadores recusam oferta de R$ 800M para manter controle sobre a missão', correctZone: 'genuino', correctFeedback: 'Correto — Propósito Genuíno. Recusar R$ 800M para proteger valores é a prova mais cara (literalmente) de propósito real. Quando o custo de manter os valores é altíssimo e você paga, o propósito é genuíno.', wrongFeedback: 'Repense. Qual é o custo dessa decisão para os fundadores? Quando alguém paga um custo altíssimo para manter seus valores, o que isso revela sobre o propósito?' },
+                  { id: 'prop-2', label: 'Banco lança campanha de "diversidade e inclusão" no Mês do Orgulho enquanto financia projetos que discriminam minorias', sublabel: 'Relatório interno mostra que apenas 3% dos cargos de liderança são ocupados por pessoas negras', correctZone: 'performatico', correctFeedback: 'Correto — Propósito Performático (Pink/Rainbow Washing). O indicador está no alinhamento entre discurso e prática. Campanha em junho + financiamento discriminatório + 3% de representação = propósito decorativo.', wrongFeedback: 'Repense. O teste é: o comportamento real (financiamento, representação interna) está alinhado com o discurso (campanha de diversidade)? Quando há desalinhamento flagrante, o que o propósito realmente é?' },
+                  { id: 'prop-3', label: 'CEO corta seu próprio bônus de R$ 2M e o da diretoria para financiar treinamento de 500 funcionários em crise econômica', sublabel: '"Se vamos pedir sacrifício, precisa começar de cima"', correctZone: 'genuino', correctFeedback: 'Correto — Propósito Genuíno. Liderar pelo exemplo em situação de custo pessoal alto é o comportamento que distingue liderança com propósito de liderança com discurso. A ação foi custosa, visível e coerente.', wrongFeedback: 'Repense. O CEO abriu mão de algo significativo pessoalmente para honrar um valor declarado. Quando o comportamento de um líder tem custo pessoal real e é consistente com os valores, o que isso revela?' },
+                  { id: 'prop-4', label: 'Empresa lança programa "Bem-estar dos Colaboradores" mas corta budget de saúde mental 3 meses depois por pressão de resultados', sublabel: 'RH é instruído a não comunicar o corte publicamente', correctZone: 'performatico', correctFeedback: 'Correto — Propósito Performático. O ciclo revela tudo: lança quando conveniente, corta quando pressiona, esconde a contradição. "Bem-estar" era marketing, não valor. O orçamento (e o segredo) revelam o propósito real.', wrongFeedback: 'Repense. Siga o dinheiro e o comportamento sob pressão: o programa durou 3 meses antes do primeiro teste real. Quando os valores desaparecem na primeira pressão e são escondidos, o que isso indica sobre o propósito?' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: '{{Propósito é o que você protege quando custa algo}}. Toda empresa tem valores escritos em parede e site. O que diferencia é o que acontece quando esses valores entram em conflito com pressão de resultados, com conveniência, com oportunidade. Nesses momentos — e só nesses — o propósito real se revela.',
+              keyInsights: [
+                'O teste definitivo do propósito: o que a empresa faz quando ninguém está olhando? Quando é caro manter os valores? Quando é conveniente abandoná-los? A resposta é o propósito real.',
+                '{{Alocação de orçamento não mente}}. Se quiser saber o que uma empresa realmente valoriza, leia o relatório financeiro — não o relatório de sustentabilidade. Dinheiro é o voto mais honesto.',
+                'Propósito institucional é mais robusto que propósito pessoal. Se o propósito da empresa depende do CEO atual, é frágil. O objetivo é criar cultura que persiste independente de quem lidera.',
+              ],
+            },
           },
         ],
+
       },
       {
         id: 'M7-2',
