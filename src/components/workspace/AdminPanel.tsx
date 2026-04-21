@@ -824,13 +824,13 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
               <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `3px solid ${GREEN}` }}>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[12px] font-semibold text-white/55">Práticas verificadas</span>
-                  <span className="font-mono text-[12px] font-bold" style={{ color: (s.sustDigital ?? []).filter(Boolean).length >= 5 ? GREEN : AMBER }}>
-                    {(s.sustDigital ?? []).filter(Boolean).length}/{SUST_ITEMS.length}
+                  <span className="font-mono text-[12px] font-bold" style={{ color: SUST_ITEMS.filter((item, i) => item.autoCheck || (s.sustDigital ?? [])[i]).length >= 5 ? GREEN : AMBER }}>
+                    {SUST_ITEMS.filter((item, i) => item.autoCheck || (s.sustDigital ?? [])[i]).length}/{SUST_ITEMS.length}
                   </span>
                 </div>
                 <div className="flex flex-col gap-2">
                   {SUST_ITEMS.map((item, i) => {
-                    const checked = (s.sustDigital ?? [])[i] ?? item.autoCheck
+                    const checked = item.autoCheck || ((s.sustDigital ?? [])[i] ?? false)
                     return (
                       <div key={i}>
                         <button onClick={() => { if (!item.autoCheck) { const next = [...(s.sustDigital ?? SUST_ITEMS.map(x => x.autoCheck))]; next[i] = !next[i]; update({ sustDigital: next }) } }}
@@ -866,7 +866,7 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
                     Calibra urgência pelo runway e margem real.
                   </p>
                 </div>
-                <button onClick={handleIA} disabled={iaLoading}
+                <button onClick={() => { update({ iaReflexao: '' }); handleIA() }} disabled={iaLoading}
                   className="w-full rounded-lg py-2.5 flex items-center justify-center gap-2 transition-opacity hover:opacity-90 disabled:opacity-50"
                   style={{ background: BLUE, color: '#fff', fontSize: 13, fontWeight: 600, cursor: iaLoading ? 'wait' : 'pointer' }}>
                   {iaLoading ? <Loader2 size={14} className="animate-spin" /> : <Brain size={14} />}
