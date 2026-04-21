@@ -50,6 +50,11 @@ export default function SmartPricing({ marketData, userProfile }: { marketData: 
   const cambioRef = 4.50
 
   const calc = useMemo(() => {
+    const custoReal = custo * (1 + (pctDolar / 100) * (usdRate / cambioRef - 1))
+    // Custo total unitário inclui rateio de custos fixos
+    const custoFixoUnitario = unidades > 0 ? custosFixos / unidades : 0
+    const custoTotalUnitario = custoReal + custoFixoUnitario
+
     const markup = custo > 0 ? ((preco - custo) / custo) * 100 : 0
     const margemBruta = preco > 0 ? ((preco - custo) / preco) * 100 : 0
     const receita = preco * unidades
@@ -57,15 +62,24 @@ export default function SmartPricing({ marketData, userProfile }: { marketData: 
     const contribuicao = preco - custo
     const breakeven = contribuicao > 0 ? custosFixos / contribuicao : Infinity
     const margemSeguranca = unidades > 0 && isFinite(breakeven) ? ((unidades - breakeven) / unidades) * 100 : -100
-    const custoReal = custo * (1 + (pctDolar / 100) * (usdRate / cambioRef - 1))
     const precoMinimo = margemDesejada < 100 ? custoReal / (1 - margemDesejada / 100) : custoReal * 10
 
+    // Prejuízo invisível: vendendo abaixo do custo total unitário
+    const prejuizoUnitario = preco - custoTotalUnitario
+    const temPrejuizoInvisivel = preco < custoTotalUnitario && preco > custo
+
     // Price points for chart
-    const pMinBreakeven = contribuicao > 0 ? custo * 1.05 + custosFixos / (unidades || 1) : custoReal * 1.2
-    const pCompetitivo = custo * 1.5
+    const pMinBreakeven = custoTotalUnitario * 1.05
+    const pCompetitivo = custoTotalUnitario * 1.3
     const pAtual = preco
-    const pEquilibrado = margemDesejada < 100 ? (custoReal * (1 + ipcaRate / 100)) / (1 - margemDesejada / 100) : custoReal * 2
+    const pEquilibrado = margemDesejada < 100 ? (custoTotalUnitario * (1 + ipcaRate / 100)) / (1 - margemDesejada / 100) : custoTotalUnitario * 2
     const pPremium = pEquilibrado * 1.15
+
+    // IPCA protection price
+    const precoIpcaProtegido = preco * (1 + ipcaRate / 100)
+    // Currency trigger: if USD crosses 5.20
+    const usdGatilho = 5.20
+    const precoGatilhoCambio = preco * (1 + (usdGatilho - cambioRef) / cambioRef * (pctDolar / 100))
 
     // Câmbio
     const custoBase = custo
@@ -81,20 +95,27 @@ export default function SmartPricing({ marketData, userProfile }: { marketData: 
     const volumeLoss15 = unidades * 0.85
     const receitaUp10Loss = precoUp10 * volumeLoss15
     const diffReceitaLoss = receitaUp10Loss - receita
-    const precoOtimo = custoReal * 1.8
+    const precoOtimo = custoTotalUnitario * 1.8
 
-    // Recomendacao
+    // Recomendação — base em custo TOTAL (não apenas variável)
     let precoRecomendado = pEquilibrado
-    if (margemBruta < margemDesejada) precoRecomendado = Math.max(pEquilibrado, precoMinimo)
-    if (margemBruta > margemDesejada + 15) precoRecomendado = pCompetitivo
+    if (preco < custoTotalUnitario) {
+      // Preço abaixo do custo total — empurra para premium
+      precoRecomendado = Math.max(pEquilibrado, pPremium)
+    } else if (margemBruta < margemDesejada) {
+      precoRecomendado = Math.max(pEquilibrado, precoMinimo)
+    } else if (margemBruta > margemDesejada + 15) {
+      precoRecomendado = pCompetitivo
+    }
 
     return {
       markup, margemBruta, receita, lucroBruto, breakeven, margemSeguranca,
-      custoReal, precoMinimo,
+      custoReal, custoTotalUnitario, custoFixoUnitario, precoMinimo,
       pMinBreakeven, pCompetitivo, pAtual, pEquilibrado, pPremium,
       custoBase, custoAtualCambio, cambioDiff, cambioPct, margemAjustadaCambio,
       precoUp10, diffReceitaFull, diffReceitaLoss, precoOtimo,
-      precoRecomendado,
+      precoRecomendado, prejuizoUnitario, temPrejuizoInvisivel,
+      precoIpcaProtegido, precoGatilhoCambio, usdGatilho,
     }
   }, [custo, preco, unidades, pctDolar, custosFixos, margemDesejada, ipcaRate, usdRate])
 
@@ -102,14 +123,15 @@ export default function SmartPricing({ marketData, userProfile }: { marketData: 
     { label: 'Markup', value: `${fmtDec(calc.markup)}%`, color: colorByRange(calc.markup, 50, 20), desc: '(preço-custo)/custo' },
     { label: 'Margem Bruta', value: `${fmtDec(calc.margemBruta)}%`, color: colorByRange(calc.margemBruta, 30, 15), desc: '(preço-custo)/preço' },
     { label: 'Receita Mensal', value: `R$${fmt(calc.receita)}`, color: BLUE, desc: 'preço × unidades' },
-    { label: 'Lucro Bruto', value: `R$${fmt(calc.lucroBruto)}`, color: calc.lucroBruto >= 0 ? GREEN : RED, desc: '(preço-custo) × unid.' },
+    { label: 'Lucro Líquido', value: `R$${fmt(calc.lucroBruto - custosFixos)}`, color: (calc.lucroBruto - custosFixos) >= 0 ? GREEN : RED, desc: '(preço-custo)×un − fixos' },
     { label: 'Breakeven', value: isFinite(calc.breakeven) ? `${fmt(Math.ceil(calc.breakeven))} un` : '---', color: AMBER, desc: 'custos fixos / contrib.' },
     { label: 'Margem Segurança', value: `${fmtDec(calc.margemSeguranca)}%`, color: colorByRange(calc.margemSeguranca, 30, 10), desc: 'folga acima do breakeven' },
-    { label: 'Custo Real (c/ dólar)', value: `R$${fmtDec(calc.custoReal, 2)}`, color: calc.custoReal > custo ? AMBER : GREEN, desc: 'custo ajustado ao câmbio' },
+    { label: 'Custo Total/Un.', value: `R$${fmtDec(calc.custoTotalUnitario, 2)}`, color: preco < calc.custoTotalUnitario ? RED : GREEN, desc: `var. R$${fmtDec(calc.custoReal,2)} + fixo R$${fmtDec(calc.custoFixoUnitario,2)}` },
     { label: 'Preço Mínimo', value: `R$${fmtDec(calc.precoMinimo, 2)}`, color: preco >= calc.precoMinimo ? GREEN : RED, desc: `p/ margem de ${margemDesejada}%` },
   ]
 
   const barData = [
+    { label: 'Custo Total', value: calc.custoTotalUnitario },
     { label: 'Preço Mínimo', value: calc.pMinBreakeven },
     { label: 'Competitivo', value: calc.pCompetitivo },
     { label: 'Atual', value: calc.pAtual },
@@ -117,7 +139,7 @@ export default function SmartPricing({ marketData, userProfile }: { marketData: 
     { label: 'Premium', value: calc.pPremium },
   ]
   const maxBar = Math.max(...barData.map(b => b.value), 1)
-  const breakevenPrice = isFinite(calc.breakeven) && calc.breakeven > 0 ? custosFixos / (unidades || 1) + custo : custo
+  const breakevenPrice = calc.custoTotalUnitario
 
   const handleIA = async () => {
     setIaLoading(true)
@@ -312,6 +334,25 @@ export default function SmartPricing({ marketData, userProfile }: { marketData: 
 
       {/* 5. Recomendacao IA */}
       <div>
+        {/* Alerta prejuízo invisível */}
+        {calc.temPrejuizoInvisivel && (
+          <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="rounded-lg p-4 mb-3"
+            style={{ background: `${RED}18`, border: `2px solid ${RED}` }}>
+            <div className="flex items-center gap-2 mb-2">
+              <AlertTriangle size={16} style={{ color: RED }} />
+              <span style={{ fontSize: 13, fontWeight: 700, color: RED, fontFamily: 'monospace' }}>PREJUÍZO INVISÍVEL DETECTADO</span>
+            </div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7 }}>
+              Custo variável <span style={{ fontFamily: 'monospace', color: AMBER }}>R${fmtDec(calc.custoReal,2)}</span> + rateio fixo{' '}
+              <span style={{ fontFamily: 'monospace', color: AMBER }}>R${fmtDec(calc.custoFixoUnitario,2)}</span> = custo total{' '}
+              <span style={{ fontFamily: 'monospace', color: RED, fontWeight: 700 }}>R${fmtDec(calc.custoTotalUnitario,2)}</span>
+            </div>
+            <div style={{ fontSize: 13, color: RED, fontFamily: 'monospace', fontWeight: 700, marginTop: 4 }}>
+              Vendendo a R${fmtDec(preco,2)}, você perde R${fmtDec(Math.abs(calc.prejuizoUnitario),2)} por venda.
+            </div>
+          </motion.div>
+        )}
+
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-lg p-4 mb-3"
           style={{ background: 'rgba(26,82,118,0.15)', border: `1px solid ${BLUE}` }}>
           <div className="flex items-center gap-2 mb-2">
@@ -319,11 +360,28 @@ export default function SmartPricing({ marketData, userProfile }: { marketData: 
             <span style={{ fontSize: 14, fontWeight: 600 }}>Recomendacao</span>
           </div>
           <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7 }}>
-            Dado IPCA <span style={{ fontFamily: 'monospace', color: AMBER }}>{fmtDec(ipcaRate)}%</span>, cambio{' '}
-            <span style={{ fontFamily: 'monospace', color: AMBER }}>R${fmtDec(usdRate, 2)}</span> e margem desejada{' '}
+            Dado custo total <span style={{ fontFamily: 'monospace', color: AMBER }}>R${fmtDec(calc.custoTotalUnitario,2)}</span>, IPCA{' '}
+            <span style={{ fontFamily: 'monospace', color: AMBER }}>{fmtDec(ipcaRate)}%</span> e margem desejada{' '}
             <span style={{ fontFamily: 'monospace', color: AMBER }}>{margemDesejada}%</span>, recomendo preco{' '}
             <span style={{ fontFamily: 'monospace', fontWeight: 700, color: GREEN, fontSize: 15 }}>R${fmtDec(calc.precoRecomendado, 2)}</span>
           </div>
+          {/* IPCA protection */}
+          <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginBottom: 6, fontFamily: 'monospace' }}>PROTEÇÃO INFLACIONÁRIA</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
+              Preço com IPCA ({fmtDec(ipcaRate)}%): <span style={{ fontFamily: 'monospace', color: AMBER, fontWeight: 700 }}>R${fmtDec(calc.precoIpcaProtegido, 2)}</span>
+            </div>
+          </div>
+          {/* Currency trigger */}
+          {pctDolar > 0 && (
+            <div className="mt-2 rounded-md px-3 py-2" style={{ background: usdRate > calc.usdGatilho ? `${RED}15` : `${AMBER}10`, border: `1px solid ${usdRate > calc.usdGatilho ? RED : AMBER}30` }}>
+              <span style={{ fontSize: 11, fontFamily: 'monospace', color: usdRate > calc.usdGatilho ? RED : AMBER }}>
+                {usdRate > calc.usdGatilho
+                  ? `⚡ GATILHO ATIVO: USD R${fmtDec(usdRate,2)} > R${fmtDec(calc.usdGatilho,2)} — ajuste para R${fmtDec(calc.precoGatilhoCambio,2)}`
+                  : `Gatilho câmbio: se USD > R${fmtDec(calc.usdGatilho,2)}, preço sobe para R${fmtDec(calc.precoGatilhoCambio,2)}`}
+              </span>
+            </div>
+          )}
         </motion.div>
 
         <button onClick={handleIA} disabled={iaLoading}

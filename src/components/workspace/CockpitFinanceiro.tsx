@@ -25,22 +25,24 @@ function colorByRange(value: number, greenAbove: number, amberAbove: number): st
   return RED
 }
 
-const PHASE_DEFAULTS: Record<string, { receita: number; despesas: number; caixa: number; cac: number }> = {
-  validacao: { receita: 3000,  despesas: 2000,  caixa: 15000,  cac: 150 },
-  mei:       { receita: 6000,  despesas: 3500,  caixa: 25000,  cac: 90  },
-  slu:       { receita: 20000, despesas: 12000, caixa: 60000,  cac: 60  },
-  startup:   { receita: 50000, despesas: 38000, caixa: 120000, cac: 120 },
-  ltda:      { receita: 80000, despesas: 55000, caixa: 200000, cac: 45  },
+const PHASE_DEFAULTS: Record<string, { receita: number; despesas: number; caixa: number; cac: number; ticketMedio: number; churnMensal: number }> = {
+  validacao: { receita: 3000,  despesas: 2000,  caixa: 15000,  cac: 150, ticketMedio: 150, churnMensal: 15 },
+  mei:       { receita: 6000,  despesas: 3500,  caixa: 25000,  cac: 90,  ticketMedio: 100, churnMensal: 10 },
+  slu:       { receita: 20000, despesas: 12000, caixa: 60000,  cac: 60,  ticketMedio: 200, churnMensal: 8  },
+  startup:   { receita: 50000, despesas: 38000, caixa: 120000, cac: 120, ticketMedio: 250, churnMensal: 7  },
+  ltda:      { receita: 80000, despesas: 55000, caixa: 200000, cac: 45,  ticketMedio: 350, churnMensal: 5  },
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function CockpitFinanceiro({ marketData, userProfile }: { marketData: any; userProfile?: any }) {
-  const phaseDefault = PHASE_DEFAULTS[userProfile?.subtype] ?? { receita: 50000, despesas: 35000, caixa: 120000, cac: 45 }
+  const phaseDefault = PHASE_DEFAULTS[userProfile?.subtype] ?? { receita: 50000, despesas: 35000, caixa: 120000, cac: 45, ticketMedio: 250, churnMensal: 7 }
   const { data, update } = useWorkspaceData('cockpit', phaseDefault)
   const receita = data.receita; const setReceita = (v: number) => update({ receita: v })
   const despesas = data.despesas; const setDespesas = (v: number) => update({ despesas: v })
   const caixa = data.caixa; const setCaixa = (v: number) => update({ caixa: v })
   const cac = data.cac; const setCac = (v: number) => update({ cac: v })
+  const ticketMedio = data.ticketMedio ?? phaseDefault.ticketMedio; const setTicketMedio = (v: number) => update({ ticketMedio: v })
+  const churnMensal = data.churnMensal ?? phaseDefault.churnMensal; const setChurnMensal = (v: number) => update({ churnMensal: v })
   const [iaLoading, setIaLoading] = useState(false)
   const [iaResponse, setIaResponse] = useState('')
 
@@ -48,18 +50,24 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
     const margemDecimal = receita > 0 ? (receita - despesas) / receita : 0
     const margem = margemDecimal * 100
     const lucro = receita - despesas
-    const runway = despesas > 0 ? caixa / despesas : 99
-    const ltvCac = cac > 0 ? ((receita / cac) * 12) / cac : 0
+    // Runway baseado em burn rate líquido (despesas - receitas)
+    const burnLiquido = despesas - receita
+    const runway = burnLiquido > 0 ? caixa / burnLiquido : (lucro >= 0 ? 999 : caixa / despesas)
+    // LTV/CAC correto: (Ticket Médio × Margem%) / Churn%
+    const ltv = churnMensal > 0 ? (ticketMedio * margemDecimal) / (churnMensal / 100) : 0
+    const ltvCac = cac > 0 && ltv > 0 ? ltv / cac : 0
     const burnRatio = receita > 0 ? 1 - despesas / receita : 0
-    const runwayNorm = Math.min(runway / 12, 1) * 100
+    const runwayNorm = Math.min((runway === 999 ? 24 : runway) / 24, 1) * 100
     const ltvCacNorm = Math.min(ltvCac / 5, 1) * 100
     const burnNorm = Math.max(burnRatio, 0) * 100
-    const healthScore = Math.round(margem * 0.3 + runwayNorm * 0.3 + ltvCacNorm * 0.2 + burnNorm * 0.2)
+    // Health Score: caixa/runway pesa mais (0.4)
+    const healthScore = Math.round(margem * 0.25 + runwayNorm * 0.4 + ltvCacNorm * 0.2 + burnNorm * 0.15)
     const breakeven = margemDecimal > 0 ? despesas / margemDecimal : 0
     const roi = caixa > 0 ? (lucro * 12) / caixa * 100 : 0
+    const breakevenAlert = breakeven > receita
 
-    return { margem, lucro, runway, healthScore, ltvCac, breakeven, roi }
-  }, [receita, despesas, caixa, cac])
+    return { margem, lucro, runway, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, breakevenAlert }
+  }, [receita, despesas, caixa, cac, ticketMedio, churnMensal])
 
   const selicRate = marketData?.macro?.selic?.value ?? 14.75
   const ipcaRate = marketData?.macro?.ipca?.value ?? 4.14
@@ -68,18 +76,18 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
   const metricCards = [
     { label: 'Margem', value: `${fmtDec(metrics.margem)}%`, color: colorByRange(metrics.margem, 20, 10), desc: '(receita - despesas) / receita' },
     { label: 'Lucro Mensal', value: `R$${fmt(metrics.lucro)}`, color: metrics.lucro >= 0 ? GREEN : RED, desc: 'Receita menos despesas operacionais' },
-    { label: 'Runway', value: `${fmtDec(metrics.runway)} meses`, color: colorByRange(metrics.runway, 6, 3), desc: 'Caixa dividido por despesas mensais' },
-    { label: 'Health Score', value: `${metrics.healthScore}/100`, color: colorByRange(metrics.healthScore, 70, 40), desc: 'Score ponderado de saúde financeira' },
-    { label: 'Burn Rate', value: `R$${fmt(despesas)}/mês`, color: AMBER, desc: 'Total de despesas operacionais mensais' },
-    { label: 'LTV/CAC', value: `${fmtDec(metrics.ltvCac)}x`, color: colorByRange(metrics.ltvCac, 3, 1), desc: 'Retorno sobre custo de aquisição' },
-    { label: 'Break-even', value: `R$${fmt(metrics.breakeven)}`, color: BLUE, desc: 'Receita necessária para cobrir despesas' },
+    { label: 'Runway', value: metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway)} meses`, color: colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: 'Caixa ÷ burn rate líquido (despesas-receitas)' },
+    { label: 'Health Score', value: `${metrics.healthScore}/100`, color: colorByRange(metrics.healthScore, 70, 40), desc: 'Score ponderado — caixa pesa 40%' },
+    { label: 'Burn Líquido', value: metrics.burnLiquido > 0 ? `-R$${fmt(metrics.burnLiquido)}/mês` : `+R$${fmt(Math.abs(metrics.burnLiquido))}/mês`, color: metrics.burnLiquido > 0 ? RED : GREEN, desc: 'Despesas − Receitas (negativo = lucrativo)' },
+    { label: 'LTV/CAC', value: `${fmtDec(metrics.ltvCac)}x`, color: colorByRange(metrics.ltvCac, 3, 1), desc: `(Ticket×Margem)/Churn — LTV R$${fmt(Math.round(metrics.ltv))}` },
+    { label: 'Break-even', value: `R$${fmt(metrics.breakeven)}`, color: metrics.breakevenAlert ? RED : BLUE, desc: metrics.breakevenAlert ? '⚠ Receita atual abaixo do break-even!' : 'Receita necessária para cobrir despesas' },
     { label: 'ROI Anualizado', value: `${fmtDec(metrics.roi)}%`, color: metrics.roi >= 0 ? GREEN : RED, desc: 'Retorno sobre capital investido (anual)' },
   ]
 
   const handleIA = async () => {
     setIaLoading(true)
     setIaResponse('')
-    const question = `Analise estes dados financeiros: Receita R$${fmt(receita)}, Despesas R$${fmt(despesas)}, Caixa R$${fmt(caixa)}, CAC R$${fmt(cac)}, Margem ${fmtDec(metrics.margem)}%, Runway ${fmtDec(metrics.runway)} meses, Health Score ${metrics.healthScore}. Dê um diagnóstico e 3 ações prioritárias.`
+    const question = `Analise estes dados financeiros: Receita R$${fmt(receita)}, Despesas R$${fmt(despesas)}, Caixa R$${fmt(caixa)}, CAC R$${fmt(cac)}, Ticket Médio R$${fmt(ticketMedio)}, Churn ${churnMensal}%/mês, Margem ${fmtDec(metrics.margem)}%, Runway ${metrics.runway >= 999 ? 'lucrativo' : fmtDec(metrics.runway)+' meses'}, LTV/CAC ${fmtDec(metrics.ltvCac)}x, Health Score ${metrics.healthScore}/100, Break-even R$${fmt(metrics.breakeven)}${metrics.breakevenAlert ? ' (ALERTA: receita abaixo do break-even)' : ''}. Dê um diagnóstico e 3 ações prioritárias.`
     try {
       const res = await fetch('/api/advisor-chat', {
         method: 'POST',
@@ -140,7 +148,23 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
           {inputField('Despesas Operacionais (R$)', despesas, setDespesas)}
           {inputField('Caixa Disponível (R$)', caixa, setCaixa)}
           {inputField('CAC (R$)', cac, setCac)}
+          {inputField('Ticket Médio (R$)', ticketMedio, setTicketMedio)}
+          <div className="flex flex-col gap-1">
+            <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>Churn Mensal (%)</label>
+            <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <input type="range" min={1} max={50} value={churnMensal} onChange={e => setChurnMensal(Number(e.target.value))}
+                style={{ flex: 1, accentColor: BLUE, height: 4 }} />
+              <span style={{ fontSize: 13, fontFamily: 'monospace', color: '#fff', minWidth: 36, textAlign: 'right' }}>{churnMensal}%</span>
+            </div>
+          </div>
         </div>
+        {metrics.breakevenAlert && (
+          <div className="mt-2 rounded-lg px-3 py-2.5" style={{ background: `${RED}18`, border: `1px solid ${RED}40` }}>
+            <span style={{ fontSize: 12, color: RED, fontFamily: 'monospace', fontWeight: 700 }}>
+              ⚠ ALERTA: receita R${fmt(receita)} abaixo do break-even R${fmt(metrics.breakeven)} — corte custos ou aumente ticket em {fmtDec((metrics.breakeven/receita - 1)*100)}%
+            </span>
+          </div>
+        )}
       </div>
 
       {/* 2. Calculated Metrics */}
@@ -227,6 +251,11 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
               <div style={{ fontSize: 16, fontWeight: 700, color: metrics.roi > 0 ? GREEN : RED, fontFamily: 'monospace' }}>{fmtDec(metrics.roi)}%</div>
               <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>retorno anualizado estimado</div>
             </div>
+          </div>
+          <div className="rounded-md p-2.5 mb-2" style={{ background: `${BLUE}10`, border: `1px solid ${BLUE}25` }}>
+            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
+              Rendimento do caixa no CDI: <span style={{ fontFamily: 'monospace', color: GREEN, fontWeight: 700 }}>R${fmt(Math.round(cdiRendimento))}/mês</span> ({fmtDec(cdiMensal, 2)}%/mês × R${fmt(caixa)})
+            </span>
           </div>
           <div className="rounded-md p-2.5" style={{ background: decisaoCDI ? `${AMBER}12` : `${GREEN}10`, border: `1px solid ${decisaoCDI ? AMBER : GREEN}25` }}>
             <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: decisaoCDI ? AMBER : GREEN }}>
