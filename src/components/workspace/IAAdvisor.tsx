@@ -12,7 +12,7 @@ interface Message {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function IAAdvisor({ marketData, userProfile }: { marketData: any; userProfile?: any }) {
+export default function IAAdvisor({ marketData, userProfile, contextMode = 'gestao' }: { marketData: any; userProfile?: any; contextMode?: 'gestao' | 'consultoria' | 'estudo' }) {
   const { iaModifier } = useAccessibility()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -110,7 +110,7 @@ OPORTUNIDADES:
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          question: `${userProfile ? `Você está falando com um(a) empreendedor(a) na fase "${userProfile.subtype ?? 'não informada'}", setor "${userProfile.sectors?.join(', ') || 'não informado'}", faturamento "${userProfile.revenue || 'não informado'}". TODA a análise deve ser filtrada por esse contexto — o que é relevante para essa fase, esse setor, esse tamanho.\n\n` : ''}Faça uma ANÁLISE COMPLETA do mercado brasileiro agora. Organize assim:
+          question: `${contextMode === 'estudo' ? 'Você é um PESQUISADOR E PROFESSOR de Inteligência Organizacional (OBI) baseado em Rezende, Peter e Mintzberg. Responda como um educador que transforma teoria em funcionalidade de software. ' : contextMode === 'gestao' && userProfile ? `Você está falando com um(a) empreendedor(a) na fase "${userProfile.subtype ?? 'não informada'}", setor "${userProfile.sectors?.join(', ') || 'não informado'}", faturamento "${userProfile.revenue || 'não informado'}". TODA a análise deve ser filtrada por esse contexto — o que é relevante para essa fase, esse setor, esse tamanho.\n\n` : ''}Faça uma ANÁLISE COMPLETA do mercado brasileiro agora. Organize assim:
 
 📊 PANORAMA GERAL (1 parágrafo resumindo o momento${userProfile?.subtype ? ` para quem está na fase ${userProfile.subtype}` : ''})
 

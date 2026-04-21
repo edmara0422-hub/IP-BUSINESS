@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Brain, LayoutDashboard, Activity, Tag, Zap,
   ShieldCheck, Globe, Users, Target, Lightbulb,
-  MessageSquare, AlertTriangle,
+  MessageSquare, AlertTriangle, Briefcase, BookOpen,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAccessibility, type AccessibilityMode } from '@/hooks/useAccessibility'
@@ -23,6 +23,14 @@ const CanalDenuncias = dynamic(() => import('@/components/workspace/CanalDenunci
 const AdminPanel = dynamic(() => import('@/components/workspace/AdminPanel'), { ssr: false })
 const Governanca = dynamic(() => import('@/components/workspace/Governanca'), { ssr: false })
 const InovacaoCockpit = dynamic(() => import('@/components/workspace/InovacaoCockpit'), { ssr: false })
+const ModoConsultoria = dynamic(() => import('@/components/workspace/ModoConsultoria'), { ssr: false })
+
+// ─────────────────────────────────────────────
+// Tipos e constantes
+// ─────────────────────────────────────────────
+
+type ContextMode = 'gestao' | 'consultoria' | 'estudo'
+type LayerType = 'sio' | 'sig' | 'sie' | 'compliance'
 
 interface ModuleMeta {
   id: string
@@ -30,32 +38,50 @@ interface ModuleMeta {
   short: string
   icon: React.ElementType
   color: string
-  group: 'trabalho' | 'compliance'
+  layer: LayerType
 }
 
+// SIO = Operacional (dado vira informação)
+// SIG = Gerencial (informação vira grupos para gestão)
+// SIE = Estratégico (inteligência organizacional)
 const MODULES: ModuleMeta[] = [
-  // Trabalho
-  { id: 'ia', title: 'IA Advisor', short: 'IA', icon: Brain, color: '#5dade2', group: 'trabalho' },
-  { id: 'cockpit', title: 'Cockpit Financeiro', short: 'Cockpit', icon: LayoutDashboard, color: '#1e8449', group: 'trabalho' },
-  { id: 'cenarios', title: 'Cenários & Forecast', short: 'Cenários', icon: Activity, color: '#9a7d0a', group: 'trabalho' },
-  { id: 'pricing', title: 'Smart Pricing', short: 'Pricing', icon: Tag, color: '#c0392b', group: 'trabalho' },
-  { id: 'inovacao', title: 'Inovação', short: 'Inovação', icon: Zap, color: '#7d3c98', group: 'trabalho' },
-  { id: 'esg', title: 'ESG', short: 'ESG', icon: ShieldCheck, color: '#1a5276', group: 'trabalho' },
-  { id: 'mercado', title: 'Mercado', short: 'Mercado', icon: Globe, color: '#b7950b', group: 'trabalho' },
-  { id: 'pessoas', title: 'Pessoas', short: 'Pessoas', icon: Users, color: '#a04000', group: 'trabalho' },
-  { id: 'processos', title: 'Processos', short: 'Processos', icon: Target, color: '#2471a3', group: 'trabalho' },
-  { id: 'canvas', title: 'Canvas & Pitch', short: 'Canvas', icon: Lightbulb, color: '#27ae60', group: 'trabalho' },
+  // SIO — Camada Operacional
+  { id: 'ia',       title: 'IA Advisor',          short: 'IA',       icon: Brain,          color: '#5dade2', layer: 'sio' },
+  { id: 'cockpit',  title: 'Cockpit Financeiro',   short: 'Cockpit',  icon: LayoutDashboard, color: '#1e8449', layer: 'sio' },
+  { id: 'pricing',  title: 'Smart Pricing',        short: 'Pricing',  icon: Tag,            color: '#c0392b', layer: 'sio' },
+  { id: 'processos',title: 'Processos',            short: 'SOPs',     icon: Target,         color: '#2471a3', layer: 'sio' },
+  // SIG — Camada Gerencial
+  { id: 'pessoas',  title: 'Pessoas',              short: 'Pessoas',  icon: Users,          color: '#a04000', layer: 'sig' },
+  { id: 'mercado',  title: 'Mercado',              short: 'Mercado',  icon: Globe,          color: '#b7950b', layer: 'sig' },
+  { id: 'esg',      title: 'ESG',                  short: 'ESG',      icon: ShieldCheck,    color: '#1a5276', layer: 'sig' },
+  { id: 'feedback', title: 'Feedback & NPS',       short: 'Feedback', icon: MessageSquare,  color: '#5dade2', layer: 'sig' },
+  // SIE — Camada Estratégica
+  { id: 'cenarios', title: 'Cenários & Forecast',  short: 'Cenários', icon: Activity,       color: '#9a7d0a', layer: 'sie' },
+  { id: 'inovacao', title: 'Inovação',             short: 'Inovação', icon: Zap,            color: '#7d3c98', layer: 'sie' },
+  { id: 'canvas',   title: 'Canvas & Pitch',       short: 'Canvas',   icon: Lightbulb,      color: '#27ae60', layer: 'sie' },
   // Compliance
-  { id: 'feedback', title: 'Feedback & NPS', short: 'Feedback', icon: MessageSquare, color: '#5dade2', group: 'compliance' },
-  { id: 'denuncia', title: 'Canal de Denúncias', short: 'Denúncias', icon: AlertTriangle, color: '#c0392b', group: 'compliance' },
-  { id: 'governanca', title: 'Governança', short: 'Governança', icon: ShieldCheck, color: '#1a5276', group: 'compliance' },
-  { id: 'admin', title: 'Painel Admin', short: 'Admin', icon: ShieldCheck, color: '#5dade2', group: 'compliance' },
+  { id: 'denuncia', title: 'Canal de Denúncias',   short: 'Denúncias',icon: AlertTriangle,  color: '#c0392b', layer: 'compliance' },
+  { id: 'governanca',title: 'Governança',          short: 'Gov.',     icon: ShieldCheck,    color: '#1a5276', layer: 'compliance' },
+  { id: 'admin',    title: 'Painel Admin',         short: 'Admin',    icon: ShieldCheck,    color: '#5dade2', layer: 'compliance' },
+]
+
+const LAYER_META: Record<LayerType, { label: string; desc: string; color: string }> = {
+  sio:        { label: 'SIO',        desc: 'Operacional',  color: '#1e8449' },
+  sig:        { label: 'SIG',        desc: 'Gerencial',    color: '#9a7d0a' },
+  sie:        { label: 'SIE',        desc: 'Estratégico',  color: '#5dade2' },
+  compliance: { label: 'Compliance', desc: 'Governança',   color: '#1a5276' },
+}
+
+const CONTEXT_SWITCHES: { id: ContextMode; label: string; short: string; icon: React.ElementType; color: string; desc: string }[] = [
+  { id: 'gestao',      label: 'Gestão Interna',  short: 'Gestão',     icon: LayoutDashboard, color: '#1e8449', desc: 'Runway, TRL, OKRs' },
+  { id: 'consultoria', label: 'Consultoria',      short: 'Consultoria',icon: Briefcase,       color: '#5dade2', desc: 'Modo Ghost · OBI' },
+  { id: 'estudo',      label: 'Estudo',           short: 'Estudo',     icon: BookOpen,        color: '#7d3c98', desc: 'IA como pesquisador' },
 ]
 
 const ACC_OPTIONS: { id: AccessibilityMode; label: string; desc: string }[] = [
-  { id: 'padrao', label: 'Padrão', desc: 'Experiência completa' },
-  { id: 'foco', label: 'Foco', desc: 'Menos estímulos visuais' },
-  { id: 'calmo', label: 'Calmo', desc: 'Sem animações' },
+  { id: 'padrao',    label: 'Padrão',    desc: 'Experiência completa' },
+  { id: 'foco',      label: 'Foco',      desc: 'Menos estímulos visuais' },
+  { id: 'calmo',     label: 'Calmo',     desc: 'Sem animações' },
   { id: 'contraste', label: 'Contraste', desc: 'Fontes maiores' },
 ]
 
@@ -78,11 +104,16 @@ const PHASE_LABELS: Record<string, { label: string; color: string }> = {
   startup:   { label: 'Startup',   color: '#7d3c98' },
 }
 
+// ─────────────────────────────────────────────
+// Componente principal
+// ─────────────────────────────────────────────
+
 export default function AbaTrabalhar() {
   const { mode, changeMode } = useAccessibility()
   const { profile, user } = useAuth()
   const isAdmin = profile?.role === 'admin'
   const [activeId, setActiveId] = useState('ia')
+  const [contextMode, setContextMode] = useState<ContextMode>('gestao')
   const [userProfile, setUserProfile] = useState<WorkspaceProfile | null>(null)
   const supabase = createClient()
 
@@ -104,61 +135,91 @@ export default function AbaTrabalhar() {
     localStorage.removeItem('ipb-workspace-ready')
     window.location.reload()
   }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [marketData, setMarketData] = useState<any>(null)
-
   useEffect(() => {
     fetch('/api/market').then(r => r.json()).then(setMarketData).catch(() => {})
   }, [])
 
-  const active = MODULES.find(m => m.id === activeId) ?? MODULES[0]
+  // Quando muda para consultoria, vai pro módulo consultoria
+  const effectiveActiveId = contextMode === 'consultoria' ? 'consultoria' : activeId
+
+  const active = MODULES.find(m => m.id === effectiveActiveId) ?? MODULES[0]
 
   const renderModule = () => {
+    // Consultoria sempre mostra ModoConsultoria
+    if (contextMode === 'consultoria') return <ModoConsultoria marketData={marketData} />
+
+    // Estudo: IA Advisor em modo pesquisador
+    if (contextMode === 'estudo') return <IAAdvisor marketData={marketData} userProfile={userProfile} contextMode="estudo" />
+
     switch (activeId) {
-      case 'ia': return <IAAdvisor marketData={marketData} userProfile={userProfile} />
-      case 'cockpit': return <CockpitFinanceiro marketData={marketData} userProfile={userProfile} />
-      case 'cenarios': return <CenariosForecast marketData={marketData} userProfile={userProfile} />
-      case 'pricing': return <SmartPricing marketData={marketData} userProfile={userProfile} />
-      case 'esg': return <ESGDiagnostico marketData={marketData} />
-      case 'inovacao': return <InovacaoCockpit />
-      case 'feedback': return <FeedbackNPS />
-      case 'denuncia': return <CanalDenuncias />
+      case 'ia':         return <IAAdvisor marketData={marketData} userProfile={userProfile} contextMode="gestao" />
+      case 'cockpit':    return <CockpitFinanceiro marketData={marketData} userProfile={userProfile} />
+      case 'cenarios':   return <CenariosForecast marketData={marketData} userProfile={userProfile} />
+      case 'pricing':    return <SmartPricing marketData={marketData} userProfile={userProfile} />
+      case 'esg':        return <ESGDiagnostico marketData={marketData} />
+      case 'inovacao':   return <InovacaoCockpit />
+      case 'feedback':   return <FeedbackNPS />
+      case 'denuncia':   return <CanalDenuncias />
       case 'governanca': return <Governanca />
-      case 'admin': return <AdminPanel />
-      default: return <Placeholder mod={active} />
+      case 'admin':      return <AdminPanel />
+      default:           return <Placeholder mod={active} />
     }
   }
 
-  const trabalho = MODULES.filter(m => m.group === 'trabalho')
-  const compliance = MODULES.filter(m => m.group === 'compliance' && (m.id !== 'admin' || isAdmin))
+  const visibleModules = MODULES.filter(m => m.layer !== 'compliance' && (m.id !== 'admin' || isAdmin))
+  const compliance = MODULES.filter(m => m.layer === 'compliance' && (m.id !== 'admin' || isAdmin))
 
+  const layers: LayerType[] = ['sio', 'sig', 'sie']
+
+  // ─────────────────────────────────────────────
+  // Render
+  // ─────────────────────────────────────────────
   return (
     <div className="w-full">
 
+      {/* Título do projeto */}
+      <div className="px-4 py-3 border-b border-white/5">
+        <p className="text-[9px] font-mono font-bold tracking-[0.2em] text-white/15 uppercase">
+          Projeto de Inteligência Organizacional (OBI) + Software BI &amp; Prototipagem
+        </p>
+      </div>
+
       {/* ── Mobile: tabs horizontais ── */}
       <div className="md:hidden overflow-x-auto scrollbar-hide border-b border-white/5">
-        <div className="flex gap-0.5 px-2 py-2 min-w-max">
-          {MODULES.filter(m => m.id !== 'admin' || isAdmin).map(mod => {
-            const Icon = mod.icon
-            const isActive = activeId === mod.id
+        {/* Switches mobile */}
+        <div className="flex gap-1 px-2 pt-2">
+          {CONTEXT_SWITCHES.map(sw => {
+            const Icon = sw.icon
+            const isActive = contextMode === sw.id
             return (
-              <button
-                key={mod.id}
-                onClick={() => setActiveId(mod.id)}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg shrink-0 transition-all"
-                style={{
-                  background: isActive ? `${mod.color}18` : 'transparent',
-                  borderLeft: isActive ? `2px solid ${mod.color}` : '2px solid transparent',
-                }}
-              >
-                <Icon size={14} style={{ color: isActive ? mod.color : 'rgba(255,255,255,0.25)' }} />
-                <span className={`text-[11px] font-medium ${isActive ? 'text-white/70' : 'text-white/25'}`}>
-                  {mod.short}
-                </span>
+              <button key={sw.id} onClick={() => setContextMode(sw.id)}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg shrink-0 transition-all text-[10px]"
+                style={{ background: isActive ? `${sw.color}20` : 'transparent', border: `1px solid ${isActive ? sw.color + '50' : 'rgba(255,255,255,0.06)'}`, color: isActive ? sw.color : 'rgba(255,255,255,0.3)' }}>
+                <Icon size={11} />
+                {sw.short}
               </button>
             )
           })}
         </div>
+        {contextMode !== 'consultoria' && contextMode !== 'estudo' && (
+          <div className="flex gap-0.5 px-2 py-2 min-w-max">
+            {MODULES.filter(m => m.layer !== 'compliance' || isAdmin).map(mod => {
+              const Icon = mod.icon
+              const isActive = activeId === mod.id
+              return (
+                <button key={mod.id} onClick={() => setActiveId(mod.id)}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg shrink-0 transition-all"
+                  style={{ background: isActive ? `${mod.color}18` : 'transparent', borderLeft: isActive ? `2px solid ${mod.color}` : '2px solid transparent' }}>
+                  <Icon size={14} style={{ color: isActive ? mod.color : 'rgba(255,255,255,0.25)' }} />
+                  <span className={`text-[11px] font-medium ${isActive ? 'text-white/70' : 'text-white/25'}`}>{mod.short}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {/* ── Desktop: sidebar + conteúdo ── */}
@@ -166,9 +227,30 @@ export default function AbaTrabalhar() {
 
         {/* Sidebar */}
         <div className="hidden md:flex flex-col w-[200px] shrink-0 border-r border-white/5 py-3">
-          <div className="px-3 mb-2">
-            <p className="font-mono text-[9px] font-bold tracking-[0.2em] text-white/15 uppercase">Workspace</p>
+
+          {/* Context switches */}
+          <div className="px-2 mb-3">
+            <p className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/12 uppercase px-1 mb-1.5">Contexto</p>
+            <div className="flex flex-col gap-0.5">
+              {CONTEXT_SWITCHES.map(sw => {
+                const Icon = sw.icon
+                const isActive = contextMode === sw.id
+                return (
+                  <button key={sw.id} onClick={() => setContextMode(sw.id)}
+                    className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-all"
+                    style={{ background: isActive ? `${sw.color}18` : 'transparent', borderLeft: isActive ? `3px solid ${sw.color}` : '3px solid transparent' }}>
+                    <Icon size={13} style={{ color: isActive ? sw.color : 'rgba(255,255,255,0.2)' }} />
+                    <div className="min-w-0">
+                      <p className={`text-[11px] font-bold truncate ${isActive ? 'text-white/75' : 'text-white/25'}`}>{sw.label}</p>
+                      <p className="text-[9px] text-white/20 truncate">{sw.desc}</p>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
           </div>
+
+          <div className="mx-3 h-px bg-white/5 mb-3" />
 
           {/* Fase atual */}
           {userProfile && (() => {
@@ -180,66 +262,77 @@ export default function AbaTrabalhar() {
                 {userProfile.sectors?.length > 0 && (
                   <p className="text-[10px] text-white/25 truncate mt-0.5">{userProfile.sectors[0]}</p>
                 )}
-                <button onClick={handleRefazer} className="font-mono text-[8px] text-white/20 hover:text-white/40 transition-colors mt-1">
-                  alterar fase
-                </button>
+                <button onClick={handleRefazer} className="font-mono text-[8px] text-white/20 hover:text-white/40 transition-colors mt-1">alterar fase</button>
               </div>
             )
           })()}
 
-          {/* Módulos de trabalho */}
-          <div className="flex flex-col gap-0.5 px-1.5">
-            {trabalho.map(mod => {
-              const Icon = mod.icon
-              const isActive = activeId === mod.id
-              return (
-                <button
-                  key={mod.id}
-                  onClick={() => setActiveId(mod.id)}
-                  className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-all"
-                  style={{
-                    background: isActive ? `${mod.color}15` : 'transparent',
-                    borderLeft: isActive ? `3px solid ${mod.color}` : '3px solid transparent',
-                  }}
-                >
-                  <Icon size={15} style={{ color: isActive ? mod.color : 'rgba(255,255,255,0.25)' }} />
-                  <span className={`text-[12px] font-medium truncate ${isActive ? 'text-white/80' : 'text-white/30'}`}>
-                    {mod.title}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
+          {/* Módulos por camada — visíveis apenas no modo Gestão */}
+          {contextMode === 'gestao' && (
+            <>
+              {layers.map(layer => {
+                const mods = visibleModules.filter(m => m.layer === layer)
+                if (!mods.length) return null
+                const lm = LAYER_META[layer]
+                return (
+                  <div key={layer} className="mb-2">
+                    <div className="px-3 mb-1 flex items-center gap-1.5">
+                      <span className="font-mono text-[8px] font-bold tracking-[0.2em] uppercase" style={{ color: lm.color }}>{lm.label}</span>
+                      <span className="text-[8px] text-white/15">·</span>
+                      <span className="text-[8px] text-white/15">{lm.desc}</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5 px-1.5">
+                      {mods.map(mod => {
+                        const Icon = mod.icon
+                        const isActive = activeId === mod.id
+                        return (
+                          <button key={mod.id} onClick={() => setActiveId(mod.id)}
+                            className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-left transition-all"
+                            style={{ background: isActive ? `${mod.color}15` : 'transparent', borderLeft: isActive ? `3px solid ${mod.color}` : '3px solid transparent' }}>
+                            <Icon size={13} style={{ color: isActive ? mod.color : 'rgba(255,255,255,0.2)' }} />
+                            <span className={`text-[11px] font-medium truncate ${isActive ? 'text-white/80' : 'text-white/25'}`}>{mod.title}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
 
-          {/* Divider */}
-          <div className="mx-3 my-3 h-px bg-white/5" />
-          <div className="px-3 mb-2">
-            <p className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/12 uppercase">Compliance</p>
-          </div>
+              <div className="mx-3 my-2 h-px bg-white/5" />
+              <div className="px-3 mb-1">
+                <p className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/12 uppercase">Compliance</p>
+              </div>
+              <div className="flex flex-col gap-0.5 px-1.5">
+                {compliance.map(mod => {
+                  const Icon = mod.icon
+                  const isActive = activeId === mod.id
+                  return (
+                    <button key={mod.id} onClick={() => setActiveId(mod.id)}
+                      className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-left transition-all"
+                      style={{ background: isActive ? `${mod.color}15` : 'transparent', borderLeft: isActive ? `3px solid ${mod.color}` : '3px solid transparent' }}>
+                      <Icon size={13} style={{ color: isActive ? mod.color : 'rgba(255,255,255,0.2)' }} />
+                      <span className={`text-[11px] font-medium truncate ${isActive ? 'text-white/80' : 'text-white/25'}`}>{mod.title}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </>
+          )}
 
-          {/* Módulos de compliance */}
-          <div className="flex flex-col gap-0.5 px-1.5">
-            {compliance.map(mod => {
-              const Icon = mod.icon
-              const isActive = activeId === mod.id
-              return (
-                <button
-                  key={mod.id}
-                  onClick={() => setActiveId(mod.id)}
-                  className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-all"
-                  style={{
-                    background: isActive ? `${mod.color}15` : 'transparent',
-                    borderLeft: isActive ? `3px solid ${mod.color}` : '3px solid transparent',
-                  }}
-                >
-                  <Icon size={15} style={{ color: isActive ? mod.color : 'rgba(255,255,255,0.25)' }} />
-                  <span className={`text-[12px] font-medium truncate ${isActive ? 'text-white/80' : 'text-white/30'}`}>
-                    {mod.title}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
+          {/* No modo consultoria/estudo: hint */}
+          {contextMode !== 'gestao' && (
+            <div className="mx-3 rounded-lg p-3" style={{ background: contextMode === 'consultoria' ? 'rgba(93,173,226,0.08)' : 'rgba(125,60,152,0.08)', border: `1px solid ${contextMode === 'consultoria' ? 'rgba(93,173,226,0.2)' : 'rgba(125,60,152,0.2)'}` }}>
+              <p className="text-[11px] font-bold" style={{ color: contextMode === 'consultoria' ? '#5dade2' : '#7d3c98' }}>
+                {contextMode === 'consultoria' ? 'Modo Ghost Ativo' : 'Modo Estudo Ativo'}
+              </p>
+              <p className="text-[10px] text-white/25 mt-0.5 leading-relaxed">
+                {contextMode === 'consultoria'
+                  ? 'Dados do cliente são temporários — não afetam seus dados pessoais'
+                  : 'IA atua como pesquisador/professor — foco em teoria OBI'}
+              </p>
+            </div>
+          )}
 
           {/* Acessibilidade + Config */}
           <div className="mt-auto px-3 pt-3 border-t border-white/5 space-y-3">
@@ -247,30 +340,16 @@ export default function AbaTrabalhar() {
               <p className="font-mono text-[8px] font-bold tracking-[0.15em] text-white/15 uppercase mb-2">Acessibilidade</p>
               <div className="flex flex-col gap-1">
                 {ACC_OPTIONS.map(a => (
-                  <button
-                    key={a.id}
-                    onClick={() => changeMode(a.id)}
+                  <button key={a.id} onClick={() => changeMode(a.id)}
                     className="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-left transition-all"
-                    style={{
-                      background: mode === a.id ? 'rgba(93,173,226,0.12)' : 'transparent',
-                      border: mode === a.id ? '1px solid rgba(93,173,226,0.25)' : '1px solid rgba(255,255,255,0.04)',
-                    }}
-                  >
-                    <span className={`text-[11px] font-medium ${mode === a.id ? 'text-white/70' : 'text-white/25'}`}>
-                      {a.label}
-                    </span>
-                    <span className={`text-[9px] ${mode === a.id ? 'text-white/40' : 'text-white/12'}`}>
-                      {a.desc}
-                    </span>
+                    style={{ background: mode === a.id ? 'rgba(93,173,226,0.12)' : 'transparent', border: mode === a.id ? '1px solid rgba(93,173,226,0.25)' : '1px solid rgba(255,255,255,0.04)' }}>
+                    <span className={`text-[11px] font-medium ${mode === a.id ? 'text-white/70' : 'text-white/25'}`}>{a.label}</span>
+                    <span className={`text-[9px] ${mode === a.id ? 'text-white/40' : 'text-white/12'}`}>{a.desc}</span>
                   </button>
                 ))}
               </div>
             </div>
-
-            <button
-              onClick={handleRefazer}
-              className="w-full text-center font-mono text-[10px] text-white/15 hover:text-white/35 transition-colors py-1"
-            >
+            <button onClick={handleRefazer} className="w-full text-center font-mono text-[10px] text-white/15 hover:text-white/35 transition-colors py-1">
               Refazer configuração
             </button>
           </div>
@@ -278,16 +357,42 @@ export default function AbaTrabalhar() {
 
         {/* Conteúdo */}
         <div className="flex-1 min-w-0 overflow-y-auto">
-          {(() => { const Icon = active.icon; return (
+          {/* Header do módulo */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
-            <Icon size={18} style={{ color: active.color }} />
-            <p className="text-[14px] font-bold text-white/80">{active.title}</p>
+            {contextMode === 'consultoria' ? (
+              <>
+                <Briefcase size={18} style={{ color: '#5dade2' }} />
+                <div>
+                  <p className="text-[14px] font-bold text-white/80">Consultoria · Modo Ghost</p>
+                  <p className="text-[10px] font-mono text-white/20">Switch 2 · Diagnóstico OBI para cliente</p>
+                </div>
+              </>
+            ) : contextMode === 'estudo' ? (
+              <>
+                <BookOpen size={18} style={{ color: '#7d3c98' }} />
+                <div>
+                  <p className="text-[14px] font-bold text-white/80">Estudo & Conteúdo</p>
+                  <p className="text-[10px] font-mono text-white/20">Switch 3 · IA como pesquisador/professor</p>
+                </div>
+              </>
+            ) : (() => {
+              const Icon = active.icon
+              const lm = LAYER_META[active.layer]
+              return (
+                <>
+                  <Icon size={18} style={{ color: active.color }} />
+                  <div>
+                    <p className="text-[14px] font-bold text-white/80">{active.title}</p>
+                    <p className="text-[10px] font-mono" style={{ color: lm.color }}>{lm.label} · {lm.desc}</p>
+                  </div>
+                </>
+              )
+            })()}
           </div>
-          ) })()}
 
           <AnimatePresence mode="wait">
             <motion.div
-              key={activeId}
+              key={effectiveActiveId + contextMode}
               initial={{ opacity: 0, x: 12 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -12 }}
@@ -304,26 +409,14 @@ export default function AbaTrabalhar() {
       <div className="md:hidden flex items-center justify-between px-4 py-3 border-t border-white/5">
         <div className="flex gap-1">
           {ACC_OPTIONS.map(a => (
-            <button
-              key={a.id}
-              onClick={() => changeMode(a.id)}
+            <button key={a.id} onClick={() => changeMode(a.id)}
               className="text-[9px] px-2.5 py-1 rounded-full transition-all"
-              style={{
-                background: mode === a.id ? 'rgba(93,173,226,0.12)' : 'transparent',
-                border: mode === a.id ? '1px solid rgba(93,173,226,0.25)' : '1px solid rgba(255,255,255,0.05)',
-                color: mode === a.id ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)',
-              }}
-            >
+              style={{ background: mode === a.id ? 'rgba(93,173,226,0.12)' : 'transparent', border: mode === a.id ? '1px solid rgba(93,173,226,0.25)' : '1px solid rgba(255,255,255,0.05)', color: mode === a.id ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)' }}>
               {a.label}
             </button>
           ))}
         </div>
-        <button
-          onClick={handleRefazer}
-          className="font-mono text-[9px] text-white/15"
-        >
-          Refazer
-        </button>
+        <button onClick={handleRefazer} className="font-mono text-[9px] text-white/15">Refazer</button>
       </div>
     </div>
   )
