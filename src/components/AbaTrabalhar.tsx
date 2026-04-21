@@ -10,6 +10,7 @@ import {
 import dynamic from 'next/dynamic'
 import { useAccessibility, type AccessibilityMode } from '@/hooks/useAccessibility'
 import { useAuth } from '@/hooks/useAuth'
+import { createClient } from '@/lib/supabase/client'
 
 const IAAdvisor = dynamic(() => import('@/components/workspace/IAAdvisor'), { ssr: false })
 const CockpitFinanceiro = dynamic(() => import('@/components/workspace/CockpitFinanceiro'), { ssr: false })
@@ -70,9 +71,18 @@ function Placeholder({ mod }: { mod: ModuleMeta }) {
 
 export default function AbaTrabalhar() {
   const { mode, changeMode } = useAccessibility()
-  const { profile } = useAuth()
+  const { profile, user } = useAuth()
   const isAdmin = profile?.role === 'admin'
   const [activeId, setActiveId] = useState('ia')
+  const supabase = createClient()
+
+  const handleRefazer = async () => {
+    if (user) {
+      await supabase.from('workspace_profiles').delete().eq('user_id', user.id)
+    }
+    localStorage.removeItem('ipb-workspace-ready')
+    window.location.reload()
+  }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [marketData, setMarketData] = useState<any>(null)
 
@@ -220,7 +230,7 @@ export default function AbaTrabalhar() {
             </div>
 
             <button
-              onClick={() => { localStorage.removeItem('ipb-workspace-ready'); window.location.reload() }}
+              onClick={handleRefazer}
               className="w-full text-center font-mono text-[10px] text-white/15 hover:text-white/35 transition-colors py-1"
             >
               Refazer configuração
@@ -271,7 +281,7 @@ export default function AbaTrabalhar() {
           ))}
         </div>
         <button
-          onClick={() => { localStorage.removeItem('ipb-workspace-ready'); window.location.reload() }}
+          onClick={handleRefazer}
           className="font-mono text-[9px] text-white/15"
         >
           Refazer
