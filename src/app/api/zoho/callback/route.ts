@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://ip-business-ten.vercel.app'
+
 function adminDb() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,21 +14,21 @@ function adminDb() {
 }
 
 export async function GET(req: NextRequest) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
   const code = req.nextUrl.searchParams.get('code')
   const errorParam = req.nextUrl.searchParams.get('error')
 
   if (errorParam) {
-    return NextResponse.redirect(`${appUrl}/?zoho_error=${errorParam}`)
+    return NextResponse.redirect(`${APP_URL}/?zoho_error=${encodeURIComponent(errorParam)}`)
   }
   if (!code) {
-    return NextResponse.redirect(`${appUrl}/?zoho_error=no_code`)
+    return NextResponse.redirect(`${APP_URL}/?zoho_error=no_code`)
   }
 
   const clientId = process.env.ZOHO_CLIENT_ID
   const clientSecret = process.env.ZOHO_CLIENT_SECRET
+
   if (!clientId || !clientSecret) {
-    return NextResponse.redirect(`${appUrl}/?zoho_error=missing_env`)
+    return NextResponse.redirect(`${APP_URL}/?zoho_error=missing_env`)
   }
 
   try {
@@ -37,24 +39,34 @@ export async function GET(req: NextRequest) {
         code,
         client_id: clientId,
         client_secret: clientSecret,
-        redirect_uri: `${appUrl}/api/zoho/callback`,
+        redirect_uri: `${APP_URL}/api/zoho/callback`,
         grant_type: 'authorization_code',
       }),
     })
 
     const tokenData = await tokenRes.json()
+
+    if (tokenData.error) {
+      return NextResponse.redirect(`${APP_URL}/?zoho_error=${encodeURIComponent(tokenData.error)}`)
+    }
+
     if (!tokenData.refresh_token) {
-      return NextResponse.redirect(`${appUrl}/?zoho_error=no_refresh_token`)
+      return NextResponse.redirect(`${APP_URL}/?zoho_error=no_refresh_token&hint=${encodeURIComponent(JSON.stringify(tokenData).slice(0, 100))}`)
     }
 
     const db = adminDb()
-    await db.from('admin_settings').upsert(
+    const { error: dbError } = await db.from('admin_settings').upsert(
       { key: 'zoho_refresh_token', value: tokenData.refresh_token, updated_at: new Date().toISOString() },
       { onConflict: 'key' }
     )
 
-    return NextResponse.redirect(`${appUrl}/?zoho=connected`)
-  } catch {
-    return NextResponse.redirect(`${appUrl}/?zoho_error=token_exchange_failed`)
+    if (dbError) {
+      return NextResponse.redirect(`${APP_URL}/?zoho_error=db_${encodeURIComponent(dbError.message.slice(0, 50))}`)
+    }
+
+    return NextResponse.redirect(`${APP_URL}/?zoho=connected`)
+  } catch (err) {
+    const msg = err instanceof Error ? err.message.slice(0, 60) : 'unknown'
+    return NextResponse.redirect(`${APP_URL}/?zoho_error=exception_${encodeURIComponent(msg)}`)
   }
 }
