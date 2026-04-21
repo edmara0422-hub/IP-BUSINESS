@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { useWorkspaceData } from '@/hooks/useWorkspaceData'
-import { Target, AlertTriangle, TrendingUp, Loader2 } from 'lucide-react'
+import { Target, AlertTriangle, TrendingUp, Loader2, Brain, ChevronRight, CheckCircle2, Circle } from 'lucide-react'
 
 const BLUE = '#1a5276'
 const GREEN = '#1e8449'
@@ -12,16 +12,84 @@ const AMBER = '#9a7d0a'
 const RED = '#c0392b'
 const PURPLE = '#7d3c98'
 
-// ── State ──
+// ── TD Phase definitions ──
+const TD_FASES = [
+  {
+    label: 'Infra',
+    desc: 'Infraestrutura básica digital instalada',
+    sinaisMercado: 'Maioria das empresas usa email, WhatsApp e planilhas. Sem sistemas integrados.',
+    checklist: [
+      'Cloud e email corporativo configurados',
+      'Ferramentas de comunicação digital (Meet, Teams ou Slack)',
+      'Backup automático de dados implementado',
+      'Controles básicos de segurança (2FA em todas as contas)',
+    ],
+  },
+  {
+    label: 'Processo',
+    desc: 'Processos internos digitalizados',
+    sinaisMercado: 'Concorrentes usam CRM e ERP. Digitização de documentos e fluxos internos é padrão.',
+    checklist: [
+      'CRM ou sistema de gestão de clientes implementado',
+      'Processos-chave documentados e digitalizados',
+      'Ao menos 1 automação de tarefa repetitiva ativa',
+      'Dashboard com métricas básicas do negócio',
+    ],
+  },
+  {
+    label: 'Estratégia',
+    desc: 'Tecnologia como vantagem competitiva',
+    sinaisMercado: 'Líderes do setor tomam decisões baseadas em dados. Tech está no planejamento estratégico.',
+    checklist: [
+      'Dados de clientes centralizados e acessíveis',
+      'Decisões de negócio orientadas por dados (DDDM)',
+      'Ao menos 1 produto ou serviço com componente digital',
+      'Tecnologia presente no planejamento estratégico anual',
+    ],
+  },
+  {
+    label: 'Digitização',
+    desc: 'Dados e produtos digitais ativos',
+    sinaisMercado: 'Novos entrantes já nascem digitais. Produtos físicos têm versões ou extensões digitais.',
+    checklist: [
+      'Produto ou canal digital gerando receita recorrente',
+      'Dados tratados como ativo estratégico da empresa',
+      'Integrações via API com parceiros ou plataformas',
+      'Modelo híbrido (digital + físico) em operação',
+    ],
+  },
+  {
+    label: 'Digitalização',
+    desc: 'Modelo de negócio digital-first',
+    sinaisMercado: 'Plataformas e marketplaces dominam o setor. Efeitos de rede são a principal vantagem.',
+    checklist: [
+      'Modelo de negócio digital-first implementado',
+      'IA integrada em ao menos 1 processo crítico',
+      'Escala digital sem crescimento proporcional de custo',
+      'Dados acumulados geram vantagem competitiva real',
+    ],
+  },
+  {
+    label: 'Transformação',
+    desc: 'Empresa reinventada pela tecnologia',
+    sinaisMercado: 'O mercado é redefinido por empresas de tecnologia que invadem setores tradicionais.',
+    checklist: [], // última fase — sem próximo passo
+  },
+]
+
+// ── OKR + Governance types ──
 interface OKR {
   objetivo: string
   krs: { texto: string; pct: number }[]
 }
 
 interface CockpitState {
+  // TD
   faseEmpresa: number
   faseMercado: number
-  reflexaoTD: string
+  checkEmpresa: boolean[][]
+  iaReflexao: string
+  // Inovação
   tipoInovacao: string
   intensidade: string
   faseHype: number
@@ -31,19 +99,27 @@ interface CockpitState {
   h2: number
   h3: number
   reflexaoInovacao: string
+  // OKRs
   okrs: OKR[]
+  // Governança
   govEstrategia: boolean[]
   govRiscos: boolean[]
   govPoliticas: boolean[]
   govMonitoramento: boolean[]
   reflexaoGov: string
+  // Norte
   norteStar: string
   cultura: string
   reflexaoNorte: string
 }
 
+const makeCheckEmpresa = () => TD_FASES.slice(0, 5).map(f => f.checklist.map(() => false))
+
 const DEFAULT: CockpitState = {
-  faseEmpresa: 0, faseMercado: 0, reflexaoTD: '',
+  faseEmpresa: 0,
+  faseMercado: 0,
+  checkEmpresa: makeCheckEmpresa(),
+  iaReflexao: '',
   tipoInovacao: '', intensidade: '', faseHype: 0, trl: 1,
   fasesFunil: [false, false, false, false, false],
   h1: 70, h2: 20, h3: 10,
@@ -60,16 +136,7 @@ const DEFAULT: CockpitState = {
   norteStar: '', cultura: '', reflexaoNorte: '',
 }
 
-// ── Constants ──
-const TD_FASES = [
-  { label: 'Infra', desc: 'Infraestrutura básica digital instalada' },
-  { label: 'Processo', desc: 'Processos internos digitalizados' },
-  { label: 'Estratégia', desc: 'Tecnologia como vantagem competitiva' },
-  { label: 'Digitização', desc: 'Dados e produtos digitais ativos' },
-  { label: 'Digitalização', desc: 'Modelo de negócio digital-first' },
-  { label: 'Transformação', desc: 'Empresa reinventada pela tecnologia' },
-]
-
+// ── Hype Cycle ──
 const HYPE_FASES = [
   { label: 'Gatilho Tecnológico', desc: 'Nova tecnologia surge. Interesse da mídia.' },
   { label: 'Pico de Expectativas', desc: 'Entusiasmo excessivo. Expectativas irrealistas.' },
@@ -131,7 +198,6 @@ interface Feedback {
 interface Denuncia {
   id: string; tipo: string; descricao: string; created_at: string
 }
-
 function timeAgo(date: string): string {
   const diff = Date.now() - new Date(date).getTime()
   const mins = Math.floor(diff / 60000)
@@ -140,7 +206,6 @@ function timeAgo(date: string): string {
   if (hours < 24) return `${hours}h`
   return `${Math.floor(hours / 24)}d`
 }
-
 function npsColor(score: number | null): string {
   if (score === null) return 'rgba(255,255,255,0.3)'
   if (score >= 9) return GREEN
@@ -148,17 +213,165 @@ function npsColor(score: number | null): string {
   return RED
 }
 
+// ── TD Rail ──
+function TDRail({
+  title, accentColor, currentPhase, onSetPhase,
+  checkEmpresa, onToggleCheck, onAdvance, isEmpresa,
+}: {
+  title: string
+  accentColor: string
+  currentPhase: number
+  onSetPhase: (i: number) => void
+  checkEmpresa?: boolean[][]
+  onToggleCheck?: (phaseIdx: number, itemIdx: number) => void
+  onAdvance?: () => void
+  isEmpresa: boolean
+}) {
+  return (
+    <div>
+      <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-3">
+        {title}
+      </p>
+      <div className="flex flex-col">
+        {TD_FASES.map((fase, i) => {
+          const isActive = currentPhase === i
+          const isDone = currentPhase > i
+          const isNext = currentPhase === i - 1
+          const checks = isEmpresa && checkEmpresa ? (checkEmpresa[i] ?? []) : []
+          const allChecked = checks.length > 0 && checks.every(Boolean)
+          const isLast = i === TD_FASES.length - 1
+
+          return (
+            <div key={i} className="flex gap-3">
+              {/* Track line + node */}
+              <div className="flex flex-col items-center" style={{ width: 28 }}>
+                <button
+                  onClick={() => onSetPhase(i)}
+                  className="rounded-full flex items-center justify-center shrink-0 transition-all"
+                  style={{
+                    width: 28, height: 28,
+                    background: isDone ? GREEN : isActive ? accentColor : 'rgba(255,255,255,0.06)',
+                    border: `2px solid ${isDone ? GREEN : isActive ? accentColor : 'rgba(255,255,255,0.1)'}`,
+                    boxShadow: isActive ? `0 0 0 4px ${accentColor}22` : 'none',
+                  }}
+                >
+                  {isDone
+                    ? <CheckCircle2 size={14} color="#fff" />
+                    : <span className="text-[10px] font-bold font-mono" style={{ color: isActive ? '#fff' : 'rgba(255,255,255,0.25)' }}>{i + 1}</span>
+                  }
+                </button>
+                {!isLast && (
+                  <div className="flex-1 w-0.5 my-0.5" style={{
+                    minHeight: 20,
+                    background: isDone ? GREEN : 'rgba(255,255,255,0.07)',
+                    transition: 'background 0.4s',
+                  }} />
+                )}
+              </div>
+
+              {/* Content */}
+              <div className={`pb-4 flex-1 ${isLast ? '' : ''}`}>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-[13px] font-bold" style={{
+                    color: isDone ? GREEN : isActive ? '#fff' : 'rgba(255,255,255,0.3)',
+                  }}>
+                    F{i + 1} · {fase.label}
+                  </span>
+                  {isDone && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full" style={{ background: `${GREEN}20`, color: GREEN }}>CONCLUÍDO</span>}
+                  {isActive && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full" style={{ background: `${accentColor}22`, color: accentColor }}>ATUAL</span>}
+                </div>
+                <p className="text-[11px] text-white/30 leading-snug mb-2">{fase.desc}</p>
+
+                {/* Market signals (for market rail) */}
+                {!isEmpresa && isActive && (
+                  <div className="rounded-lg px-3 py-2 mb-2" style={{ background: 'rgba(0,0,0,0.2)', border: `1px solid ${accentColor}20` }}>
+                    <p className="text-[10px] font-mono text-white/25 mb-1 uppercase tracking-wider">Sinais observados no mercado</p>
+                    <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{fase.sinaisMercado}</p>
+                  </div>
+                )}
+
+                {/* Checklist for empresa — next steps to advance */}
+                {isEmpresa && isActive && !isLast && checkEmpresa && onToggleCheck && (
+                  <div className="rounded-lg p-3 mb-2" style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <p className="text-[10px] font-mono text-white/25 uppercase tracking-wider mb-2">
+                      Para avançar para {TD_FASES[i + 1].label}
+                    </p>
+                    <div className="flex flex-col gap-1.5">
+                      {fase.checklist.map((item, ci) => {
+                        const checked = checks[ci] ?? false
+                        return (
+                          <button key={ci}
+                            onClick={() => onToggleCheck(i, ci)}
+                            className="flex items-start gap-2 text-left transition-all rounded px-1 py-0.5"
+                          >
+                            {checked
+                              ? <CheckCircle2 size={13} style={{ color: GREEN, marginTop: 1, shrink: 0 }} className="shrink-0" />
+                              : <Circle size={13} style={{ color: 'rgba(255,255,255,0.2)', marginTop: 1 }} className="shrink-0" />
+                            }
+                            <span className="text-[12px] leading-snug" style={{ color: checked ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.32)' }}>
+                              {item}
+                            </span>
+                          </button>
+                        )
+                      })}
+                    </div>
+
+                    {allChecked && onAdvance && (
+                      <motion.button
+                        initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
+                        onClick={onAdvance}
+                        className="mt-3 w-full flex items-center justify-center gap-2 rounded-lg py-2 font-bold text-[12px] transition-all"
+                        style={{ background: `${GREEN}22`, border: `1px solid ${GREEN}55`, color: GREEN }}
+                      >
+                        Avançar para F{i + 2} · {TD_FASES[i + 1].label}
+                        <ChevronRight size={14} />
+                      </motion.button>
+                    )}
+                  </div>
+                )}
+
+                {/* If done, show next-phase checklist collapsed */}
+                {isEmpresa && isDone && !isLast && checkEmpresa && (
+                  <p className="text-[10px] text-white/20 mb-1">
+                    {fase.checklist.length} itens concluídos ✓
+                  </p>
+                )}
+
+                {/* Last phase achieved */}
+                {isEmpresa && isActive && isLast && (
+                  <div className="rounded-lg px-3 py-2" style={{ background: `${GREEN}12`, border: `1px solid ${GREEN}30` }}>
+                    <p className="text-[12px] font-bold" style={{ color: GREEN }}>🏆 Transformação Digital completa</p>
+                    <p className="text-[11px] text-white/35 mt-0.5">Foco em manter, inovar e liderar.</p>
+                  </div>
+                )}
+
+                {/* Next phase preview (for isNext) */}
+                {isEmpresa && isNext && !isActive && (
+                  <p className="text-[10px] text-white/20 italic">
+                    Próxima fase — complete os itens acima para avançar
+                  </p>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 type AdminTab = 'td' | 'inovacao' | 'okrs' | 'gov' | 'norte' | 'monitor'
 
 export default function AdminPanel() {
   const [tab, setTab] = useState<AdminTab>('td')
   const { data: s, update } = useWorkspaceData<CockpitState>('admin-cockpit', DEFAULT)
+  const [iaLoading, setIaLoading] = useState(false)
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
   const [denuncias, setDenuncias] = useState<Denuncia[]>([])
-  const [loading, setLoading] = useState(false)
+  const [monitorLoading, setMonitorLoading] = useState(false)
 
   const loadMonitor = async () => {
-    setLoading(true)
+    setMonitorLoading(true)
     try {
       const supabase = createClient()
       const [fbRes, dnRes] = await Promise.all([
@@ -168,12 +381,84 @@ export default function AdminPanel() {
       if (fbRes.data) setFeedbacks(fbRes.data)
       if (dnRes.data) setDenuncias(dnRes.data)
     } catch { /* silent */ }
-    finally { setLoading(false) }
+    finally { setMonitorLoading(false) }
   }
 
   useEffect(() => { if (tab === 'monitor') loadMonitor() }, [tab])
 
+  // Ensure checkEmpresa is always valid length
+  const checkEmpresa: boolean[][] = (() => {
+    const existing = s.checkEmpresa ?? []
+    return TD_FASES.slice(0, 5).map((f, i) =>
+      existing[i] ?? f.checklist.map(() => false)
+    )
+  })()
+
+  const toggleCheck = (phaseIdx: number, itemIdx: number) => {
+    const next = checkEmpresa.map((row, pi) =>
+      pi === phaseIdx ? row.map((v, ci) => ci === itemIdx ? !v : v) : [...row]
+    )
+    update({ checkEmpresa: next })
+  }
+
+  const advanceEmpresa = () => {
+    if (s.faseEmpresa < TD_FASES.length - 1) {
+      update({ faseEmpresa: s.faseEmpresa + 1 })
+    }
+  }
+
   const gap = s.faseMercado - s.faseEmpresa
+
+  // AI reflexão — pulls all cockpit context
+  const handleIA = async () => {
+    setIaLoading(true)
+    try {
+      // pull market data for context
+      let marketCtx = ''
+      try {
+        const mkt = await fetch('/api/market').then(r => r.json())
+        marketCtx = `SELIC ${mkt?.macro?.selic?.value ?? '—'}%, IPCA ${mkt?.macro?.ipca?.value ?? '—'}%, USD/BRL ${mkt?.macro?.usdBrl?.value ?? '—'}.`
+      } catch { /* use without */ }
+
+      const okrSummary = s.okrs.map((o, i) =>
+        `OKR${i + 1}: "${o.objetivo}" — KRs: ${o.krs.map(k => `${k.texto} (${k.pct}%)`).join(', ')}`
+      ).join('. ')
+
+      const govDone = [s.govEstrategia, s.govRiscos, s.govPoliticas, s.govMonitoramento]
+        .map(arr => arr.filter(Boolean).length).reduce((a, b) => a + b, 0)
+
+      const prompt = `Você é um consultor de transformação digital e estratégia empresarial. Analise o estado atual da empresa com base nos dados abaixo e gere uma reflexão estratégica direta, em bullet points, com 3 seções: (1) Diagnóstico, (2) Prioridade imediata, (3) Próximo passo em 7 dias.
+
+DADOS:
+- Fase TD da empresa: F${s.faseEmpresa + 1} (${TD_FASES[s.faseEmpresa].label})
+- Fase TD do mercado: F${s.faseMercado + 1} (${TD_FASES[s.faseMercado].label})
+- Gap: ${gap > 0 ? `${gap} fases atrás do mercado` : gap < 0 ? `${Math.abs(gap)} fases à frente` : 'alinhado com o mercado'}
+- Itens concluídos na fase atual: ${checkEmpresa[s.faseEmpresa]?.filter(Boolean).length ?? 0}/${TD_FASES[s.faseEmpresa]?.checklist?.length ?? 0}
+- Tipo de inovação: ${s.tipoInovacao || 'não definido'}
+- Intensidade: ${s.intensidade || 'não definido'}
+- TRL: ${s.trl}/9
+- Fase Hype Cycle: ${HYPE_FASES[s.faseHype]?.label ?? '—'}
+- OKRs: ${okrSummary || 'não definidos'}
+- Pilares de governança completos: ${govDone}/16
+- Norte estratégico: ${s.norteStar || 'não definido'}
+- Mercado macro: ${marketCtx}
+
+Seja direto, útil e autoresponsivo. Máximo 200 palavras.`
+
+      const res = await fetch('/api/advisor-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
+      })
+      const data = await res.json()
+      update({ iaReflexao: data.response ?? data.content ?? 'Sem resposta.' })
+    } catch {
+      update({ iaReflexao: 'Erro ao conectar com a IA. Tente novamente.' })
+    } finally {
+      setIaLoading(false)
+    }
+  }
+
   const npsScores = feedbacks.filter(f => f.nps_score !== null).map(f => f.nps_score as number)
   const npsAvg = npsScores.length > 0 ? (npsScores.reduce((a, b) => a + b, 0) / npsScores.length).toFixed(1) : '—'
   const promoters = npsScores.filter(n => n >= 9).length
@@ -196,7 +481,7 @@ export default function AdminPanel() {
       <div className="rounded-xl px-4 py-3" style={{ background: 'rgba(26,82,118,0.1)', border: '1px solid rgba(26,82,118,0.2)' }}>
         <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-1.5">Pergunta do dia</p>
         <p className="text-[13px] text-white/55 leading-relaxed">
-          Em qual fase <span style={{ color: '#5dade2' }}>estamos</span> hoje?{' '}
+          Em qual fase <span style={{ color: '#5dade2' }}>estamos</span>?{' '}
           Em qual fase o <span style={{ color: AMBER }}>mercado</span> chegou?{' '}
           <span className="text-white/30">Todo dia aplicar, desenvolver, aprender, evoluir.</span>
         </p>
@@ -218,7 +503,7 @@ export default function AdminPanel() {
           <div className="mt-2 flex items-center gap-2">
             <TrendingUp size={11} style={{ color: GREEN }} />
             <span className="text-[11px]" style={{ color: GREEN }}>
-              À frente do mercado em {Math.abs(gap)} fase{Math.abs(gap) > 1 ? 's' : ''} — liderar
+              À frente em {Math.abs(gap)} fase{Math.abs(gap) > 1 ? 's' : ''} — liderar
             </span>
           </div>
         )}
@@ -245,50 +530,34 @@ export default function AdminPanel() {
 
           {/* ─── TD ─── */}
           {tab === 'td' && (
-            <div className="flex flex-col gap-5">
-              <div>
-                <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">
-                  Fase da <span style={{ color: '#5dade2' }}>empresa</span>
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {TD_FASES.map((f, i) => (
-                    <button key={i} onClick={() => update({ faseEmpresa: i })}
-                      className="rounded-lg px-3 py-2.5 text-left transition-all"
-                      style={{
-                        background: s.faseEmpresa === i ? 'rgba(26,82,118,0.2)' : 'rgba(0,0,0,0.25)',
-                        border: `2px solid ${s.faseEmpresa === i ? '#5dade2' : 'rgba(255,255,255,0.06)'}`,
-                      }}>
-                      <p className="text-[12px] font-bold" style={{ color: s.faseEmpresa === i ? '#5dade2' : 'rgba(255,255,255,0.4)' }}>
-                        F{i + 1} · {f.label}
-                      </p>
-                      <p className="text-[10px] mt-0.5 text-white/20 leading-snug">{f.desc}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <div className="flex flex-col gap-6">
 
-              <div>
-                <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">
-                  Fase do <span style={{ color: AMBER }}>mercado</span>
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {TD_FASES.map((f, i) => (
-                    <button key={i} onClick={() => update({ faseMercado: i })}
-                      className="rounded-lg px-3 py-2.5 text-left transition-all"
-                      style={{
-                        background: s.faseMercado === i ? 'rgba(154,125,10,0.15)' : 'rgba(0,0,0,0.25)',
-                        border: `2px solid ${s.faseMercado === i ? AMBER : 'rgba(255,255,255,0.06)'}`,
-                      }}>
-                      <p className="text-[12px] font-bold" style={{ color: s.faseMercado === i ? AMBER : 'rgba(255,255,255,0.4)' }}>
-                        F{i + 1} · {f.label}
-                      </p>
-                      <p className="text-[10px] mt-0.5 text-white/20 leading-snug">{f.desc}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              {/* Rail Empresa */}
+              <TDRail
+                title="Trilho da empresa"
+                accentColor="#5dade2"
+                currentPhase={s.faseEmpresa}
+                onSetPhase={i => update({ faseEmpresa: i })}
+                checkEmpresa={checkEmpresa}
+                onToggleCheck={toggleCheck}
+                onAdvance={advanceEmpresa}
+                isEmpresa={true}
+              />
 
-              {/* Gap visual */}
+              <div className="h-px bg-white/5" />
+
+              {/* Rail Mercado */}
+              <TDRail
+                title="Trilho do mercado"
+                accentColor={AMBER}
+                currentPhase={s.faseMercado}
+                onSetPhase={i => update({ faseMercado: i })}
+                isEmpresa={false}
+              />
+
+              <div className="h-px bg-white/5" />
+
+              {/* Posição relativa */}
               <div className="rounded-lg p-4" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-mono text-white/25 uppercase tracking-widest">Posição relativa</span>
@@ -306,6 +575,9 @@ export default function AdminPanel() {
                       {s.faseMercado === i && (
                         <div className="absolute bottom-0 left-0 right-0 rounded-b-sm" style={{ height: 4, background: AMBER }} />
                       )}
+                      {s.faseEmpresa > i && (
+                        <div className="absolute inset-0 rounded-sm" style={{ background: GREEN, opacity: 0.2 }} />
+                      )}
                     </div>
                   ))}
                 </div>
@@ -316,15 +588,30 @@ export default function AdminPanel() {
                   <span className="text-[9px] text-white/30 flex items-center gap-1">
                     <span className="inline-block w-3 rounded-sm" style={{ height: 4, background: AMBER }} /> Mercado
                   </span>
+                  <span className="text-[9px] text-white/30 flex items-center gap-1">
+                    <span className="inline-block w-3 h-2 rounded-sm" style={{ background: GREEN, opacity: 0.2 }} /> Concluído
+                  </span>
                 </div>
               </div>
 
+              {/* IA Reflexão */}
               <div>
-                <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Reflexão do dia</p>
-                <textarea value={s.reflexaoTD} onChange={e => update({ reflexaoTD: e.target.value })}
-                  placeholder="O que mudou hoje? Qual ação vai fechar o gap?" rows={3}
-                  className="w-full rounded-lg px-3 py-2.5 text-[13px] outline-none resize-none"
-                  style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.65)', lineHeight: 1.65 }} />
+                <button onClick={handleIA} disabled={iaLoading}
+                  className="w-full rounded-lg py-2.5 flex items-center justify-center gap-2 transition-opacity hover:opacity-90 disabled:opacity-50"
+                  style={{ background: BLUE, color: '#fff', fontSize: 13, fontWeight: 600, cursor: iaLoading ? 'wait' : 'pointer' }}
+                >
+                  {iaLoading ? <Loader2 size={14} className="animate-spin" /> : <Brain size={14} />}
+                  {iaLoading ? 'Analisando todos os dados...' : 'Reflexão com IA — analisar posição atual'}
+                </button>
+
+                {s.iaReflexao && (
+                  <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                    className="rounded-lg p-4 mt-3"
+                    style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.07)', fontSize: 13, lineHeight: 1.75, whiteSpace: 'pre-wrap', color: 'rgba(255,255,255,0.65)' }}
+                  >
+                    {s.iaReflexao}
+                  </motion.div>
+                )}
               </div>
             </div>
           )}
@@ -332,7 +619,6 @@ export default function AdminPanel() {
           {/* ─── INOVAÇÃO ─── */}
           {tab === 'inovacao' && (
             <div className="flex flex-col gap-5">
-
               <div>
                 <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Qual tipo de inovação?</p>
                 <div className="grid grid-cols-2 gap-2">
@@ -455,7 +741,7 @@ export default function AdminPanel() {
               </div>
 
               <div>
-                <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Reflexão</p>
+                <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Notas</p>
                 <textarea value={s.reflexaoInovacao} onChange={e => update({ reflexaoInovacao: e.target.value })}
                   placeholder="O que aprendemos? O que vamos desenvolver? Onde o mercado chegou?" rows={3}
                   className="w-full rounded-lg px-3 py-2.5 text-[13px] outline-none resize-none"
@@ -542,7 +828,7 @@ export default function AdminPanel() {
                 )
               })}
               <div>
-                <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Reflexão</p>
+                <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Notas</p>
                 <textarea value={s.reflexaoGov} onChange={e => update({ reflexaoGov: e.target.value })}
                   placeholder="O que precisa ser resolvido em governança? Qual vulnerabilidade existe hoje?"
                   rows={3}
@@ -562,7 +848,6 @@ export default function AdminPanel() {
                   e inovação ambidestra: eficiência hoje + experimentação amanhã.
                 </p>
               </div>
-
               <div>
                 <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Onde queremos chegar?</p>
                 <textarea value={s.norteStar} onChange={e => update({ norteStar: e.target.value })}
@@ -570,7 +855,6 @@ export default function AdminPanel() {
                   className="w-full rounded-lg px-3 py-2.5 text-[13px] outline-none resize-none"
                   style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(93,173,226,0.18)', color: 'rgba(255,255,255,0.7)', lineHeight: 1.7 }} />
               </div>
-
               <div>
                 <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Cultura — o que estamos construindo internamente?</p>
                 <textarea value={s.cultura} onChange={e => update({ cultura: e.target.value })}
@@ -578,7 +862,6 @@ export default function AdminPanel() {
                   className="w-full rounded-lg px-3 py-2.5 text-[13px] outline-none resize-none"
                   style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 }} />
               </div>
-
               <div>
                 <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Reflexão livre</p>
                 <textarea value={s.reflexaoNorte} onChange={e => update({ reflexaoNorte: e.target.value })}
@@ -607,7 +890,7 @@ export default function AdminPanel() {
                 ))}
               </div>
 
-              {loading ? (
+              {monitorLoading ? (
                 <div className="flex items-center justify-center py-10">
                   <Loader2 size={16} className="animate-spin text-white/25" />
                 </div>
@@ -639,9 +922,7 @@ export default function AdminPanel() {
                       </div>
                     </>
                   )}
-
                   {feedbacks.length === 0 && <p className="text-center text-[13px] text-white/25 py-6">Nenhum feedback ainda</p>}
-
                   {denuncias.length > 0 && (
                     <>
                       <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mt-2">Denúncias</p>
@@ -660,7 +941,6 @@ export default function AdminPanel() {
                       </div>
                     </>
                   )}
-
                   <button onClick={loadMonitor}
                     className="mx-auto text-[11px] text-white/20 hover:text-white/40 font-mono transition-colors">
                     Atualizar dados
