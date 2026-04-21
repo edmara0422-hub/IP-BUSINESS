@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Calculator, TrendingUp, AlertTriangle, Brain, Loader2 } from 'lucide-react'
+import { useWorkspaceData } from '@/hooks/useWorkspaceData'
 
 const RED = '#c0392b'
 const GREEN = '#1e8449'
@@ -25,10 +27,11 @@ function colorByRange(value: number, greenAbove: number, amberAbove: number): st
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function CockpitFinanceiro({ marketData }: { marketData: any }) {
-  const [receita, setReceita] = useState(50000)
-  const [despesas, setDespesas] = useState(35000)
-  const [caixa, setCaixa] = useState(120000)
-  const [cac, setCac] = useState(45)
+  const { data, update } = useWorkspaceData('cockpit', { receita: 50000, despesas: 35000, caixa: 120000, cac: 45 })
+  const receita = data.receita; const setReceita = (v: number) => update({ receita: v })
+  const despesas = data.despesas; const setDespesas = (v: number) => update({ despesas: v })
+  const caixa = data.caixa; const setCaixa = (v: number) => update({ caixa: v })
+  const cac = data.cac; const setCac = (v: number) => update({ cac: v })
   const [iaLoading, setIaLoading] = useState(false)
   const [iaResponse, setIaResponse] = useState('')
 

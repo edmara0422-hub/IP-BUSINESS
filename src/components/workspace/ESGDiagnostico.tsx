@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useWorkspaceData } from '@/hooks/useWorkspaceData'
 import dynamic from 'next/dynamic'
 import {
   Leaf, Users, Shield, Target, TrendingUp, Loader2,
@@ -115,9 +116,15 @@ const IA_HELP: Record<string, string> = {
 /* ── Component ── */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function ESGDiagnostico({ marketData }: { marketData: any }) {
+  const { data: esgSaved, update: updateEsg } = useWorkspaceData('esg', {
+    answers: {} as Record<string, number>,
+    phase: 'DIAG' as 'DIAG' | 'RESULT',
+  })
+  const answers = esgSaved.answers
+  const setAnswers = (v: Record<string, number>) => updateEsg({ answers: v })
+  const phase = esgSaved.phase
+  const setPhase = (v: 'DIAG' | 'RESULT') => updateEsg({ phase: v })
   const [esgTab, setEsgTab] = useState<'diagnostico' | 'frameworks' | 'executar' | 'tbl'>('diagnostico')
-  const [phase, setPhase] = useState<'DIAG' | 'RESULT'>('DIAG')
-  const [answers, setAnswers] = useState<Record<string, number>>({})
   const [iaLoading, setIaLoading] = useState(false)
   const [iaResponse, setIaResponse] = useState('')
   const [helpLoading, setHelpLoading] = useState<string | null>(null)

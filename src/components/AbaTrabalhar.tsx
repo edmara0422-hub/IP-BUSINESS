@@ -19,6 +19,7 @@ const FeedbackNPS = dynamic(() => import('@/components/workspace/FeedbackNPS'), 
 const CanalDenuncias = dynamic(() => import('@/components/workspace/CanalDenuncias'), { ssr: false })
 const AdminPanel = dynamic(() => import('@/components/workspace/AdminPanel'), { ssr: false })
 const Governanca = dynamic(() => import('@/components/workspace/Governanca'), { ssr: false })
+const InovacaoCockpit = dynamic(() => import('@/components/workspace/InovacaoCockpit'), { ssr: false })
 
 interface ModuleMeta {
   id: string
@@ -85,6 +86,7 @@ export default function AbaTrabalhar() {
       case 'cenarios': return <CenariosForecast marketData={marketData} />
       case 'pricing': return <SmartPricing marketData={marketData} />
       case 'esg': return <ESGDiagnostico marketData={marketData} />
+      case 'inovacao': return <InovacaoCockpit />
       case 'feedback': return <FeedbackNPS />
       case 'denuncia': return <CanalDenuncias />
       case 'governanca': return <Governanca />

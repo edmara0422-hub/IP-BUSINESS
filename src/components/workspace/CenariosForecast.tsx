@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
+import { useWorkspaceData } from '@/hooks/useWorkspaceData'
 
 const RED = '#c0392b'
 const GREEN = '#1e8449'
@@ -84,7 +85,9 @@ export default function CenariosForecast({ marketData }: { marketData: any }) {
     usd: marketData?.macro?.usdBrl?.value ?? 5.2,
   }
 
-  const [stress, setStress] = useState({ ...base })
+  const { data: savedStress, update: updateStress } = useWorkspaceData('cenarios', base)
+  const stress = savedStress
+  const setStress = (v: typeof base) => updateStress(v)
   const [aiResponse, setAiResponse] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
 

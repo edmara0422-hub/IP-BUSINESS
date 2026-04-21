@@ -81,6 +81,20 @@ create policy "workspace_profiles: admin read all" on public.workspace_profiles
     exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
   );
 
+-- Dados persistidos por módulo do Workspace
+create table public.workspace_data (
+  user_id uuid references auth.users(id) on delete cascade,
+  module_id text not null,
+  data jsonb not null default '{}',
+  updated_at timestamptz not null default now(),
+  primary key (user_id, module_id)
+);
+
+alter table public.workspace_data enable row level security;
+
+create policy "workspace_data: own" on public.workspace_data
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
 -- Auto-criar perfil ao registrar
 create or replace function public.handle_new_user()
 returns trigger as $$

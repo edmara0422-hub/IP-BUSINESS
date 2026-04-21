@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Shield, FileText, CheckSquare, BookOpen, Loader2, Copy, ChevronDown, Sparkles, Building } from 'lucide-react'
+import { useWorkspaceData } from '@/hooks/useWorkspaceData'
 
 const BLUE = '#1a5276'
 const GREEN = '#1e8449'
@@ -801,24 +803,41 @@ const GENERATOR_TEMPLATES = [
   },
 ]
 
+const GOV_DEFAULT = {
+  empresa: '',
+  setor: '',
+  porte: '',
+  funcionarios: '',
+  faturamento: '',
+  tipoProduto: '',
+  temInvestidores: '',
+  exporta: '',
+  temESG: '',
+  generated: {} as Record<string, string>,
+}
+
 export default function Governanca() {
   const [openSection, setOpenSection] = useState<string | null>('politicas')
   const [openItem, setOpenItem] = useState<string | null>(null)
   const [generatorOpen, setGeneratorOpen] = useState(false)
   const [generating, setGenerating] = useState<string | null>(null)
-  const [generated, setGenerated] = useState<Record<string, string>>({})
   const [copied, setCopied] = useState<string | null>(null)
 
-  // Generator company context
-  const [empresa, setEmpresa] = useState('')
-  const [setor, setSetor] = useState('')
-  const [porte, setPorte] = useState('')
-  const [funcionarios, setFuncionarios] = useState('')
-  const [faturamento, setFaturamento] = useState('')
-  const [tipoProduto, setTipoProduto] = useState('')
-  const [temInvestidores, setTemInvestidores] = useState('')
-  const [exporta, setExporta] = useState('')
-  const [temESG, setTemESG] = useState('')
+  const { data: gov, update: updateGov } = useWorkspaceData('governanca', GOV_DEFAULT)
+
+  const empresa = gov.empresa; const setEmpresa = (v: string) => updateGov({ empresa: v })
+  const setor = gov.setor; const setSetor = (v: string) => updateGov({ setor: v })
+  const porte = gov.porte; const setPorte = (v: string) => updateGov({ porte: v })
+  const funcionarios = gov.funcionarios; const setFuncionarios = (v: string) => updateGov({ funcionarios: v })
+  const faturamento = gov.faturamento; const setFaturamento = (v: string) => updateGov({ faturamento: v })
+  const tipoProduto = gov.tipoProduto; const setTipoProduto = (v: string) => updateGov({ tipoProduto: v })
+  const temInvestidores = gov.temInvestidores; const setTemInvestidores = (v: string) => updateGov({ temInvestidores: v })
+  const exporta = gov.exporta; const setExporta = (v: string) => updateGov({ exporta: v })
+  const temESG = gov.temESG; const setTemESG = (v: string) => updateGov({ temESG: v })
+  const generated = gov.generated
+  const setGenerated = (updater: (prev: Record<string, string>) => Record<string, string>) => {
+    updateGov({ generated: updater(gov.generated) })
+  }
 
   const contextReady = empresa.trim().length > 0 && setor.length > 0 && porte.length > 0
 

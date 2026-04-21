@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { Tag, TrendingUp, AlertTriangle, Brain, Loader2, DollarSign, BarChart3, Target } from 'lucide-react'
+import { useWorkspaceData } from '@/hooks/useWorkspaceData'
 
 const RED = '#c0392b'
 const GREEN = '#1e8449'
@@ -25,12 +26,13 @@ function colorByRange(value: number, greenAbove: number, amberAbove: number): st
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function SmartPricing({ marketData }: { marketData: any }) {
-  const [custo, setCusto] = useState(80)
-  const [preco, setPreco] = useState(150)
-  const [unidades, setUnidades] = useState(200)
-  const [custosFixos, setCustosFixos] = useState(15000)
-  const [pctDolar, setPctDolar] = useState(20)
-  const [margemDesejada, setMargemDesejada] = useState(30)
+  const { data, update } = useWorkspaceData('pricing', { custo: 80, preco: 150, unidades: 200, custosFixos: 15000, pctDolar: 20, margemDesejada: 30 })
+  const custo = data.custo; const setCusto = (v: number) => update({ custo: v })
+  const preco = data.preco; const setPreco = (v: number) => update({ preco: v })
+  const unidades = data.unidades; const setUnidades = (v: number) => update({ unidades: v })
+  const custosFixos = data.custosFixos; const setCustosFixos = (v: number) => update({ custosFixos: v })
+  const pctDolar = data.pctDolar; const setPctDolar = (v: number) => update({ pctDolar: v })
+  const margemDesejada = data.margemDesejada; const setMargemDesejada = (v: number) => update({ margemDesejada: v })
   const [iaLoading, setIaLoading] = useState(false)
   const [iaResponse, setIaResponse] = useState('')
 
