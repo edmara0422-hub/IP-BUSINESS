@@ -25,9 +25,18 @@ function colorByRange(value: number, greenAbove: number, amberAbove: number): st
   return RED
 }
 
+const PHASE_DEFAULTS: Record<string, { receita: number; despesas: number; caixa: number; cac: number }> = {
+  validacao: { receita: 3000,  despesas: 2000,  caixa: 15000,  cac: 150 },
+  mei:       { receita: 6000,  despesas: 3500,  caixa: 25000,  cac: 90  },
+  slu:       { receita: 20000, despesas: 12000, caixa: 60000,  cac: 60  },
+  startup:   { receita: 50000, despesas: 38000, caixa: 120000, cac: 120 },
+  ltda:      { receita: 80000, despesas: 55000, caixa: 200000, cac: 45  },
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function CockpitFinanceiro({ marketData }: { marketData: any }) {
-  const { data, update } = useWorkspaceData('cockpit', { receita: 50000, despesas: 35000, caixa: 120000, cac: 45 })
+export default function CockpitFinanceiro({ marketData, userProfile }: { marketData: any; userProfile?: any }) {
+  const phaseDefault = PHASE_DEFAULTS[userProfile?.subtype] ?? { receita: 50000, despesas: 35000, caixa: 120000, cac: 45 }
+  const { data, update } = useWorkspaceData('cockpit', phaseDefault)
   const receita = data.receita; const setReceita = (v: number) => update({ receita: v })
   const despesas = data.despesas; const setDespesas = (v: number) => update({ despesas: v })
   const caixa = data.caixa; const setCaixa = (v: number) => update({ caixa: v })

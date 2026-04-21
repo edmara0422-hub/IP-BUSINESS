@@ -12,7 +12,7 @@ interface Message {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function IAAdvisor({ marketData }: { marketData: any }) {
+export default function IAAdvisor({ marketData, userProfile }: { marketData: any; userProfile?: any }) {
   const { iaModifier } = useAccessibility()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -51,7 +51,16 @@ export default function IAAdvisor({ marketData }: { marketData: any }) {
       `${o.label}: urgência ${o.urgency}%`
     ).join('\n  ') ?? ''
 
-    return `DADOS MACRO:
+    const phaseCtx = userProfile ? `
+PERFIL DO USUÁRIO:
+  Tipo: ${userProfile.type === 'pj' ? 'Pessoa Jurídica' : userProfile.type === 'pf' ? 'Pessoa Física' : 'Indefinido'}
+  Fase: ${userProfile.subtype ?? 'não informada'}
+  Setor(es): ${userProfile.sectors?.join(', ') || 'não informado'}
+  Faturamento: ${userProfile.revenue || 'não informado'}
+  Produto/Serviço: ${userProfile.product?.join(', ') || 'não informado'}
+` : ''
+
+    return `${phaseCtx}DADOS MACRO:
   SELIC: ${selic}%
   IPCA: ${ipca}%
   PIB: ${pib}%
@@ -101,19 +110,19 @@ OPORTUNIDADES:
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          question: `Faça uma ANÁLISE COMPLETA do mercado brasileiro agora. Organize assim:
+          question: `${userProfile ? `Você está falando com um(a) empreendedor(a) na fase "${userProfile.subtype ?? 'não informada'}", setor "${userProfile.sectors?.join(', ') || 'não informado'}", faturamento "${userProfile.revenue || 'não informado'}". TODA a análise deve ser filtrada por esse contexto — o que é relevante para essa fase, esse setor, esse tamanho.\n\n` : ''}Faça uma ANÁLISE COMPLETA do mercado brasileiro agora. Organize assim:
 
-📊 PANORAMA GERAL (1 parágrafo resumindo o momento)
+📊 PANORAMA GERAL (1 parágrafo resumindo o momento${userProfile?.subtype ? ` para quem está na fase ${userProfile.subtype}` : ''})
 
-💰 MACRO — como SELIC, IPCA, câmbio e PIB se conectam e o que isso gera pra quem tem negócio
+💰 MACRO — como SELIC, IPCA, câmbio e PIB se conectam e o que isso gera${userProfile?.sectors?.length ? ` para o setor de ${userProfile.sectors[0]}` : ' pra quem tem negócio'}
 
-📈 SETORES — quais estão quentes, quais estão frios, onde está a oportunidade
+📈 SETORES — quais estão quentes, quais estão frios, onde está a oportunidade${userProfile?.sectors?.length ? ` (destaque ${userProfile.sectors[0]})` : ''}
 
 🎯 MARKETING — CAC, CPM, orgânico: está caro crescer? o que fazer?
 
 ⚠️ RISCOS — os 3 maiores riscos agora e como LUCRAR com cada um
 
-🚀 AÇÃO IMEDIATA — as 3 coisas que qualquer empresa deveria fazer AGORA baseado nesses dados
+🚀 AÇÃO IMEDIATA — as 3 coisas que ${userProfile?.subtype ? `uma empresa ${userProfile.subtype}` : 'qualquer empresa'} deveria fazer AGORA baseado nesses dados
 
 Use TODOS os dados que te passei. Seja específico com números reais. Não seja genérico.${iaModifier}`,
           marketContext: ctx,

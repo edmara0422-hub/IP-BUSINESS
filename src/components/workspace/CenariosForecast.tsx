@@ -77,7 +77,17 @@ function seededRandom(seed: number) {
   return x - Math.floor(x)
 }
 
-export default function CenariosForecast({ marketData }: { marketData: any }) {
+const PHASE_CONTEXT: Record<string, string> = {
+  validacao: 'Você está em validação — priorize sobrevivência de caixa. Cenário pessimista é o mais crítico.',
+  mei:       'MEI: SELIC alta aumenta custo de crédito. Foque no cenário base e reserve caixa.',
+  slu:       'SLU: avalie o impacto do câmbio nos seus custos e do IPCA no seu pricing.',
+  startup:   'Startup: analise o cenário pessimista — runway curto exige planejamento conservador.',
+  ltda:      'LTDA: compare os cenários e estime o impacto no EBITDA e no fluxo de caixa.',
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function CenariosForecast({ marketData, userProfile }: { marketData: any; userProfile?: any }) {
+  const phaseHint = PHASE_CONTEXT[userProfile?.subtype ?? ''] ?? null
   const base = {
     selic: marketData?.macro?.selic?.value ?? 14.75,
     ipca: marketData?.macro?.ipca?.value ?? 4.14,
@@ -206,6 +216,13 @@ Faça uma análise estratégica considerando:
       transition={{ duration: 0.4 }}
       style={{ color: '#e0e0e0', padding: 24 }}
     >
+      {/* Phase hint */}
+      {phaseHint && (
+        <div style={{ background: 'rgba(154,125,10,0.1)', border: '1px solid rgba(154,125,10,0.25)', borderRadius: 8, padding: '8px 12px', marginBottom: 16, fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>
+          💡 {phaseHint}
+        </div>
+      )}
+
       {/* 1. Base Atual */}
       <div style={{ background: 'rgba(26,82,118,0.12)', border: `1px solid ${BLUE}`, borderRadius: 10, padding: 16, marginBottom: 24 }}>
         <p style={{ fontSize: 11, color: '#888', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>

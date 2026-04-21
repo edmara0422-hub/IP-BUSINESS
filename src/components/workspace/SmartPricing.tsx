@@ -24,9 +24,18 @@ function colorByRange(value: number, greenAbove: number, amberAbove: number): st
   return RED
 }
 
+const PRICING_DEFAULTS: Record<string, { custo: number; preco: number; unidades: number; custosFixos: number; pctDolar: number; margemDesejada: number }> = {
+  validacao: { custo: 30,  preco: 60,   unidades: 50,   custosFixos: 2000,  pctDolar: 10, margemDesejada: 40 },
+  mei:       { custo: 50,  preco: 100,  unidades: 100,  custosFixos: 4000,  pctDolar: 15, margemDesejada: 35 },
+  slu:       { custo: 70,  preco: 130,  unidades: 150,  custosFixos: 10000, pctDolar: 20, margemDesejada: 30 },
+  startup:   { custo: 120, preco: 240,  unidades: 200,  custosFixos: 20000, pctDolar: 30, margemDesejada: 35 },
+  ltda:      { custo: 200, preco: 350,  unidades: 500,  custosFixos: 40000, pctDolar: 25, margemDesejada: 28 },
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function SmartPricing({ marketData }: { marketData: any }) {
-  const { data, update } = useWorkspaceData('pricing', { custo: 80, preco: 150, unidades: 200, custosFixos: 15000, pctDolar: 20, margemDesejada: 30 })
+export default function SmartPricing({ marketData, userProfile }: { marketData: any; userProfile?: any }) {
+  const pricingDefault = PRICING_DEFAULTS[userProfile?.subtype] ?? { custo: 80, preco: 150, unidades: 200, custosFixos: 15000, pctDolar: 20, margemDesejada: 30 }
+  const { data, update } = useWorkspaceData('pricing', pricingDefault)
   const custo = data.custo; const setCusto = (v: number) => update({ custo: v })
   const preco = data.preco; const setPreco = (v: number) => update({ preco: v })
   const unidades = data.unidades; const setUnidades = (v: number) => update({ unidades: v })

@@ -11,6 +11,7 @@ import dynamic from 'next/dynamic'
 import { useAccessibility, type AccessibilityMode } from '@/hooks/useAccessibility'
 import { useAuth } from '@/hooks/useAuth'
 import { createClient } from '@/lib/supabase/client'
+import type { WorkspaceProfile } from '@/components/WorkspaceOnboarding'
 
 const IAAdvisor = dynamic(() => import('@/components/workspace/IAAdvisor'), { ssr: false })
 const CockpitFinanceiro = dynamic(() => import('@/components/workspace/CockpitFinanceiro'), { ssr: false })
@@ -69,12 +70,32 @@ function Placeholder({ mod }: { mod: ModuleMeta }) {
   )
 }
 
+const PHASE_LABELS: Record<string, { label: string; color: string }> = {
+  validacao: { label: 'Validação', color: '#9a7d0a' },
+  mei:       { label: 'MEI',       color: '#1e8449' },
+  slu:       { label: 'SLU',       color: '#1e8449' },
+  ltda:      { label: 'LTDA',      color: '#2471a3' },
+  startup:   { label: 'Startup',   color: '#7d3c98' },
+}
+
 export default function AbaTrabalhar() {
   const { mode, changeMode } = useAccessibility()
   const { profile, user } = useAuth()
   const isAdmin = profile?.role === 'admin'
   const [activeId, setActiveId] = useState('ia')
+  const [userProfile, setUserProfile] = useState<WorkspaceProfile | null>(null)
   const supabase = createClient()
+
+  useEffect(() => {
+    if (!user) return
+    supabase
+      .from('workspace_profiles')
+      .select('*')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => { if (data) setUserProfile(data as WorkspaceProfile) })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id])
 
   const handleRefazer = async () => {
     if (user) {
@@ -94,10 +115,10 @@ export default function AbaTrabalhar() {
 
   const renderModule = () => {
     switch (activeId) {
-      case 'ia': return <IAAdvisor marketData={marketData} />
-      case 'cockpit': return <CockpitFinanceiro marketData={marketData} />
-      case 'cenarios': return <CenariosForecast marketData={marketData} />
-      case 'pricing': return <SmartPricing marketData={marketData} />
+      case 'ia': return <IAAdvisor marketData={marketData} userProfile={userProfile} />
+      case 'cockpit': return <CockpitFinanceiro marketData={marketData} userProfile={userProfile} />
+      case 'cenarios': return <CenariosForecast marketData={marketData} userProfile={userProfile} />
+      case 'pricing': return <SmartPricing marketData={marketData} userProfile={userProfile} />
       case 'esg': return <ESGDiagnostico marketData={marketData} />
       case 'inovacao': return <InovacaoCockpit />
       case 'feedback': return <FeedbackNPS />
@@ -148,6 +169,23 @@ export default function AbaTrabalhar() {
           <div className="px-3 mb-2">
             <p className="font-mono text-[9px] font-bold tracking-[0.2em] text-white/15 uppercase">Workspace</p>
           </div>
+
+          {/* Fase atual */}
+          {userProfile && (() => {
+            const ph = PHASE_LABELS[userProfile.subtype] ?? { label: userProfile.subtype, color: '#5dade2' }
+            return (
+              <div className="mx-3 mb-3 rounded-lg px-2.5 py-2" style={{ background: `${ph.color}10`, border: `1px solid ${ph.color}25` }}>
+                <p className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 mb-0.5">FASE ATUAL</p>
+                <p className="text-[12px] font-semibold" style={{ color: ph.color }}>{ph.label}</p>
+                {userProfile.sectors?.length > 0 && (
+                  <p className="text-[10px] text-white/25 truncate mt-0.5">{userProfile.sectors[0]}</p>
+                )}
+                <button onClick={handleRefazer} className="font-mono text-[8px] text-white/20 hover:text-white/40 transition-colors mt-1">
+                  alterar fase
+                </button>
+              </div>
+            )
+          })()}
 
           {/* Módulos de trabalho */}
           <div className="flex flex-col gap-0.5 px-1.5">
