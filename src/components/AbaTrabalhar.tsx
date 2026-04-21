@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Brain, LayoutDashboard, Activity, Tag, Zap,
   ShieldCheck, Globe, Users, Target, Lightbulb,
-  MessageSquare, AlertTriangle, Briefcase, BookOpen,
+  MessageSquare, AlertTriangle, BookOpen,
+  TrendingUp, UserCheck,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAccessibility, type AccessibilityMode } from '@/hooks/useAccessibility'
@@ -72,11 +73,15 @@ const LAYER_META: Record<LayerType, { label: string; desc: string; color: string
   compliance: { label: 'Compliance', desc: 'Governança',   color: '#1a5276' },
 }
 
-const CONTEXT_SWITCHES: { id: ContextMode; label: string; short: string; icon: React.ElementType; color: string; desc: string }[] = [
-  { id: 'gestao',      label: 'Gestão Interna',  short: 'Gestão',     icon: LayoutDashboard, color: '#1e8449', desc: 'Runway, TRL, OKRs' },
-  { id: 'consultoria', label: 'Consultoria',      short: 'Consultoria',icon: Briefcase,       color: '#5dade2', desc: 'Modo Ghost · OBI' },
-  { id: 'estudo',      label: 'Estudo',           short: 'Estudo',     icon: BookOpen,        color: '#7d3c98', desc: 'IA como pesquisador' },
+const CONTEXT_SWITCHES: { id: ContextMode; label: string; short: string; icon: React.ElementType; color: string; desc: string; mood: string }[] = [
+  { id: 'gestao',      label: 'Meu Negócio',     short: 'Gestão',     icon: TrendingUp,  color: '#10b981', desc: 'Runway · OKRs · TRL',    mood: 'Pragmática — foco em sobrevivência e crescimento' },
+  { id: 'consultoria', label: 'Modo Ghost',       short: 'Ghost',      icon: UserCheck,   color: '#f59e0b', desc: 'OBI · Diagnóstico',       mood: 'Analítica — diagnóstico e valor para o cliente' },
+  { id: 'estudo',      label: 'Estudo & Teoria',  short: 'Estudo',     icon: BookOpen,    color: '#6366f1', desc: 'Rezende · Peter · OBI',   mood: 'Inspiradora — teoria, conceitos e curadoria' },
 ]
+
+// Setores/produtos que habilitam cada switch extra
+const CONSULTORIA_TRIGGERS = ['Consultoria', 'Agência', 'Consultoria Empresarial']
+const ESTUDO_TRIGGERS = ['Educação', 'Conteúdo', 'Infoproduto', 'Educação Corporativa']
 
 const ACC_OPTIONS: { id: AccessibilityMode; label: string; desc: string }[] = [
   { id: 'padrao',    label: 'Padrão',    desc: 'Experiência completa' },
@@ -115,6 +120,16 @@ export default function AbaTrabalhar() {
   const [activeId, setActiveId] = useState('ia')
   const [contextMode, setContextMode] = useState<ContextMode>('gestao')
   const [userProfile, setUserProfile] = useState<WorkspaceProfile | null>(null)
+
+  // Visibilidade dos switches baseada no onboarding
+  const allSectors = userProfile?.sectors ?? []
+  const allProducts = userProfile?.product ?? []
+  const showConsultoria = isAdmin || allSectors.some(s => CONSULTORIA_TRIGGERS.includes(s)) || allProducts.some(p => CONSULTORIA_TRIGGERS.includes(p))
+  const showEstudo     = isAdmin || allSectors.some(s => ESTUDO_TRIGGERS.includes(s))     || allProducts.some(p => ESTUDO_TRIGGERS.includes(p))
+
+  const visibleSwitches = CONTEXT_SWITCHES.filter(sw =>
+    sw.id === 'gestao' || (sw.id === 'consultoria' && showConsultoria) || (sw.id === 'estudo' && showEstudo)
+  )
   const supabase = createClient()
 
   useEffect(() => {
@@ -191,7 +206,7 @@ export default function AbaTrabalhar() {
       <div className="md:hidden overflow-x-auto scrollbar-hide border-b border-white/5">
         {/* Switches mobile */}
         <div className="flex gap-1 px-2 pt-2">
-          {CONTEXT_SWITCHES.map(sw => {
+          {visibleSwitches.map(sw => {
             const Icon = sw.icon
             const isActive = contextMode === sw.id
             return (
@@ -226,13 +241,32 @@ export default function AbaTrabalhar() {
       <div className="flex min-h-[70vh]">
 
         {/* Sidebar */}
-        <div className="hidden md:flex flex-col w-[200px] shrink-0 border-r border-white/5 py-3">
+        <div className="hidden md:flex flex-col w-[200px] shrink-0 border-r border-white/5 py-3"
+          style={{ borderRight: contextMode === 'consultoria' ? '1px solid rgba(245,158,11,0.15)' : contextMode === 'estudo' ? '1px solid rgba(99,102,241,0.15)' : undefined }}>
+
+          {/* Sidebar title por contexto */}
+          <div className="px-3 mb-3">
+            {contextMode === 'gestao' && (
+              <p className="text-[10px] font-bold text-white/35 truncate">
+                {userProfile?.sectors?.[0] ? `Workspace · ${userProfile.sectors[0]}` : 'Workspace · Meu Negócio'}
+              </p>
+            )}
+            {contextMode === 'consultoria' && (
+              <div className="flex items-center gap-2">
+                <p className="text-[10px] font-bold" style={{ color: '#f59e0b' }}>OBI · Diagnóstico de Cliente</p>
+                <span className="text-[8px] font-mono font-bold px-1.5 py-0.5 rounded" style={{ background: 'rgba(245,158,11,0.2)', color: '#f59e0b', letterSpacing: '0.1em' }}>GHOST</span>
+              </div>
+            )}
+            {contextMode === 'estudo' && (
+              <p className="text-[10px] font-bold" style={{ color: '#6366f1' }}>Academia de Gestão IPB</p>
+            )}
+          </div>
 
           {/* Context switches */}
           <div className="px-2 mb-3">
             <p className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/12 uppercase px-1 mb-1.5">Contexto</p>
             <div className="flex flex-col gap-0.5">
-              {CONTEXT_SWITCHES.map(sw => {
+              {visibleSwitches.map(sw => {
                 const Icon = sw.icon
                 const isActive = contextMode === sw.id
                 return (
@@ -320,19 +354,24 @@ export default function AbaTrabalhar() {
             </>
           )}
 
-          {/* No modo consultoria/estudo: hint */}
-          {contextMode !== 'gestao' && (
-            <div className="mx-3 rounded-lg p-3" style={{ background: contextMode === 'consultoria' ? 'rgba(93,173,226,0.08)' : 'rgba(125,60,152,0.08)', border: `1px solid ${contextMode === 'consultoria' ? 'rgba(93,173,226,0.2)' : 'rgba(125,60,152,0.2)'}` }}>
-              <p className="text-[11px] font-bold" style={{ color: contextMode === 'consultoria' ? '#5dade2' : '#7d3c98' }}>
-                {contextMode === 'consultoria' ? 'Modo Ghost Ativo' : 'Modo Estudo Ativo'}
-              </p>
-              <p className="text-[10px] text-white/25 mt-0.5 leading-relaxed">
-                {contextMode === 'consultoria'
-                  ? 'Dados do cliente são temporários — não afetam seus dados pessoais'
-                  : 'IA atua como pesquisador/professor — foco em teoria OBI'}
-              </p>
-            </div>
-          )}
+          {/* No modo consultoria/estudo: hint com mood da IA */}
+          {contextMode !== 'gestao' && (() => {
+            const sw = CONTEXT_SWITCHES.find(s => s.id === contextMode)!
+            return (
+              <div className="mx-3 rounded-lg p-3" style={{ background: `${sw.color}0d`, border: `1px solid ${sw.color}30` }}>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <sw.icon size={11} style={{ color: sw.color }} />
+                  <p className="text-[11px] font-bold" style={{ color: sw.color }}>{sw.label}</p>
+                </div>
+                <p className="text-[10px] text-white/25 leading-relaxed">{sw.mood}</p>
+                {contextMode === 'consultoria' && (
+                  <p className="text-[9px] font-mono mt-1.5" style={{ color: 'rgba(245,158,11,0.5)' }}>
+                    Dados temporários · não afetam seu perfil
+                  </p>
+                )}
+              </div>
+            )
+          })()}
 
           {/* Acessibilidade + Config */}
           <div className="mt-auto px-3 pt-3 border-t border-white/5 space-y-3">
@@ -359,23 +398,24 @@ export default function AbaTrabalhar() {
         <div className="flex-1 min-w-0 overflow-y-auto">
           {/* Header do módulo */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
-            {contextMode === 'consultoria' ? (
-              <>
-                <Briefcase size={18} style={{ color: '#5dade2' }} />
-                <div>
-                  <p className="text-[14px] font-bold text-white/80">Consultoria · Modo Ghost</p>
-                  <p className="text-[10px] font-mono text-white/20">Switch 2 · Diagnóstico OBI para cliente</p>
-                </div>
-              </>
-            ) : contextMode === 'estudo' ? (
-              <>
-                <BookOpen size={18} style={{ color: '#7d3c98' }} />
-                <div>
-                  <p className="text-[14px] font-bold text-white/80">Estudo & Conteúdo</p>
-                  <p className="text-[10px] font-mono text-white/20">Switch 3 · IA como pesquisador/professor</p>
-                </div>
-              </>
-            ) : (() => {
+            {contextMode !== 'gestao' ? (() => {
+              const sw = CONTEXT_SWITCHES.find(s => s.id === contextMode)!
+              const Icon = sw.icon
+              return (
+                <>
+                  <Icon size={18} style={{ color: sw.color }} />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-[14px] font-bold text-white/80">{sw.label}</p>
+                      {contextMode === 'consultoria' && (
+                        <span className="text-[8px] font-mono font-bold px-1.5 py-0.5 rounded animate-pulse" style={{ background: 'rgba(245,158,11,0.2)', color: '#f59e0b', letterSpacing: '0.1em' }}>GHOST</span>
+                      )}
+                    </div>
+                    <p className="text-[10px] font-mono" style={{ color: `${sw.color}90` }}>{sw.mood}</p>
+                  </div>
+                </>
+              )
+            })() : (() => {
               const Icon = active.icon
               const lm = LAYER_META[active.layer]
               return (
