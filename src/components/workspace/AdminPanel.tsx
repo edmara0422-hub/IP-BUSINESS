@@ -294,6 +294,76 @@ const MATURITY = ['Não iniciado', 'Em desenvolvimento', 'Implementado', 'Otimiz
 const MATURITY_COLORS = ['rgba(255,255,255,0.2)', AMBER, '#5dade2', GREEN]
 
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// OKRs — sugestão automática baseada no diagnóstico
+// ─────────────────────────────────────────────
+function suggestOKRs(faseEmpresa: number, faseHype: number, trl: number, fasesFunil: boolean[]): OKR[] {
+  const funilAtual = fasesFunil.lastIndexOf(true) + 1
+  const okrs: OKR[] = []
+
+  // OKR 1: baseado na fase TD atual
+  if (faseEmpresa <= 1) {
+    okrs.push({
+      objetivo: 'Completar Fase 2 (Processo) e avançar para Estratégia',
+      krs: [
+        { texto: 'Criar SOPs dos 3 processos principais no Zoho WorkDrive', pct: 0 },
+        { texto: 'Ter 1 automação ativa via Zoho Flow (onboarding automático)', pct: 0 },
+        { texto: 'Revisar OKRs toda segunda-feira por 8 semanas consecutivas', pct: 0 },
+      ],
+    })
+  } else if (faseEmpresa <= 2) {
+    okrs.push({
+      objetivo: 'Tornar decisões baseadas em dados (DDDM) padrão na operação',
+      krs: [
+        { texto: 'Definir 3 KPIs semanais revisados toda segunda-feira', pct: 0 },
+        { texto: 'Centralizar dados de clientes no Zoho CRM → IPB Cockpit', pct: 0 },
+        { texto: 'Documentar roadmap de 12 meses no Zoho Projects', pct: 0 },
+      ],
+    })
+  } else {
+    okrs.push({
+      objetivo: 'Escalar operação com dados como ativo estratégico',
+      krs: [
+        { texto: 'Lançar canal digital com receita recorrente ativa', pct: 0 },
+        { texto: 'Pipeline de dados Zoho CRM → análise de churn e LTV', pct: 0 },
+        { texto: 'Benchmarks setoriais gerados automaticamente', pct: 0 },
+      ],
+    })
+  }
+
+  // OKR 2: baseado na janela de inovação (Hype + TRL + Funil)
+  if (faseHype === 3 && trl >= 7) {
+    okrs.push({
+      objetivo: 'Capturar janela de mercado de IA — escalar aquisição de clientes agora',
+      krs: [
+        { texto: 'Atingir primeiros 50 usuários pagos no IPB até próximo trimestre', pct: 0 },
+        { texto: 'MRR de R$5.000 com churn < 10% no primeiro trimestre', pct: 0 },
+        { texto: funilAtual < 4 ? 'Passar o funil de inovação para Stage Gate 2 (ROI validado)' : 'Lançar go-to-market com métricas de crescimento semanais', pct: 0 },
+      ],
+    })
+  } else if (trl < 7) {
+    okrs.push({
+      objetivo: 'Amadurecer o produto para nível de escala (TRL 7→9)',
+      krs: [
+        { texto: 'Validar tecnicamente com 10 usuários reais em ambiente de produção', pct: 0 },
+        { texto: 'Reduzir bugs críticos a zero e latência < 2s em todas as telas', pct: 0 },
+        { texto: 'Publicar IPB nas App Stores (iOS + Android) via Capacitor', pct: 0 },
+      ],
+    })
+  } else {
+    okrs.push({
+      objetivo: 'Diferenciar o IPB em mercado maduro de IA',
+      krs: [
+        { texto: 'Lançar feature exclusiva não replicável por concorrentes em 90 dias', pct: 0 },
+        { texto: 'NPS acima de 8 com pelo menos 20 respondentes', pct: 0 },
+        { texto: 'Case de sucesso documentado de 1 cliente usando o IPB', pct: 0 },
+      ],
+    })
+  }
+
+  return okrs
+}
+
 // Monitor types
 // ─────────────────────────────────────────────
 interface Feedback { id: string; nps_score: number | null; category: string | null; message: string | null; created_at: string }
@@ -1127,7 +1197,47 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
           {/* ═══ OKRs ═══ */}
           {tab === 'okrs' && (
             <div className="flex flex-col gap-5">
-              <p className="text-[11px] text-white/30">OKRs são ambiciosos — <span style={{ color: GREEN }}>70% já é sucesso.</span></p>
+
+              {/* Saúde geral */}
+              {(() => {
+                const allKrs = s.okrs.flatMap(o => o.krs.filter(k => k.texto))
+                if (allKrs.length === 0) return null
+                const onTrack = allKrs.filter(k => k.pct >= 70).length
+                const atRisk = allKrs.filter(k => k.pct > 0 && k.pct < 40).length
+                const avg = Math.round(allKrs.reduce((a, b) => a + b.pct, 0) / allKrs.length)
+                return (
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { label: 'PROGRESSO MÉDIO', value: `${avg}%`, color: avg >= 70 ? GREEN : avg >= 40 ? AMBER : RED },
+                      { label: 'NO CAMINHO', value: `${onTrack}/${allKrs.length} KRs`, color: GREEN },
+                      { label: 'EM RISCO', value: `${atRisk} KRs`, color: atRisk > 0 ? RED : 'rgba(255,255,255,0.25)' },
+                    ].map(c => (
+                      <div key={c.label} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <p className="text-[9px] font-mono text-white/20 mb-1">{c.label}</p>
+                        <p className="text-[16px] font-bold font-mono" style={{ color: c.color }}>{c.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })()}
+
+              {/* Sugestão automática */}
+              {s.okrs.every(o => !o.objetivo) && (
+                <div className="rounded-xl p-4" style={{ background: 'rgba(30,132,73,0.06)', border: '1px solid rgba(30,132,73,0.2)' }}>
+                  <p className="text-[11px] text-white/40 mb-3">
+                    <span style={{ color: GREEN }}>Sistema identificou OKRs relevantes</span> com base na fase TD, janela de inovação e gaps do diagnóstico.
+                  </p>
+                  <button onClick={() => update({ okrs: suggestOKRs(s.faseEmpresa, s.faseHype, s.trl, s.fasesFunil) })}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-[12px] font-bold transition-all"
+                    style={{ background: `${GREEN}20`, border: `1px solid ${GREEN}55`, color: GREEN }}>
+                    <Zap size={13} />
+                    Preencher OKRs com base no diagnóstico
+                  </button>
+                </div>
+              )}
+
+              <p className="text-[11px] text-white/25">OKRs são ambiciosos — <span style={{ color: GREEN }}>70% já é sucesso.</span> Edite conforme sua realidade.</p>
+
               {s.okrs.map((okr, oi) => (
                 <div key={oi} className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `3px solid ${GREEN}` }}>
                   <div className="flex items-center gap-2 mb-3"><Target size={13} style={{ color: GREEN }} /><span className="text-[10px] font-mono text-white/30 uppercase tracking-widest">Objetivo {oi + 1}</span></div>
