@@ -419,6 +419,66 @@ function SignalCard({
   )
 }
 
+/* ── CAC por Canal ─────────────────────────────────────────────── */
+function CACPorCanal({ data }: { data: any }) {
+  const platforms: any[] = data?.platforms ?? []
+  const marketing = data?.marketing ?? {}
+  const cacBase   = marketing.cacTrend?.value ?? 48.6
+  const usd       = data?.macro?.usdBrl?.value ?? 4.98
+
+  const meta    = platforms.find((p: any) => p.id === 'meta_ads')
+  const tiktok  = platforms.find((p: any) => p.id === 'tiktok')
+  const google  = platforms.find((p: any) => p.id === 'google_ads')
+
+  const metaCAC  = Math.round((meta?.cpm  ?? 14.2) * usd * 0.33)
+  const ttCAC    = Math.round((tiktok?.cpm ?? 6.8)  * usd * 0.28)
+  const gCAC     = Math.round((google?.cpc ?? 2.84) * usd * 22)
+  const orgCAC   = Math.round(cacBase * 0.15)
+
+  const channels = [
+    { label: 'Meta Ads',  cac: metaCAC, color: RED,   note: `CPM US$${(meta?.cpm ?? 14.2).toFixed(1)}` },
+    { label: 'Google',    cac: gCAC,    color: AMBER,  note: `CPC US$${(google?.cpc ?? 2.84).toFixed(2)}` },
+    { label: 'TikTok',    cac: ttCAC,   color: GREEN,  note: `CPM US$${(tiktok?.cpm ?? 6.8).toFixed(1)}` },
+    { label: 'Orgânico',  cac: orgCAC,  color: GREEN,  note: 'SEO + Referral' },
+  ].sort((a, b) => a.cac - b.cac)
+
+  const maxCAC = Math.max(...channels.map(c => c.cac), 1)
+
+  return (
+    <div className="rounded-lg p-3 mb-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="flex items-center justify-between mb-3">
+        <span className="font-mono text-[10px] font-bold tracking-[0.2em] text-white/25">CAC POR CANAL</span>
+        <span className="font-mono text-[10px] text-white/20">blended: R${Math.round(cacBase)}</span>
+      </div>
+      <div className="flex flex-col gap-2">
+        {channels.map((c) => (
+          <div key={c.label}>
+            <div className="flex items-center justify-between mb-0.5">
+              <div className="flex items-center gap-2">
+                <span className="text-[12px] text-white/55">{c.label}</span>
+                <span className="font-mono text-[9px] text-white/25">{c.note}</span>
+              </div>
+              <span className="font-mono text-[12px] font-bold" style={{ color: c.color }}>R${c.cac}</span>
+            </div>
+            <div className="h-[4px] rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: c.color }}
+                initial={{ width: 0 }}
+                animate={{ width: `${(c.cac / maxCAC) * 100}%` }}
+                transition={{ duration: 0.8 }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="text-[10px] text-white/20 mt-2 leading-snug">
+        TikTok e Orgânico têm melhor custo-benefício. Migre budget de Meta progressivamente.
+      </p>
+    </div>
+  )
+}
+
 /* ── Main Section Component ────────────────────────────────────── */
 export default function SignalFeedSection({ data }: { data: any }) {
   const [filter, setFilter] = useState<FilterKey>('all')
@@ -468,6 +528,9 @@ export default function SignalFeedSection({ data }: { data: any }) {
           </span>
         </div>
       </div>
+
+      {/* CAC por Canal */}
+      <CACPorCanal data={data} />
 
       {/* Filter buttons */}
       <div className="flex gap-1" style={{ marginBottom: 10 }}>

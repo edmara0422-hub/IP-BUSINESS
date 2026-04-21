@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 const RED   = '#c0392b'
 const GREEN = '#1e8449'
 const AMBER = '#9a7d0a'
+const BLUE  = '#1a5276'
 
 function v(n: number | undefined, fb: number) { return (n != null && Number.isFinite(n)) ? n : fb }
 
@@ -670,6 +671,159 @@ function CompactRow({ chain, index, isExpanded, onToggle }: {
   )
 }
 
+/* ─── AI Efficiency Index ─── */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function AIEficienciaIndex({ data }: { data: any }) {
+  const aiAdoption = v(data.marketing?.aiAdoption?.value, 64)
+  const techHeat   = data.sectors?.find((s: { id: string }) => s.id === 'tech')?.heat ?? 95
+  const score      = Math.min(100, Math.round(aiAdoption * 0.6 + techHeat * 0.4))
+  const scoreColor = score > 70 ? GREEN : score > 50 ? AMBER : RED
+
+  const tasks = [
+    { label: 'Conteúdo & Marketing',    pct: Math.min(99, Math.round(aiAdoption * 0.80)) },
+    { label: 'Atendimento ao Cliente',  pct: Math.min(99, Math.round(aiAdoption * 0.50)) },
+    { label: 'Análise de Dados',        pct: Math.min(99, Math.round(aiAdoption * 0.40)) },
+    { label: 'Automação Operacional',   pct: Math.min(99, Math.round(aiAdoption * 0.30)) },
+  ]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="rounded-lg p-3"
+      style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <span className="font-mono text-[11px] font-bold tracking-[0.15em] text-white/30">ÍNDICE DE EFICIÊNCIA IA</span>
+        <div className="flex items-center gap-1.5">
+          <span className="font-mono text-[22px] font-bold leading-none" style={{ color: scoreColor }}>{score}</span>
+          <span className="font-mono text-[11px] text-white/25">/100</span>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2">
+        {tasks.map((t, i) => (
+          <div key={t.label}>
+            <div className="flex items-center justify-between mb-0.5">
+              <span className="text-[11px] text-white/40">{t.label}</span>
+              <span className="font-mono text-[11px] font-bold" style={{ color: t.pct > 60 ? GREEN : t.pct > 40 ? AMBER : RED }}>{t.pct}%</span>
+            </div>
+            <div className="h-[3px] rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: t.pct > 60 ? GREEN : t.pct > 40 ? AMBER : RED }}
+                initial={{ width: 0 }}
+                animate={{ width: `${t.pct}%` }}
+                transition={{ duration: 0.9, delay: 0.1 + i * 0.08 }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="text-[10px] text-white/25 mt-2 leading-snug">
+        {aiAdoption.toFixed(0)}% das empresas adotam IA. {score > 70 ? 'Setor tech aquecido acelera adoção.' : 'Janela de vantagem competitiva ainda aberta.'}
+      </p>
+    </motion.div>
+  )
+}
+
+/* ─── Gatilhos de Decisão ─── */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function GatilhosDecisao({ data }: { data: any }) {
+  const usd      = v(data.macro?.usdBrl?.value, 4.98)
+  const selic    = v(data.macro?.selic?.value, 14.75)
+  const pib      = v(data.macro?.pib?.value, 1.86)
+  const cacDelta = v(data.marketing?.cacTrend?.delta, 0)
+  const tiktok   = data.platforms?.find((p: { id: string }) => p.id === 'tiktok')
+  const ttCpmD   = tiktok?.cpmDelta ?? 0
+
+  const triggers = [
+    {
+      condition: 'USD > R$5,10',
+      active: usd > 5.10,
+      then: 'Reduzir Meta Ads 15% e migrar para influenciadores pagos em Real',
+      reason: `USD atual: R$${usd.toFixed(2)}`,
+    },
+    {
+      condition: 'SELIC > 14%',
+      active: selic > 14,
+      then: 'Alocar caixa livre no CDI — rende mais que ROI médio de marketing',
+      reason: `SELIC: ${selic.toFixed(2)}% a.a.`,
+    },
+    {
+      condition: 'CAC subindo > 15%',
+      active: cacDelta > 15,
+      then: 'Migrar 20% do budget Meta → TikTok imediatamente',
+      reason: `CAC delta: ${cacDelta > 0 ? '+' : ''}${cacDelta.toFixed(0)}%`,
+    },
+    {
+      condition: 'TikTok CPM caindo > 2%',
+      active: ttCpmD < -2,
+      then: 'Alocar 20-30% do budget em TikTok Ads nessa janela',
+      reason: `TikTok CPM: ${ttCpmD.toFixed(1)}%`,
+    },
+    {
+      condition: 'PIB < 1%',
+      active: pib < 1,
+      then: 'Cortar gastos não-essenciais, preservar runway mínimo 6 meses',
+      reason: `PIB atual: +${pib.toFixed(1)}%`,
+    },
+  ]
+
+  const ativos = triggers.filter(t => t.active).length
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="rounded-lg overflow-hidden"
+      style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}
+    >
+      <div className="flex items-center justify-between px-3 pt-3 pb-2">
+        <span className="font-mono text-[11px] font-bold tracking-[0.15em] text-white/30">REGRAS DE DECISÃO</span>
+        <span
+          className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-sm"
+          style={{ background: ativos > 0 ? `${GREEN}15` : 'rgba(255,255,255,0.04)', color: ativos > 0 ? GREEN : 'rgba(255,255,255,0.2)', border: `1px solid ${ativos > 0 ? GREEN + '30' : 'rgba(255,255,255,0.06)'}` }}
+        >
+          {ativos} ATIVO{ativos !== 1 ? 'S' : ''}
+        </span>
+      </div>
+      <div className="flex flex-col gap-1.5 px-3 pb-3">
+        {triggers.map((t, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -6 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 + i * 0.05 }}
+            className="rounded-md px-3 py-2"
+            style={{
+              background: t.active ? `${GREEN}08` : 'rgba(0,0,0,0.2)',
+              borderLeft: `3px solid ${t.active ? GREEN : 'rgba(255,255,255,0.08)'}`,
+            }}
+          >
+            <div className="flex items-center justify-between mb-0.5">
+              <span className="font-mono text-[11px] font-bold" style={{ color: t.active ? GREEN : 'rgba(255,255,255,0.35)' }}>
+                SE {t.condition}
+              </span>
+              <span
+                className="font-mono text-[9px] font-bold"
+                style={{ color: t.active ? GREEN : 'rgba(255,255,255,0.18)' }}
+              >
+                {t.active ? '● ATIVO' : '○ INATIVO'}
+              </span>
+            </div>
+            <p className="text-[11px] text-white/50 leading-snug">
+              <span className="text-white/25">→ </span>{t.then}
+            </p>
+            <span className="font-mono text-[10px] text-white/22">{t.reason}</span>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
 /* ─── Section Divider ─── */
 function SectionDivider({ label, color }: { label: string; color: string }) {
   return (
@@ -694,9 +848,9 @@ export default function RiscosSection({ data, ai }: { data: any; ai?: any }) {
   const remainingRisks = remaining.filter(c => c.type === 'critical' || c.type === 'risk')
   const remainingOpps  = remaining.filter(c => c.type === 'opportunity')
 
-  const selic = v(data.macro.selic?.value, 10.5)
-  const ipca  = v(data.macro.ipca?.value, 4.8)
-  const pib   = v(data.macro.pib?.value, 2.9)
+  const selic = v(data.macro.selic?.value, 14.75)
+  const ipca  = v(data.macro.ipca?.value, 4.14)
+  const pib   = v(data.macro.pib?.value, 1.86)
 
   const contextSentence = macroContextSentence(selic, ipca, pib)
 
@@ -814,6 +968,18 @@ export default function RiscosSection({ data, ai }: { data: any; ai?: any }) {
           ))}
         </div>
       )}
+
+      {/* 6. AI Efficiency Index */}
+      <div className="flex flex-col gap-2">
+        <SectionDivider label="EFICIÊNCIA IA" color={BLUE} />
+        <AIEficienciaIndex data={data} />
+      </div>
+
+      {/* 7. Decision Triggers */}
+      <div className="flex flex-col gap-2">
+        <SectionDivider label="REGRAS DE DECISÃO" color={BLUE} />
+        <GatilhosDecisao data={data} />
+      </div>
 
     </div>
   )

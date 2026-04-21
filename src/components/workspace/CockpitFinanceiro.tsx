@@ -107,6 +107,11 @@ export default function CockpitFinanceiro({ marketData }: { marketData: any }) {
   const cambioRef = 4.50
   const cambioDiff = ((usdRate - cambioRef) / cambioRef) * 100
 
+  const cdiMensal = (selicRate - 0.1) / 12           // CDI ≈ SELIC − 0.1% ao ano → mensal
+  const cdiRendimento = caixa * (cdiMensal / 100)    // R$/mês rendendo no CDI
+  const roiMensal = metrics.roi / 12                  // ROI marketing mensal
+  const decisaoCDI = roiMensal < cdiMensal            // true = CDI bate marketing
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -195,7 +200,36 @@ export default function CockpitFinanceiro({ marketData }: { marketData: any }) {
         </div>
       </div>
 
-      {/* 4. IA Analysis */}
+      {/* 4. CDI vs Marketing ROI */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <TrendingUp size={16} style={{ color: GREEN }} />
+          <span style={{ fontSize: 14, fontWeight: 600 }}>Caixa livre vs CDI</span>
+        </div>
+        <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.2)', borderLeft: `3px solid ${decisaoCDI ? AMBER : GREEN}` }}>
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="rounded-lg p-2.5" style={{ background: 'rgba(0,0,0,0.25)' }}>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>CDI mensal ({fmtDec(cdiMensal, 2)}%)</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: GREEN, fontFamily: 'monospace' }}>R${fmt(Math.round(cdiRendimento))}</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>seu caixa rendendo parado</div>
+            </div>
+            <div className="rounded-lg p-2.5" style={{ background: 'rgba(0,0,0,0.25)' }}>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>ROI marketing ({fmtDec(roiMensal, 2)}%/mês)</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: metrics.roi > 0 ? GREEN : RED, fontFamily: 'monospace' }}>{fmtDec(metrics.roi)}%</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>retorno anualizado estimado</div>
+            </div>
+          </div>
+          <div className="rounded-md p-2.5" style={{ background: decisaoCDI ? `${AMBER}12` : `${GREEN}10`, border: `1px solid ${decisaoCDI ? AMBER : GREEN}25` }}>
+            <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: decisaoCDI ? AMBER : GREEN }}>
+              {decisaoCDI
+                ? `⚠ CDI bate seu ROI de marketing — considere deixar R$${fmt(Math.round(caixa * 0.3))} no banco`
+                : `✓ ROI marketing (${fmtDec(roiMensal, 1)}%/mês) supera CDI (${fmtDec(cdiMensal, 2)}%/mês) — continue investindo`}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. IA Analysis */}
       <div>
         <button
           onClick={handleIA}
