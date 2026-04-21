@@ -95,6 +95,23 @@ alter table public.workspace_data enable row level security;
 create policy "workspace_data: own" on public.workspace_data
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+-- Configurações admin (tokens Zoho, integrações)
+create table public.admin_settings (
+  key text primary key,
+  value text not null,
+  updated_at timestamptz default now()
+);
+
+alter table public.admin_settings enable row level security;
+
+create policy "admin_settings: admin only" on public.admin_settings
+  for all using (
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  )
+  with check (
+    exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+  );
+
 -- Auto-criar perfil ao registrar
 create or replace function public.handle_new_user()
 returns trigger as $$
