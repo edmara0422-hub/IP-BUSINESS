@@ -4,9 +4,9 @@ import { NextResponse } from 'next/server'
 // - SELIC: BCB série 432
 // - IPCA: BCB série 13522 (acumulado 12m)
 // - PIB: BCB Focus (projeção mercado)
-// - USD/BRL, EUR/BRL: AwesomeAPI
+// - USD/BRL: AwesomeAPI
 // - Ouro, Prata: AwesomeAPI (XAU-USD, XAG-USD)
-// - Ações BR (9 tickers): Brapi.dev (PETR4, VALE3, ITUB4, TOTVS3, SLCE3, RDOR3, EGIE3, MGLU3, RAIL3)
+// - Ações BR (9 tickers): Yahoo Finance chart API /v8/finance/chart/{TICKER}.SA
 //
 // ESTIMADO (derivado de dados reais):
 // - Petróleo: derivado de PETR4
@@ -14,15 +14,38 @@ import { NextResponse } from 'next/server'
 // - AAPL, GOOGL, META, AMZN: derivado de setores BR
 // - Plataformas (CPM/CPC): estimativa via ação da empresa-mãe
 
+const YF_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Accept': 'application/json',
+}
+
 // ── Fetch com timeout ───────────────────────────────────────────────────────
-async function safeFetch(url: string, ms = 5000): Promise<Response | null> {
+async function safeFetch(url: string, ms = 5000, extraHeaders?: Record<string, string>): Promise<Response | null> {
   try {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), ms)
-    const res = await fetch(url, { signal: controller.signal, cache: 'no-store' })
+    const res = await fetch(url, { signal: controller.signal, cache: 'no-store', headers: extraHeaders })
     clearTimeout(timer)
     return res.ok ? res : null
   } catch { return null }
+}
+
+async function yfChangePercent(ticker: string): Promise<number> {
+  try {
+    const res = await safeFetch(
+      `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}.SA?interval=1d&range=5d`,
+      6000,
+      YF_HEADERS,
+    )
+    if (!res) return 0
+    const d = await res.json()
+    const meta = d?.chart?.result?.[0]?.meta
+    if (!meta) return 0
+    const price = parseFloat(meta.regularMarketPrice)
+    const prev  = parseFloat(meta.chartPreviousClose)
+    if (!Number.isFinite(price) || !Number.isFinite(prev) || prev === 0) return 0
+    return parseFloat(((price / prev - 1) * 100).toFixed(2))
+  } catch { return 0 }
 }
 
 function clamp(n: number, min: number, max: number) { return Math.max(min, Math.min(max, n)) }
@@ -35,12 +58,12 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
 
   // ── Defaults (usados se qualquer fetch falhar) ──────────────────────────
-  let usdBrl = 5.25, usdDelta = 0.01
-  let ipca = 3.81, pib = 1.84, selic = 14.75
+  let usdBrl = 4.98, usdDelta = 0.02
+  let ipca = 4.14, pib = 1.86, selic = 14.75
 
   // commodities
-  let goldP = 4493, goldD = 0
-  let silP = 69.6,  silD = 0
+  let goldP = 4817, goldD = 0
+  let silP = 76.8,  silD = 0
   let oilP = 69.5,  oilD = 0
   let copP = 4.35,  copD = 0   // precisa API paga
   let cornP = 465,  cornD = 0  // precisa API paga
@@ -60,7 +83,7 @@ export async function GET() {
     const [
       fxRes, selicRes, ipcaRes, pibRes,
       goldRes, silverRes,
-      brapiRes,
+      petr4D, vale3D, itub4D, totvs3D, slce3D, rdor3D, egie3D, mglu3D, rail3D,
     ] = await Promise.allSettled([
       // Macro
       safeFetch('https://economia.awesomeapi.com.br/json/last/USD-BRL'),
@@ -70,8 +93,16 @@ export async function GET() {
       // Commodities (AwesomeAPI)
       safeFetch('https://economia.awesomeapi.com.br/json/last/XAU-USD'),
       safeFetch('https://economia.awesomeapi.com.br/json/last/XAG-USD'),
-      // Ações BR (Brapi.dev — free, no token)
-      safeFetch('https://brapi.dev/api/quote/PETR4,VALE3,ITUB4,TOTVS3,SLCE3,RDOR3,EGIE3,MGLU3,RAIL3?token='),
+      // Ações BR — Yahoo Finance chart API (sem token)
+      yfChangePercent('PETR4'),
+      yfChangePercent('VALE3'),
+      yfChangePercent('ITUB4'),
+      yfChangePercent('TOTVS3'),
+      yfChangePercent('SLCE3'),
+      yfChangePercent('RDOR3'),
+      yfChangePercent('EGIE3'),
+      yfChangePercent('MGLU3'),
+      yfChangePercent('RAIL3'),
     ])
 
     // ── Parse macro ──────────────────────────────────────────────────────
@@ -120,58 +151,28 @@ export async function GET() {
       } catch { /* fallback */ }
     }
 
-    // ── Parse ações BR (Brapi.dev) ──────────────────────────────────────
-    if (brapiRes.status === 'fulfilled' && brapiRes.value) {
-      try {
-        const d = await brapiRes.value.json()
-        const results: Array<{ symbol: string; regularMarketPrice: number; regularMarketChangePercent: number }> = d?.results ?? []
-        const bySymbol = new Map(results.map(r => [r.symbol, r]))
+    // ── Parse ações BR (Yahoo Finance chart API) ─────────────────────────
+    // Each yfChangePercent returns a number directly via Promise.allSettled
+    const pct = (r: PromiseSettledResult<number>) => r.status === 'fulfilled' ? r.value : 0
+    petrD      = pct(petr4D)
+    valeD      = pct(vale3D)
+    dFintech   = pct(itub4D)
+    dTech      = pct(totvs3D)
+    dAgro      = pct(slce3D)
+    dHealth    = pct(rdor3D)
+    dEnergy    = pct(egie3D)
+    dRetail    = pct(mglu3D)
+    dLogistics = pct(rail3D)
 
-        // Setores — ação representativa
-        const totvs = bySymbol.get('TOTVS3')
-        if (totvs) dTech = r2(totvs.regularMarketChangePercent)
+    // Agentes globais US — derivados de setores BR (proxy)
+    aaplD  = r2(dTech * 0.7)
+    googlD = r2(dTech * 0.6)
+    metaD  = r2(dTech * 0.4 + dRetail * 0.3)
+    amznD  = r2(dTech * 0.3 + dLogistics * 0.3 + dRetail * 0.2)
 
-        const slce = bySymbol.get('SLCE3')
-        if (slce) dAgro = r2(slce.regularMarketChangePercent)
-
-        const rdor = bySymbol.get('RDOR3')
-        if (rdor) dHealth = r2(rdor.regularMarketChangePercent)
-
-        const egie = bySymbol.get('EGIE3')
-        if (egie) dEnergy = r2(egie.regularMarketChangePercent)
-
-        const itub = bySymbol.get('ITUB4')
-        if (itub) dFintech = r2(itub.regularMarketChangePercent)
-
-        const rail = bySymbol.get('RAIL3')
-        if (rail) dLogistics = r2(rail.regularMarketChangePercent)
-
-        const mglu = bySymbol.get('MGLU3')
-        if (mglu) dRetail = r2(mglu.regularMarketChangePercent)
-
-        // Agentes globais — ações BR
-        const petr4 = bySymbol.get('PETR4')
-        if (petr4) petrD = r2(petr4.regularMarketChangePercent)
-
-        const vale3 = bySymbol.get('VALE3')
-        if (vale3) valeD = r2(vale3.regularMarketChangePercent)
-
-        // Agentes globais US — derivados de setores BR (proxy)
-        // AAPL (consumer tech) ≈ tech sector
-        aaplD = r2(dTech * 0.7)
-        // GOOGL (ads/search) ≈ tech sector
-        googlD = r2(dTech * 0.6)
-        // META (social/ads) ≈ mix tech + retail (consumer spending)
-        metaD = r2(dTech * 0.4 + dRetail * 0.3)
-        // AMZN (e-commerce/cloud) ≈ mix tech + logistics + retail
-        amznD = r2(dTech * 0.3 + dLogistics * 0.3 + dRetail * 0.2)
-
-        // Petróleo: derivado de PETR4 (se PETR4 sobe, petróleo provavelmente subiu)
-        oilD = r2(petrD * 0.8)
-        oilP = r2(69.5 * (1 + oilD / 100))
-
-      } catch { /* fallback */ }
-    }
+    // Petróleo: derivado de PETR4
+    oilD = r2(petrD * 0.8)
+    oilP = r2(69.5 * (1 + oilD / 100))
 
     // Serviços: estimado via macro (sem ação representativa)
     dServices = pib > 2 ? 0.3 : pib > 0 ? 0.1 : -0.3
