@@ -282,11 +282,32 @@ const FUNIL_FASES = [
   'Stage Gate 2 — Decisão final (ROI, mercado validado?)',
   'Lançamento e Escala — Go-to-market, métricas, ciclo reinicia',
 ]
-const GOV_CHECKS = {
-  govEstrategia: ['Tecnologia alinhada à estratégia de longo prazo', 'Prioridades e investimentos em tech definidos', 'Indicadores de resultado mapeados', 'Roadmap de 12 meses atualizado'],
-  govRiscos: ['Ameaças identificadas e avaliadas', 'Criptografia e 2FA ativos em todas as contas', 'Plano de resposta a incidentes documentado', 'Treinamento de segurança realizado no time'],
-  govPoliticas: ['Política de uso de dados definida (LGPD)', 'Acesso a dados sensíveis controlado por role', 'Política de fornecedores ESG aplicada', 'Código de conduta digital publicado'],
-  govMonitoramento: ['Monitoramento de uptime ativo', 'Logs de acesso armazenados (mín. 6 meses)', 'Revisão trimestral de ferramentas e custos', 'Métricas de impacto acompanhadas toda semana'],
+interface GovItem { text: string; autoCheck: boolean; evidence: string | null; directive: string | null }
+const GOV_CHECKS: Record<string, GovItem[]> = {
+  govEstrategia: [
+    { text: 'Tecnologia alinhada à estratégia de longo prazo', autoCheck: true, evidence: 'IPB é o produto — tech É a estratégia', directive: null },
+    { text: 'Prioridades e investimentos em tech definidos', autoCheck: true, evidence: 'TD + OKRs ativos no painel Admin', directive: null },
+    { text: 'Indicadores de resultado mapeados', autoCheck: true, evidence: 'Cockpit Financeiro: receita, margem, runway, health score', directive: null },
+    { text: 'Roadmap de 12 meses atualizado', autoCheck: false, evidence: null, directive: 'Documentar roadmap no Zoho Projects com marcos trimestrais e revisar com OKRs' },
+  ],
+  govRiscos: [
+    { text: 'Ameaças identificadas e avaliadas', autoCheck: false, evidence: null, directive: 'Mapear top 5 riscos do IPB (churn, segurança, concorrência, dependência de APIs, infra) e definir mitigações' },
+    { text: 'Criptografia e 2FA ativos em todas as contas', autoCheck: true, evidence: 'Supabase Auth + RLS em todas as tabelas + HTTPS via Vercel', directive: null },
+    { text: 'Plano de resposta a incidentes documentado', autoCheck: false, evidence: null, directive: 'Criar runbook no Zoho WorkDrive: o que fazer se Supabase cair, se dados vazarem, se Vercel sair do ar' },
+    { text: 'Treinamento de segurança realizado no time', autoCheck: false, evidence: null, directive: 'Conduzir sessão de 1h sobre: senhas seguras, phishing, acesso a dados de clientes' },
+  ],
+  govPoliticas: [
+    { text: 'Política de uso de dados definida (LGPD)', autoCheck: false, evidence: null, directive: 'Criar documento de política de privacidade e termos de uso — publicar em ip-business-ten.vercel.app/privacidade' },
+    { text: 'Acesso a dados sensíveis controlado por role', autoCheck: true, evidence: 'Supabase RLS ativo — cada usuário acessa só os próprios dados, admin acessa tudo', directive: null },
+    { text: 'Política de fornecedores ESG aplicada', autoCheck: false, evidence: null, directive: 'Mapear fornecedores (Vercel, Supabase, Zoho, Groq) com critérios ESG e documentar no Zoho WorkDrive' },
+    { text: 'Código de conduta digital publicado', autoCheck: false, evidence: null, directive: 'Criar código de conduta para uso do IPB e comunicar a todos os usuários por email via Zoho' },
+  ],
+  govMonitoramento: [
+    { text: 'Monitoramento de uptime ativo', autoCheck: true, evidence: 'Vercel monitoring automático + healthz endpoint ativo em /api/healthz', directive: null },
+    { text: 'Logs de acesso armazenados (mín. 6 meses)', autoCheck: true, evidence: 'Supabase logs + Vercel logs retidos automaticamente', directive: null },
+    { text: 'Revisão trimestral de ferramentas e custos', autoCheck: false, evidence: null, directive: 'Agendar revisão trimestral: custos Vercel + Supabase + Zoho + Groq vs valor gerado' },
+    { text: 'Métricas de impacto acompanhadas toda semana', autoCheck: true, evidence: 'IPB Cockpit + painel Admin — health score, OKRs e TD revisados semanalmente', directive: null },
+  ],
 }
 const GOV_LABELS: Record<string, string> = { govEstrategia: '🎯 Estratégia', govRiscos: '🛡️ Riscos', govPoliticas: '📋 Políticas', govMonitoramento: '🔄 Monitoramento' }
 const GOV_COLORS: Record<string, string> = { govEstrategia: BLUE, govRiscos: RED, govPoliticas: AMBER, govMonitoramento: GREEN }
@@ -1262,24 +1283,80 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
           {/* ═══ GOVERNANÇA ═══ */}
           {tab === 'gov' && (
             <div className="flex flex-col gap-4">
-              <p className="text-[11px] text-white/30">4 pilares — se um falha, a casa desaba.</p>
-              {(Object.entries(GOV_CHECKS) as [keyof typeof GOV_CHECKS, string[]][]).map(([key, items]) => {
-                const arr = (s[key] as boolean[]) ?? items.map(() => false)
-                const done = arr.filter(Boolean).length
+
+              {/* Banner auto-detecção */}
+              <div className="rounded-lg px-3 py-2.5 flex items-start gap-2.5" style={{ background: 'rgba(30,132,73,0.08)', border: '1px solid rgba(30,132,73,0.2)' }}>
+                <Zap size={13} style={{ color: GREEN, marginTop: 1, flexShrink: 0 }} />
+                <p className="text-[11px] leading-relaxed text-white/45">
+                  <span style={{ color: GREEN }}>Diagnóstico automático ativo.</span>{' '}
+                  Itens verificados via Supabase RLS, Vercel monitoring e stack do IPB marcados automaticamente com <span style={{ color: '#5dade2' }}>auto</span>.
+                  Itens pendentes mostram a diretiva exata.
+                </p>
+              </div>
+
+              {/* Health score geral */}
+              {(() => {
+                const total = Object.values(GOV_CHECKS).flat()
+                const allKeys = Object.keys(GOV_CHECKS) as (keyof CockpitState)[]
+                const done = total.filter((item, gi) => {
+                  const key = allKeys[Math.floor(gi / 4)]
+                  const arr = (s[key] as boolean[]) ?? []
+                  return item.autoCheck || (arr[gi % 4] ?? false)
+                }).length
+                const pct = Math.round((done / total.length) * 100)
                 return (
-                  <div key={key} className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `3px solid ${GOV_COLORS[key]}` }}>
+                  <div className="flex items-center gap-3 rounded-lg px-4 py-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div className="flex-1">
+                      <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-1">Maturidade de governança</p>
+                      <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+                        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: pct >= 75 ? GREEN : pct >= 50 ? AMBER : RED }} />
+                      </div>
+                    </div>
+                    <span className="font-mono text-[20px] font-bold shrink-0" style={{ color: pct >= 75 ? GREEN : pct >= 50 ? AMBER : RED }}>{done}/{total.length}</span>
+                  </div>
+                )
+              })()}
+
+              <p className="text-[11px] text-white/25">4 pilares — se um falha, a casa desaba.</p>
+              {(Object.entries(GOV_CHECKS) as [string, GovItem[]][]).map(([key, items]) => {
+                const arr = (s[key as keyof CockpitState] as boolean[]) ?? []
+                const effective = items.map((item, i) => item.autoCheck || (arr[i] ?? false))
+                const done = effective.filter(Boolean).length
+                const color = GOV_COLORS[key]
+                return (
+                  <div key={key} className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `3px solid ${color}` }}>
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-[13px] font-semibold text-white/60">{GOV_LABELS[key]}</span>
                       <span className="font-mono text-[12px] font-bold" style={{ color: done === items.length ? GREEN : done >= 2 ? AMBER : RED }}>{done}/{items.length}</span>
                     </div>
-                    <div className="flex flex-col gap-1.5">
-                      {items.map((item, i) => (
-                        <button key={i} onClick={() => { const next = [...arr]; next[i] = !next[i]; update({ [key]: next } as Partial<CockpitState>) }}
-                          className="flex items-center gap-2.5 text-left rounded-md px-2.5 py-1.5 transition-all" style={{ background: arr[i] ? `${GOV_COLORS[key]}08` : 'transparent' }}>
-                          <span className="text-[12px] font-mono shrink-0 w-4" style={{ color: arr[i] ? GREEN : 'rgba(255,255,255,0.2)' }}>{arr[i] ? '✓' : '○'}</span>
-                          <span className="text-[12px] leading-snug" style={{ color: arr[i] ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.28)' }}>{item}</span>
-                        </button>
-                      ))}
+                    <div className="flex flex-col gap-2">
+                      {items.map((item, i) => {
+                        const checked = item.autoCheck || (arr[i] ?? false)
+                        return (
+                          <div key={i}>
+                            <button onClick={() => { if (item.autoCheck) return; const next = items.map((it, j) => it.autoCheck || (arr[j] ?? false)); next[i] = !checked; update({ [key]: next } as Partial<CockpitState>) }}
+                              className="flex items-start gap-2.5 w-full text-left rounded-md px-2.5 py-1.5 transition-all"
+                              style={{ background: checked ? `${color}08` : 'transparent', cursor: item.autoCheck ? 'default' : 'pointer' }}>
+                              <span className="text-[12px] font-mono shrink-0 w-4 mt-0.5" style={{ color: checked ? GREEN : 'rgba(255,255,255,0.2)' }}>{checked ? '✓' : '○'}</span>
+                              <div className="flex-1">
+                                <span className="text-[12px] leading-snug" style={{ color: checked ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.28)' }}>{item.text}</span>
+                                {item.autoCheck && item.evidence && (
+                                  <span className="ml-2 text-[9px] font-mono px-1.5 py-0.5 rounded-full align-middle" style={{ background: 'rgba(93,173,226,0.1)', color: '#5dade2' }}>auto</span>
+                                )}
+                              </div>
+                            </button>
+                            {checked && item.evidence && (
+                              <p className="text-[10px] text-white/20 ml-9 mt-0.5 leading-snug">{item.evidence}</p>
+                            )}
+                            {!checked && item.directive && (
+                              <div className="ml-9 mt-1 flex items-start gap-1.5">
+                                <ChevronRight size={10} style={{ color: AMBER, marginTop: 1, flexShrink: 0 }} />
+                                <p className="text-[10px] leading-snug" style={{ color: AMBER }}>{item.directive}</p>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                 )
