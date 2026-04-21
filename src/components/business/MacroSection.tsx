@@ -18,10 +18,10 @@ const ADMIN_MODULES: Record<string, string[]> = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getValues(data: any) {
   const vv = (n: number | undefined, fb: number) => (n != null && Number.isFinite(n)) ? n : fb
-  const selic = vv(data.macro?.selic?.value, 10.5)
-  const ipca  = vv(data.macro?.ipca?.value, 4.8)
-  const pib   = vv(data.macro?.pib?.value, 2.9)
-  const usd   = vv(data.macro?.usdBrl?.value, 5.72)
+  const selic = vv(data.macro?.selic?.value, 14.75)
+  const ipca  = vv(data.macro?.ipca?.value, 4.14)
+  const pib   = vv(data.macro?.pib?.value, 1.86)
+  const usd   = vv(data.macro?.usdBrl?.value, 4.98)
   return { selic, ipca, pib, usd }
 }
 

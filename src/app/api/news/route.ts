@@ -23,9 +23,28 @@ function simpleHash(str: string): string {
   return Math.abs(hash).toString(36)
 }
 
+function decodeEntities(str: string): string {
+  return str
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&#8217;/g, '\u2019')
+    .replace(/&#8216;/g, '\u2018')
+    .replace(/&#8220;/g, '\u201C')
+    .replace(/&#8221;/g, '\u201D')
+    .replace(/&#8211;/g, '\u2013')
+    .replace(/&#8212;/g, '\u2014')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&[a-zA-Z]+;/g, '')
+    .trim()
+}
+
 function extractTag(xml: string, tag: string): string {
   const re = new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?</${tag}>`)
-  return (xml.match(re)?.[1] ?? '').trim()
+  return decodeEntities(xml.match(re)?.[1] ?? '')
 }
 
 interface NewsItem { id: string; title: string; source: string; category: string; pubDate: string; link: string }

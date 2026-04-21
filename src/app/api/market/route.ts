@@ -48,6 +48,24 @@ async function yfChangePercent(ticker: string): Promise<number> {
   } catch { return 0 }
 }
 
+async function yfCommodity(symbol: string): Promise<{ price: number; delta: number } | null> {
+  try {
+    const res = await safeFetch(
+      `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`,
+      6000,
+      YF_HEADERS,
+    )
+    if (!res) return null
+    const d = await res.json()
+    const meta = d?.chart?.result?.[0]?.meta
+    if (!meta) return null
+    const price = parseFloat(meta.regularMarketPrice)
+    const prev  = parseFloat(meta.chartPreviousClose)
+    if (!Number.isFinite(price) || !Number.isFinite(prev) || prev === 0) return null
+    return { price: parseFloat(price.toFixed(2)), delta: parseFloat(((price / prev - 1) * 100).toFixed(2)) }
+  } catch { return null }
+}
+
 function clamp(n: number, min: number, max: number) { return Math.max(min, Math.min(max, n)) }
 function r2(n: number) { return parseFloat(n.toFixed(2)) }
 function r1(n: number) { return parseFloat(n.toFixed(1)) }
@@ -64,7 +82,7 @@ export async function GET() {
   // commodities
   let goldP = 4817, goldD = 0
   let silP = 76.8,  silD = 0
-  let oilP = 69.5,  oilD = 0
+  let oilP = 83.0,  oilD = 0
   let copP = 4.35,  copD = 0   // precisa API paga
   let cornP = 465,  cornD = 0  // precisa API paga
   let lithD = 0                // precisa API paga
@@ -82,7 +100,7 @@ export async function GET() {
   try {
     const [
       fxRes, selicRes, ipcaRes, pibRes,
-      goldRes, silverRes,
+      goldRes, silverRes, oilRes,
       petr4D, vale3D, itub4D, totvs3D, slce3D, rdor3D, egie3D, mglu3D, rail3D,
     ] = await Promise.allSettled([
       // Macro
@@ -90,9 +108,10 @@ export async function GET() {
       safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/1?formato=json'),
       safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.13522/dados/ultimos/1?formato=json'),
       safeFetch('https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?$filter=Indicador%20eq%20%27PIB%20Total%27%20and%20DataReferencia%20eq%20%272026%27&$top=1&$orderby=Data%20desc&$format=json'),
-      // Commodities (AwesomeAPI)
+      // Commodities (AwesomeAPI + Yahoo Finance)
       safeFetch('https://economia.awesomeapi.com.br/json/last/XAU-USD'),
       safeFetch('https://economia.awesomeapi.com.br/json/last/XAG-USD'),
+      yfCommodity('CL=F'),
       // Ações BR — Yahoo Finance chart API (sem token)
       yfChangePercent('PETR4'),
       yfChangePercent('VALE3'),
@@ -150,6 +169,10 @@ export async function GET() {
         silD = parseFloat(d?.XAGUSD?.varBid ?? '0')
       } catch { /* fallback */ }
     }
+    if (oilRes.status === 'fulfilled' && oilRes.value) {
+      oilP = oilRes.value.price
+      oilD = oilRes.value.delta
+    }
 
     // ── Parse ações BR (Yahoo Finance chart API) ─────────────────────────
     // Each yfChangePercent returns a number directly via Promise.allSettled
@@ -169,10 +192,6 @@ export async function GET() {
     googlD = r2(dTech * 0.6)
     metaD  = r2(dTech * 0.4 + dRetail * 0.3)
     amznD  = r2(dTech * 0.3 + dLogistics * 0.3 + dRetail * 0.2)
-
-    // Petróleo: derivado de PETR4
-    oilD = r2(petrD * 0.8)
-    oilP = r2(69.5 * (1 + oilD / 100))
 
     // Serviços: estimado via macro (sem ação representativa)
     dServices = pib > 2 ? 0.3 : pib > 0 ? 0.1 : -0.3
