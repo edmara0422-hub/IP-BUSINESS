@@ -482,7 +482,7 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
           <div className="absolute top-4 left-4 flex flex-col gap-3">
             {[
               { label: 'SELIC', value: v(data.macro.selic?.value, 14.75), suf: '%', dec: 1, delta: v(data.macro.selic?.delta, 0), desc: 'TAXA BÁSICA DE JUROS', min: 2, max: 20, alert: v(data.macro.selic?.value, 14.75) > 12 },
-              { label: 'IPCA', value: v(data.macro.ipca?.value, 3.81), suf: '%', dec: 2, delta: v(data.macro.ipca?.delta, 0), desc: 'INFLAÇÃO 12 MESES', min: 0, max: 12, alert: v(data.macro.ipca?.value, 3.81) > 6 },
+              { label: 'IPCA', value: v(data.macro.ipca?.value, 4.14), suf: '%', dec: 2, delta: v(data.macro.ipca?.delta, 0), desc: 'INFLAÇÃO 12 MESES', min: 0, max: 12, alert: v(data.macro.ipca?.value, 4.14) > 6 },
             ].map(ind => {
               const pct = Math.max(0, Math.min(100, ((ind.value - ind.min) / (ind.max - ind.min)) * 100))
               const alertColor = ind.alert ? 'rgba(192,57,43,0.7)' : 'rgba(192,192,192,0.4)'
@@ -531,8 +531,8 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
           {/* ── HUD direita: PIB + USD ── */}
           <div className="absolute top-4 right-4 flex flex-col gap-3 items-end">
             {[
-              { label: 'PIB', value: v(data.macro.pib?.value, 1.84), suf: '%', dec: 1, delta: v(data.macro.pib?.delta, 0), pre: '', desc: 'CRESCIMENTO ANUAL', min: -3, max: 8, good: v(data.macro.pib?.value, 1.84) > 2 },
-              { label: 'USD/BRL', value: v(data.macro.usdBrl?.value, 5.16), pre: 'R$', suf: '', dec: 2, delta: v(data.macro.usdBrl?.delta, 0), desc: 'COTAÇÃO DO DÓLAR', min: 3, max: 8, good: false },
+              { label: 'PIB', value: v(data.macro.pib?.value, 1.86), suf: '%', dec: 1, delta: v(data.macro.pib?.delta, 0), pre: '', desc: 'CRESCIMENTO ANUAL', min: -3, max: 8, good: v(data.macro.pib?.value, 1.86) > 2 },
+              { label: 'USD/BRL', value: v(data.macro.usdBrl?.value, 4.98), pre: 'R$', suf: '', dec: 2, delta: v(data.macro.usdBrl?.delta, 0), desc: 'COTAÇÃO DO DÓLAR', min: 3, max: 8, good: false },
             ].map(ind => {
               const pct = Math.max(0, Math.min(100, ((ind.value - ind.min) / (ind.max - ind.min)) * 100))
               const color = ind.good ? 'rgba(52,211,153,0.6)' : 'rgba(192,192,192,0.4)'

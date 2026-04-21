@@ -150,7 +150,7 @@ function buildCausalChains(data: any): CausalChain[] {
       `Google CPC em keywords competitivas cresceu 15-30% por conta de leilao mais acirrado`,
       `iOS 14.5+ limitou rastreamento → segmentacao menos precisa → desperdicio de verba maior`,
       `${videoShr.toFixed(0)}% do engajamento em video → anuncios estaticos perdem eficiencia`,
-      `TikTok CPM em R$${tiktokCPM.toFixed(1)} (${tiktokCPMD.toFixed(1)}%) — janela de arbitragem aberta`,
+      `TikTok CPM US$${tiktokCPM.toFixed(1)} (${tiktokCPMD.toFixed(1)}%) — janela de arbitragem aberta`,
     ],
     effects: [
       `${cacAff}% das empresas com CAC 20-40% mais alto que 2 anos atras`,
@@ -213,11 +213,11 @@ function buildCausalChains(data: any): CausalChain[] {
     opportunity: `Adotar IA agora corta custos 30-60%. Quem implementa primeiro opera com estrutura 3x mais eficiente que concorrente tradicional.`,
   })
 
-  // ── Setores em queda ──
-  if (sectorRetail && sectorRetail.change < 0) chains.push({
-    id: 'retail_decline', type: sectorRetail.change < -20 ? 'critical' : 'risk',
-    title: `Varejo tradicional em queda (${sectorRetail.change.toFixed(1)}% YTD) — modelo sob pressao`,
-    urgency: Math.min(75, Math.abs(Math.round(sectorRetail.change * 1.5))),
+  // ── Setores em queda ── (usa heat estrutural, não delta diário)
+  if (sectorRetail && sectorRetail.heat < 30) chains.push({
+    id: 'retail_decline', type: sectorRetail.heat < 15 ? 'critical' : 'risk',
+    title: `Varejo tradicional fraco (heat ${sectorRetail.heat}/100) — modelo sob pressao`,
+    urgency: Math.min(75, Math.round((30 - sectorRetail.heat) * 2.5)),
     why: `O varejo fisico tradicional enfrenta tripla pressao: e-commerce roubando participacao, custo fixo alto (aluguel, folha) que nao cai com a demanda, e consumidor mais exigente por experiencia e preco. O modelo de "loja como estoque" esta obsoleto.`,
     influence: [
       `E-commerce cresceu — consumidor compara preco em segundos e compra online com entrega no dia seguinte`,
@@ -237,10 +237,10 @@ function buildCausalChains(data: any): CausalChain[] {
     opportunity: `M&A barato — adquirir concorrentes em dificuldade. Concorrência sai do mercado = mais share pra quem sobrevive.`,
   })
 
-  if (sectorMedia && sectorMedia.change < -20) chains.push({
+  if (sectorMedia && sectorMedia.heat < 10) chains.push({
     id: 'media_decline', type: 'risk',
-    title: `Midia impressa −${Math.abs(sectorMedia.change).toFixed(1)}% — setor em colapso estrutural`,
-    urgency: Math.min(65, Math.abs(Math.round(sectorMedia.change))),
+    title: `Midia impressa (heat ${sectorMedia.heat}/100) — setor em colapso estrutural`,
+    urgency: 62,
     why: `A midia impressa enfrenta colapso estrutural irreversivel. Anunciantes migraram para digital (mensuravel, segmentado, mais barato). Leitores migraram para redes sociais e agregadores. Nao e crise de demanda — e obsolescencia de modelo de negocio.`,
     influence: [
       `Meta e Google capturam 70%+ do budget de publicidade digital`,
@@ -265,10 +265,10 @@ function buildCausalChains(data: any): CausalChain[] {
     urgency: Math.min(85, Math.round(pib * 20)),
     why: `A economia brasileira cresce ${pib.toFixed(1)}%, acima da media historica. Agro em expansao, servicos aquecidos e mercado de trabalho formal criando vagas sustentam o crescimento. O consumo das familias esta positivo apesar dos juros altos.`,
     influence: [
-      `Agro ${sectorAgro ? sectorAgro.change.toFixed(1) : '+28'}% gera renda para o interior e aquece mercados regionais`,
+      `Agro heat ${sectorAgro ? sectorAgro.heat : 88}/100 — um dos setores mais aquecidos do mercado`,
       `Mercado formal empregando mais → massa salarial sobe → consumo segue`,
       `Credito consignado e FGTS ativo sustentam consumo mesmo com SELIC alta`,
-      `Tech & IA ${sectorTech ? sectorTech.change.toFixed(1) : '+34'}% puxando inovacao e produtividade`,
+      `Tech & IA heat ${sectorTech ? sectorTech.heat : 95}/100 — setor mais aquecido, puxando inovacao e produtividade`,
     ],
     effects: [
       `Mais renda circulando → CAC tende a cair em setores essenciais`,
@@ -284,9 +284,9 @@ function buildCausalChains(data: any): CausalChain[] {
   // ── TikTok CPM ──
   chains.push({
     id: 'tiktok_opp', type: 'opportunity',
-    title: `TikTok CPM R$${tiktokCPM.toFixed(1)} (${tiktokCPMD.toFixed(1)}%) — janela de aquisicao barata`,
+    title: `TikTok CPM US$${tiktokCPM.toFixed(1)} (${tiktokCPMD.toFixed(1)}%) — janela de aquisicao barata`,
     urgency: 82,
-    why: `TikTok tem CPM significativamente menor que Meta (R$${metaCPM.toFixed(1)}) e Google. Enquanto outras plataformas encarecem, TikTok ainda esta em fase de crescimento de inventario de anuncios — mais espaco do que anunciantes. Essa janela fecha quando mais empresas perceberem a oportunidade.`,
+    why: `TikTok tem CPM significativamente menor que Meta (US$${metaCPM.toFixed(1)}) e Google. Enquanto outras plataformas encarecem, TikTok ainda esta em fase de crescimento de inventario de anuncios — mais espaco do que anunciantes. Essa janela fecha quando mais empresas perceberem a oportunidade.`,
     influence: [
       `TikTok ainda conquistando anunciantes brasileiros — leilao menos acirrado`,
       `Formato de video curto alinhado com ${videoShr.toFixed(0)}% do engajamento digital`,
@@ -326,10 +326,10 @@ function buildCausalChains(data: any): CausalChain[] {
     opportunity: `Adotar Claude/ChatGPT para rascunho de conteudo imediatamente. Treinar time em prompts. Criar processo de revisao humana para qualidade. Liberar time para estrategia ao inves de execucao repetitiva.`,
   })
 
-  // ── Agro B2B ──
-  if (sectorAgro && sectorAgro.change > 20) chains.push({
+  // ── Agro B2B ── (usa heat estrutural)
+  if (sectorAgro && sectorAgro.heat > 75) chains.push({
     id: 'agro_b2b', type: 'opportunity',
-    title: `Agro ${sectorAgro.change.toFixed(1)}% — oportunidade B2B em agritech`,
+    title: `Agro heat ${sectorAgro.heat}/100 — oportunidade B2B em agritech`,
     urgency: 58,
     why: `O agronegocio brasileiro cresce consistentemente e esta em processo de digitalizacao. Produtores rurais modernos adotam tecnologia para gestao, monitoramento, logistica e financiamento. Mercado B2B com ticket alto e baixo churn.`,
     influence: [

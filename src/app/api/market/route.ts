@@ -199,18 +199,19 @@ export async function GET() {
   } catch { /* todos os fallbacks permanecem */ }
 
   // ── Helpers de setor ───────────────────────────────────────────────────
-  const sectorChange = (d: number, base: number) => r1(base + d * 2)
+  // change = delta diário real da ação representativa (não base fixa)
+  // heat   = score anual de oportunidade do setor (estrutural, não muda diariamente)
   const sectorHeat   = (d: number, base: number) => clamp(Math.round(base + d * 5), 0, 100)
-  const sectorTrend  = (ch: number) => ch > 3 ? 'up' : ch < -3 ? 'down' : 'neutral'
+  const sectorTrend  = (ch: number) => ch > 0.5 ? 'up' : ch < -0.5 ? 'down' : 'neutral'
 
-  const techCh = sectorChange(dTech, 34.2)
-  const agroCh = sectorChange(dAgro, 28.1)
-  const healthCh = sectorChange(dHealth, 22.4)
-  const energyCh = sectorChange(dEnergy, 19.3)
-  const fintechCh = sectorChange(dFintech, 17.1)
-  const logCh = sectorChange(dLogistics, 15.0)
-  const servicesCh = sectorChange(dServices, 3.2)
-  const retailCh = sectorChange(dRetail, -12.1)
+  const techCh    = r1(dTech)
+  const agroCh    = r1(dAgro)
+  const healthCh  = r1(dHealth)
+  const energyCh  = r1(dEnergy)
+  const fintechCh = r1(dFintech)
+  const logCh     = r1(dLogistics)
+  const servicesCh = r1(dServices)
+  const retailCh  = r1(dRetail)
 
   // ── Plataformas — estimativa via ação da empresa mãe ──────────────────
   const metaCpm     = r2(14.2 + metaD * 0.2)

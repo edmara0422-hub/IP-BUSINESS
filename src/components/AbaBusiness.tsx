@@ -42,10 +42,10 @@ function clamp(n: number, min: number, max: number) { return Math.max(min, Math.
 
 function applySimulation(data: MarketData, sim: SimOffsets): MarketData {
   const si = sim.selic, pi = sim.pib, ci = sim.cambio, ii = sim.ipca
-  const selicNew = clamp(v(data.macro.selic?.value, 10.5) + si, 2, 20)
-  const cambioNew = clamp(v(data.macro.usdBrl?.value, 5.72) + ci, 3, 8)
-  const ipcaNew = clamp(v(data.macro.ipca?.value, 4.8) + ii, 0.5, 15)
-  const pibNew = clamp(v(data.macro.pib?.value, 2.9) + pi, -3, 8)
+  const selicNew = clamp(v(data.macro.selic?.value, 14.75) + si, 2, 20)
+  const cambioNew = clamp(v(data.macro.usdBrl?.value, 4.98) + ci, 3, 8)
+  const ipcaNew = clamp(v(data.macro.ipca?.value, 4.14) + ii, 0.5, 15)
+  const pibNew = clamp(v(data.macro.pib?.value, 1.86) + pi, -3, 8)
 
   const sectors = data.sectors.map(s => {
     let a = 0

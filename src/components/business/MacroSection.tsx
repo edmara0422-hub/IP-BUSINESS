@@ -238,10 +238,13 @@ function BottomPanel({ data }: { data: any }) {
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-[13px] font-semibold text-white/60">{s.label ?? s.id}</span>
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-[11px] text-white/30">heat {s.heat}/100</span>
-                            <span className="font-mono text-[12px] font-bold" style={{ color }}>
-                              {s.change > 0 ? '\u25B2' : s.change < 0 ? '\u25BC' : '\u25CF'}{Math.abs(s.change).toFixed(1)}%
-                            </span>
+                            <span className="font-mono text-[11px] text-white/30">oport {s.heat}/100</span>
+                            <div className="flex flex-col items-end">
+                              <span className="font-mono text-[12px] font-bold" style={{ color }}>
+                                {s.change > 0 ? '\u25B2' : s.change < 0 ? '\u25BC' : '\u2014'}{s.change !== 0 ? Math.abs(s.change).toFixed(1) + '%' : 'hoje'}
+                              </span>
+                              <span className="font-mono text-[9px] text-white/20">delta diário</span>
+                            </div>
                           </div>
                         </div>
                         <div className="h-[4px] rounded-full overflow-hidden mb-1.5" style={{ background: 'rgba(255,255,255,0.04)' }}>
