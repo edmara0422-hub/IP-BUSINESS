@@ -26,7 +26,7 @@ function colorByRange(value: number, greenAbove: number, amberAbove: number): st
 }
 
 const PHASE_DEFAULTS: Record<string, { receita: number; despesas: number; caixa: number; cac: number; ticketMedio: number; churnMensal: number }> = {
-  validacao: { receita: 3000,  despesas: 2000,  caixa: 15000,  cac: 150, ticketMedio: 150, churnMensal: 15 },
+  validacao: { receita: 0,     despesas: 500,   caixa: 2000,   cac: 100, ticketMedio: 30,  churnMensal: 0  },
   mei:       { receita: 6000,  despesas: 3500,  caixa: 25000,  cac: 90,  ticketMedio: 100, churnMensal: 10 },
   slu:       { receita: 20000, despesas: 12000, caixa: 60000,  cac: 60,  ticketMedio: 200, churnMensal: 8  },
   startup:   { receita: 50000, despesas: 38000, caixa: 120000, cac: 120, ticketMedio: 250, churnMensal: 7  },
@@ -35,7 +35,7 @@ const PHASE_DEFAULTS: Record<string, { receita: number; despesas: number; caixa:
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function CockpitFinanceiro({ marketData, userProfile }: { marketData: any; userProfile?: any }) {
-  const phaseDefault = PHASE_DEFAULTS[userProfile?.subtype] ?? { receita: 50000, despesas: 35000, caixa: 120000, cac: 45, ticketMedio: 250, churnMensal: 7 }
+  const phaseDefault = PHASE_DEFAULTS[userProfile?.subtype] ?? { receita: 0, despesas: 0, caixa: 0, cac: 0, ticketMedio: 0, churnMensal: 0 }
   const { data, update } = useWorkspaceData('cockpit', phaseDefault)
   const receita = data.receita; const setReceita = (v: number) => update({ receita: v })
   const despesas = data.despesas; const setDespesas = (v: number) => update({ despesas: v })
