@@ -45,7 +45,9 @@ ${question}`
     })
 
     if (!res.ok) {
-      throw new Error(`Groq API error: ${res.status}`)
+      const errBody = await res.text()
+      console.error('[advisor-chat] Groq error:', res.status, errBody)
+      return NextResponse.json({ answer: `Erro Groq ${res.status}: ${errBody.slice(0, 200)}` })
     }
 
     const json = await res.json()
@@ -53,7 +55,8 @@ ${question}`
 
     return NextResponse.json({ answer })
   } catch (error) {
-    console.error('[advisor-chat] error:', error)
-    return NextResponse.json({ answer: 'Erro ao conectar com a IA. Tente novamente.' })
+    const msg = error instanceof Error ? error.message : String(error)
+    console.error('[advisor-chat] error:', msg)
+    return NextResponse.json({ answer: `Erro: ${msg}` })
   }
 }
