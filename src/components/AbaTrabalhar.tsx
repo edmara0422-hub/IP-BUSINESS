@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAccessibility, type AccessibilityMode } from '@/hooks/useAccessibility'
+import { useAuth } from '@/hooks/useAuth'
 
 const IAAdvisor = dynamic(() => import('@/components/workspace/IAAdvisor'), { ssr: false })
 const CockpitFinanceiro = dynamic(() => import('@/components/workspace/CockpitFinanceiro'), { ssr: false })
@@ -69,6 +70,8 @@ function Placeholder({ mod }: { mod: ModuleMeta }) {
 
 export default function AbaTrabalhar() {
   const { mode, changeMode } = useAccessibility()
+  const { profile } = useAuth()
+  const isAdmin = profile?.role === 'admin'
   const [activeId, setActiveId] = useState('ia')
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [marketData, setMarketData] = useState<any>(null)
@@ -96,7 +99,7 @@ export default function AbaTrabalhar() {
   }
 
   const trabalho = MODULES.filter(m => m.group === 'trabalho')
-  const compliance = MODULES.filter(m => m.group === 'compliance')
+  const compliance = MODULES.filter(m => m.group === 'compliance' && (m.id !== 'admin' || isAdmin))
 
   return (
     <div className="w-full">
@@ -104,7 +107,7 @@ export default function AbaTrabalhar() {
       {/* ── Mobile: tabs horizontais ── */}
       <div className="md:hidden overflow-x-auto scrollbar-hide border-b border-white/5">
         <div className="flex gap-0.5 px-2 py-2 min-w-max">
-          {MODULES.map(mod => {
+          {MODULES.filter(m => m.id !== 'admin' || isAdmin).map(mod => {
             const Icon = mod.icon
             const isActive = activeId === mod.id
             return (
