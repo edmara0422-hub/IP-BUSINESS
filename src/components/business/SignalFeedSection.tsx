@@ -159,7 +159,7 @@ function generateSignals(data: any): PipelineSignal[] {
       oportunidade: `Escalar ads no TikTok antes da correção de preço. Window de 4-8 semanas para CPM baixo.`,
       acao: 'Realocar 20-30% do budget de Meta/Google para TikTok. Produzir 3-5 criativos nativos por semana',
       timestamp: 'há 6min',
-      detail: `TikTok CPM: R$${tiktok.cpm?.toFixed(2) ?? '—'} (${tiktok.cpmDelta > 0 ? '+' : ''}${tiktok.cpmDelta?.toFixed(1) ?? 0}%). Reach: ${tiktok.reach ?? '—'}. ${tiktok.note ?? ''}. Historicamente, quedas de CPM > 10% duram 6-10 semanas. ROI médio de campanhas TikTok durante janela de CPM baixo: 4.2x vs 2.1x em períodos normais.`,
+      detail: `TikTok CPM: US$${tiktok.cpm?.toFixed(2) ?? '—'} (${tiktok.cpmDelta > 0 ? '+' : ''}${tiktok.cpmDelta?.toFixed(1) ?? 0}%). Reach: ${tiktok.reach ?? '—'}. ${tiktok.note ?? ''}. Historicamente, quedas de CPM > 10% duram 6-10 semanas. ROI médio de campanhas TikTok durante janela de CPM baixo: 4.2x vs 2.1x em períodos normais.`,
     })
   }
 
@@ -190,7 +190,7 @@ function generateSignals(data: any): PipelineSignal[] {
         oportunidade: `Aumentar investimento em ${p.label} enquanto CPC está favorável. ${p.note ?? ''}`,
         acao: `Escalar campanhas em ${p.label}. Testar novos segmentos de audiência com CPC reduzido`,
         timestamp: 'há 7min',
-        detail: `${p.label}: CPC R$${p.cpc?.toFixed(2) ?? '—'} (${p.cpcDelta > 0 ? '+' : ''}${p.cpcDelta?.toFixed(1) ?? 0}%). CPM: R$${p.cpm?.toFixed(2) ?? '—'}. Reach: ${p.reach ?? '—'}. Tendência: ${p.trend}. ${p.note ?? ''}`,
+        detail: `${p.label}: CPC US$${p.cpc?.toFixed(2) ?? '—'} (${p.cpcDelta > 0 ? '+' : ''}${p.cpcDelta?.toFixed(1) ?? 0}%). CPM: US$${p.cpm?.toFixed(2) ?? '—'}. Reach: ${p.reach ?? '—'}. Tendência: ${p.trend}. ${p.note ?? ''}`,
       })
     })
 
