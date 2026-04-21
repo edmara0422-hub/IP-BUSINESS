@@ -441,10 +441,10 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
       const res = await fetch('/api/advisor-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
+        body: JSON.stringify({ question: prompt, marketContext: marketCtx }),
       })
       const data = await res.json()
-      update({ iaReflexao: data.response ?? data.content ?? 'Sem resposta.' })
+      update({ iaReflexao: data.answer ?? data.response ?? data.content ?? 'Sem resposta.' })
     } catch {
       update({ iaReflexao: 'Erro ao conectar. Tente novamente.' })
     } finally { setIaLoading(false) }
@@ -509,6 +509,36 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
                 </p>
               </div>
 
+              {/* Plano de ação semanal */}
+              {(() => {
+                const currentFase = TD_FASES[s.faseEmpresa]
+                const currentChecks = checkEmpresa[s.faseEmpresa] ?? []
+                const acoesTD = currentFase?.items
+                  .filter((item, ci) => !item.autoCheck && !(currentChecks[ci] ?? false) && item.directive)
+                  .map(item => item.directive as string) ?? []
+                const acoesOKR = s.okrs
+                  .flatMap(o => o.krs.filter(k => k.pct < 70 && k.texto).map(k => `KR "${k.texto}" — ${k.pct}% → meta 70%`))
+                  .slice(0, 2)
+                const acoes = [...acoesTD, ...acoesOKR].slice(0, 4)
+                if (acoes.length === 0) return null
+                return (
+                  <div className="rounded-xl p-4" style={{ background: 'rgba(26,82,118,0.1)', border: '1px solid rgba(26,82,118,0.25)' }}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <Target size={13} style={{ color: '#5dade2' }} />
+                      <span className="text-[11px] font-bold font-mono text-white/50 uppercase tracking-widest">Plano de ação — esta semana</span>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {acoes.map((acao, i) => (
+                        <div key={i} className="flex items-start gap-2.5">
+                          <span className="text-[10px] font-mono font-bold shrink-0 mt-0.5" style={{ color: '#5dade2' }}>{i + 1}</span>
+                          <p className="text-[12px] leading-snug text-white/50">{acao}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
+
               <SectionHeader label="Trilho da empresa" color="#5dade2" />
 
               {/* Rail */}
@@ -518,8 +548,9 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
                   const isDone = s.faseEmpresa > fi
                   const isLast = fi === TD_FASES.length - 1
                   const checks = checkEmpresa[fi] ?? []
-                  const allChecked = checks.length > 0 && checks.every(Boolean)
-                  const doneCount = checks.filter(Boolean).length
+                  const effectiveChecks = fase.items.map((item, ci) => item.autoCheck || (checks[ci] ?? false))
+                  const allChecked = effectiveChecks.length > 0 && effectiveChecks.every(Boolean)
+                  const doneCount = effectiveChecks.filter(Boolean).length
 
                   return (
                     <div key={fi} className="flex gap-3">
@@ -550,11 +581,11 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
                               <p className="text-[10px] font-mono text-white/25 uppercase tracking-wider">
                                 Para avançar para F{fi + 2} · {TD_FASES[fi + 1]?.label}
                               </p>
-                              <span className="text-[10px] font-mono" style={{ color: allChecked ? GREEN : AMBER }}>{doneCount}/{checks.length}</span>
+                              <span className="text-[10px] font-mono" style={{ color: allChecked ? GREEN : AMBER }}>{doneCount}/{fase.items.length}</span>
                             </div>
                             <div className="flex flex-col gap-2">
                               {fase.items.map((item, ci) => {
-                                const checked = checks[ci] ?? false
+                                const checked = item.autoCheck || (checks[ci] ?? false)
                                 return (
                                   <div key={ci}>
                                     <button onClick={() => toggleCheck(fi, ci)}
@@ -575,11 +606,9 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
                                         )}
                                       </div>
                                     </button>
-                                    {/* Evidence detail */}
                                     {checked && item.evidence && (
                                       <p className="text-[10px] text-white/20 ml-7 mt-0.5 leading-snug">{item.evidence}</p>
                                     )}
-                                    {/* Directive for unchecked manual items */}
                                     {!checked && !item.autoCheck && item.directive && (
                                       <div className="ml-7 mt-1 flex items-start gap-1.5">
                                         <ChevronRight size={10} style={{ color: AMBER, marginTop: 1, flexShrink: 0 }} />
