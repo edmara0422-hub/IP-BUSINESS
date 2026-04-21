@@ -80,9 +80,9 @@ function generateInsights(data: any): Insight[] {
     insights.push({
       id: 'selic-retail',
       type: 'critical',
-      title: `SELIC ${selic.toFixed(1)}% está matando o varejo`,
+      title: `SELIC ${selic.toFixed(2)}% está matando o varejo`,
       body: `Correlação direta: juro alto → crédito caro → consumo cai → varejo contrai. O setor de varejo está com heat ${sectors.find(s => s.id === 'retail')!.heat}/100 enquanto a média do mercado é ${Math.round(totalHeat / sectors.length)}. A lógica causal é clara: cada ponto de Selic acima de 10% retira ~3% da demanda discricionária.`,
-      metric: `${selic.toFixed(1)}%`,
+      metric: `${selic.toFixed(2)}%`,
     })
   }
 
@@ -103,7 +103,7 @@ function generateInsights(data: any): Insight[] {
       id: 'cac-pressure',
       type: cacD > 20 ? 'critical' : 'warning',
       title: `CAC subindo ${cacD.toFixed(0)}% — eficiência caindo`,
-      body: `O custo de aquisição de cliente sobe porque: (1) SELIC ${selic.toFixed(1)}% encarece financiamento de growth, (2) CPMs de plataformas sobem com mais anunciantes disputando o mesmo inventário, (3) privacidade iOS reduziu eficiência de targeting. A solução não é gastar mais — é diversificar canais e investir em LTV para compensar o CAC mais alto.`,
+      body: `O custo de aquisição de cliente sobe porque: (1) SELIC ${selic.toFixed(2)}% encarece financiamento de growth, (2) CPMs de plataformas sobem com mais anunciantes disputando o mesmo inventário, (3) privacidade iOS reduziu eficiência de targeting. A solução não é gastar mais — é diversificar canais e investir em LTV para compensar o CAC mais alto.`,
       metric: `+${cacD.toFixed(0)}%`,
     })
   }

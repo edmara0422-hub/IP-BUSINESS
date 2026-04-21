@@ -65,9 +65,9 @@ function buildCausalChains(data: any): CausalChain[] {
   // ── SELIC ──
   if (selic > 10) chains.push({
     id: 'selic', type: selic > 13 ? 'critical' : 'risk',
-    title: `SELIC ${selic.toFixed(1)}% — credito travado, caixa pressionado`,
+    title: `SELIC ${selic.toFixed(2)}% — credito travado, caixa pressionado`,
     urgency: Math.min(95, Math.round(selic * 6)),
-    why: `O Banco Central mantem a SELIC em ${selic.toFixed(1)}% para conter o IPCA (${ipca.toFixed(2)}% vs meta de 3.25%). A logica: juros altos encarecem o credito, reduzem consumo e derrubam a inflacao. O problema e que o remedio doi na economia real antes de curar a inflacao.`,
+    why: `O Banco Central mantem a SELIC em ${selic.toFixed(2)}% para conter o IPCA (${ipca.toFixed(2)}% vs meta de 3.25%). A logica: juros altos encarecem o credito, reduzem consumo e derrubam a inflacao. O problema e que o remedio doi na economia real antes de curar a inflacao.`,
     influence: [
       `IPCA acima da meta (${ipca.toFixed(2)}%) obriga o BC a agir — sem isso, a inflacao desancoraria as expectativas`,
       `Dolar R$${usd.toFixed(2)} importa inflacao via combustiveis, insumos e eletronicos`,
@@ -85,7 +85,7 @@ function buildCausalChains(data: any): CausalChain[] {
     affected: `Varejo, construtoras, fintechs de credito, PMEs endividadas, startups dependentes de funding e consumidores com financiamentos ativos.`,
     action: `Liquidar divida de curto prazo agora (antes de renovar com taxa maior). Negociar prazos mais longos com fornecedores. Alocar caixa ocioso em CDI/Tesouro SELIC. Cortar gastos nao-essenciais para preservar liquidez. Evitar expansao alavancada.`,
     modules: ['Cenarios & Forecast', 'Cockpit Financeiro'],
-    opportunity: `Empresas com caixa forte lucram com renda fixa a ${selic.toFixed(1)}% a.a. Quem não depende de crédito ganha vantagem competitiva sobre endividados.`,
+    opportunity: `Empresas com caixa forte lucram com renda fixa a ${selic.toFixed(2)}% a.a. Quem não depende de crédito ganha vantagem competitiva sobre endividados.`,
   })
 
   // ── IPCA ──

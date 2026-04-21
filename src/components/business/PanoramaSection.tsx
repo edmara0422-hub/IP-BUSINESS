@@ -481,7 +481,7 @@ export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
           {/* ── HUD esquerda: SELIC + IPCA ── */}
           <div className="absolute top-4 left-4 flex flex-col gap-3">
             {[
-              { label: 'SELIC', value: v(data.macro.selic?.value, 14.75), suf: '%', dec: 1, delta: v(data.macro.selic?.delta, 0), desc: 'TAXA BÁSICA DE JUROS', min: 2, max: 20, alert: v(data.macro.selic?.value, 14.75) > 12 },
+              { label: 'SELIC', value: v(data.macro.selic?.value, 14.75), suf: '%', dec: 2, delta: v(data.macro.selic?.delta, 0), desc: 'TAXA BÁSICA DE JUROS', min: 2, max: 20, alert: v(data.macro.selic?.value, 14.75) > 12 },
               { label: 'IPCA', value: v(data.macro.ipca?.value, 4.14), suf: '%', dec: 2, delta: v(data.macro.ipca?.delta, 0), desc: 'INFLAÇÃO 12 MESES', min: 0, max: 12, alert: v(data.macro.ipca?.value, 4.14) > 6 },
             ].map(ind => {
               const pct = Math.max(0, Math.min(100, ((ind.value - ind.min) / (ind.max - ind.min)) * 100))

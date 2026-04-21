@@ -79,7 +79,7 @@ export function buildSignals(data: {
     signals.push({
       id: 'sig-selic-chain',
       type: 'alert',
-      event: `SELIC ${selic.toFixed(1)}% → Crédito caro → Consumo cai → Varejo sofre`,
+      event: `SELIC ${selic.toFixed(2)}% → Crédito caro → Consumo cai → Varejo sofre`,
       impact: `Juros altos comprimem margem. ${data.centralProblems.find(p => p.id === 'credit')?.affected ?? 47}% das PMEs sem acesso a crédito. Famílias endividadas reduzem consumo.`,
       action: 'Refinanciar dívida curta, migrar para capital próprio, revisar pricing para manter volume',
       urgency: Math.min(92, Math.round(selic * 6)),

@@ -430,7 +430,7 @@ export default function SimulacaoSection({ data }: { data: any }) {
           borderTop: '1px solid rgba(255,255,255,0.04)',
         }}>
           {[
-            { label: 'SELIC', value: `${baseSelic.toFixed(1)}%` },
+            { label: 'SELIC', value: `${baseSelic.toFixed(2)}%` },
             { label: 'USD/BRL', value: `R$${baseUsd.toFixed(2)}` },
             { label: 'IPCA', value: `${baseIpca.toFixed(2)}%` },
             { label: 'PIB', value: `${basePib.toFixed(1)}%` },

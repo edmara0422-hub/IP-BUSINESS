@@ -28,7 +28,7 @@ function getValues(data: any) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildHeadline(data: any): { before: string; highlight: string; after: string } {
   const { selic, ipca, pib } = getValues(data)
-  if (selic > 13) return { before: 'Juro alto domina: SELIC ', highlight: `${selic.toFixed(1)}%`, after: ' trava crédito e comprime margens' }
+  if (selic > 13) return { before: 'Juro alto domina: SELIC ', highlight: `${selic.toFixed(2)}%`, after: ' trava crédito e comprime margens' }
   if (ipca > 5) return { before: 'Inflação acima da meta: ', highlight: `IPCA ${ipca.toFixed(2)}%`, after: ' — poder de compra do consumidor cai' }
   if (pib > 3) return { before: 'Economia aquecida: PIB ', highlight: `${pib.toFixed(1)}%`, after: ' abre janela de crescimento' }
   return { before: 'Mercado misto: ', highlight: 'crescimento lento', after: ' com custo alto' }
@@ -52,7 +52,7 @@ function buildInsights(data: any): InsightCard[] {
 
   const creditColor = selic > 12 ? RED : selic > 9 ? AMBER : GREEN
   const creditTitle = selic > 9 ? 'Crédito caro' : 'Crédito acessível'
-  const creditBody = `SELIC ${selic.toFixed(1)}% = empresas pagam ~${bankRate}% a.a. em financiamento bancário. ${selic > 12 ? 'Capital de giro fica inviável para PMEs. Priorize caixa próprio.' : 'Janela para financiar expansão.'}`
+  const creditBody = `SELIC ${selic.toFixed(2)}% = empresas pagam ~${bankRate}% a.a. em financiamento bancário. ${selic > 12 ? 'Capital de giro fica inviável para PMEs. Priorize caixa próprio.' : 'Janela para financiar expansão.'}`
 
   const inflaColor = ipca > 6 ? RED : ipca > 4 ? AMBER : GREEN
   const inflaTitle = ipca > 4.75 ? 'Poder de compra caindo' : 'Poder de compra estável'
@@ -69,7 +69,7 @@ function buildInsights(data: any): InsightCard[] {
   const demandaBody = `PIB ${pib > 0 ? '+' : ''}${pib.toFixed(1)}%. ${pib > 2.5 ? 'Consumo em expansão — bom momento para investir em aquisição e contratar.' : pib > 0 ? 'Crescimento fraco — foque em eficiência antes de expandir.' : 'Contração — modo sobrevivência: corte custos, proteja caixa.'}`
 
   return [
-    { id: 'CREDITO', value: `${selic.toFixed(1)}%`, title: creditTitle, body: creditBody, color: creditColor, module: 'Cenários & Forecast', affects: selic > 12 ? 'PME, varejo, startups em growth' : 'Funding, expansão, contratação' },
+    { id: 'CREDITO', value: `${selic.toFixed(2)}%`, title: creditTitle, body: creditBody, color: creditColor, module: 'Cenários & Forecast', affects: selic > 12 ? 'PME, varejo, startups em growth' : 'Funding, expansão, contratação' },
     { id: 'INFLACAO', value: `${ipca.toFixed(2)}%`, title: inflaTitle, body: inflaBody, color: inflaColor, module: 'Smart Pricing', affects: ipca > 4.75 ? 'Preço, demanda, cesta básica' : 'Poder de compra estável' },
     { id: 'CAMBIO', value: `R$${usd.toFixed(2)}`, title: cambioTitle, body: cambioBody, color: cambioColor, module: 'Cenários & Forecast', affects: usd > 5.5 ? 'Custo, insumos, SaaS em dólar' : 'Importação acessível' },
     { id: 'DEMANDA', value: `${pib > 0 ? '+' : ''}${pib.toFixed(1)}%`, title: demandaTitle, body: demandaBody, color: demandaColor, module: 'Cockpit Financeiro', affects: pib > 2.5 ? 'Aquisição, escala, contratação' : pib > 0 ? 'Eficiência operacional' : 'Corte de custos, caixa' },
@@ -361,7 +361,7 @@ export default function MacroSection({ data, ai }: { data: any; ai?: any }) {
 
         // SELIC + IPCA = taxa real
         cascades.push({
-          cross: `SELIC ${selic.toFixed(1)}% + IPCA ${ipca.toFixed(2)}%`,
+          cross: `SELIC ${selic.toFixed(2)}% + IPCA ${ipca.toFixed(2)}%`,
           insight: `Taxa real de ${taxaReal}% — ${parseFloat(taxaReal) > 8 ? 'um dos maiores juros reais do mundo. Renda fixa paga mais que bolsa, capital foge de risco.' : parseFloat(taxaReal) > 5 ? 'juro real elevado. Investimento produtivo perde pra renda fixa.' : 'juro real moderado. Capital começa a voltar pra risco.'}`,
           color: parseFloat(taxaReal) > 8 ? RED : parseFloat(taxaReal) > 5 ? AMBER : GREEN,
         })
@@ -379,7 +379,7 @@ export default function MacroSection({ data, ai }: { data: any; ai?: any }) {
         // SELIC + Varejo
         if (selic > 12 && retailHeat < 40) {
           cascades.push({
-            cross: `SELIC ${selic.toFixed(1)}% + Varejo heat ${retailHeat}/100`,
+            cross: `SELIC ${selic.toFixed(2)}% + Varejo heat ${retailHeat}/100`,
             insight: `Juro alto mata crédito ao consumidor → varejo contrai. Cada ponto de SELIC acima de 10% retira ~3% da demanda discricionária.`,
             color: RED,
           })

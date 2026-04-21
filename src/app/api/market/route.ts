@@ -214,16 +214,17 @@ export async function GET() {
   const retailCh  = r1(dRetail)
 
   // ── Plataformas — estimativa via ação da empresa mãe ──────────────────
+  // Base: médias reais de mercado BR (Q1 2026). Deltas refletem movimento da ação
   const metaCpm     = r2(14.2 + metaD * 0.2)
-  const metaCpmD    = r1(3.8  + metaD * 0.3)
+  const metaCpmD    = r1(metaD * 0.3)           // 0 quando ação estável
   const igCpm       = r2(11.4 + metaD * 0.15)
-  const igCpmD      = r1(2.1  + metaD * 0.25)
+  const igCpmD      = r1(metaD * 0.25)
   const gCpc        = r2(2.84 + googlD * 0.1)
-  const gCpcD       = r1(1.2  + googlD * 0.2)
+  const gCpcD       = r1(googlD * 0.2)
   const ttCpm       = r2(clamp(6.8 - metaD * 0.1, 3, 12))
-  const ttCpmD      = r1(-5.2 - metaD * 0.2)
+  const ttCpmD      = r1(metaD * -0.15)          // cai quando Meta sobe (migração de budget)
   const cacValue    = r1(48.6 + metaD * 0.5 + googlD * 0.3)
-  const cacDelta    = r1(12.1 + (metaCpmD + gCpcD * 3) * 0.4)
+  const cacDelta    = r1((metaCpmD + gCpcD * 3) * 0.4)  // 0 quando mercado estável
   const cpmGlobal   = r1((metaCpm * 0.35 + igCpm * 0.25 + ttCpm * 0.25 + 8.2 * 0.15))
   const cpmGlobalD  = r1((metaCpmD * 0.35 + igCpmD * 0.25 + ttCpmD * 0.25))
 

@@ -63,12 +63,12 @@ function generateSignals(data: any): PipelineSignal[] {
     signals.push({
       id: 'sig-selic-high',
       severity: 'CRÍTICO',
-      evento: `SELIC em ${selic.toFixed(1)}% — crédito travado`,
+      evento: `SELIC em ${selic.toFixed(2)}% — crédito travado`,
       impacto: `PMEs sem acesso a financiamento. Custo da dívida sobe ${((selic - 10) * 8).toFixed(0)}%. Consumo retraído e inadimplência crescente.`,
       oportunidade: `Produtos de renda fixa ganham atratividade. CDBs, LCIs e títulos públicos com retorno real acima de ${(selic - ipca).toFixed(1)}%.`,
       acao: 'Renegociar dívidas de curto prazo, migrar para linhas subsidiadas, alocar caixa em renda fixa pós-fixada',
       timestamp: 'Detectado agora',
-      detail: `A SELIC a ${selic.toFixed(1)}% representa o maior custo de capital dos últimos ciclos. ${centralProblems.find((p: any) => p.id === 'credit')?.affected ?? 47}% das PMEs reportam dificuldade de acesso a crédito. A cadeia causal completa: BC sobe juros → bancos encarecem crédito → empresas cortam investimento → demanda cai → desemprego sobe. Janela para renda fixa: títulos IPCA+ pagando ${(selic - 1.5).toFixed(1)}% a.a.`,
+      detail: `A SELIC a ${selic.toFixed(2)}% representa o maior custo de capital dos últimos ciclos. ${centralProblems.find((p: any) => p.id === 'credit')?.affected ?? 47}% das PMEs reportam dificuldade de acesso a crédito. A cadeia causal completa: BC sobe juros → bancos encarecem crédito → empresas cortam investimento → demanda cai → desemprego sobe. Janela para renda fixa: títulos IPCA+ pagando ${(selic - 1.5).toFixed(1)}% a.a.`,
     })
   }
 
