@@ -26,11 +26,11 @@ function colorByRange(value: number, greenAbove: number, amberAbove: number): st
 }
 
 const PHASE_DEFAULTS: Record<string, { receita: number; despesas: number; caixa: number; cac: number; ticketMedio: number; churnMensal: number }> = {
-  validacao: { receita: 0,     despesas: 500,   caixa: 2000,   cac: 100, ticketMedio: 30,  churnMensal: 0  },
-  mei:       { receita: 6000,  despesas: 3500,  caixa: 25000,  cac: 90,  ticketMedio: 100, churnMensal: 10 },
-  slu:       { receita: 20000, despesas: 12000, caixa: 60000,  cac: 60,  ticketMedio: 200, churnMensal: 8  },
-  startup:   { receita: 50000, despesas: 38000, caixa: 120000, cac: 120, ticketMedio: 250, churnMensal: 7  },
-  ltda:      { receita: 80000, despesas: 55000, caixa: 200000, cac: 45,  ticketMedio: 350, churnMensal: 5  },
+  validacao: { receita: 0, despesas: 0, caixa: 0, cac: 0, ticketMedio: 0, churnMensal: 0 },
+  mei:       { receita: 0, despesas: 0, caixa: 0, cac: 0, ticketMedio: 0, churnMensal: 0 },
+  slu:       { receita: 0, despesas: 0, caixa: 0, cac: 0, ticketMedio: 0, churnMensal: 0 },
+  startup:   { receita: 0, despesas: 0, caixa: 0, cac: 0, ticketMedio: 0, churnMensal: 0 },
+  ltda:      { receita: 0, despesas: 0, caixa: 0, cac: 0, ticketMedio: 0, churnMensal: 0 },
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
