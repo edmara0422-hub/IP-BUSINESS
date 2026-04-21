@@ -211,6 +211,11 @@ export default function MainApp() {
   const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && localStorage.getItem('ipb-workspace-ready') === '1') {
+      setWorkspaceReady(true)
+      setWorkspaceLoading(false)
+      return
+    }
     if (!user) { setWorkspaceLoading(false); return }
     supabase
       .from('workspace_profiles')
@@ -218,12 +223,16 @@ export default function MainApp() {
       .eq('user_id', user.id)
       .maybeSingle()
       .then(({ data }) => {
-        setWorkspaceReady(!!data)
+        if (data) {
+          localStorage.setItem('ipb-workspace-ready', '1')
+          setWorkspaceReady(true)
+        }
         setWorkspaceLoading(false)
       })
   }, [user, supabase])
 
   const handleWorkspaceComplete = (_p: unknown) => {
+    localStorage.setItem('ipb-workspace-ready', '1')
     setWorkspaceReady(true)
   }
 
