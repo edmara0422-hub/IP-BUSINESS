@@ -139,7 +139,8 @@ export default function AbaTrabalhar() {
       .select('*')
       .eq('user_id', user.id)
       .maybeSingle()
-      .then(({ data }) => { if (data) setUserProfile(data as WorkspaceProfile) })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then(({ data }: { data: any }) => { if (data) setUserProfile({ ...data, nomeNegocio: data.nome_negocio ?? '' } as WorkspaceProfile) })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id])
 
@@ -248,7 +249,11 @@ export default function AbaTrabalhar() {
           <div className="px-3 mb-3">
             {contextMode === 'gestao' && (
               <p className="text-[10px] font-bold text-white/35 truncate">
-                {userProfile?.sectors?.[0] ? `Workspace · ${userProfile.sectors[0]}` : 'Workspace · Meu Negócio'}
+                {userProfile?.nomeNegocio
+                    ? `Workspace · ${userProfile.nomeNegocio}`
+                    : userProfile?.sectors?.[0]
+                    ? `Workspace · ${userProfile.sectors[0]}`
+                    : 'Workspace · Meu Negócio'}
               </p>
             )}
             {contextMode === 'consultoria' && (

@@ -13,6 +13,7 @@ export interface WorkspaceProfile {
   sectors: string[]
   revenue: string
   product: string[]
+  nomeNegocio: string
 }
 
 interface Props {
@@ -159,6 +160,7 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
     sectors: [],
     revenue: '',
     product: [],
+    nomeNegocio: '',
   })
 
   // helper for "não sei" path
@@ -435,6 +437,17 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
         <Title>Workspace pronto</Title>
 
         <div className="rounded-[1.4rem] border border-white/[0.08] bg-white/[0.03] px-6 py-5">
+          <p className="mb-2 text-[12px] uppercase tracking-widest text-white/30">Nome do negócio / projeto</p>
+          <input
+            type="text"
+            value={profile.nomeNegocio}
+            onChange={e => patch({ nomeNegocio: e.target.value })}
+            placeholder="Ex: IPB, Studio Fulano, Clínica Nova Vida..."
+            className="w-full bg-transparent text-[14px] text-white/80 placeholder:text-white/20 outline-none border-b border-white/[0.08] pb-2 focus:border-white/25 transition-colors"
+          />
+        </div>
+
+        <div className="rounded-[1.4rem] border border-white/[0.08] bg-white/[0.03] px-6 py-5">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-[12px] uppercase tracking-widest text-white/30">Tipo</span>
@@ -523,6 +536,7 @@ export default function WorkspaceOnboarding({ onComplete }: Props) {
               sectors: profile.sectors,
               revenue: profile.revenue,
               product: profile.product,
+              nome_negocio: profile.nomeNegocio,
               updated_at: new Date().toISOString(),
             }, { onConflict: 'user_id' })
             setSaving(false)
