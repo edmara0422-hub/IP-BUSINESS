@@ -232,6 +232,10 @@ interface CockpitState {
   govEstrategia: boolean[]; govRiscos: boolean[]; govPoliticas: boolean[]; govMonitoramento: boolean[]
   reflexaoGov: string
   norteStar: string; cultura: string; reflexaoNorte: string
+  // Execução Comercial
+  sprintDias: boolean[]
+  semanas4: boolean[][]
+  logAdmin: string
 }
 
 const AUTO_CHECKS = buildAutoState()
@@ -262,6 +266,9 @@ const DEFAULT: CockpitState = {
   govMonitoramento: [false, false, false, false],
   reflexaoGov: '',
   norteStar: '', cultura: '', reflexaoNorte: '',
+  sprintDias: Array(7).fill(false),
+  semanas4: [[false,false,false],[false,false,false],[false,false,false],[false,false,false]],
+  logAdmin: '',
 }
 
 const COCKPIT_DEFAULT = { receita: 0, despesas: 0, caixa: 0, cac: 0 }
@@ -492,7 +499,7 @@ function SectionHeader({ label, color = 'rgba(255,255,255,0.12)' }: { label: str
 // ─────────────────────────────────────────────
 // MAIN
 // ─────────────────────────────────────────────
-type AdminTab = 'td' | 'inovacao' | 'okrs' | 'gov' | 'norte' | 'monitor'
+type AdminTab = 'td' | 'inovacao' | 'okrs' | 'gov' | 'norte' | 'monitor' | 'execucao'
 
 export default function AdminPanel() {
   const [tab, setTab] = useState<AdminTab>('td')
@@ -507,6 +514,7 @@ export default function AdminPanel() {
   const [zohoLoading, setZohoLoading] = useState(false)
   const [stackHealth, setStackHealth] = useState<{ ok: boolean; latencyMs: number | null } | null>(null)
   const [userStats, setUserStats] = useState<{ total: number; newThisWeek: number } | null>(null)
+  const [openScript, setOpenScript] = useState<'entrevista' | 'objecao' | null>(null)
 
   // Bootstrap: apply auto-facts on first load if not yet done
   useEffect(() => {
@@ -731,6 +739,7 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
   })()
 
   const TABS: { id: AdminTab; label: string; color: string }[] = [
+    { id: 'execucao', label: 'Execução', color: RED },
     { id: 'td', label: 'TD', color: BLUE },
     { id: 'inovacao', label: 'Inovação', color: PURPLE },
     { id: 'okrs', label: 'OKRs', color: GREEN },
@@ -1770,6 +1779,286 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
 
             </div>
           )}
+
+          {/* ═══ EXECUÇÃO COMERCIAL ═══ */}
+          {tab === 'execucao' && (() => {
+            const fin = cockpit as typeof COCKPIT_DEFAULT
+            const sprintDias = s.sprintDias?.length === 7 ? s.sprintDias : Array(7).fill(false)
+            const semanas4 = s.semanas4?.length === 4 ? s.semanas4 : [[false,false,false],[false,false,false],[false,false,false],[false,false,false]]
+            const sprintDone = sprintDias.filter(Boolean).length
+
+            const SPRINT_DIAS = [
+              { dia: 1, label: 'Lista de Alvos', acao: 'Identifique 20 contatos do LinkedIn/rede que sejam o avatar do cliente (donos de pequenas empresas ou consultores)' },
+              { dia: 2, label: 'Convite Beta', acao: '"Estou finalizando uma IA de Gestão Estratégica e preciso de um olhar crítico antes de lançar. Topa testar o Smart Pricing com seus dados?"' },
+              { dia: 3, label: 'Demo de Stress', acao: 'Mostre o app mesmo que "no arame". Objetivo: ver se o usuário entende o que o Runway quer dizer' },
+              { dia: 4, label: 'Coleta de Atrito', acao: 'Anote onde travou. Se não entendeu o Health Score, o UX falhou. Isso economiza meses de dev errado' },
+              { dia: 5, label: '"Sim" Hipotético', acao: '"Se isso estivesse pronto por R$156/mês, você assinaria? Se não, o que falta?" — valida Stage Gate 2' },
+              { dia: 6, label: 'Ajuste de Rota', acao: 'Priorize o que falta no código com base nos feedbacks. Às vezes a feature que você achava vital é ignorada' },
+              { dia: 7, label: 'Documentação', acao: 'Atualize OKRs e Roadmap na aba OKRs com o que você ouviu' },
+            ]
+
+            const SEMANAS_4 = [
+              {
+                titulo: 'Semana 1 — Validação de Oferta',
+                cor: RED,
+                kpis: [
+                  'Disparar pitch para 50 contatos qualificados no LinkedIn',
+                  'Conseguir 5 chamadas de demonstração agendadas',
+                  'KPI: ≥10% de taxa de resposta',
+                ],
+              },
+              {
+                titulo: 'Semana 2 — Protótipo em Combate',
+                cor: AMBER,
+                kpis: [
+                  'Realizar as demos mostrando Gatilho de Decisão (não funcionalidades)',
+                  'Identificar se o cliente entende Preço Mínimo vs SELIC',
+                  'KPI: 1 carta de intenção ou pré-venda',
+                ],
+              },
+              {
+                titulo: 'Semana 3 — Blindagem Jurídica',
+                cor: BLUE,
+                kpis: [
+                  'Publicar Política de Privacidade/LGPD no site',
+                  'Subir Governança de 50% → 65%',
+                  'KPI: documento publicado em /privacidade',
+                ],
+              },
+              {
+                titulo: 'Semana 4 — Primeira Receita',
+                cor: GREEN,
+                kpis: [
+                  'Converter validações em assinaturas pagas R$156+',
+                  'Emitir primeira nota fiscal ou recebimento via Stripe/Asaas',
+                  'KPI: R$500 de MRR (primeiro cliente)',
+                ],
+              },
+            ]
+
+            return (
+              <div className="flex flex-col gap-5">
+
+                {/* Alerta de Gap Comercial */}
+                <div className="rounded-xl p-4" style={{ background: `${RED}12`, border: `1px solid ${RED}40` }}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle size={14} style={{ color: RED }} />
+                    <span className="text-[11px] font-mono font-bold tracking-wider" style={{ color: RED }}>DIAGNÓSTICO: GAP DE EXECUÇÃO COMERCIAL</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 mb-3">
+                    <div className="rounded-lg p-2.5 text-center" style={{ background: 'rgba(0,0,0,0.25)' }}>
+                      <div className="text-[9px] font-mono text-white/25 mb-1">TRL</div>
+                      <div className="text-[18px] font-bold font-mono" style={{ color: '#5dade2' }}>{s.trl}</div>
+                      <div className="text-[9px] text-white/30">produção real</div>
+                    </div>
+                    <div className="rounded-lg p-2.5 text-center" style={{ background: 'rgba(0,0,0,0.25)' }}>
+                      <div className="text-[9px] font-mono text-white/25 mb-1">HYPE CYCLE</div>
+                      <div className="text-[11px] font-bold" style={{ color: GREEN }}>Encosta</div>
+                      <div className="text-[9px] text-white/30">iluminação</div>
+                    </div>
+                    <div className="rounded-lg p-2.5 text-center" style={{ background: 'rgba(0,0,0,0.25)' }}>
+                      <div className="text-[9px] font-mono text-white/25 mb-1">MRR</div>
+                      <div className="text-[18px] font-bold font-mono" style={{ color: fin.receita > 0 ? GREEN : RED }}>R${fin.receita.toLocaleString('pt-BR')}</div>
+                      <div className="text-[9px]" style={{ color: fin.receita === 0 ? RED : 'rgba(255,255,255,0.3)' }}>{fin.receita === 0 ? 'zero — alerta' : '/mês'}</div>
+                    </div>
+                  </div>
+                  <p className="text-[12px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                    Produto em TRL {s.trl} (produção real) + Hype na Encosta da Iluminação = <span style={{ color: GREEN }}>janela aberta</span>.
+                    {fin.receita === 0
+                      ? <> Mas MRR R$0 = <span style={{ color: RED, fontWeight: 700 }}>morte por perfeccionismo</span>. Automação de onboarding só faz sentido com &gt;5 clientes/semana. Hoje: zero.</>
+                      : <> Continue crescendo — cada semana perdida é posição cedida.</>
+                    }
+                  </p>
+                  <div className="mt-3 rounded-md px-3 py-2" style={{ background: 'rgba(0,0,0,0.3)' }}>
+                    <p className="text-[11px] font-mono" style={{ color: AMBER }}>
+                      📋 Pergunta do log: "O que você fez hoje que aproximou o Runway 0 de R$500 (primeiro cliente)?"
+                    </p>
+                  </div>
+                </div>
+
+                {/* H1 vs H3 Alert */}
+                {s.h3 > 20 && fin.receita === 0 && (
+                  <div className="rounded-lg px-3 py-2.5" style={{ background: `${AMBER}12`, border: `1px solid ${AMBER}35` }}>
+                    <span className="text-[11px] font-mono" style={{ color: AMBER }}>
+                      ⚠ H3 (Agentes IA) em {s.h3}% com MRR zero. Guarde para o final de semana — de seg a sex, foco total no H1 (venda do core).
+                    </span>
+                  </div>
+                )}
+
+                {/* Sprint 7 Dias */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Zap size={14} style={{ color: RED }} />
+                      <span className="text-[12px] font-bold text-white/70">Sprint de Validação Alpha — 7 Dias</span>
+                    </div>
+                    <span className="text-[11px] font-mono" style={{ color: sprintDone === 7 ? GREEN : AMBER }}>
+                      {sprintDone}/7 dias
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {SPRINT_DIAS.map((d, i) => (
+                      <div key={d.dia} className="rounded-lg p-3 flex items-start gap-3 cursor-pointer transition-all"
+                        style={{ background: sprintDias[i] ? 'rgba(30,132,73,0.1)' : 'rgba(0,0,0,0.25)', border: `1px solid ${sprintDias[i] ? 'rgba(30,132,73,0.3)' : 'rgba(255,255,255,0.06)'}` }}
+                        onClick={() => { const next = [...sprintDias]; next[i] = !next[i]; update({ sprintDias: next }) }}>
+                        <div className="mt-0.5 shrink-0">
+                          {sprintDias[i]
+                            ? <CheckCircle2 size={15} style={{ color: GREEN }} />
+                            : <Circle size={15} style={{ color: 'rgba(255,255,255,0.2)' }} />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="text-[10px] font-mono font-bold" style={{ color: RED }}>DIA {d.dia}</span>
+                            <span className="text-[11px] font-bold" style={{ color: sprintDias[i] ? GREEN : 'rgba(255,255,255,0.6)' }}>{d.label}</span>
+                          </div>
+                          <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>{d.acao}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4 Semanas */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <TrendingUp size={14} style={{ color: GREEN }} />
+                    <span className="text-[12px] font-bold text-white/70">Plano de 4 Semanas — Sair do Prédio</span>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    {SEMANAS_4.map((sem, si) => {
+                      const kpisDone = (semanas4[si] ?? []).filter(Boolean).length
+                      return (
+                        <div key={si} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `3px solid ${sem.cor}` }}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[12px] font-bold" style={{ color: sem.cor }}>{sem.titulo}</span>
+                            <span className="text-[10px] font-mono" style={{ color: kpisDone === 3 ? GREEN : 'rgba(255,255,255,0.2)' }}>{kpisDone}/3</span>
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            {sem.kpis.map((kpi, ki) => (
+                              <div key={ki} className="flex items-start gap-2 cursor-pointer"
+                                onClick={() => { const ns = semanas4.map((r, ri) => ri === si ? r.map((v, vi) => vi === ki ? !v : v) : [...r]); update({ semanas4: ns }) }}>
+                                {(semanas4[si]?.[ki] ?? false)
+                                  ? <CheckCircle2 size={13} style={{ color: GREEN, flexShrink: 0, marginTop: 1 }} />
+                                  : <Circle size={13} style={{ color: 'rgba(255,255,255,0.2)', flexShrink: 0, marginTop: 1 }} />}
+                                <span className="text-[11px] leading-snug" style={{ color: 'rgba(255,255,255,0.5)' }}>{kpi}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Scripts de Campo */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Info size={14} style={{ color: BLUE }} />
+                    <span className="text-[12px] font-bold text-white/70">Scripts de Campo</span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {/* Script entrevista */}
+                    <div className="rounded-lg overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <button className="w-full flex items-center justify-between px-3 py-2.5 text-left"
+                        style={{ background: openScript === 'entrevista' ? 'rgba(26,82,118,0.15)' : 'rgba(0,0,0,0.2)' }}
+                        onClick={() => setOpenScript(openScript === 'entrevista' ? null : 'entrevista')}>
+                        <span className="text-[12px] font-bold text-white/60">📋 Script de Entrevista — Validação do IPB</span>
+                        <ChevronRight size={14} style={{ color: 'rgba(255,255,255,0.3)', transform: openScript === 'entrevista' ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+                      </button>
+                      {openScript === 'entrevista' && (
+                        <div className="px-3 py-3 flex flex-col gap-3" style={{ background: 'rgba(0,0,0,0.15)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                          {[
+                            { titulo: '1. Contexto do Problema (antes de mostrar o app)', perguntas: [
+                              '"Como você toma a decisão de reajustar seus preços hoje? Você olha para o mercado ou apenas para seus custos?"',
+                              '"Qual foi a última vez que um indicador econômico (Dólar ou SELIC) afetou seu lucro e você só percebeu tarde demais?"',
+                              '"Quanto tempo por semana você gasta alimentando planilhas para ter uma visão clara do seu caixa?"',
+                            ]},
+                            { titulo: '2. Teste de Funcionalidade (durante a demo)', perguntas: [
+                              'Smart Pricing: "Esse valor de Preço Mínimo faz sentido para você ou parece fora da realidade do seu mercado?"',
+                              'Cockpit: "O que o indicador de Runway te diz agora? Se esse número caísse pela metade amanhã, qual seria sua primeira reação?"',
+                              'IA Advisor: "Essa análise te trouxe algum insight que sua planilha não mostrava, ou ela disse o óbvio?"',
+                            ]},
+                            { titulo: '3. Teste de UX', perguntas: [
+                              '"Se você tivesse que usar isso toda segunda-feira às 08h, o que seria a coisa mais chata ou difícil?"',
+                              '"Qual dessas informações é a mais irrelevante para você? O que eu poderia remover sem que você sentisse falta?"',
+                              '"O que falta aqui para você confiar 100% na decisão que essa IA está sugerindo?"',
+                            ]},
+                            { titulo: '4. Pergunta de Ouro (validação de mercado)', perguntas: [
+                              '"O IPB substitui a necessidade de um consultor ou funcionário sênior de finanças para você?"',
+                              '"De 0 a 10, o quanto você ficaria decepcionado se eu decidisse não lançar esse app?" (Se < 8, MVP ainda não está forte)',
+                            ]},
+                          ].map((sec, si) => (
+                            <div key={si}>
+                              <p className="text-[10px] font-mono font-bold text-white/30 uppercase tracking-wider mb-1.5">{sec.titulo}</p>
+                              <div className="flex flex-col gap-1">
+                                {sec.perguntas.map((p, pi) => (
+                                  <p key={pi} className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)', paddingLeft: 8, borderLeft: '2px solid rgba(26,82,118,0.4)' }}>{p}</p>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                          <div className="rounded-md px-3 py-2" style={{ background: `${AMBER}12`, border: `1px solid ${AMBER}25` }}>
+                            <p className="text-[11px]" style={{ color: AMBER }}>⚠ Dica: Não defenda o app durante a entrevista. Se o usuário não entendeu, anote "função X falhou" — o erro é do produto, não do usuário.</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Script objeção */}
+                    <div className="rounded-lg overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <button className="w-full flex items-center justify-between px-3 py-2.5 text-left"
+                        style={{ background: openScript === 'objecao' ? 'rgba(26,82,118,0.15)' : 'rgba(0,0,0,0.2)' }}
+                        onClick={() => setOpenScript(openScript === 'objecao' ? null : 'objecao')}>
+                        <span className="text-[12px] font-bold text-white/60">💬 Script: "Minha planilha já resolve bem"</span>
+                        <ChevronRight size={14} style={{ color: 'rgba(255,255,255,0.3)', transform: openScript === 'objecao' ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+                      </button>
+                      {openScript === 'objecao' && (
+                        <div className="px-3 py-3 flex flex-col gap-3" style={{ background: 'rgba(0,0,0,0.15)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                          <div>
+                            <p className="text-[10px] font-mono text-white/25 uppercase tracking-wider mb-1">Objeção</p>
+                            <p className="text-[12px] text-white/50 italic">"Minha planilha já resolve bem, não vejo por que mudar."</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-mono text-white/25 uppercase tracking-wider mb-1">Sua resposta (foco em co-criação)</p>
+                            <p className="text-[12px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                              "Justamente por isso eu queria o seu feedback. A planilha é ótima para organizar o passado, mas o IPB foca em
+                              <span style={{ color: '#5dade2' }}> prever o impacto de mercado (SELIC/Dólar) no seu preço de amanhã</span>.
+                              Eu não quero que você mude agora. Eu quero te mostrar como a IA interpreta os dados que você já tem na planilha
+                              e te dá um Gatilho de Decisão que o Excel não consegue.
+                              <span style={{ color: GREEN }}> Você me deixa rodar um teste rápido com seus números para ver se a IA encontra um 'ponto cego' na sua margem?</span>"
+                            </p>
+                          </div>
+                          <div className="rounded-md px-3 py-2" style={{ background: `${GREEN}10`, border: `1px solid ${GREEN}25` }}>
+                            <p className="text-[11px]" style={{ color: GREEN }}>
+                              Você não está vendendo uma assinatura — está vendendo a oportunidade de ser co-autor de uma tecnologia inovadora.
+                              Primeiros usuários sentem que o produto foi feito para eles → LTV altíssimo.
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Log Diário */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Clock size={14} style={{ color: AMBER }} />
+                    <span className="text-[12px] font-bold text-white/70">Log Diário</span>
+                  </div>
+                  <textarea
+                    value={s.logAdmin ?? ''}
+                    onChange={e => update({ logAdmin: e.target.value })}
+                    placeholder="O que você fez hoje que aproximou o Runway 0 de R$500 (primeiro cliente pagante)?"
+                    rows={3}
+                    className="w-full rounded-lg px-3 py-2.5 bg-transparent outline-none resize-none"
+                    style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', fontSize: 12, color: 'rgba(255,255,255,0.65)', lineHeight: 1.6 }}
+                  />
+                </div>
+
+              </div>
+            )
+          })()}
 
         </motion.div>
       </AnimatePresence>
