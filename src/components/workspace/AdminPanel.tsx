@@ -223,7 +223,8 @@ interface CockpitState {
   tendAgentesIA: number; tendRegTech: number; tendAmbidestra: number
   sustDigital: boolean[]
   iaReflexao: string
-  bootstrapped: boolean   // true = auto-facts already applied
+  bootstrapped: boolean
+  bootstrappedInovacao: boolean
   tipoInovacao: string; intensidade: string; faseHype: number; trl: number
   fasesFunil: boolean[]; h1: number; h2: number; h3: number; reflexaoInovacao: string
   okrs: OKR[]
@@ -246,6 +247,7 @@ const DEFAULT: CockpitState = {
   sustDigital: SUST_ITEMS.map(i => i.autoCheck),
   iaReflexao: '',
   bootstrapped: true,
+  bootstrappedInovacao: false,
   tipoInovacao: '', intensidade: '', faseHype: 0, trl: 3,
   fasesFunil: [false, false, false, false, false],
   h1: 70, h2: 20, h3: 10, reflexaoInovacao: '',
@@ -344,6 +346,26 @@ export default function AdminPanel() {
       })
     }
   }, [s.bootstrapped]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-detecta Inovação na primeira abertura
+  useEffect(() => {
+    if (!s.bootstrappedInovacao) {
+      update({
+        // IPB é produto SaaS com IA — arquitetônica afeta modelo + tecnologia
+        tipoInovacao: 'produto',
+        intensidade: 'arquitetonica',
+        // 3 Horizontes: H1=core IPB, H2=integrações(Zoho/mobile), H3=IA estratégica
+        h1: 60, h2: 30, h3: 10,
+        // Funil: ideia→gate→desenvolvimento (F1-3 concluídos), F4-5 em curso
+        fasesFunil: [true, true, true, false, false],
+        // Hype Cycle: IA em 2025 está na Encosta da Iluminação (casos reais funcionando)
+        faseHype: 3,
+        // TRL: sistema em produção real → TRL 7 (sistema completo e qualificado)
+        trl: 7,
+        bootstrappedInovacao: true,
+      })
+    }
+  }, [s.bootstrappedInovacao]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-avança a fase se todos os itens da fase atual já estão verificados pelo sistema
   useEffect(() => {
@@ -887,12 +909,27 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
           {/* ═══ INOVAÇÃO ═══ */}
           {tab === 'inovacao' && (
             <div className="flex flex-col gap-5">
+
+              {/* Banner diagnóstico */}
+              <div className="rounded-lg px-3 py-2.5 flex items-start gap-2.5" style={{ background: 'rgba(125,60,152,0.08)', border: '1px solid rgba(125,60,152,0.2)' }}>
+                <Zap size={13} style={{ color: PURPLE, marginTop: 1, flexShrink: 0 }} />
+                <p className="text-[11px] leading-relaxed text-white/45">
+                  <span style={{ color: '#a569bd' }}>Diagnóstico automático ativo.</span>{' '}
+                  IPB detectado como <span style={{ color: '#a569bd' }}>produto SaaS arquitetônico</span> (afeta modelo + tecnologia).
+                  IA em <span style={{ color: '#a569bd' }}>Encosta da Iluminação</span> (2025). TRL 7 — sistema em produção real.
+                  Ajuste conforme necessário.
+                </p>
+              </div>
+
               <div><p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Tipo de inovação</p>
                 <div className="grid grid-cols-2 gap-2">
-                  {[{ id: 'produto', label: 'Produto / Serviço', desc: 'Novo produto ou melhoria substancial' }, { id: 'organizacional', label: 'Organizacional', desc: 'Estrutura, gestão, parcerias' }, { id: 'processo', label: 'Processo', desc: 'Como entregamos o que já entregamos' }, { id: 'modelo', label: 'Modelo de Negócio', desc: 'Como capturamos e criamos valor' }].map(t => (
+                  {[{ id: 'produto', label: 'Produto / Serviço', desc: 'Novo produto ou melhoria substancial', auto: true }, { id: 'organizacional', label: 'Organizacional', desc: 'Estrutura, gestão, parcerias', auto: false }, { id: 'processo', label: 'Processo', desc: 'Como entregamos o que já entregamos', auto: false }, { id: 'modelo', label: 'Modelo de Negócio', desc: 'Como capturamos e criamos valor', auto: false }].map(t => (
                     <button key={t.id} onClick={() => update({ tipoInovacao: t.id })} className="rounded-lg px-3 py-2.5 text-left transition-all"
                       style={{ background: s.tipoInovacao === t.id ? 'rgba(125,60,152,0.18)' : 'rgba(0,0,0,0.25)', border: `2px solid ${s.tipoInovacao === t.id ? PURPLE : 'rgba(255,255,255,0.06)'}` }}>
-                      <p className="text-[12px] font-bold" style={{ color: s.tipoInovacao === t.id ? '#a569bd' : 'rgba(255,255,255,0.4)' }}>{t.label}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-[12px] font-bold" style={{ color: s.tipoInovacao === t.id ? '#a569bd' : 'rgba(255,255,255,0.4)' }}>{t.label}</p>
+                        {t.auto && <span className="text-[8px] font-mono px-1 py-0.5 rounded" style={{ background: 'rgba(125,60,152,0.2)', color: '#a569bd' }}>auto</span>}
+                      </div>
                       <p className="text-[10px] mt-0.5 text-white/20 leading-snug">{t.desc}</p>
                     </button>
                   ))}
@@ -900,10 +937,13 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
               </div>
               <div><p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Intensidade</p>
                 <div className="grid grid-cols-2 gap-2">
-                  {[{ id: 'rotina', label: '🔄 Rotina', desc: 'Renovação natural, baixo impacto' }, { id: 'radical', label: '🚀 Radical', desc: 'Novas competências, alto investimento' }, { id: 'disruptiva', label: '💥 Disruptiva', desc: 'Reavalia o modelo de negócio' }, { id: 'arquitetonica', label: '🏗️ Arquitetônica', desc: 'Afeta modelo + tecnologia' }].map(t => (
+                  {[{ id: 'rotina', label: '🔄 Rotina', desc: 'Renovação natural, baixo impacto', auto: false }, { id: 'radical', label: '🚀 Radical', desc: 'Novas competências, alto investimento', auto: false }, { id: 'disruptiva', label: '💥 Disruptiva', desc: 'Reavalia o modelo de negócio', auto: false }, { id: 'arquitetonica', label: '🏗️ Arquitetônica', desc: 'Afeta modelo + tecnologia', auto: true }].map(t => (
                     <button key={t.id} onClick={() => update({ intensidade: t.id })} className="rounded-lg px-3 py-2.5 text-left transition-all"
                       style={{ background: s.intensidade === t.id ? 'rgba(125,60,152,0.18)' : 'rgba(0,0,0,0.25)', border: `2px solid ${s.intensidade === t.id ? PURPLE : 'rgba(255,255,255,0.06)'}` }}>
-                      <p className="text-[12px] font-bold" style={{ color: s.intensidade === t.id ? '#a569bd' : 'rgba(255,255,255,0.4)' }}>{t.label}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-[12px] font-bold" style={{ color: s.intensidade === t.id ? '#a569bd' : 'rgba(255,255,255,0.4)' }}>{t.label}</p>
+                        {t.auto && <span className="text-[8px] font-mono px-1 py-0.5 rounded" style={{ background: 'rgba(125,60,152,0.2)', color: '#a569bd' }}>auto</span>}
+                      </div>
                       <p className="text-[10px] mt-0.5 text-white/20 leading-snug">{t.desc}</p>
                     </button>
                   ))}
