@@ -1368,16 +1368,101 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
           {/* ═══ NORTE ═══ */}
           {tab === 'norte' && (
             <div className="flex flex-col gap-4">
-              <div className="rounded-lg px-4 py-3" style={{ background: 'rgba(93,173,226,0.06)', border: '1px solid rgba(93,173,226,0.15)' }}>
-                <p className="text-[11px] text-white/35 leading-relaxed">A pergunta que separa quem sobrevive de quem lidera: "onde queremos chegar?". Cultura de dados + governança + inovação ambidestra = liderança em 2025.</p>
-              </div>
-              <div><p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Onde queremos chegar?</p>
+
+              {/* Painel de posição integrado */}
+              {(() => {
+                const allGovItems = Object.entries(GOV_CHECKS).flatMap(([key, items], gi) =>
+                  items.map((item, i) => item.autoCheck || ((s[key as keyof CockpitState] as boolean[] ?? [])[i] ?? false))
+                )
+                const govScore = Math.round((allGovItems.filter(Boolean).length / allGovItems.length) * 100)
+                const okrKrs = s.okrs.flatMap(o => o.krs.filter(k => k.texto))
+                const okrAvg = okrKrs.length > 0 ? Math.round(okrKrs.reduce((a, b) => a + b.pct, 0) / okrKrs.length) : 0
+                const sintese = getInovacaoSintese(s.tipoInovacao, s.intensidade, s.h1, s.h2, s.h3, s.fasesFunil, s.faseHype, s.trl)
+                const sustScore = Math.round((SUST_ITEMS.filter((item, i) => item.autoCheck || (s.sustDigital ?? [])[i]).length / SUST_ITEMS.length) * 100)
+
+                return (
+                  <div className="rounded-xl p-4 flex flex-col gap-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(93,173,226,0.2)' }}>
+                    <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest">Posição atual — síntese integrada</p>
+
+                    {/* Indicadores */}
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { label: 'TD', value: `F${s.faseEmpresa + 1} · ${TD_FASES[s.faseEmpresa]?.label ?? '—'}`, color: '#5dade2', sub: gap === 0 ? 'Alinhado ao mercado' : gap > 0 ? `${gap} fase(s) atrás` : `${Math.abs(gap)} fase(s) à frente` },
+                        { label: 'INOVAÇÃO', value: sintese?.janelaLabel.split('—')[0].trim() ?? '—', color: sintese?.janelaColor ?? PURPLE, sub: `TRL ${s.trl}/9 · ${HYPE_FASES[s.faseHype]?.label ?? '—'}` },
+                        { label: 'OKRs', value: okrKrs.length > 0 ? `${okrAvg}% médio` : 'Não definidos', color: okrAvg >= 70 ? GREEN : okrAvg >= 40 ? AMBER : 'rgba(255,255,255,0.25)', sub: `${okrKrs.filter(k => k.pct >= 70).length}/${okrKrs.length} KRs no caminho` },
+                        { label: 'GOVERNANÇA', value: `${govScore}%`, color: govScore >= 75 ? GREEN : govScore >= 50 ? AMBER : RED, sub: `${allGovItems.filter(Boolean).length}/${allGovItems.length} pilares ativos` },
+                      ].map(c => (
+                        <div key={c.label} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                          <p className="text-[9px] font-mono text-white/20 mb-1">{c.label}</p>
+                          <p className="text-[13px] font-bold leading-tight" style={{ color: c.color }}>{c.value}</p>
+                          <p className="text-[10px] text-white/25 mt-0.5">{c.sub}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Veredicto */}
+                    {(() => {
+                      const tdOk = s.faseEmpresa >= 1
+                      const inoOk = sintese?.janela === 'urgente' || sintese?.janela === 'favoravel'
+                      const okrOk = okrKrs.length > 0
+                      const govOk = govScore >= 50
+                      const score = [tdOk, inoOk, okrOk, govOk].filter(Boolean).length
+                      const msgs = [
+                        { ok: tdOk, msg: tdOk ? null : 'Completar F2 do TD é pré-requisito para tudo' },
+                        { ok: inoOk, msg: inoOk ? null : 'Definir posição no Hype Cycle para calibrar timing' },
+                        { ok: okrOk, msg: okrOk ? null : 'Sem OKRs não há como saber se você está no caminho' },
+                        { ok: govOk, msg: govOk ? null : 'Governança abaixo de 50% — risco operacional elevado' },
+                      ].filter(m => !m.ok).map(m => m.msg!)
+
+                      return (
+                        <div className="rounded-lg p-3" style={{ background: score >= 3 ? 'rgba(30,132,73,0.08)' : 'rgba(154,125,10,0.08)', border: `1px solid ${score >= 3 ? GREEN : AMBER}30` }}>
+                          <p className="text-[11px] font-bold mb-1" style={{ color: score >= 3 ? GREEN : AMBER }}>
+                            {score === 4 ? 'Posição sólida — foco em execução e escala' : score >= 2 ? 'Fundação em construção — continue avançando' : 'Atenção: gaps críticos antes de escalar'}
+                          </p>
+                          {msgs.map((m, i) => (
+                            <div key={i} className="flex items-start gap-1.5 mt-1">
+                              <ChevronRight size={10} style={{ color: AMBER, marginTop: 1, flexShrink: 0 }} />
+                              <p className="text-[10px] leading-snug" style={{ color: AMBER }}>{m}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    })()}
+                  </div>
+                )
+              })()}
+
+              {/* Estrela do Norte */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest">Onde queremos chegar?</p>
+                  {!s.norteStar && (
+                    <button onClick={() => update({ norteStar: 'Ser a plataforma de inteligência de negócios mais acessível e acionável para médias empresas brasileiras — onde dados viram decisões e decisões viram crescimento sustentável.' })}
+                      className="text-[9px] font-mono px-2 py-1 rounded transition-colors" style={{ background: 'rgba(93,173,226,0.1)', color: '#5dade2' }}>
+                      Sugerir
+                    </button>
+                  )}
+                </div>
                 <textarea value={s.norteStar} onChange={e => update({ norteStar: e.target.value })} placeholder="Nossa estrela do norte..." rows={4} className="w-full rounded-lg px-3 py-2.5 text-[13px] outline-none resize-none" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(93,173,226,0.18)', color: 'rgba(255,255,255,0.7)', lineHeight: 1.7 }} />
               </div>
-              <div><p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Cultura</p>
+
+              {/* Cultura */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest">Cultura</p>
+                  {!s.cultura && (
+                    <button onClick={() => update({ cultura: 'Dados antes de opinião. Aprendizado antes de escala. Foco antes de expansão. Construímos rápido, medimos tudo e descartamos o que não funciona sem ego.' })}
+                      className="text-[9px] font-mono px-2 py-1 rounded transition-colors" style={{ background: 'rgba(93,173,226,0.1)', color: '#5dade2' }}>
+                      Sugerir
+                    </button>
+                  )}
+                </div>
                 <textarea value={s.cultura} onChange={e => update({ cultura: e.target.value })} placeholder="Valores praticados vs declarados, rituais, clima..." rows={4} className="w-full rounded-lg px-3 py-2.5 text-[13px] outline-none resize-none" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 }} />
               </div>
-              <div><p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Reflexão livre</p>
+
+              {/* Reflexão */}
+              <div>
+                <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-2">Reflexão livre</p>
                 <textarea value={s.reflexaoNorte} onChange={e => update({ reflexaoNorte: e.target.value })} placeholder="O que aprendemos hoje?" rows={3} className="w-full rounded-lg px-3 py-2.5 text-[13px] outline-none resize-none" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 }} />
               </div>
             </div>
