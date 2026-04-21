@@ -302,6 +302,89 @@ function timeAgo(d: string) { const m = Math.floor((Date.now() - new Date(d).get
 function npsColor(sc: number | null) { return sc === null ? 'rgba(255,255,255,0.3)' : sc >= 9 ? GREEN : sc >= 7 ? AMBER : RED }
 
 // ─────────────────────────────────────────────
+// INOVAÇÃO — síntese automática (rule-based, sem API)
+// ─────────────────────────────────────────────
+interface InovacaoSintese {
+  janela: 'urgente' | 'favoravel' | 'aguardar' | 'matura'
+  janelaLabel: string
+  janelaColor: string
+  prioridade: string
+  acoes: string[]
+  alerta: string | null
+}
+
+function getInovacaoSintese(
+  tipo: string, intensidade: string,
+  h1: number, h2: number, h3: number,
+  fasesFunil: boolean[], faseHype: number, trl: number
+): InovacaoSintese | null {
+  if (!tipo || !intensidade) return null
+
+  // Janela de mercado baseada no Hype Cycle
+  const janelaMap: Record<number, { janela: InovacaoSintese['janela']; label: string; color: string }> = {
+    0: { janela: 'aguardar', label: 'Aguardar — tecnologia emergindo', color: '#9a7d0a' },
+    1: { janela: 'aguardar', label: 'Cuidado — pico de expectativas, hype perigoso', color: '#c0392b' },
+    2: { janela: 'favoravel', label: 'Oportunidade — vale da desilusão, consolidar posição', color: '#9a7d0a' },
+    3: { janela: 'urgente', label: 'JANELA ABERTA — encosta da iluminação, agir agora', color: '#1e8449' },
+    4: { janela: 'matura', label: 'Mercado maduro — diferenciação é crítica', color: '#5dade2' },
+  }
+  const { janela, label: janelaLabel, color: janelaColor } = janelaMap[faseHype] ?? janelaMap[0]
+
+  // Funil — qual a próxima fase
+  const funilAtual = fasesFunil.lastIndexOf(true) + 1 // 0 = nenhuma, 1-5 = fase concluída
+  const funilProximos: Record<number, string> = {
+    0: 'Iniciar o funil: registre as ideias brutas e aplique divergência criativa',
+    1: 'Avançar para Stage Gate 1: triagem com critérios de alinhamento e viabilidade',
+    2: 'Iniciar desenvolvimento: prototipar, testar, validar tecnicamente',
+    3: 'Avançar para Stage Gate 2: validar ROI esperado e mercado antes de escalar',
+    4: 'Lançar e escalar: definir go-to-market, métricas de crescimento e ciclo de feedback',
+    5: 'Funil completo: reiniciar o ciclo com novos problemas identificados no mercado',
+  }
+  const funilAcao = funilProximos[funilAtual] ?? funilProximos[0]
+
+  // TRL — maturidade da tecnologia
+  let trlAcao: string
+  if (trl <= 3) trlAcao = 'TRL baixo: valide o conceito com protótipos antes de qualquer investimento de escala'
+  else if (trl <= 6) trlAcao = 'TRL médio: foco em validação técnica e primeiros usuários reais — não otimize antes de validar'
+  else if (trl <= 8) trlAcao = 'TRL 7-8: produto qualificado para escala — pare de construir features e comece a escalar aquisição'
+  else trlAcao = 'TRL 9: tecnologia madura — foco em eficiência operacional e expansão de mercado'
+
+  // Horizontes — diagnóstico de distribuição
+  let horizonteAlerta: string | null = null
+  if (h1 > 80) horizonteAlerta = `H1 em ${h1}% — risco de estagnação. Aumente H2/H3 ou você para de crescer.`
+  else if (h1 < 40) horizonteAlerta = `H1 em ${h1}% — receita atual em risco. Garanta o core antes de inovar.`
+  else if (h3 > 30) horizonteAlerta = `H3 em ${h3}% — aposta alta sem base sólida. Reequilibre com mais H1.`
+
+  // Intensidade — risco específico
+  const intensidadeRisco: Record<string, string> = {
+    arquitetonica: 'Inovação arquitetônica: cada mudança afeta modelo E tecnologia em cascata — governe cada decisão',
+    disruptiva: 'Inovação disruptiva: prepare resistência interna. Mudança de paradigma leva 2-3x mais tempo que o planejado',
+    radical: 'Inovação radical: invista em competências novas ANTES de acelerar execução',
+    rotina: 'Inovação incremental: eficiente mas insuficiente para liderar. Aumente H2/H3 ou será ultrapassado',
+  }
+
+  // Prioridade síntese
+  let prioridade: string
+  if (janela === 'urgente' && trl >= 7) {
+    prioridade = 'Janela aberta + produto pronto: prioridade máxima é ESCALA. Pare de construir e comece a adquirir clientes agora.'
+  } else if (janela === 'urgente' && trl < 7) {
+    prioridade = 'Janela aberta mas produto ainda amadurecendo: acelere o TRL. Cada mês de atraso é posição perdida no mercado.'
+  } else if (janela === 'favoravel' && trl >= 7) {
+    prioridade = 'Momento favorável com produto pronto: consolide sua posição enquanto concorrentes ainda saem do vale.'
+  } else if (janela === 'aguardar') {
+    prioridade = 'Momento de preparação: construa capacidade interna. Não escale marketing ainda — o mercado não está pronto.'
+  } else {
+    prioridade = 'Mercado maduro: diferenciação é o único caminho. Defina o que o IPB faz que ninguém mais faz.'
+  }
+
+  return {
+    janela, janelaLabel, janelaColor, prioridade,
+    acoes: [funilAcao, trlAcao, intensidadeRisco[intensidade] ?? ''],
+    alerta: horizonteAlerta,
+  }
+}
+
+// ─────────────────────────────────────────────
 // Section header
 // ─────────────────────────────────────────────
 function SectionHeader({ label, color = 'rgba(255,255,255,0.12)' }: { label: string; color?: string }) {
@@ -989,7 +1072,55 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
                 <input type="range" min={1} max={9} value={s.trl} onChange={e => update({ trl: Number(e.target.value) })} className="w-full h-1.5" style={{ accentColor: s.trl >= 7 ? GREEN : s.trl >= 4 ? AMBER : RED }} />
                 <div className="flex justify-between mt-1"><span className="text-[9px] text-white/20">Conceito</span><span className="text-[9px] text-white/20">Protótipo</span><span className="text-[9px] text-white/20">Produção</span></div>
               </div>
-              <textarea value={s.reflexaoInovacao} onChange={e => update({ reflexaoInovacao: e.target.value })} placeholder="Notas de inovação..." rows={3} className="w-full rounded-lg px-3 py-2.5 text-[13px] outline-none resize-none" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.65)', lineHeight: 1.65 }} />
+              {/* Síntese automática */}
+              {(() => {
+                const sintese = getInovacaoSintese(s.tipoInovacao, s.intensidade, s.h1, s.h2, s.h3, s.fasesFunil, s.faseHype, s.trl)
+                if (!sintese) return (
+                  <div className="rounded-lg p-4 text-center text-[11px] text-white/25" style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    Selecione tipo e intensidade para gerar o diagnóstico de inovação
+                  </div>
+                )
+                return (
+                  <div className="rounded-xl p-4 flex flex-col gap-3" style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${sintese.janelaColor}40` }}>
+                    {/* Janela */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] font-mono font-bold px-2 py-1 rounded-full" style={{ background: `${sintese.janelaColor}20`, color: sintese.janelaColor }}>
+                        JANELA DE MERCADO
+                      </span>
+                      <span className="text-[11px] font-bold" style={{ color: sintese.janelaColor }}>{sintese.janelaLabel}</span>
+                    </div>
+
+                    {/* Prioridade */}
+                    <div className="rounded-lg p-3" style={{ background: `${sintese.janelaColor}10`, borderLeft: `3px solid ${sintese.janelaColor}` }}>
+                      <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mb-1">Prioridade #1</p>
+                      <p className="text-[13px] font-semibold leading-snug" style={{ color: 'rgba(255,255,255,0.75)' }}>{sintese.prioridade}</p>
+                    </div>
+
+                    {/* Alerta horizontes */}
+                    {sintese.alerta && (
+                      <div className="flex items-start gap-2 rounded-lg p-2.5" style={{ background: 'rgba(192,57,43,0.08)', border: '1px solid rgba(192,57,43,0.25)' }}>
+                        <AlertTriangle size={11} style={{ color: RED, marginTop: 1, flexShrink: 0 }} />
+                        <p className="text-[11px] leading-snug" style={{ color: RED }}>{sintese.alerta}</p>
+                      </div>
+                    )}
+
+                    {/* Ações */}
+                    <div>
+                      <p className="text-[9px] font-mono text-white/20 uppercase tracking-widest mb-2">Próximas ações</p>
+                      <div className="flex flex-col gap-2">
+                        {sintese.acoes.filter(Boolean).map((acao, i) => (
+                          <div key={i} className="flex items-start gap-2">
+                            <span className="text-[10px] font-mono font-bold shrink-0 mt-0.5" style={{ color: sintese.janelaColor }}>{i + 1}</span>
+                            <p className="text-[12px] leading-snug text-white/50">{acao}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })()}
+
+              <textarea value={s.reflexaoInovacao} onChange={e => update({ reflexaoInovacao: e.target.value })} placeholder="Suas notas de inovação..." rows={3} className="w-full rounded-lg px-3 py-2.5 text-[13px] outline-none resize-none" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.65)', lineHeight: 1.65 }} />
             </div>
           )}
 
