@@ -8,6 +8,7 @@ import {
   Target, AlertTriangle, TrendingUp, Loader2, Brain,
   ChevronRight, CheckCircle2, Circle, Zap, Info,
   Link2, RefreshCw, Building2, Users2, DollarSign,
+  Activity, Server, UserCheck, Bell, Shield, Clock, BarChart2,
 } from 'lucide-react'
 
 const BLUE = '#1a5276'
@@ -504,6 +505,8 @@ export default function AdminPanel() {
   const [zohoStatus, setZohoStatus] = useState<{ configured: boolean; connected: boolean; level: number; org?: { name?: string } | null } | null>(null)
   const [zohoData, setZohoData] = useState<{ summary?: { totalDeals: number; totalPipeline: number; wonThisMonth: number; totalContacts: number }; pipeline?: { stage: string; count: number; value: number }[] } | null>(null)
   const [zohoLoading, setZohoLoading] = useState(false)
+  const [stackHealth, setStackHealth] = useState<{ ok: boolean; latencyMs: number | null } | null>(null)
+  const [userStats, setUserStats] = useState<{ total: number; newThisWeek: number } | null>(null)
 
   // Bootstrap: apply auto-facts on first load if not yet done
   useEffect(() => {
@@ -580,7 +583,27 @@ export default function AdminPanel() {
     finally { setZohoLoading(false) }
   }
 
-  useEffect(() => { if (tab === 'monitor') { loadMonitor(); loadZoho() } }, [tab]) // eslint-disable-line react-hooks/exhaustive-deps
+  const loadStack = async () => {
+    try {
+      const t0 = Date.now()
+      const res = await fetch('/api/healthz')
+      const latencyMs = Date.now() - t0
+      setStackHealth({ ok: res.ok, latencyMs })
+    } catch {
+      setStackHealth({ ok: false, latencyMs: null })
+    }
+    try {
+      const supabase = createClient()
+      const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+      const [{ count: total }, { count: newThisWeek }] = await Promise.all([
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
+        supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', weekAgo),
+      ])
+      setUserStats({ total: total ?? 0, newThisWeek: newThisWeek ?? 0 })
+    } catch { /* silent */ }
+  }
+
+  useEffect(() => { if (tab === 'monitor') { loadMonitor(); loadZoho(); loadStack() } }, [tab]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const checkEmpresa: boolean[][] = (() => {
     const ex = s.checkEmpresa ?? []
@@ -663,6 +686,49 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
   const promoters = npsScores.filter(n => n >= 9).length
   const detractors = npsScores.filter(n => n <= 6).length
   const npsNet = npsScores.length > 0 ? Math.round(((promoters - detractors) / npsScores.length) * 100) : 0
+
+  // Smart alerts — rule-based, no API
+  const monitorAlertas: { level: 'red' | 'amber' | 'green'; icon: string; titulo: string; detalhe: string }[] = (() => {
+    const fin = cockpit as typeof COCKPIT_DEFAULT
+    const margem = fin.receita > 0 ? Math.round(((fin.receita - fin.despesas) / fin.receita) * 100) : 0
+    const runway = fin.despesas > 0 ? Math.round(fin.caixa / fin.despesas) : 99
+    const alerts: { level: 'red' | 'amber' | 'green'; icon: string; titulo: string; detalhe: string }[] = []
+    if (fin.despesas > 0 && runway < 3) alerts.push({ level: 'red', icon: '🔴', titulo: `Runway crítico: ${runway} meses`, detalhe: 'Prioridade máxima: aumentar receita ou cortar despesas hoje.' })
+    else if (fin.despesas > 0 && runway < 6) alerts.push({ level: 'amber', icon: '🟡', titulo: `Runway apertado: ${runway} meses`, detalhe: 'Menos de 6 meses. Planeje captação ou redução de custos este mês.' })
+    if (fin.receita > 0 && margem < 0) alerts.push({ level: 'red', icon: '🔴', titulo: `Margem negativa: ${margem}%`, detalhe: 'Despesas maiores que receita. Revise contratos e recorrentes.' })
+    else if (fin.receita > 0 && margem < 20) alerts.push({ level: 'amber', icon: '🟡', titulo: `Margem baixa: ${margem}%`, detalhe: 'Meta mínima saudável: 20%. Identifique o maior custo variável.' })
+    if (denuncias.length > 0) alerts.push({ level: 'red', icon: '🔴', titulo: `${denuncias.length} denúncia(s) pendente(s)`, detalhe: 'Responda toda denúncia em até 48h. Falta de resposta agrava o risco legal.' })
+    if (npsScores.length > 0 && npsNet < 0) alerts.push({ level: 'red', icon: '🔴', titulo: `NPS negativo: ${npsNet}`, detalhe: 'Mais detratores que promotores. Analise feedbacks negativos e aja esta semana.' })
+    else if (npsScores.length > 0 && npsNet < 30) alerts.push({ level: 'amber', icon: '🟡', titulo: `NPS abaixo do ideal: ${npsNet}`, detalhe: 'Meta: >50 para SaaS educacional. Entreviste os últimos 3 detratores.' })
+    const gap = s.faseMercado - s.faseEmpresa
+    if (gap >= 2) alerts.push({ level: 'red', icon: '🔴', titulo: `Gap TD crítico: ${gap} fases atrás do mercado`, detalhe: 'Concorrentes com vantagem estrutural. Acelere TD F' + (s.faseEmpresa + 1) + '.' })
+    else if (gap === 1) alerts.push({ level: 'amber', icon: '🟡', titulo: 'Gap TD: 1 fase atrás do mercado', detalhe: 'Complete os itens pendentes desta fase para alcançar o mercado.' })
+    const okrsDefined = s.okrs?.some(o => o.objetivo.trim().length > 0)
+    if (!okrsDefined) alerts.push({ level: 'amber', icon: '🟡', titulo: 'OKRs não definidos', detalhe: 'Sem OKRs ativos você opera sem metas mensuráveis. Defina pelo menos 1 objetivo esta semana.' })
+    if (alerts.length === 0) alerts.push({ level: 'green', icon: '🟢', titulo: 'Todos os indicadores OK', detalhe: 'Nenhum alerta crítico identificado. Continue monitorando semanalmente.' })
+    return alerts
+  })()
+
+  // Plano da semana — top 3 pendentes mais críticos
+  const planoDaSemana: string[] = (() => {
+    const items: string[] = []
+    const fin = cockpit as typeof COCKPIT_DEFAULT
+    const margem = fin.receita > 0 ? Math.round(((fin.receita - fin.despesas) / fin.receita) * 100) : 0
+    const runway = fin.despesas > 0 ? Math.round(fin.caixa / fin.despesas) : 99
+    if (runway < 6 && fin.despesas > 0) items.push(`Revisar despesas e prospectar 2 novos clientes (runway: ${runway}m)`)
+    if (margem > 0 && margem < 20) items.push(`Mapear o maior custo variável e renegociar (margem atual: ${margem}%)`)
+    if (denuncias.length > 0) items.push(`Responder ${denuncias.length} denúncia(s) pendente(s) no prazo de 48h`)
+    // Add pending TD directives
+    const faseItems = TD_FASES[s.faseEmpresa]?.items ?? []
+    const stored = (s.checkEmpresa ?? [])[s.faseEmpresa] ?? []
+    faseItems.forEach((item, ci) => {
+      if (!item.autoCheck && !(stored[ci] ?? false) && item.directive) {
+        if (items.length < 3) items.push(item.directive)
+      }
+    })
+    if (!s.okrs?.some(o => o.objetivo.trim().length > 0)) items.push('Definir 1 OKR para o trimestre na aba OKRs')
+    return items.slice(0, 3)
+  })()
 
   const TABS: { id: AdminTab; label: string; color: string }[] = [
     { id: 'td', label: 'TD', color: BLUE },
@@ -1472,131 +1538,236 @@ Use os dados financeiros para calibrar urgência. Se runway < 6 meses, priorize 
           {tab === 'monitor' && (
             <div className="flex flex-col gap-5">
 
-              {/* ── Zoho CRM ── */}
+              {/* ── Header refresh ── */}
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-mono text-white/25 uppercase tracking-widest">Cockpit operacional</p>
+                <button onClick={() => { loadMonitor(); loadZoho(); loadStack() }}
+                  className="flex items-center gap-1.5 text-[10px] text-white/25 hover:text-white/50 font-mono transition-colors">
+                  <RefreshCw size={10} className={(monitorLoading || zohoLoading) ? 'animate-spin' : ''} />
+                  Atualizar tudo
+                </button>
+              </div>
+
+              {/* ── Stack Health ── */}
               <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <Link2 size={13} style={{ color: '#5dade2' }} />
-                    <span className="text-[12px] font-bold text-white/60">Zoho CRM</span>
-                    {zohoStatus?.connected && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full" style={{ background: `${GREEN}20`, color: GREEN }}>CONECTADO</span>}
-                    {zohoStatus && !zohoStatus.connected && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full" style={{ background: `${AMBER}20`, color: AMBER }}>NÃO CONECTADO</span>}
-                  </div>
-                  <button onClick={loadZoho} className="flex items-center gap-1 text-[10px] text-white/20 hover:text-white/40 transition-colors">
-                    <RefreshCw size={10} className={zohoLoading ? 'animate-spin' : ''} />
-                    Atualizar
-                  </button>
+                <div className="flex items-center gap-2 mb-3">
+                  <Server size={13} style={{ color: '#5dade2' }} />
+                  <span className="text-[12px] font-bold text-white/60">Stack</span>
                 </div>
-
-                {zohoLoading && <div className="flex items-center justify-center py-6"><Loader2 size={14} className="animate-spin text-white/25" /></div>}
-
-                {!zohoLoading && zohoStatus && !zohoStatus.connected && (
-                  <div className="flex flex-col gap-3">
-                    {!zohoStatus.configured ? (
-                      <div className="rounded-lg p-3" style={{ background: 'rgba(154,125,10,0.08)', border: '1px solid rgba(154,125,10,0.2)' }}>
-                        <p className="text-[11px] font-bold mb-1" style={{ color: AMBER }}>Configuração necessária</p>
-                        <p className="text-[11px] text-white/40 leading-relaxed mb-2">Adicione no Vercel (Settings → Environment Variables):</p>
-                        <div className="flex flex-col gap-1 font-mono text-[10px]" style={{ color: AMBER }}>
-                          <span>ZOHO_CLIENT_ID=&lt;seu client id&gt;</span>
-                          <span>ZOHO_CLIENT_SECRET=&lt;seu client secret&gt;</span>
-                          <span>NEXT_PUBLIC_APP_URL=https://seu-dominio.vercel.app</span>
-                        </div>
-                        <p className="text-[10px] text-white/30 mt-2 leading-relaxed">
-                          Crie as credenciais em: <span style={{ color: '#5dade2' }}>api-console.zoho.com → Server-based Applications</span>
-                        </p>
-                        <p className="text-[10px] text-white/30 mt-1">
-                          Authorized Redirect URI: <span style={{ color: '#5dade2' }}>seu-dominio.vercel.app/api/zoho/callback</span>
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col gap-3">
-                        <p className="text-[11px] text-white/40">Credenciais configuradas. Clique para autorizar o acesso ao Zoho CRM.</p>
-                        <a href="/api/zoho/connect"
-                          className="flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-[12px] transition-all"
-                          style={{ background: 'rgba(93,173,226,0.12)', border: '1px solid rgba(93,173,226,0.3)', color: '#5dade2' }}>
-                          <Link2 size={13} />
-                          Conectar Zoho CRM
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {!zohoLoading && zohoStatus?.connected && zohoData?.summary && (
-                  <div className="flex flex-col gap-3">
-                    {zohoStatus.org?.name && (
-                      <div className="flex items-center gap-2">
-                        <Building2 size={11} style={{ color: GREEN }} />
-                        <span className="text-[11px] text-white/40">{zohoStatus.org.name}</span>
-                      </div>
-                    )}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {[
-                        { label: 'DEALS', value: zohoData.summary.totalDeals, color: '#5dade2', icon: Target },
-                        { label: 'PIPELINE', value: `R$${(zohoData.summary.totalPipeline / 1000).toFixed(0)}k`, color: GREEN, icon: DollarSign },
-                        { label: 'GANHO MÊS', value: `R$${(zohoData.summary.wonThisMonth / 1000).toFixed(0)}k`, color: AMBER, icon: TrendingUp },
-                        { label: 'CONTATOS', value: zohoData.summary.totalContacts, color: PURPLE, icon: Users2 },
-                      ].map(card => {
-                        const Icon = card.icon
-                        return (
-                          <div key={card.label} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
-                            <div className="flex items-center gap-1.5 mb-1"><Icon size={10} style={{ color: card.color }} /><p className="text-[9px] text-white/25 font-mono">{card.label}</p></div>
-                            <p className="text-[20px] font-bold font-mono" style={{ color: card.color }}>{card.value}</p>
-                          </div>
-                        )
-                      })}
+                <div className="grid grid-cols-3 gap-2">
+                  {/* Vercel / API */}
+                  <div className="rounded-lg p-3 flex flex-col gap-1" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div className="flex items-center gap-1.5">
+                      <Activity size={10} style={{ color: stackHealth === null ? 'rgba(255,255,255,0.2)' : stackHealth.ok ? GREEN : RED }} />
+                      <p className="text-[9px] text-white/25 font-mono">VERCEL / API</p>
                     </div>
-
-                    {zohoData.pipeline && zohoData.pipeline.length > 0 && (
-                      <div>
-                        <p className="text-[9px] font-mono text-white/20 uppercase tracking-widest mb-2">Pipeline por fase</p>
-                        <div className="flex flex-col gap-1">
-                          {zohoData.pipeline.slice(0, 6).map(p => (
-                            <div key={p.stage} className="flex items-center justify-between py-1.5 px-2 rounded" style={{ background: 'rgba(0,0,0,0.2)' }}>
-                              <div className="flex items-center gap-2">
-                                <span className="text-[11px] text-white/45">{p.stage}</span>
-                                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.3)' }}>{p.count}</span>
-                              </div>
-                              <span className="text-[11px] font-mono font-bold" style={{ color: p.value > 0 ? GREEN : 'rgba(255,255,255,0.25)' }}>
-                                {p.value > 0 ? `R$${(p.value / 1000).toFixed(0)}k` : '—'}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                    <p className="text-[15px] font-bold font-mono" style={{ color: stackHealth === null ? 'rgba(255,255,255,0.2)' : stackHealth.ok ? GREEN : RED }}>
+                      {stackHealth === null ? '—' : stackHealth.ok ? 'OK' : 'DOWN'}
+                    </p>
+                    {stackHealth?.latencyMs !== null && stackHealth !== null && (
+                      <p className="text-[9px] font-mono" style={{ color: (stackHealth.latencyMs ?? 0) < 500 ? GREEN : AMBER }}>{stackHealth.latencyMs}ms</p>
                     )}
                   </div>
+                  {/* Supabase */}
+                  <div className="rounded-lg p-3 flex flex-col gap-1" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div className="flex items-center gap-1.5">
+                      <Shield size={10} style={{ color: userStats !== null ? GREEN : 'rgba(255,255,255,0.2)' }} />
+                      <p className="text-[9px] text-white/25 font-mono">SUPABASE</p>
+                    </div>
+                    <p className="text-[15px] font-bold font-mono" style={{ color: userStats !== null ? GREEN : 'rgba(255,255,255,0.2)' }}>
+                      {userStats !== null ? 'OK' : '—'}
+                    </p>
+                    <p className="text-[9px] font-mono text-white/20">RLS + Auth ativo</p>
+                  </div>
+                  {/* Zoho */}
+                  <div className="rounded-lg p-3 flex flex-col gap-1" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <div className="flex items-center gap-1.5">
+                      <Link2 size={10} style={{ color: zohoStatus === null ? 'rgba(255,255,255,0.2)' : zohoStatus.connected ? GREEN : AMBER }} />
+                      <p className="text-[9px] text-white/25 font-mono">ZOHO CRM</p>
+                    </div>
+                    <p className="text-[15px] font-bold font-mono" style={{ color: zohoStatus === null ? 'rgba(255,255,255,0.2)' : zohoStatus.connected ? GREEN : AMBER }}>
+                      {zohoStatus === null ? '—' : zohoStatus.connected ? 'OK' : 'DESCONECT.'}
+                    </p>
+                    <p className="text-[9px] font-mono text-white/20">{zohoStatus?.org?.name ?? 'CRM'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* ── Usuários ── */}
+              <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <UserCheck size={13} style={{ color: PURPLE }} />
+                  <span className="text-[12px] font-bold text-white/60">Usuários</span>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {[
+                    { label: 'TOTAL', value: userStats?.total ?? '—', color: PURPLE },
+                    { label: 'NOVOS 7D', value: userStats?.newThisWeek ?? '—', color: '#5dade2' },
+                    { label: 'FEEDBACKS', value: feedbacks.length, color: GREEN },
+                    { label: 'NPS NET', value: npsScores.length > 0 ? npsNet : '—', color: npsScores.length > 0 ? (npsNet >= 50 ? GREEN : npsNet >= 0 ? AMBER : RED) : 'rgba(255,255,255,0.2)' },
+                  ].map(card => (
+                    <div key={card.label} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <p className="text-[9px] text-white/25 font-mono mb-1">{card.label}</p>
+                      <p className="text-[22px] font-bold font-mono" style={{ color: card.color }}>{card.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── Alertas Inteligentes ── */}
+              <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <Bell size={13} style={{ color: AMBER }} />
+                  <span className="text-[12px] font-bold text-white/60">Alertas</span>
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.25)' }}>automático</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {monitorAlertas.map((a, i) => {
+                    const borderColor = a.level === 'red' ? RED : a.level === 'amber' ? AMBER : GREEN
+                    return (
+                      <div key={i} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `3px solid ${borderColor}` }}>
+                        <p className="text-[12px] font-bold mb-0.5" style={{ color: borderColor }}>{a.titulo}</p>
+                        <p className="text-[11px] text-white/40 leading-relaxed">{a.detalhe}</p>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* ── Plano da Semana ── */}
+              {planoDaSemana.length > 0 && (
+                <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Clock size={13} style={{ color: '#5dade2' }} />
+                    <span className="text-[12px] font-bold text-white/60">Plano desta semana</span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {planoDaSemana.map((acao, i) => (
+                      <div key={i} className="flex items-start gap-3 py-2 px-3 rounded-lg" style={{ background: 'rgba(0,0,0,0.25)' }}>
+                        <span className="text-[11px] font-bold font-mono mt-0.5 shrink-0" style={{ color: '#5dade2' }}>{i + 1}</span>
+                        <p className="text-[12px] text-white/55 leading-relaxed">{acao}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* ── Zoho CRM detalhado ── */}
+              {zohoStatus?.connected && zohoData?.summary && (
+                <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <BarChart2 size={13} style={{ color: GREEN }} />
+                    <span className="text-[12px] font-bold text-white/60">Pipeline Zoho CRM</span>
+                    {zohoStatus.org?.name && <span className="text-[10px] text-white/25 font-mono">— {zohoStatus.org.name}</span>}
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                    {[
+                      { label: 'DEALS', value: zohoData.summary.totalDeals, color: '#5dade2', icon: Target },
+                      { label: 'PIPELINE', value: `R$${(zohoData.summary.totalPipeline / 1000).toFixed(0)}k`, color: GREEN, icon: DollarSign },
+                      { label: 'GANHO MÊS', value: `R$${(zohoData.summary.wonThisMonth / 1000).toFixed(0)}k`, color: AMBER, icon: TrendingUp },
+                      { label: 'CONTATOS', value: zohoData.summary.totalContacts, color: PURPLE, icon: Users2 },
+                    ].map(card => {
+                      const Icon = card.icon
+                      return (
+                        <div key={card.label} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                          <div className="flex items-center gap-1.5 mb-1"><Icon size={10} style={{ color: card.color }} /><p className="text-[9px] text-white/25 font-mono">{card.label}</p></div>
+                          <p className="text-[20px] font-bold font-mono" style={{ color: card.color }}>{card.value}</p>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {zohoData.pipeline && zohoData.pipeline.length > 0 && (
+                    <div className="flex flex-col gap-1">
+                      {zohoData.pipeline.slice(0, 6).map(p => (
+                        <div key={p.stage} className="flex items-center justify-between py-1.5 px-2 rounded" style={{ background: 'rgba(0,0,0,0.2)' }}>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] text-white/45">{p.stage}</span>
+                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.3)' }}>{p.count}</span>
+                          </div>
+                          <span className="text-[11px] font-mono font-bold" style={{ color: p.value > 0 ? GREEN : 'rgba(255,255,255,0.25)' }}>
+                            {p.value > 0 ? `R$${(p.value / 1000).toFixed(0)}k` : '—'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              {zohoStatus && !zohoStatus.connected && (
+                <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Link2 size={13} style={{ color: AMBER }} />
+                    <span className="text-[12px] font-bold text-white/60">Zoho CRM</span>
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full" style={{ background: `${AMBER}20`, color: AMBER }}>NÃO CONECTADO</span>
+                  </div>
+                  {!zohoStatus.configured ? (
+                    <p className="text-[11px] text-white/35 leading-relaxed">Configure <span className="font-mono" style={{ color: AMBER }}>ZOHO_CLIENT_ID</span> e <span className="font-mono" style={{ color: AMBER }}>ZOHO_CLIENT_SECRET</span> no Vercel.</p>
+                  ) : (
+                    <a href="/api/zoho/connect" className="flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-[12px] transition-all" style={{ background: 'rgba(93,173,226,0.12)', border: '1px solid rgba(93,173,226,0.3)', color: '#5dade2' }}>
+                      <Link2 size={13} />Conectar Zoho CRM
+                    </a>
+                  )}
+                </div>
+              )}
+
+              {/* ── NPS + Feedbacks ── */}
+              <div className="rounded-xl p-4" style={{ background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <TrendingUp size={13} style={{ color: GREEN }} />
+                  <span className="text-[12px] font-bold text-white/60">NPS & Feedbacks</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {[
+                    { label: 'NPS MÉDIO', value: npsAvg, color: parseFloat(npsAvg) >= 8 ? GREEN : parseFloat(npsAvg) >= 6 ? AMBER : RED },
+                    { label: 'NPS NET', value: npsNet, color: npsNet >= 50 ? GREEN : npsNet >= 0 ? AMBER : RED },
+                    { label: 'DENÚNCIAS', value: denuncias.length, color: denuncias.length > 0 ? RED : 'rgba(255,255,255,0.3)' },
+                  ].map(card => (
+                    <div key={card.label} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <p className="text-[9px] text-white/25 font-mono mb-1">{card.label}</p>
+                      <p className="text-[22px] font-bold font-mono" style={{ color: card.color }}>{card.value}</p>
+                    </div>
+                  ))}
+                </div>
+                {monitorLoading ? (
+                  <div className="flex items-center justify-center py-6"><Loader2 size={14} className="animate-spin text-white/25" /></div>
+                ) : (
+                  <>
+                    {feedbacks.length > 0 && (
+                      <div className="flex flex-col gap-2">
+                        <p className="text-[9px] font-mono text-white/20 uppercase tracking-widest">Recentes</p>
+                        {feedbacks.slice(0, 5).map(fb => (
+                          <div key={fb.id} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `3px solid ${npsColor(fb.nps_score)}` }}>
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center gap-2">
+                                {fb.nps_score !== null && <span className="font-mono text-[16px] font-bold" style={{ color: npsColor(fb.nps_score) }}>{fb.nps_score}</span>}
+                                {fb.category && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}>{fb.category}</span>}
+                              </div>
+                              <span className="text-[10px] text-white/20 font-mono">{timeAgo(fb.created_at)}</span>
+                            </div>
+                            {fb.message && <p className="text-[12px] text-white/45 leading-relaxed">{fb.message}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {feedbacks.length === 0 && <p className="text-[12px] text-white/20 text-center py-4">Nenhum feedback ainda</p>}
+                    {denuncias.length > 0 && (
+                      <div className="flex flex-col gap-2 mt-3">
+                        <p className="text-[9px] font-mono text-white/20 uppercase tracking-widest">Denúncias</p>
+                        {denuncias.map(dn => (
+                          <div key={dn.id} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `3px solid ${RED}` }}>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(192,57,43,0.15)', color: RED }}>{dn.tipo}</span>
+                              <span className="text-[10px] text-white/20 font-mono">{timeAgo(dn.created_at)}</span>
+                            </div>
+                            <p className="text-[12px] text-white/45 leading-relaxed mt-1">{dn.descricao}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 
-              {/* ── NPS + Denúncias ── */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {[{ label: 'FEEDBACKS', value: feedbacks.length, color: '#5dade2' }, { label: 'NPS MÉDIO', value: npsAvg, color: parseFloat(npsAvg) >= 8 ? GREEN : parseFloat(npsAvg) >= 6 ? AMBER : RED }, { label: 'NPS NET', value: npsNet, color: npsNet >= 50 ? GREEN : npsNet >= 0 ? AMBER : RED }, { label: 'DENÚNCIAS', value: denuncias.length, color: RED }].map(card => (
-                  <div key={card.label} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                    <p className="text-[10px] text-white/25 font-mono">{card.label}</p>
-                    <p className="text-[24px] font-bold font-mono" style={{ color: card.color }}>{card.value}</p>
-                  </div>
-                ))}
-              </div>
-              {monitorLoading ? <div className="flex items-center justify-center py-10"><Loader2 size={16} className="animate-spin text-white/25" /></div> : (
-                <>
-                  {feedbacks.length > 0 && <><p className="text-[10px] font-mono text-white/25 uppercase tracking-widest">Feedbacks recentes</p>
-                    <div className="flex flex-col gap-2">{feedbacks.slice(0, 10).map(fb => (
-                      <div key={fb.id} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `3px solid ${npsColor(fb.nps_score)}` }}>
-                        <div className="flex items-center justify-between mb-1"><div className="flex items-center gap-2">{fb.nps_score !== null && <span className="font-mono text-[16px] font-bold" style={{ color: npsColor(fb.nps_score) }}>{fb.nps_score}</span>}{fb.category && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}>{fb.category}</span>}</div><span className="text-[10px] text-white/20 font-mono">{timeAgo(fb.created_at)}</span></div>
-                        {fb.message && <p className="text-[13px] text-white/50 leading-relaxed">{fb.message}</p>}
-                      </div>
-                    ))}</div></>}
-                  {feedbacks.length === 0 && <p className="text-center text-[13px] text-white/25 py-6">Nenhum feedback ainda</p>}
-                  {denuncias.length > 0 && <><p className="text-[10px] font-mono text-white/25 uppercase tracking-widest mt-2">Denúncias</p>
-                    <div className="flex flex-col gap-2">{denuncias.map(dn => (
-                      <div key={dn.id} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `3px solid ${RED}` }}>
-                        <div className="flex items-center justify-between mb-1"><span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(192,57,43,0.15)', color: RED }}>{dn.tipo}</span><span className="text-[10px] text-white/20 font-mono">{timeAgo(dn.created_at)}</span></div>
-                        <p className="text-[13px] text-white/50 leading-relaxed mt-1">{dn.descricao}</p>
-                      </div>
-                    ))}</div></>}
-                  <button onClick={loadMonitor} className="mx-auto text-[11px] text-white/20 hover:text-white/40 font-mono transition-colors">Atualizar dados</button>
-                </>
-              )}
             </div>
           )}
 
