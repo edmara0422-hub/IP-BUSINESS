@@ -345,6 +345,18 @@ export default function AdminPanel() {
     }
   }, [s.bootstrapped]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Auto-avança a fase se todos os itens da fase atual já estão verificados pelo sistema
+  useEffect(() => {
+    if (!s.bootstrapped) return
+    const currentFase = TD_FASES[s.faseEmpresa]
+    if (!currentFase || currentFase.items.length === 0) return
+    const storedChecks = (s.checkEmpresa ?? [])[s.faseEmpresa] ?? []
+    const allDone = currentFase.items.every((item, ci) => item.autoCheck || (storedChecks[ci] ?? false))
+    if (allDone && s.faseEmpresa < TD_FASES.length - 1) {
+      update({ faseEmpresa: s.faseEmpresa + 1 })
+    }
+  }, [s.bootstrapped, s.faseEmpresa, s.checkEmpresa]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const loadMonitor = async () => {
     setMonitorLoading(true)
     try {
