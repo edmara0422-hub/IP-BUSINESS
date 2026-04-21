@@ -52,9 +52,9 @@ export default function CockpitFinanceiro({ marketData }: { marketData: any }) {
     return { margem, lucro, runway, healthScore, ltvCac, breakeven, roi }
   }, [receita, despesas, caixa, cac])
 
-  const selicRate = marketData?.macro?.selic?.value ?? 13.75
-  const ipcaRate = marketData?.macro?.ipca?.value ?? 4.5
-  const usdRate = marketData?.macro?.usdBrl?.value ?? 5.72
+  const selicRate = marketData?.macro?.selic?.value ?? 14.75
+  const ipcaRate = marketData?.macro?.ipca?.value ?? 4.14
+  const usdRate = marketData?.macro?.usdBrl?.value ?? 4.98
 
   const metricCards = [
     { label: 'Margem', value: `${fmtDec(metrics.margem)}%`, color: colorByRange(metrics.margem, 20, 10), desc: '(receita - despesas) / receita' },

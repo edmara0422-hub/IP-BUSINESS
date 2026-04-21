@@ -36,8 +36,8 @@ export default function SmartPricing({ marketData }: { marketData: any }) {
   const [iaLoading, setIaLoading] = useState(false)
   const [iaResponse, setIaResponse] = useState('')
 
-  const ipcaRate = marketData?.macro?.ipca?.value ?? 4.5
-  const usdRate = marketData?.macro?.usdBrl?.value ?? 5.72
+  const ipcaRate = marketData?.macro?.ipca?.value ?? 4.14
+  const usdRate = marketData?.macro?.usdBrl?.value ?? 4.98
   const cambioRef = 4.50
 
   const calc = useMemo(() => {

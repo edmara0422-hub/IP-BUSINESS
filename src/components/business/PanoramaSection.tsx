@@ -101,7 +101,7 @@ const INDICATOR_KEYWORDS: Array<{ pattern: RegExp; indicator: string; getImpact:
     pattern: /inflação|ipca|preços ao consumidor|cesta básica|carestia/i,
     indicator: 'IPCA',
     getImpact: (d) => {
-      const i = d?.macro?.ipca?.value ?? 4.83
+      const i = d?.macro?.ipca?.value ?? 4.14
       return `IPCA em ${i.toFixed(2)}% → poder de compra do consumidor ${i > 4.75 ? 'caindo' : 'estável'}`
     },
   },
@@ -109,7 +109,7 @@ const INDICATOR_KEYWORDS: Array<{ pattern: RegExp; indicator: string; getImpact:
     pattern: /dólar|câmbio|real|moeda|forex|usd/i,
     indicator: 'USD/BRL',
     getImpact: (d) => {
-      const u = d?.macro?.usdBrl?.value ?? 5.72
+      const u = d?.macro?.usdBrl?.value ?? 4.98
       return `Dólar R$${u.toFixed(2)} → insumos importados ${u > 5.5 ? 'mais caros' : 'controlados'}`
     },
   },
@@ -117,7 +117,7 @@ const INDICATOR_KEYWORDS: Array<{ pattern: RegExp; indicator: string; getImpact:
     pattern: /pib|crescimento|economia brasileira|atividade econômica|recessão/i,
     indicator: 'PIB',
     getImpact: (d) => {
-      const p = d?.macro?.pib?.value ?? 2.9
+      const p = d?.macro?.pib?.value ?? 1.86
       return `PIB ${p > 0 ? '+' : ''}${p.toFixed(1)}% → demanda ${p > 2 ? 'em expansão' : p > 0 ? 'fraca' : 'contraindo'}`
     },
   },
@@ -159,7 +159,7 @@ const INDICATOR_KEYWORDS: Array<{ pattern: RegExp; indicator: string; getImpact:
     indicator: 'AGRO',
     getImpact: (d) => {
       const a = d?.sectors?.find((s: any) => s.id === 'agro')
-      const u = d?.macro?.usdBrl?.value ?? 5.72
+      const u = d?.macro?.usdBrl?.value ?? 4.98
       return a ? `Agro heat ${a.heat}/100 — dólar R$${u.toFixed(2)} ${u > 5.3 ? 'favorece exportador' : 'comprime margem'}` : 'Impacta agronegócio'
     },
   },

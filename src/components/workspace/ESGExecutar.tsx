@@ -169,9 +169,9 @@ export default function ESGExecutar({ marketData }: { marketData: any }) {
   const rating = msciRating(esgScore)
   const sinCount = sins.filter(Boolean).length
 
-  const selic = marketData?.macro?.selic?.value ?? 14.25
-  const ipca = marketData?.macro?.ipca?.value ?? 4.5
-  const pib = marketData?.macro?.pib?.value ?? 2.0
+  const selic = marketData?.macro?.selic?.value ?? 14.75
+  const ipca = marketData?.macro?.ipca?.value ?? 4.14
+  const pib = marketData?.macro?.pib?.value ?? 1.86
 
   /* ── IA helpers ── */
   const callIA = async (question: string) => {

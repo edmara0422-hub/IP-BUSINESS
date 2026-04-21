@@ -26,10 +26,10 @@ interface CausalChain {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildCausalChains(data: any): CausalChain[] {
   const chains: CausalChain[] = []
-  const selic  = v(data.macro.selic?.value, 10.5)
-  const ipca   = v(data.macro.ipca?.value, 4.8)
-  const pib    = v(data.macro.pib?.value, 2.9)
-  const usd    = v(data.macro.usdBrl?.value, 5.72)
+  const selic  = v(data.macro.selic?.value, 14.75)
+  const ipca   = v(data.macro.ipca?.value, 4.14)
+  const pib    = v(data.macro.pib?.value, 1.86)
+  const usd    = v(data.macro.usdBrl?.value, 4.98)
   const creditAff = data.centralProblems?.find((p:{id:string}) => p.id === 'credit')?.affected ?? 47
   const marginAff = data.centralProblems?.find((p:{id:string}) => p.id === 'margin')?.affected ?? 68
   const cacAff    = data.centralProblems?.find((p:{id:string}) => p.id === 'cac')?.affected ?? 54

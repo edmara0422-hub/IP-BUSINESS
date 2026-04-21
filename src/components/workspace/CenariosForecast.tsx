@@ -79,10 +79,10 @@ function seededRandom(seed: number) {
 
 export default function CenariosForecast({ marketData }: { marketData: any }) {
   const base = {
-    selic: marketData?.macro?.selic?.value ?? 13.75,
-    ipca: marketData?.macro?.ipca?.value ?? 4.5,
-    pib: marketData?.macro?.pib?.value ?? 2.0,
-    usd: marketData?.macro?.usdBrl?.value ?? 5.2,
+    selic: marketData?.macro?.selic?.value ?? 14.75,
+    ipca: marketData?.macro?.ipca?.value ?? 4.14,
+    pib: marketData?.macro?.pib?.value ?? 1.86,
+    usd: marketData?.macro?.usdBrl?.value ?? 4.98,
   }
 
   const { data: savedStress, update: updateStress } = useWorkspaceData('cenarios', base)
