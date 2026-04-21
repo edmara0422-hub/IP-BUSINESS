@@ -3,6 +3,9 @@ import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
+const CALLBACK = 'https://ip-business-ten.vercel.app/api/zoho/callback'
+const HOME = 'https://ip-business-ten.vercel.app'
+
 export async function GET() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -12,11 +15,7 @@ export async function GET() {
   if (profile?.role !== 'admin') return NextResponse.json({ error: 'Sem permissão' }, { status: 403 })
 
   const clientId = process.env.ZOHO_CLIENT_ID
-  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? '').trim()
-
-  if (!clientId) {
-    return NextResponse.redirect(`${appUrl}/?zoho_error=missing_client_id`)
-  }
+  if (!clientId) return NextResponse.redirect(`${HOME}/?zoho_error=missing_client_id`)
 
   const scopes = [
     'ZohoCRM.modules.deals.READ',
@@ -30,7 +29,7 @@ export async function GET() {
     response_type: 'code',
     client_id: clientId,
     scope: scopes,
-    redirect_uri: `${appUrl}/api/zoho/callback`,
+    redirect_uri: CALLBACK,
     access_type: 'offline',
     prompt: 'consent',
   })
