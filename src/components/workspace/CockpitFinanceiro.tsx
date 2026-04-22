@@ -1,9 +1,9 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Calculator, TrendingUp, AlertTriangle, Brain, Loader2 } from 'lucide-react'
+import { Calculator, TrendingUp, AlertTriangle, Brain, Loader2, FileDown } from 'lucide-react'
 import { useWorkspaceData } from '@/hooks/useWorkspaceData'
 
 const RED = '#c0392b'
@@ -45,6 +45,8 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
   const churnMensal = data.churnMensal ?? phaseDefault.churnMensal; const setChurnMensal = (v: number) => update({ churnMensal: v })
   const [iaLoading, setIaLoading] = useState(false)
   const [iaResponse, setIaResponse] = useState('')
+  const [pdfLoading, setPdfLoading] = useState(false)
+  const pdfRef = useRef<HTMLDivElement>(null)
 
   const metrics = useMemo(() => {
     const margemDecimal = receita > 0 ? (receita - despesas) / receita : 0
@@ -83,6 +85,43 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
     { label: 'Break-even', value: `R$${fmt(metrics.breakeven)}`, color: metrics.breakevenAlert ? RED : BLUE, desc: metrics.breakevenAlert ? '⚠ Receita atual abaixo do break-even!' : 'Receita necessária para cobrir despesas' },
     { label: 'ROI Anualizado', value: `${fmtDec(metrics.roi)}%`, color: metrics.roi >= 0 ? GREEN : RED, desc: 'Retorno sobre capital investido (anual)' },
   ]
+
+  const exportPDF = async () => {
+    if (!pdfRef.current) return
+    setPdfLoading(true)
+    try {
+      const html2canvas = (await import('html2canvas')).default
+      const { jsPDF } = await import('jspdf')
+      const canvas = await html2canvas(pdfRef.current, {
+        backgroundColor: '#0a0f1e',
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      })
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+      const pdfW = pdf.internal.pageSize.getWidth()
+      const pdfH = (canvas.height * pdfW) / canvas.width
+      const nomeNegocio = userProfile?.nomeNegocio || userProfile?.nome_negocio || userProfile?.sectors?.[0] || 'IPB'
+      const dataAtual = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      // Cabeçalho
+      pdf.setFillColor(10, 15, 30)
+      pdf.rect(0, 0, pdfW, 14, 'F')
+      pdf.setTextColor(255, 255, 255)
+      pdf.setFontSize(10)
+      pdf.setFont('helvetica', 'bold')
+      pdf.text(`COCKPIT FINANCEIRO — ${nomeNegocio.toUpperCase()}`, 8, 9)
+      pdf.setFontSize(8)
+      pdf.setFont('helvetica', 'normal')
+      pdf.setTextColor(120, 140, 160)
+      pdf.text(`Health Score: ${metrics.healthScore}/100  |  Gerado em ${dataAtual}`, pdfW - 8, 9, { align: 'right' })
+      // Conteúdo
+      pdf.addImage(imgData, 'PNG', 0, 14, pdfW, pdfH)
+      pdf.save(`cockpit-${nomeNegocio.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().slice(0,10)}.pdf`)
+    } finally {
+      setPdfLoading(false)
+    }
+  }
 
   const handleIA = async () => {
     setIaLoading(true)
@@ -131,6 +170,7 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
 
   return (
     <motion.div
+      ref={pdfRef}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
@@ -139,9 +179,20 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
     >
       {/* 1. Inputs */}
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <Calculator size={16} style={{ color: BLUE }} />
-          <span style={{ fontSize: 14, fontWeight: 600 }}>Seus dados</span>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Calculator size={16} style={{ color: BLUE }} />
+            <span style={{ fontSize: 14, fontWeight: 600 }}>Seus dados</span>
+          </div>
+          <button
+            onClick={exportPDF}
+            disabled={pdfLoading}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40"
+            style={{ background: 'rgba(26,82,118,0.25)', border: '1px solid rgba(26,82,118,0.5)', fontSize: 11, color: 'rgba(255,255,255,0.6)' }}
+          >
+            {pdfLoading ? <Loader2 size={12} className="animate-spin" /> : <FileDown size={12} />}
+            {pdfLoading ? 'Gerando...' : 'Salvar PDF'}
+          </button>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {inputField('Receita Mensal (R$)', receita, setReceita)}
