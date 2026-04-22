@@ -71,6 +71,7 @@ function r2(n: number) { return parseFloat(n.toFixed(2)) }
 function r1(n: number) { return parseFloat(n.toFixed(1)) }
 
 export const dynamic = 'force-dynamic'
+export const revalidate = 300 // cache 5 minutos no Vercel
 
 // ══════════════════════════════════════════════════════════════════════════
 export async function GET() {

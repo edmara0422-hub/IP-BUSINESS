@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import BusinessSectionNav from '@/components/business/BusinessSectionNav'
 import PanoramaSection from '@/components/business/PanoramaSection'
@@ -8,8 +8,8 @@ import RiscosSection from '@/components/business/RiscosSection'
 import MacroSection from '@/components/business/MacroSection'
 import MarketingSection from '@/components/business/MarketingSection'
 import { useBusinessStore } from '@/store/business-store'
-import { apiFetch } from '@/lib/api'
 import { useIntelligence } from '@/hooks/useIntelligence'
+import { useMarketData } from '@/hooks/useMarketData'
 
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -105,25 +105,12 @@ function applySimulation(data: MarketData, sim: SimOffsets): MarketData {
 // ════════════════════════════════════════════════════════════════════════════
 
 export default function AbaBusiness() {
-  const [rawData, setRawData] = useState<MarketData | null>(null)
+  const { marketData: rawData } = useMarketData()
   const [sim, setSim] = useState<SimOffsets>({ selic: 0, cambio: 0, ipca: 0, pib: 0 })
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const activeSection = useBusinessStore((s) => s.businessActiveSection)
 
-  const fetchData = useCallback(async () => {
-    try {
-      const res = await apiFetch('/api/market')
-      const text = await res.text()
-      if (text && text.startsWith('{')) {
-        setRawData(JSON.parse(text) as MarketData)
-      }
-    } catch {}
-  }, [])
-
-  useEffect(() => { fetchData(); intervalRef.current = setInterval(fetchData, 60_000); return () => { if (intervalRef.current) clearInterval(intervalRef.current) } }, [fetchData])
-
   const hasSim = sim.selic !== 0 || sim.cambio !== 0 || sim.ipca !== 0 || sim.pib !== 0
-  const data = useMemo(() => rawData ? (hasSim ? applySimulation(rawData, sim) : rawData) : null, [rawData, sim, hasSim])
+  const data = useMemo(() => rawData ? (hasSim ? applySimulation(rawData as MarketData, sim) : rawData as MarketData) : null, [rawData, sim, hasSim])
   const { intelligence } = useIntelligence(rawData)
 
   if (!data) return (

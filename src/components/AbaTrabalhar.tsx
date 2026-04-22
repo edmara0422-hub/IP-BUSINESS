@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useMarketData } from '@/hooks/useMarketData'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Brain, LayoutDashboard, Activity, Tag, Zap,
@@ -152,11 +153,7 @@ export default function AbaTrabalhar() {
     window.location.reload()
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [marketData, setMarketData] = useState<any>(null)
-  useEffect(() => {
-    fetch('/api/market').then(r => r.json()).then(setMarketData).catch(() => {})
-  }, [])
+  const { marketData } = useMarketData()
 
   // Quando muda para consultoria, vai pro módulo consultoria
   const effectiveActiveId = contextMode === 'consultoria' ? 'consultoria' : activeId
