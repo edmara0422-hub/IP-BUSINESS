@@ -102,7 +102,7 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
       })
     } else if (receita > 0 && margem > 0 && margem < ipcaRate * 4) {
       insights.push({
-        cross: `Margem ${fmtDec(margem)}% + IPCA ${ipcaRate.toFixed(1)}%`,
+        cross: `Margem ${fmtDec(margem, 2)}% + IPCA ${ipcaRate.toFixed(2)}%`,
         insight: `Margem real de ${margemReal.toFixed(2)}%. Sem reajuste este ano, R$${fmt(Math.round(receita * ipcaRate / 100))} sumidos em 12 meses. Reajuste mínimo necessário: ${ipcaRate.toFixed(2)}%.`,
         color: AMBER,
       })
@@ -120,8 +120,8 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
     // U4. LTV/CAC + setor aquecido
     if (ltvCac > 3 && userSectorObj && userSectorObj.heat > 70) {
       insights.push({
-        cross: `LTV/CAC ${fmtDec(ltvCac)}x + ${userSectorObj.label ?? userSectorObj.id} AQUECIDO`,
-        insight: `Equação saudável em setor aquecido. Janela para escalar paid — cada R$1 de CAC retorna R$${fmtDec(ltvCac)} em LTV. Canal mais barato do mercado para maximizar escala.`,
+        cross: `LTV/CAC ${fmtDec(ltvCac, 2)}x + ${userSectorObj.label ?? userSectorObj.id} AQUECIDO`,
+        insight: `Equação saudável em setor aquecido. Janela para escalar paid — cada R$1 de CAC retorna R$${fmtDec(ltvCac, 2)} em LTV. Canal mais barato do mercado para maximizar escala.`,
         color: GREEN,
       })
     }
@@ -167,11 +167,11 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
       <div className="grid grid-cols-2 gap-2">
         {[
           {
-            label: 'SELIC', value: `${fmtDec(selicRate)}%`, color: selicRate > 12 ? RED : GREEN,
-            desc: `Crédito: ${fmtDec(selicRate * 2.5)}% a.a.${despesas > 0 ? ` — se financiar R$${fmt(despesas)}, paga +R$${fmt(Math.round(despesas * (selicRate * 2.5 / 100) / 12))}/mês de juros` : ' — capital de giro inviável para PME'}`,
+            label: 'SELIC', value: `${fmtDec(selicRate, 2)}%`, color: selicRate > 12 ? RED : GREEN,
+            desc: `Crédito: ${fmtDec(selicRate * 2.5, 2)}% a.a.${despesas > 0 ? ` — se financiar R$${fmt(despesas)}, paga +R$${(despesas * (selicRate * 2.5 / 100) / 12).toFixed(2)}/mês de juros` : ' — capital de giro inviável para PME'}`,
           },
           {
-            label: 'IPCA', value: `${fmtDec(ipcaRate)}%`, color: ipcaRate > 4 ? AMBER : GREEN,
+            label: 'IPCA', value: `${fmtDec(ipcaRate, 2)}%`, color: ipcaRate > 4 ? AMBER : GREEN,
             desc: despesas > 0 ? `Suas despesas em 12 meses serão R$${fmt(Math.round(despesas * (1 + ipcaRate / 100)))} — R$${fmt(Math.round(despesas * ipcaRate / 100))} a mais pelo IPCA` : `Inflação ${ipcaRate > 4.75 ? 'acima da meta — poder de compra do cliente caindo' : 'dentro da meta — consumo estável'}`,
           },
           {
@@ -180,7 +180,7 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
           },
           {
             label: 'CDI vs ROI', value: decisaoCDI ? '⚠ CDI > ROI' : '✓ ROI > CDI', color: decisaoCDI ? AMBER : GREEN,
-            desc: caixa > 0 ? `Caixa de R$${fmt(caixa)} rende R$${fmt(Math.round(cdiRendimento))}/mês no CDI (${fmtDec(cdiMensal, 2)}%/mês)${decisaoCDI ? ' — mais que seu ROI' : ''}` : 'Insira o Caixa Disponível para comparar com o CDI',
+            desc: caixa > 0 ? `Caixa de R$${fmt(caixa)} rende R$${cdiRendimento.toFixed(2)}/mês no CDI (${fmtDec(cdiMensal, 4)}%/mês)${decisaoCDI ? ' — mais que seu ROI' : ''}` : 'Insira o Caixa Disponível para comparar com o CDI',
           },
         ].map(c => (
           <div key={c.label} className="rounded-lg p-2.5" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `3px solid ${c.color}` }}>
@@ -410,16 +410,16 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const est = (isEst: boolean) => isEst ? ' · ref.mercado' : ''
   const metricCards = [
     { label: 'Health Score',    value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: `runway+margem+LTV/CAC+burn+setor ${sectorHeat}/100` },
-    { label: 'Margem',          value: `${fmtDec(metrics.margem)}%`,  color: colorByRange(metrics.margem, 20, 10),      desc: '(receita − despesas) / receita' },
-    { label: 'Runway',          value: metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway)} meses`, color: colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: 'Caixa ÷ burn real' },
+    { label: 'Margem',          value: `${fmtDec(metrics.margem, 2)}%`,  color: colorByRange(metrics.margem, 20, 10),      desc: '(receita − despesas) / receita' },
+    { label: 'Runway',          value: metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway, 2)} meses`, color: colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: 'Caixa ÷ burn real' },
     { label: 'Lucro Mensal',    value: `R$${fmt(metrics.lucro)}`,     color: metrics.lucro >= 0 ? GREEN : RED,          desc: 'Receita − despesas' },
     { label: 'Burn Líquido',    value: metrics.burnLiquido > 0 ? `-R$${fmt(metrics.burnLiquido)}/mês` : `+R$${fmt(Math.abs(metrics.burnLiquido))}/mês`, color: metrics.burnLiquido > 0 ? RED : GREEN, desc: 'Despesas − receitas' },
-    { label: 'LTV/CAC',         value: `${fmtDec(metrics.ltvCac)}x`, color: colorByRange(metrics.ltvCac, 3, 1),        desc: `LTV R$${fmt(Math.round(metrics.ltv))}${churnIsEstimado ? ' · churn ref.' : ''}` },
+    { label: 'LTV/CAC',         value: `${fmtDec(metrics.ltvCac, 2)}x`, color: colorByRange(metrics.ltvCac, 3, 1),      desc: `LTV R$${metrics.ltv.toFixed(2)}${churnIsEstimado ? ' · churn ref.' : ''}` },
     { label: 'Break-even',      value: `R$${fmt(metrics.breakeven)}`, color: metrics.breakevenAlert ? RED : BLUE,       desc: metrics.breakevenAlert ? '⚠ Receita abaixo do break-even!' : 'Receita mínima para cobrir custos' },
-    { label: 'ROI Anualizado',  value: `${fmtDec(metrics.roi)}%`,    color: metrics.roi >= 0 ? GREEN : RED,            desc: 'Retorno sobre capital investido (anual)' },
+    { label: 'ROI Anualizado',  value: `${fmtDec(metrics.roi, 2)}%`,    color: metrics.roi >= 0 ? GREEN : RED,          desc: 'Retorno sobre capital investido (anual)' },
     { label: 'Ticket Médio',    value: `R$${fmt(ticketMedio)}`,       color: ticketMedio > 0 ? BLUE : AMBER,            desc: modoManual ? 'manual' : 'receita ÷ clientes ativos' },
     { label: `CAC${est(cacIsEstimado)}`,   value: `R$${fmt(cacEfetivo)}`,   color: cac > 0 ? BLUE : AMBER, desc: cacIsEstimado ? `ref. mercado — insira seus dados` : modoManual ? 'manual' : 'verba ÷ novos clientes' },
-    { label: `Churn${est(churnIsEstimado)}`, value: `${fmtDec(churnEfetivo)}%`, color: colorByRange(100 - churnEfetivo, 95, 90), desc: churnIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'perdidos ÷ ativos × 100' },
+    { label: `Churn${est(churnIsEstimado)}`, value: `${fmtDec(churnEfetivo, 2)}%`, color: colorByRange(100 - churnEfetivo, 95, 90), desc: churnIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'perdidos ÷ ativos × 100' },
     { label: 'LTV',             value: `R$${fmt(Math.round(metrics.ltv))}`, color: metrics.ltv > 0 ? GREEN : AMBER,   desc: `(Ticket × Margem) ÷ Churn${churnIsEstimado ? ' ref.' : ''}` },
   ]
 
