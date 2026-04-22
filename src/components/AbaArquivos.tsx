@@ -11,11 +11,11 @@ export interface CockpitSnapshot {
   nome: string
   empresa: string
   createdAt: string
-  inputs: Record<string, number>
+  inputs: Record<string, number | string>
   metrics: {
     healthScore: number; margem: number; runway: number; lucro: number
     ltvCac: number; ltv: number; breakeven: number; roi: number; margemReal: number
-    runwayCritico?: boolean; roiIneficiente?: boolean; breakevenMeta?: boolean
+    runwayCritico?: boolean; runwayProtegido?: boolean; roiIneficiente?: boolean; breakevenMeta?: boolean
   }
   iaResponse: string
   selicRate: number; ipcaRate: number; usdRate: number

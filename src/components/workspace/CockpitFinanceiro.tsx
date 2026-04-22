@@ -54,6 +54,12 @@ const ZERO_DEFAULT = {
   modelosReceita: [] as string[], objetivos: [] as string[],
   faseNegocio: '', motivoCaixaZero: '',
   ticketProjetado: 0, margemEstimada: 0,
+  // Calibragem profunda
+  naturezaCobranca: '',   // 'recorrente' | 'unica' | 'hibrida'
+  cicloMedioMeses: 0,     // permanência média do cliente em meses
+  complexidadeVenda: '',  // 'self-service' | 'consultivo'
+  aporteMensal: 0,        // injeção mensal do sócio/bootstrap (R$)
+  cargaTributaria: 0,     // % de impostos + taxas de transação
   // Legacy (migration compat)
   modeloReceita: '', objetivoAtual: '',
 }
@@ -453,10 +459,16 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     update({ objetivos: next })
   }
 
-  const faseNegocio     = data.faseNegocio     ?? ''; const setFaseNegocio     = (v: string) => update({ faseNegocio: v })
-  const motivoCaixaZero = data.motivoCaixaZero ?? ''; const setMotivoCaixaZero = (v: string) => update({ motivoCaixaZero: v })
-  const ticketProjetado = data.ticketProjetado ?? 0;  const setTicketProjetado = (v: number) => update({ ticketProjetado: v })
-  const margemEstimada  = data.margemEstimada  ?? 0;  const setMargemEstimada  = (v: number) => update({ margemEstimada: v })
+  const faseNegocio      = data.faseNegocio      ?? ''; const setFaseNegocio      = (v: string) => update({ faseNegocio: v })
+  const motivoCaixaZero  = data.motivoCaixaZero  ?? ''; const setMotivoCaixaZero  = (v: string) => update({ motivoCaixaZero: v })
+  const ticketProjetado  = data.ticketProjetado  ?? 0;  const setTicketProjetado  = (v: number) => update({ ticketProjetado: v })
+  const margemEstimada   = data.margemEstimada   ?? 0;  const setMargemEstimada   = (v: number) => update({ margemEstimada: v })
+  // Calibragem profunda
+  const naturezaCobranca  = data.naturezaCobranca  ?? ''; const setNaturezaCobranca  = (v: string) => update({ naturezaCobranca: v })
+  const cicloMedioMeses   = data.cicloMedioMeses   ?? 0;  const setCicloMedioMeses   = (v: number) => update({ cicloMedioMeses: v })
+  const complexidadeVenda = data.complexidadeVenda ?? ''; const setComplexidadeVenda = (v: string) => update({ complexidadeVenda: v })
+  const aporteMensal      = data.aporteMensal      ?? 0;  const setAporteMensal      = (v: number) => update({ aporteMensal: v })
+  const cargaTributaria   = data.cargaTributaria   ?? 0;  const setCargaTributaria   = (v: number) => update({ cargaTributaria: v })
 
   // Cálculo automático ou manual
   const ticketMedio = modoManual ? ticketManual : (clientesAtivos > 0 ? receita / clientesAtivos : 0)
@@ -514,6 +526,9 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const churnEfetivo     = churnMensal > 0 ? churnMensal : churnRefNum
   const cacIsEstimado    = cac === 0
   const churnIsEstimado  = churnMensal === 0
+  // Churn implícito via ciclo médio de permanência (quando churn real = 0 e ciclo informado)
+  const churnImplicito = churnMensal === 0 && cicloMedioMeses > 0 ? 100 / cicloMedioMeses : 0
+  const churnParaLTV   = churnMensal > 0 ? churnMensal : churnImplicito > 0 ? churnImplicito : churnRefNum
 
   // Fórmulas de sensibilidade (sempre calculadas, independem de dados completos)
   const taxaRealExata    = ((1 + selicRate / 100) / (1 + ipcaRate / 100) - 1) * 100
@@ -523,42 +538,53 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const custoGiroMensal  = despesas > 0 ? despesas * (selicRate * 2.5 / 100) / 12 : 0
 
   const metrics = useMemo(() => {
-    // ── COALESCE: margem — se receita=0, usa 30% como alvo de consultoria ──
-    // Permite que LTV, break-even e health score não colem em zero
+    // ── COALESCE: margem — se receita=0, usa calibragem/benchmark ──
     const margemIsEstimada = receita === 0
-    const margemDecimal    = receita > 0 ? (receita - despesas) / receita : calibragemMargem
-    const margem           = margemDecimal * 100
+    const margemBruta      = receita > 0 ? (receita - despesas) / receita * 100 : calibragemMargem * 100
+    // Margem líquida: desconta carga tributária + taxas de transação se informada
+    const margemLiquida    = cargaTributaria > 0 ? Math.max(margemBruta - cargaTributaria, 0) : margemBruta
+    const margemDecimal    = margemLiquida / 100
+    const margem           = margemLiquida
     const lucro            = receita - despesas
     const burnLiquido      = despesas - receita
 
-    // ── ENGRENAGEM 3: Runway Adaptativo ───────────────────────────────────
-    const burnParaRunway = burnReal > 0 ? burnReal : (despesas > 0 ? despesas : 0)
-    const runway         = burnParaRunway > 0
-      ? (lucro >= 0 ? 999 : Math.max(0, caixa / burnParaRunway))
-      : (lucro >= 0 ? 999 : 0)
-    const runwayCritico  = runway === 0 && despesas > 0
+    // ── ENGRENAGEM 3: Runway com Aporte ──────────────────────────────────
+    const burnParaRunway    = burnReal > 0 ? burnReal : (despesas > 0 ? despesas : 0)
+    const cobertura         = receita + aporteMensal  // total de caixa que entra por mês
+    const burnEfetivo       = Math.max(0, burnParaRunway - aporteMensal)  // burn que não é coberto pela receita normal já está em burnParaRunway
+    const runwayProtegido   = aporteMensal > 0 && aporteMensal >= burnParaRunway && lucro < 0
+    const runway            = runwayProtegido
+      ? 999
+      : burnEfetivo > 0
+        ? (cobertura >= burnParaRunway ? 999 : Math.max(0, caixa / burnEfetivo))
+        : (lucro >= 0 ? 999 : 0)
+    const runwayCritico     = runway === 0 && despesas > 0 && !runwayProtegido
 
-    // LTV usa margem efetiva (30% estimada se receita=0) + churnEfetivo
+    // ── LTV por natureza de cobrança ──────────────────────────────────────
     const margemLtv      = Math.max(margemDecimal, 0.1)
     const ltvMult        = bm?.ltvMult ?? 1
-    const ltv            = ticketEfetivo > 0 && churnEfetivo > 0
-      ? (ticketEfetivo * margemLtv) / (churnEfetivo / 100)
-      : bm && ticketEfetivo > 0
-      ? ticketEfetivo * margemLtv * ltvMult
-      : ltvRefNum
+    const ltv = naturezaCobranca === 'unica'
+      // Venda única: LTV = ticket × margem (sem recorrência, sem divisor de churn)
+      ? (ticketEfetivo > 0 ? ticketEfetivo * margemLtv : ltvRefNum)
+      : ticketEfetivo > 0 && churnParaLTV > 0
+        // Recorrente/híbrido: fórmula clássica churn
+        ? (ticketEfetivo * margemLtv) / (churnParaLTV / 100)
+        : bm && ticketEfetivo > 0
+        ? ticketEfetivo * margemLtv * ltvMult
+        : ltvRefNum
+
     const ltvCac         = cacEfetivo > 0 && ltv > 0 ? ltv / cacEfetivo : 0
     const burnRatio      = receita > 0 ? 1 - despesas / receita : 0
-    const runwayNorm     = Math.min((runway === 999 ? 24 : runway) / 24, 1) * 100
+    const runwayParaNorm = runwayProtegido ? 12 : (runway === 999 ? 24 : runway)
+    const runwayNorm     = Math.min(runwayParaNorm / 24, 1) * 100
     const ltvCacNorm     = Math.min(ltvCac / 5, 1) * 100
     const burnNorm       = Math.max(burnRatio, 0) * 100
-    const semDados       = receita === 0 && despesas === 0 && caixa === 0
+    const semDados       = receita === 0 && despesas === 0 && caixa === 0 && aporteMensal === 0
     const healthBase     = semDados ? 0 : Math.round(margem * 0.22 + runwayNorm * 0.35 + ltvCacNorm * 0.18 + burnNorm * 0.12)
     const sectorBonus    = Math.round((sectorHeat / 100) * 13)
     const healthScore    = semDados ? 0 : Math.min(100, healthBase + sectorBonus)
 
     // ── ENGRENAGEM 1: Break-even Universal ───────────────────────────────
-    // Sem receita: break-even de sobrevivência = despesas totais (sem margem alvo)
-    // Com receita: BurnReal / (1 − margemReal)
     const burnBase       = burnReal > 0 ? burnReal : (despesas > 0 ? despesas : 0)
     const breakeven      = burnBase > 0
       ? (receita === 0 ? despesas : burnBase / (1 - Math.max(margemDecimal, 0.05)))
@@ -566,19 +592,18 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     const breakevenAlert = receita > 0 && breakeven > receita
     const breakevenMeta  = receita === 0 && despesas > 0
 
-    // ── ENGRENAGEM 2: ROI Anualizado baseado em LTV/CAC (universal) ───────
+    // ── ENGRENAGEM 2: ROI Anualizado baseado em LTV/CAC ──────────────────
     const cacAdj            = cacEfetivo * (usdRate / 4.50)
     const roi               = cacAdj > 0 ? ((ltv - cacAdj) / cacAdj) * 12 * 100 : 0
-    // ROI sem receita real = estimado (não confiável, não sinaliza como ineficiente)
     const roiIneficiente    = receita > 0 && roi < selicRate && (despesas > 0 || receita > 0)
-    const roiSemValidacao   = receita === 0 && (despesas > 0) // ROI alto mas sem receita real
+    const roiSemValidacao   = receita === 0 && (despesas > 0)
 
     // ── ENGRENAGEM 4: Margem Real Fisher ──────────────────────────────────
     const margemReal     = margem - taxaRealExata
 
-    return { margem, margemIsEstimada, lucro, runway, runwayCritico, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, roiIneficiente, roiSemValidacao, breakevenAlert, breakevenMeta, semDados, margemReal }
+    return { margem, margemIsEstimada, lucro, runway, runwayCritico, runwayProtegido, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, roiIneficiente, roiSemValidacao, breakevenAlert, breakevenMeta, semDados, margemReal }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receita, despesas, caixa, cacEfetivo, ticketMedio, ticketEfetivo, churnEfetivo, ltvRefNum, sectorHeat, taxaRealExata, burnReal, usdRate, selicRate, calibragemMargem, bm])
+  }, [receita, despesas, caixa, cacEfetivo, ticketMedio, ticketEfetivo, churnEfetivo, churnParaLTV, ltvRefNum, sectorHeat, taxaRealExata, burnReal, usdRate, selicRate, calibragemMargem, bm, aporteMensal, cargaTributaria, naturezaCobranca])
 
   // origem: verde = seus dados, amarelo = ref.mercado, azul = calculado/fundido
   const O_REAL  = { text: 'seus dados',   color: GREEN }
@@ -609,14 +634,21 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
         tip: 'Apenas infoprodutos chegam perto de 87% — revise se impostos, plataformas e suporte estão incluídos nas despesas',
       })
     }
+    if (complexidadeVenda === 'consultivo' && cacEfetivo > 0 && ticketEfetivo > 0 && cacEfetivo > ticketEfetivo * 0.2) {
+      alerts.push({
+        field: 'CAC × Ticket',
+        msg: `CAC R$${fmt(Math.round(cacEfetivo))} acima de 20% do ticket R$${fmt(Math.round(ticketEfetivo))} em venda consultiva`,
+        tip: 'Venda consultiva (reuniões, SDR, proposta) tem custo alto — ticket precisa ser alto o suficiente para sustentá-la. Meta: CAC < 20% do ticket',
+      })
+    }
     return alerts
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receita, despesas, metrics.margem])
+  }, [receita, despesas, metrics.margem, complexidadeVenda, cacEfetivo, ticketEfetivo])
 
   const metricCards = useMemo(() => [
     { label: 'Health Score',   value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: sanityAlerts.length > 0 ? `⚠ Dados incompletos — corrija os avisos abaixo para um diagnóstico confiável` : `Nota geral do negócio (0–100): pondera margem, runway, LTV/CAC, setor e burn. >70 = saudável`, origin: O_FUND },
     { label: 'Margem',         value: `${fmtDec(metrics.margem, 2)}%`, color: colorByRange(metrics.margem, 20, 10),   desc: metrics.margemIsEstimada ? `Estimada (referência do modelo) — preencha Receita para valor real` : `De cada R$100 de receita, R$${(metrics.margem).toFixed(0)} sobram após pagar as despesas`, origin: metrics.margemIsEstimada ? O_REF : receita > 0 && despesas > 0 ? O_REAL : O_CALC },
-    { label: 'Runway',         value: metrics.runwayCritico ? '0,0 meses ⚠' : metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway, 2)} meses`, color: metrics.runwayCritico ? RED : colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: metrics.runwayCritico ? 'CRÍTICO — o caixa já acabou com despesas ativas' : `Quanto tempo o caixa dura no ritmo atual de gastos. Mínimo saudável: 6 meses`, origin: caixa > 0 || despesas > 0 ? O_REAL : O_CALC },
+    { label: 'Runway',         value: metrics.runwayProtegido ? 'Protegido — aporte ativo' : metrics.runwayCritico ? '0,0 meses ⚠' : metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway, 2)} meses`, color: metrics.runwayProtegido ? GREEN : metrics.runwayCritico ? RED : colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: metrics.runwayProtegido ? `Aporte mensal de R$${fmt(aporteMensal)} cobre o burn — sem prazo de extinção imediato` : metrics.runwayCritico ? 'CRÍTICO — o caixa já acabou com despesas ativas' : `Quanto tempo o caixa dura no ritmo atual de gastos. Mínimo saudável: 6 meses`, origin: caixa > 0 || despesas > 0 || aporteMensal > 0 ? O_REAL : O_CALC },
     { label: 'Lucro Mensal',   value: `R$${fmt(metrics.lucro)}`,     color: metrics.lucro >= 0 ? GREEN : RED,         desc: `O que sobra (ou falta) no mês: receita menos todas as despesas. Negativo = prejuízo operacional`, origin: receita > 0 || despesas > 0 ? O_REAL : O_CALC },
     { label: 'Burn Líquido',   value: metrics.burnLiquido > 0 ? `-R$${fmt(metrics.burnLiquido)}/mês` : `+R$${fmt(Math.abs(metrics.burnLiquido))}/mês`, color: metrics.burnLiquido > 0 ? RED : GREEN, desc: metrics.burnLiquido > 0 ? `Você está gastando R$${fmt(metrics.burnLiquido)} a mais do que ganha por mês` : `Você está gerando R$${fmt(Math.abs(metrics.burnLiquido))} de sobra por mês`, origin: despesas > 0 ? O_REAL : O_CALC },
     { label: 'LTV/CAC',        value: `${fmtDec(metrics.ltvCac, 2)}x`, color: colorByRange(metrics.ltvCac, 3, 1),    desc: `Para cada R$1 gasto para adquirir um cliente, você recupera R$${fmtDec(metrics.ltvCac, 1)}. Meta mínima: 3x${cacIsEstimado || metrics.margemIsEstimada ? ' (dados estimados)' : ''}`, origin: cacIsEstimado || churnIsEstimado ? O_FUND : O_CALC },
@@ -748,8 +780,8 @@ Relatório em 4 seções:
       nome: saveNome.trim() || `${nomeNegocio || 'Diagnóstico'} — ${new Date().toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })}`,
       empresa: nomeNegocio || 'Empresa',
       createdAt: new Date().toISOString(),
-      inputs: { receita, despesas, caixa, verbaMkt, clientesAtivos, novosClientes, clientesPerdidos, cacManual, ticketManual, churnManual, modelosReceita, objetivos, faseNegocio, motivoCaixaZero, ticketProjetado, margemEstimada },
-      metrics: { healthScore: metrics.healthScore, margem: metrics.margem, runway: metrics.runway, lucro: metrics.lucro, ltvCac: metrics.ltvCac, ltv: metrics.ltv, breakeven: metrics.breakeven, roi: metrics.roi, margemReal: metrics.margemReal, runwayCritico: metrics.runwayCritico, roiIneficiente: metrics.roiIneficiente, breakevenMeta: metrics.breakevenMeta },
+      inputs: { receita, despesas, caixa, verbaMkt, clientesAtivos, novosClientes, clientesPerdidos, cacManual, ticketManual, churnManual, modelosReceita, objetivos, faseNegocio, motivoCaixaZero, ticketProjetado, margemEstimada, naturezaCobranca, cicloMedioMeses, complexidadeVenda, aporteMensal, cargaTributaria },
+      metrics: { healthScore: metrics.healthScore, margem: metrics.margem, runway: metrics.runway, lucro: metrics.lucro, ltvCac: metrics.ltvCac, ltv: metrics.ltv, breakeven: metrics.breakeven, roi: metrics.roi, margemReal: metrics.margemReal, runwayCritico: metrics.runwayCritico, runwayProtegido: metrics.runwayProtegido, roiIneficiente: metrics.roiIneficiente, breakevenMeta: metrics.breakevenMeta },
       iaResponse, selicRate, ipcaRate, usdRate, sectorLabel, sectorHeat,
     }
     try {
@@ -785,6 +817,24 @@ Relatório em 4 seções:
   return (
     <motion.div ref={pdfRef} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
       className="flex flex-col gap-6 p-4" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
+
+      {/* ── DESCRIÇÃO DO COCKPIT ── */}
+      <div className="rounded-lg px-4 py-3" style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', letterSpacing: '0.1em', marginBottom: 10 }}>PARA QUE SERVE O COCKPIT</p>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+          {([
+            { title: 'Parar de Chutar',    desc: 'Diz se o seu preço (ticket) realmente paga o seu custo real (burn). Sem achismo.' },
+            { title: 'Alerta de Colisão',  desc: 'Avisa antes do dinheiro acabar — o Runway mostra quantos meses de fôlego você tem hoje.' },
+            { title: 'Filtro de Ruído',    desc: 'Separa o que importa agora do que pode esperar. Foco no gargalo real, não no que aparece mais.' },
+            { title: 'Prova de Valor',     desc: 'O que você mostra para sócio, investidor ou cliente para provar viabilidade em números.' },
+          ] as { title: string; desc: string }[]).map(item => (
+            <div key={item.title}>
+              <p style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>{item.title}</p>
+              <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', lineHeight: 1.55 }}>{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* ── CONTEXTO DO ONBOARDING COMPLETO ── */}
       {benchmark && (
@@ -916,6 +966,117 @@ Relatório em 4 seções:
                     </select>
                     <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', lineHeight: 1.4 }}>Contexto que muda o diagnóstico — "zerado por reinvestimento" é diferente de "zerado por dívida"</p>
                   </div>
+                </div>
+
+                {/* ── Natureza da Cobrança ── */}
+                <div className="flex flex-col gap-2 pt-3 border-t border-white/5">
+                  <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>Natureza da cobrança <span style={{ color: 'rgba(255,255,255,0.25)' }}>— como o dinheiro entra</span></label>
+                  <div className="flex gap-2 flex-wrap">
+                    {[
+                      { v: 'recorrente', label: 'Recorrente', desc: 'assinatura, mensalidade' },
+                      { v: 'unica',      label: 'Única',      desc: 'curso, produto, projeto' },
+                      { v: 'hibrida',    label: 'Híbrida',    desc: 'setup + mensalidade' },
+                    ].map(({ v, label, desc }) => {
+                      const sel = naturezaCobranca === v
+                      return (
+                        <button key={v} onClick={() => setNaturezaCobranca(sel ? '' : v)}
+                          className="flex flex-col px-3 py-2 rounded-lg transition-all"
+                          style={{ border: `1px solid ${sel ? BLUE + '70' : 'rgba(255,255,255,0.1)'}`, background: sel ? `${BLUE}18` : 'rgba(255,255,255,0.03)', textAlign: 'left' }}>
+                          <span style={{ fontSize: 11, color: sel ? '#5dade2' : 'rgba(255,255,255,0.5)', fontWeight: sel ? 600 : 400 }}>{sel ? '✓ ' : ''}{label}</span>
+                          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)' }}>{desc}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {naturezaCobranca === 'unica' && (
+                    <p style={{ fontSize: 10, color: AMBER, lineHeight: 1.5 }}>
+                      LTV = ticket × margem (sem recorrência). ROI depende de volume constante de novas vendas.
+                    </p>
+                  )}
+                  {naturezaCobranca !== 'unica' && naturezaCobranca !== '' && (
+                    <div className="flex flex-col gap-1.5 mt-1">
+                      <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
+                        Ciclo médio de permanência do cliente{cicloMedioMeses > 0 ? ` — ${cicloMedioMeses} meses (churn implícito ${fmtDec(100 / cicloMedioMeses, 1)}%/mês)` : ' — opcional'}
+                      </label>
+                      <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <input type="number" min={0} value={cicloMedioMeses || ''}
+                          placeholder="ex: 6 meses"
+                          onChange={e => setCicloMedioMeses(parseFloat(e.target.value) || 0)}
+                          className="bg-transparent outline-none flex-1"
+                          style={{ fontSize: 14, fontFamily: 'monospace', color: '#fff', border: 'none' }} />
+                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>meses</span>
+                        {cicloMedioMeses > 0 && <button onClick={() => setCicloMedioMeses(0)} style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* ── Complexidade de Venda ── */}
+                <div className="flex flex-col gap-2">
+                  <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>Como você fecha vendas</label>
+                  <div className="flex gap-2">
+                    {[
+                      { v: 'self-service', label: 'Self-service', desc: 'cliente compra sozinho, sem reunião' },
+                      { v: 'consultivo',   label: 'Consultivo',    desc: 'reunião, proposta, SDR, negociação' },
+                    ].map(({ v, label, desc }) => {
+                      const sel = complexidadeVenda === v
+                      return (
+                        <button key={v} onClick={() => setComplexidadeVenda(sel ? '' : v)}
+                          className="flex flex-col flex-1 px-3 py-2 rounded-lg transition-all"
+                          style={{ border: `1px solid ${sel ? AMBER + '60' : 'rgba(255,255,255,0.1)'}`, background: sel ? `${AMBER}12` : 'rgba(255,255,255,0.03)', textAlign: 'left' }}>
+                          <span style={{ fontSize: 11, color: sel ? AMBER : 'rgba(255,255,255,0.5)', fontWeight: sel ? 600 : 400 }}>{sel ? '✓ ' : ''}{label}</span>
+                          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)' }}>{desc}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {complexidadeVenda === 'consultivo' && (
+                    <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', lineHeight: 1.5 }}>
+                      CAC consultivo inclui custo de vendedor + tempo de proposta. Meta: CAC &lt; 20% do ticket.
+                    </p>
+                  )}
+                </div>
+
+                {/* ── Aporte Mensal ── */}
+                <div className="flex flex-col gap-1.5">
+                  <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
+                    Aporte mensal{aporteMensal > 0 ? ` — R$${fmt(aporteMensal)}/mês injetados` : ' — opcional'}
+                  </label>
+                  <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', fontFamily: 'monospace' }}>R$</span>
+                    <input type="number" min={0} value={aporteMensal || ''}
+                      placeholder="0"
+                      onChange={e => setAporteMensal(parseFloat(e.target.value) || 0)}
+                      className="bg-transparent outline-none flex-1"
+                      style={{ fontSize: 14, fontFamily: 'monospace', color: '#fff', border: 'none' }} />
+                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>/mês</span>
+                    {aporteMensal > 0 && <button onClick={() => setAporteMensal(0)} style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>}
+                  </div>
+                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', lineHeight: 1.4 }}>
+                    Injeção de sócio/bootstrap que cobre burn — altera o Runway de "Crítico" para "Protegido"
+                  </p>
+                </div>
+
+                {/* ── Carga Tributária ── */}
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
+                      Impostos + taxas de transação{cargaTributaria > 0 ? ` — ${fmtDec(cargaTributaria, 1)}% descontado da margem` : ' — opcional'}
+                    </label>
+                    {cargaTributaria > 0 && <button onClick={() => setCargaTributaria(0)} style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', background: 'none', border: 'none', cursor: 'pointer' }}>↺ remover</button>}
+                  </div>
+                  <div className="flex items-center gap-3 rounded-lg px-3 py-2" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <input type="range" min={0} max={40} step={0.5}
+                      value={cargaTributaria || 0}
+                      onChange={e => setCargaTributaria(Number(e.target.value))}
+                      style={{ flex: 1, accentColor: RED, height: 4 }} />
+                    <span style={{ fontSize: 14, fontFamily: 'monospace', color: cargaTributaria > 0 ? '#fff' : 'rgba(255,255,255,0.3)', minWidth: 36, textAlign: 'right' }}>
+                      {cargaTributaria > 0 ? fmtDec(cargaTributaria, 1) : '0'}%
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', lineHeight: 1.4 }}>
+                    Ex: Simples 6% + gateway 3% = 9%. Desconta direto da Margem para mostrar o que sobra de verdade.
+                  </p>
                 </div>
 
                 {/* Personalizar ticket e margem — opcionais, collapsíveis */}
