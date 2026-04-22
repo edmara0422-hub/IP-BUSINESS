@@ -62,8 +62,9 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
     const runwayNorm = Math.min((runway === 999 ? 24 : runway) / 24, 1) * 100
     const ltvCacNorm = Math.min(ltvCac / 5, 1) * 100
     const burnNorm = Math.max(burnRatio, 0) * 100
-    // Health Score: caixa/runway pesa mais (0.4)
-    const healthScore = Math.round(margem * 0.25 + runwayNorm * 0.4 + ltvCacNorm * 0.2 + burnNorm * 0.15)
+    // Health Score: só calcula se há pelo menos receita ou despesas reais
+    const semDados = receita === 0 && despesas === 0 && caixa === 0
+    const healthScore = semDados ? 0 : Math.round(margem * 0.25 + runwayNorm * 0.4 + ltvCacNorm * 0.2 + burnNorm * 0.15)
     const breakeven = margemDecimal > 0 ? despesas / margemDecimal : 0
     const roi = caixa > 0 ? (lucro * 12) / caixa * 100 : 0
     const breakevenAlert = breakeven > receita
