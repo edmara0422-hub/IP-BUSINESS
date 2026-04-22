@@ -48,7 +48,7 @@ function buildBenchmark(fase: string, setores: string[], produtos: string[], rev
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function CockpitFinanceiro({ marketData, userProfile }: { marketData: any; userProfile?: any }) {
+export default function CockpitFinanceiro({ marketData, userProfile, cockpitAlerts }: { marketData: any; userProfile?: any; cockpitAlerts?: string[] }) {
   const { data, update } = useWorkspaceData('cockpit', ZERO_DEFAULT)
   const [modoManual, setModoManual] = useState(false)
   const [iaLoading, setIaLoading]   = useState(false)
@@ -356,6 +356,25 @@ Seja direto, use os números reais, compare com os benchmarks informados.`
           </div>
         </div>
       </div>
+
+      {/* ── 4.5 ALERTAS DE MERCADO AUTOMÁTICOS ── */}
+      {cockpitAlerts && cockpitAlerts.length > 0 && (
+        <div className="rounded-lg overflow-hidden" style={{ border: `1px solid ${AMBER}30` }}>
+          <div className="px-3 py-2" style={{ background: `${AMBER}10` }}>
+            <p style={{ fontSize: 10, color: AMBER, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '0.1em', marginBottom: 6 }}>
+              ⚡ ALERTAS DE MERCADO — conectado ao Business
+            </p>
+            <div className="flex flex-col gap-2">
+              {cockpitAlerts.map((alert, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <span style={{ fontSize: 11, color: AMBER, marginTop: 1 }}>▸</span>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5 }}>{alert}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── 5. IA + PDF ── */}
       <div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useMarketData } from '@/hooks/useMarketData'
+import { useIntelligence } from '@/hooks/useIntelligence'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Brain, LayoutDashboard, Activity, Tag, Zap,
@@ -154,6 +155,7 @@ export default function AbaTrabalhar() {
   }
 
   const { marketData } = useMarketData()
+  const { intelligence } = useIntelligence(marketData)
 
   // Quando muda para consultoria, vai pro módulo consultoria
   const effectiveActiveId = contextMode === 'consultoria' ? 'consultoria' : activeId
@@ -169,7 +171,7 @@ export default function AbaTrabalhar() {
 
     switch (activeId) {
       case 'ia':         return <IAAdvisor marketData={marketData} userProfile={userProfile} contextMode="gestao" />
-      case 'cockpit':    return <CockpitFinanceiro marketData={marketData} userProfile={userProfile} />
+      case 'cockpit':    return <CockpitFinanceiro marketData={marketData} userProfile={userProfile} cockpitAlerts={intelligence.cockpit_alerts} />
       case 'cenarios':   return <CenariosForecast marketData={marketData} userProfile={userProfile} />
       case 'pricing':    return <SmartPricing marketData={marketData} userProfile={userProfile} />
       case 'esg':        return <ESGDiagnostico marketData={marketData} />
