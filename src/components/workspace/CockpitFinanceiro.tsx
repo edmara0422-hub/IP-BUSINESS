@@ -586,8 +586,35 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const O_CALC  = { text: 'calculado',    color: '#5dade2' }
   const O_FUND  = { text: 'fundido',      color: '#5dade2' }
 
+  const sanityAlerts = useMemo(() => {
+    const alerts: Array<{ field: string; msg: string; tip: string }> = []
+    if (despesas > 0 && despesas < 150) {
+      alerts.push({
+        field: 'Despesas',
+        msg: `R$${fmtDec(despesas, 2)} em despesas parece incompleto`,
+        tip: 'Inclua: pró-labore ou salários, aluguel/home office, ferramentas/software, impostos, fornecedores, plataformas, marketing',
+      })
+    }
+    if (receita > 0 && despesas === 0) {
+      alerts.push({
+        field: 'Despesas',
+        msg: 'Receita cadastrada mas despesas zeradas',
+        tip: 'Todo negócio tem custos — sem eles o lucro e a margem estão artificialmente inflados',
+      })
+    }
+    if (receita > 0 && despesas > 0 && metrics.margem > 95) {
+      alerts.push({
+        field: 'Margem',
+        msg: `Margem de ${fmtDec(metrics.margem, 1)}% é improvável`,
+        tip: 'Apenas infoprodutos chegam perto de 87% — revise se impostos, plataformas e suporte estão incluídos nas despesas',
+      })
+    }
+    return alerts
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [receita, despesas, metrics.margem])
+
   const metricCards = useMemo(() => [
-    { label: 'Health Score',   value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: `Nota geral do negócio (0–100): pondera margem, runway, LTV/CAC, setor e burn. >70 = saudável`, origin: O_FUND },
+    { label: 'Health Score',   value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: sanityAlerts.length > 0 ? `⚠ Dados incompletos — corrija os avisos abaixo para um diagnóstico confiável` : `Nota geral do negócio (0–100): pondera margem, runway, LTV/CAC, setor e burn. >70 = saudável`, origin: O_FUND },
     { label: 'Margem',         value: `${fmtDec(metrics.margem, 2)}%`, color: colorByRange(metrics.margem, 20, 10),   desc: metrics.margemIsEstimada ? `Estimada (referência do modelo) — preencha Receita para valor real` : `De cada R$100 de receita, R$${(metrics.margem).toFixed(0)} sobram após pagar as despesas`, origin: metrics.margemIsEstimada ? O_REF : receita > 0 && despesas > 0 ? O_REAL : O_CALC },
     { label: 'Runway',         value: metrics.runwayCritico ? '0,0 meses ⚠' : metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway, 2)} meses`, color: metrics.runwayCritico ? RED : colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: metrics.runwayCritico ? 'CRÍTICO — o caixa já acabou com despesas ativas' : `Quanto tempo o caixa dura no ritmo atual de gastos. Mínimo saudável: 6 meses`, origin: caixa > 0 || despesas > 0 ? O_REAL : O_CALC },
     { label: 'Lucro Mensal',   value: `R$${fmt(metrics.lucro)}`,     color: metrics.lucro >= 0 ? GREEN : RED,         desc: `O que sobra (ou falta) no mês: receita menos todas as despesas. Negativo = prejuízo operacional`, origin: receita > 0 || despesas > 0 ? O_REAL : O_CALC },
@@ -600,7 +627,7 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     { label: 'Churn',          value: `${fmtDec(churnEfetivo, 2)}%`, color: colorByRange(100 - churnEfetivo, 95, 90), desc: churnIsEstimado ? `Referência de mercado — preencha Clientes Ativos + Perdidos para o real` : `% de clientes que saíram este mês. Cada 1% a mais dobra o custo de crescimento`, origin: churnIsEstimado ? O_REF : O_REAL },
     { label: 'LTV',            value: `R$${fmt(Math.round(metrics.ltv))}`, color: metrics.ltv > 0 ? GREEN : AMBER,  desc: `Quanto um cliente vale no total enquanto fica com você (ticket × margem ÷ churn)`, origin: churnIsEstimado || ticketMedio === 0 ? O_FUND : O_CALC },
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [metrics, sectorHeat, receita, despesas, caixa, cacEfetivo, churnEfetivo, ticketMedio, cac, cacIsEstimado, churnIsEstimado, modoManual, selicRate])
+  ], [metrics, sanityAlerts, sectorHeat, receita, despesas, caixa, cacEfetivo, churnEfetivo, ticketMedio, cac, cacIsEstimado, churnIsEstimado, modoManual, selicRate])
 
   const benchmark = useMemo(
     () => fase ? buildBenchmark(fase, setores, produtos, revenue, nomeNegocio) : '',
@@ -1025,6 +1052,19 @@ Relatório em 4 seções:
           <AlertTriangle size={16} style={{ color: AMBER }} />
           <span style={{ fontSize: 14, fontWeight: 600 }}>Indicadores calculados</span>
         </div>
+
+        {sanityAlerts.length > 0 && (
+          <div className="mb-3 rounded-lg p-3 flex flex-col gap-2" style={{ background: `${AMBER}10`, border: `1px solid ${AMBER}40` }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: AMBER, letterSpacing: '0.05em' }}>⚠ DADOS INCOMPLETOS — diagnóstico pouco confiável</p>
+            {sanityAlerts.map(a => (
+              <div key={a.field} className="flex flex-col gap-0.5">
+                <span style={{ fontSize: 12, color: AMBER }}>{a.msg}</span>
+                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>{a.tip}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
         {metrics.breakevenAlert && (
           <div className="mb-3 rounded-lg px-3 py-2.5" style={{ background: `${RED}18`, border: `1px solid ${RED}40` }}>
             <span style={{ fontSize: 12, color: RED, fontFamily: 'monospace', fontWeight: 700 }}>
