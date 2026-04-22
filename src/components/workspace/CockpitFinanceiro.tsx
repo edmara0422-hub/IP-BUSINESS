@@ -436,7 +436,15 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     const margem         = margemDecimal * 100
     const lucro          = receita - despesas
     const burnLiquido    = despesas - receita
-    const runway         = burnLiquido > 0 ? caixa / burnLiquido : (lucro >= 0 ? 999 : caixa / despesas)
+
+    // ── ENGRENAGEM 3: Runway Adaptativo ───────────────────────────────────
+    // Usa burnReal (custo oculto SELIC incluído). Caixa=0 → 0 meses (CRÍTICO).
+    const burnParaRunway = burnReal > 0 ? burnReal : (despesas > 0 ? despesas : 0)
+    const runway         = burnParaRunway > 0
+      ? (lucro >= 0 ? 999 : Math.max(0, caixa / burnParaRunway))
+      : (lucro >= 0 ? 999 : 0)
+    const runwayCritico  = runway === 0 && despesas > 0
+
     // LTV usa churnEfetivo — não retorna 0 quando churn não foi preenchido
     const margemLtv      = Math.max(margemDecimal, 0.1)
     const ltv            = ticketMedio > 0 && churnEfetivo > 0
@@ -452,12 +460,30 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     const healthBase     = semDados ? 0 : Math.round(margem * 0.22 + runwayNorm * 0.35 + ltvCacNorm * 0.18 + burnNorm * 0.12)
     const sectorBonus    = Math.round((sectorHeat / 100) * 13)
     const healthScore    = semDados ? 0 : Math.min(100, healthBase + sectorBonus)
-    const breakeven      = margemDecimal > 0 ? despesas / margemDecimal : 0
-    const roi            = caixa > 0 ? (lucro * 12) / caixa * 100 : 0
-    const breakevenAlert = breakeven > receita && receita > 0
+
+    // ── ENGRENAGEM 1: Break-even Universal (Meta de Sobrevivência) ────────
+    // Fórmula: BurnReal / (1 − margemAlvo/100)
+    // Com receita: usa margem real (min 5%). Sem receita: usa 20% como alvo.
+    // Nunca retorna 0 quando há despesas.
+    const margemAlvo     = receita > 0 && margem > 5 ? margem : 20
+    const burnBase       = burnReal > 0 ? burnReal : (despesas > 0 ? despesas : 0)
+    const breakeven      = burnBase > 0 ? burnBase / (1 - margemAlvo / 100) : 0
+    const breakevenAlert = receita > 0 && breakeven > receita
+    const breakevenMeta  = receita === 0 && despesas > 0  // modo meta de sobrevivência
+
+    // ── ENGRENAGEM 2: ROI Anualizado baseado em LTV/CAC (universal) ───────
+    // Fórmula: ((LTV − CAC_ajustado) / CAC_ajustado) × 12 × 100
+    // Funciona sem caixa. Compara com SELIC como piso.
+    const cacAdj         = cacEfetivo * (usdRate / 4.50)
+    const roi            = cacAdj > 0 ? ((ltv - cacAdj) / cacAdj) * 12 * 100 : 0
+    const roiIneficiente = roi < selicRate && (despesas > 0 || receita > 0)
+
+    // ── ENGRENAGEM 4: Margem Real Fisher ──────────────────────────────────
     const margemReal     = margem - taxaRealExata
-    return { margem, lucro, runway, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, breakevenAlert, semDados, margemReal }
-  }, [receita, despesas, caixa, cacEfetivo, ticketMedio, churnEfetivo, ltvRefNum, sectorHeat, taxaRealExata])
+
+    return { margem, lucro, runway, runwayCritico, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, roiIneficiente, breakevenAlert, breakevenMeta, semDados, margemReal }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [receita, despesas, caixa, cacEfetivo, ticketMedio, churnEfetivo, ltvRefNum, sectorHeat, taxaRealExata, burnReal, usdRate, selicRate])
 
   // origem: verde = seus dados, amarelo = ref.mercado, azul = calculado/fundido
   const O_REAL  = { text: 'seus dados',   color: GREEN }
@@ -468,12 +494,12 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const metricCards = useMemo(() => [
     { label: 'Health Score',   value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: `setor ${sectorHeat}/100 + runway + margem + LTV/CAC + burn`, origin: O_FUND },
     { label: 'Margem',         value: `${fmtDec(metrics.margem, 2)}%`, color: colorByRange(metrics.margem, 20, 10),   desc: '(receita − despesas) / receita', origin: receita > 0 && despesas > 0 ? O_REAL : O_CALC },
-    { label: 'Runway',         value: metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway, 2)} meses`, color: colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: 'Caixa ÷ burn real', origin: caixa > 0 || despesas > 0 ? O_REAL : O_CALC },
+    { label: 'Runway',         value: metrics.runwayCritico ? '0,0 meses ⚠' : metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway, 2)} meses`, color: metrics.runwayCritico ? RED : colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: metrics.runwayCritico ? 'CRÍTICO — caixa zerado com despesas ativas' : 'Caixa ÷ burn real (SELIC inclusa)', origin: caixa > 0 || despesas > 0 ? O_REAL : O_CALC },
     { label: 'Lucro Mensal',   value: `R$${fmt(metrics.lucro)}`,     color: metrics.lucro >= 0 ? GREEN : RED,         desc: 'Receita − despesas', origin: receita > 0 || despesas > 0 ? O_REAL : O_CALC },
     { label: 'Burn Líquido',   value: metrics.burnLiquido > 0 ? `-R$${fmt(metrics.burnLiquido)}/mês` : `+R$${fmt(Math.abs(metrics.burnLiquido))}/mês`, color: metrics.burnLiquido > 0 ? RED : GREEN, desc: 'Despesas − receitas', origin: despesas > 0 ? O_REAL : O_CALC },
     { label: 'LTV/CAC',        value: `${fmtDec(metrics.ltvCac, 2)}x`, color: colorByRange(metrics.ltvCac, 3, 1),    desc: `LTV R$${metrics.ltv.toFixed(2)}`, origin: cacIsEstimado || churnIsEstimado ? O_FUND : O_CALC },
-    { label: 'Break-even',     value: `R$${fmt(metrics.breakeven)}`, color: metrics.breakevenAlert ? RED : BLUE,      desc: metrics.breakevenAlert ? '⚠ Receita abaixo do break-even!' : 'Receita mínima para cobrir custos', origin: receita > 0 && despesas > 0 ? O_REAL : O_CALC },
-    { label: 'ROI Anualizado', value: `${fmtDec(metrics.roi, 2)}%`,  color: metrics.roi >= 0 ? GREEN : RED,          desc: 'Retorno sobre capital investido (anual)', origin: caixa > 0 && (receita > 0 || despesas > 0) ? O_REAL : O_CALC },
+    { label: 'Break-even',     value: `R$${fmt(metrics.breakeven)}`, color: metrics.breakevenAlert ? RED : metrics.breakevenMeta ? AMBER : BLUE, desc: metrics.breakevenAlert ? '⚠ Receita abaixo do break-even!' : metrics.breakevenMeta ? `meta sobrevivência — faturar R$${fmt(metrics.breakeven)} p/ cobrir custos` : 'BurnReal ÷ (1 − margem)', origin: despesas > 0 ? O_FUND : O_CALC },
+    { label: 'ROI Anualizado', value: `${fmtDec(metrics.roi, 2)}%`,  color: metrics.roiIneficiente ? AMBER : metrics.roi >= 0 ? GREEN : RED, desc: metrics.roiIneficiente ? `⚠ ROI < SELIC ${selicRate}% — negócio rende menos que o banco` : '(LTV − CAC) / CAC × 12 meses', origin: O_FUND },
     { label: 'Ticket Médio',   value: `R$${fmt(ticketMedio)}`,       color: ticketMedio > 0 ? BLUE : AMBER,          desc: modoManual ? 'manual' : 'receita ÷ clientes ativos', origin: ticketMedio > 0 ? O_REAL : null },
     { label: 'CAC',            value: `R$${fmt(cacEfetivo)}`,        color: cac > 0 ? BLUE : AMBER,                  desc: cacIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'verba ÷ novos clientes', origin: cacIsEstimado ? O_REF : O_REAL },
     { label: 'Churn',          value: `${fmtDec(churnEfetivo, 2)}%`, color: colorByRange(100 - churnEfetivo, 95, 90), desc: churnIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'perdidos ÷ ativos × 100', origin: churnIsEstimado ? O_REF : O_REAL },
@@ -829,7 +855,7 @@ REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
         const cdiAnual  = selicRate - 0.1
         const roiVsCdi  = metrics.roi - cdiAnual
         const pts = [
-          metrics.runway > 6 ? 1 : metrics.runway > 3 ? 0 : -1,
+          metrics.runwayCritico ? -2 : metrics.runway > 6 ? 1 : metrics.runway > 3 ? 0 : -1,
           sectorHeat > 70 ? 1 : sectorHeat > 40 ? 0 : -1,
           metrics.margemReal > 5 ? 1 : metrics.margemReal > 0 ? 0 : -1,
           roiVsCdi > 5 ? 1 : roiVsCdi > -5 ? 0 : -1,
