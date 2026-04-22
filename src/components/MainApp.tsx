@@ -1,20 +1,18 @@
 'use client'
 
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bell, BookOpen, Briefcase, Globe, Search, LogOut, Shield, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { useAccessibility } from '@/hooks/useAccessibility'
-import { createClient } from '@/lib/supabase/client'
 
 type Tab = 'business' | 'estudo' | 'admin'
 
 const AbaBusiness  = dynamic(() => import('@/components/AbaBusiness'),   { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
 const AbaEstudo    = dynamic(() => import('@/components/AbaEstudo'),     { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
 const AbaWorkspace = dynamic(() => import('@/components/AbaTrabalhar'),  { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
-const WorkspaceOnboarding = dynamic(() => import('@/components/WorkspaceOnboarding'), { ssr: false, loading: () => null })
 
 function ShellBackdrop() {
   return (
@@ -205,36 +203,7 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
 export default function MainApp() {
   useAccessibility()
   const [activeTab, setActiveTab] = useState<Tab>('business')
-  const [workspaceReady, setWorkspaceReady] = useState(false)
-  const [workspaceLoading, setWorkspaceLoading] = useState(true)
-  const { user, profile } = useAuth()
-  const supabase = useMemo(() => createClient(), [])
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && localStorage.getItem('ipb-workspace-ready') === '1') {
-      setWorkspaceReady(true)
-      setWorkspaceLoading(false)
-      return
-    }
-    if (!user) { setWorkspaceLoading(false); return }
-    supabase
-      .from('workspace_profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) {
-          localStorage.setItem('ipb-workspace-ready', '1')
-          setWorkspaceReady(true)
-        }
-        setWorkspaceLoading(false)
-      })
-  }, [user, supabase])
-
-  const handleWorkspaceComplete = (_p: unknown) => {
-    localStorage.setItem('ipb-workspace-ready', '1')
-    setWorkspaceReady(true)
-  }
+  const { profile } = useAuth()
 
   return (
     <motion.div
@@ -252,13 +221,7 @@ export default function MainApp() {
             {activeTab === 'business'  && <AbaBusiness key="business" />}
             {activeTab === 'estudo'    && <AbaEstudo key="estudo" />}
 
-            {activeTab === 'admin' && (
-              workspaceLoading
-                ? <div key="ws-loading" className="glass-card min-h-[32rem] p-6 flex items-center justify-center"><span className="text-[0.7rem] uppercase tracking-[0.3em] text-white/30">Carregando workspace...</span></div>
-                : workspaceReady
-                  ? <AbaWorkspace key="workspace" />
-                  : <WorkspaceOnboarding key="onboarding" onComplete={handleWorkspaceComplete} />
-            )}
+            {activeTab === 'admin' && <AbaWorkspace key="workspace" />}
           </AnimatePresence>
         </div>
       </div>

@@ -149,13 +149,6 @@ export default function AbaTrabalhar() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id])
 
-  const handleRefazer = async () => {
-    if (user) {
-      await supabase.from('workspace_profiles').delete().eq('user_id', user.id)
-    }
-    localStorage.removeItem('ipb-workspace-ready')
-    window.location.reload()
-  }
 
   const { marketData } = useMarketData()
   const { intelligence } = useIntelligence(marketData)
@@ -306,7 +299,6 @@ export default function AbaTrabalhar() {
                 {userProfile.sectors?.length > 0 && (
                   <p className="text-[10px] text-white/25 truncate mt-0.5">{userProfile.sectors[0]}</p>
                 )}
-                <button onClick={handleRefazer} className="font-mono text-[8px] text-white/20 hover:text-white/40 transition-colors mt-1">alterar fase</button>
               </div>
             )
           })()}
@@ -398,9 +390,6 @@ export default function AbaTrabalhar() {
                 ))}
               </div>
             </div>
-            <button onClick={handleRefazer} className="w-full text-center font-mono text-[10px] text-white/15 hover:text-white/35 transition-colors py-1">
-              Refazer configuração
-            </button>
           </div>
         </div>
 
@@ -466,7 +455,6 @@ export default function AbaTrabalhar() {
             </button>
           ))}
         </div>
-        <button onClick={handleRefazer} className="font-mono text-[9px] text-white/15">Refazer</button>
       </div>
     </div>
   )
