@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Calculator, TrendingUp, AlertTriangle, Brain, FolderPlus, Loader2, FileDown, ToggleLeft, ToggleRight } from 'lucide-react'
 import { useWorkspaceData } from '@/hooks/useWorkspaceData'
@@ -407,7 +407,15 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const [showCalib,     setShowCalib]     = useState(false)
   const [modoManual,    setModoManual]    = useState(false)
   const [iaLoading,     setIaLoading]     = useState(false)
+  const [iaCooldown,    setIaCooldown]    = useState(0)
   const [iaResponse,    setIaResponse]    = useState('')
+
+  // Countdown tick
+  useEffect(() => {
+    if (iaCooldown <= 0) return
+    const t = setTimeout(() => setIaCooldown(c => Math.max(0, c - 1)), 1000)
+    return () => clearTimeout(t)
+  }, [iaCooldown])
   const [pdfLoading,    setPdfLoading]    = useState(false)
   const [showSave,      setShowSave]      = useState(false)
   const [saveNome,      setSaveNome]      = useState('')
@@ -702,6 +710,7 @@ Relatório em 4 seções:
     } finally {
       clearTimeout(timer)
       setIaLoading(false)
+      setIaCooldown(90) // 90s entre chamadas — evita exceder 6k TPM do Groq
     }
   }
 
@@ -1214,12 +1223,17 @@ Relatório em 4 seções:
             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>Preencha Receita, Despesas ou Caixa para ativar o diagnóstico IA</p>
           </div>
         )}
-        <button onClick={handleIA} disabled={iaLoading || metrics.semDados}
+        <button onClick={handleIA} disabled={iaLoading || metrics.semDados || iaCooldown > 0}
           className="w-full rounded-lg py-3 flex items-center justify-center gap-2 transition-opacity hover:opacity-90 disabled:opacity-40"
-          style={{ background: BLUE, color: '#fff', fontSize: 14, fontWeight: 600, cursor: (iaLoading || metrics.semDados) ? 'not-allowed' : 'pointer' }}>
+          style={{ background: iaCooldown > 0 ? 'rgba(26,82,118,0.4)' : BLUE, color: '#fff', fontSize: 14, fontWeight: 600, cursor: (iaLoading || metrics.semDados || iaCooldown > 0) ? 'not-allowed' : 'pointer' }}>
           {iaLoading ? <Loader2 size={16} className="animate-spin" /> : <Brain size={16} />}
-          {iaLoading ? 'Analisando...' : 'Analisar com IA — Diagnóstico completo'}
+          {iaLoading ? 'Analisando...' : iaCooldown > 0 ? `Aguardar ${iaCooldown}s para nova análise` : 'Analisar com IA — Diagnóstico completo'}
         </button>
+        {iaCooldown > 0 && (
+          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', textAlign: 'center', marginTop: 4 }}>
+            Limite de chamadas Groq — próxima análise em {iaCooldown}s
+          </p>
+        )}
 
         {iaResponse && (
           <>
