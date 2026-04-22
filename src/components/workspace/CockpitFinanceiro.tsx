@@ -555,99 +555,63 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const handleIA = async () => {
     setIaLoading(true)
     setIaResponse('')
-
-    // ── Extração completa de marketData ────────────────────────────────────
-    const pibRate      = marketData?.macro?.pib?.value              ?? 1.9
-    const cpmUsd       = marketData?.marketing?.cpmGlobal?.value    ?? 0
-    const cpcUsd       = marketData?.marketing?.cpcGlobal?.value    ?? 0
-    const organicPct   = marketData?.marketing?.organicShare?.value ?? 0
-    const organicDelta = marketData?.marketing?.organicShare?.delta ?? 0
-    const cacRef       = marketData?.marketing?.cacTrend?.value     ?? 0
-    const ltvRef       = 156
-    const churnRef     = 4.2
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const platforms    = (marketData?.platforms ?? []) as Array<{ id: string; label: string; cpm: number; delta: number }>
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const metaAgent    = marketData?.globalAgents?.find((a: any) => a.id === 'meta')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const googleAgent  = marketData?.globalAgents?.find((a: any) => a.id === 'googl')
-    // commodities é objeto {oil:{...}} — acesso direto pela chave
-    const petroleo     = marketData?.commodities?.oil
-    const briefing     = marketData?.briefing ?? ''
-
-    const userSectorIdIA = SECTOR_MAP[setores[0] ?? ''] ?? null
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userSectorData = userSectorIdIA ? (marketData?.sectors ?? []).find((s: any) => s.id === userSectorIdIA) : null
-    const sectorHeat  = (userSectorData as any)?.heat  ?? 0
-    const sectorLabel = (userSectorData as any)?.label ?? setores[0] ?? 'não definido'
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const bestPlatform = platforms.length > 0 ? platforms.reduce((a: any, b: any) => a.cpm < b.cpm ? a : b) : null
-
-    // ── Fórmulas de sensibilidade (precisão máxima, sem arredondamento) ────
-    // Taxa real exata — fórmula Fisher: ((1+SELIC)/(1+IPCA))−1
-    const taxaRealExata   = ((1 + selicRate / 100) / (1 + ipcaRate / 100) - 1) * 100
-    // Burn real: despesas + impacto oculto de crédito mais caro com SELIC alta
-    const burnReal        = despesas + despesas * (selicRate / 100) * 0.2
-    // Custo mensal se financiar via capital de giro bancário (SELIC × 2.5)
-    const custoGiroMensal = despesas * (selicRate * 2.5 / 100) / 12
-    // CAC ajustado ao câmbio atual (base histórico R$4,50)
-    const cacBase         = cac > 0 ? cac : cacRef
-    const cacAjustado     = cacBase * (usdRate / 4.50)
-    // CPM convertido para R$ (custo por 1000 impressões)
-    const cpmReais        = cpmUsd * usdRate
-    // Margem real líquida após taxa real
-    const margemReal      = metrics.margem - taxaRealExata
-    // Break-even inflacionado em 12 meses
-    const breakevenInflado = metrics.breakeven * (1 + ipcaRate / 100)
-    // CDI mensal (proxy)
-    const cdiAnual        = selicRate - 0.1
-    // ROI vs CDI gap
-    const roiCdiGap       = metrics.roi - cdiAnual
-
-    const platformLines = platforms.slice(0, 6).map((p: any) =>
-      `  ${p.label}: US$${p.cpm.toFixed(2)} = R$${(p.cpm * usdRate).toFixed(2)}/mil impressões${p.id === bestPlatform?.id ? ' ← MELHOR CUSTO AGORA' : ''}`
-    ).join('\n')
-
-    const question = `Analista financeiro PME Brasil. Responda em PT-BR, sem arredondamento.
-
-NEGÓCIO: ${nomeNegocio || '?'} | Fase: ${fase || '?'} | Setor: ${sectorLabel} ${sectorHeat}/100 | Produto: ${produtos[0] || '?'}
-MACRO: SELIC ${selicRate}% | IPCA ${ipcaRate}% | USD R$${usdRate.toFixed(2)} | PIB ${pibRate.toFixed(1)}%
-
-DADOS FUNDIDOS:
-Receita R$${receita.toFixed(2)} | Despesas R$${despesas.toFixed(2)} | Caixa R$${caixa.toFixed(2)}
-Burn Real R$${burnReal.toFixed(2)}/mês (SELIC +R$${(despesas * selicRate / 100 * 0.2).toFixed(2)} oculto)
-Margem ${metrics.margem.toFixed(2)}%${receita === 0 ? ' (alvo 30%, receita R$0)' : ''} | Margem Real ${margemReal.toFixed(2)}% | Taxa Fisher ${taxaRealExata.toFixed(2)}%
-Runway ${metrics.runway >= 999 ? '∞' : metrics.runway.toFixed(1) + 'm'}${metrics.runwayCritico ? ' ⚠CRÍTICO' : ''} | Health ${metrics.healthScore}/100
-LTV R$${metrics.ltv.toFixed(2)} | CAC ajust R$${cacAjustado.toFixed(2)} | LTV/CAC ${metrics.ltvCac.toFixed(2)}x
-ROI ${metrics.roi.toFixed(2)}% vs CDI ${(selicRate - 0.1).toFixed(1)}%${metrics.roiSemValidacao ? ' ⚠SEM RECEITA REAL' : ''}
-Break-even R$${metrics.breakeven.toFixed(2)}${metrics.breakevenMeta ? ' (sobrevivência)' : ''}
-Canal mais barato: ${bestPlatform?.label ?? 'orgânico'} R$${((bestPlatform?.cpm ?? 0) * usdRate).toFixed(2)}/mil
-${benchmark ? `Benchmark ${fase}: ${benchmark}` : ''}
-
-Gere relatório em 4 seções curtas:
-1. DIAGNÓSTICO (2-3 linhas com os valores acima)
-2. SEMÁFORO 🔴🟡🟢 (Burn Real, Margem Real, Runway, LTV/CAC, ROI vs CDI)
-3. PLANO 7/30/90 dias (ações específicas com valores reais do setor ${sectorLabel})
-4. FRASE EXECUTIVA (1 frase, 3 números críticos)`
-
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), 25000)
     try {
+      const pibRate      = marketData?.macro?.pib?.value           ?? 1.9
+      const cpmUsd       = marketData?.marketing?.cpmGlobal?.value ?? 0
+      const cacRef       = marketData?.marketing?.cacTrend?.value  ?? 0
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const platforms    = (marketData?.platforms ?? []) as Array<{ id: string; label: string; cpm: number; delta: number }>
+      const userSectorIdIA  = SECTOR_MAP[setores[0] ?? ''] ?? null
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const userSectorData  = userSectorIdIA ? (marketData?.sectors ?? []).find((s: any) => s.id === userSectorIdIA) : null
+      const sectorHeatIA    = (userSectorData as any)?.heat  ?? 0
+      const sectorLabelIA   = (userSectorData as any)?.label ?? setores[0] ?? 'não definido'
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const bestPlatform    = platforms.length > 0 ? platforms.reduce((a: any, b: any) => (a.cpm ?? 999) < (b.cpm ?? 999) ? a : b) : null
+
+      const taxaRealIA  = ((1 + selicRate / 100) / (1 + ipcaRate / 100) - 1) * 100
+      const burnRealIA  = despesas + despesas * (selicRate / 100) * 0.2
+      const cacBase     = cac > 0 ? cac : cacRef
+      const cacAjustIA  = cacBase * (usdRate / 4.50)
+      const cpmReais    = cpmUsd * usdRate
+      const margemRealIA = metrics.margem - taxaRealIA
+
+      const question = `Analista financeiro PME Brasil. Responda em PT-BR.
+
+NEGÓCIO: ${nomeNegocio || '?'} | Fase: ${fase || '?'} | Setor: ${sectorLabelIA} ${sectorHeatIA}/100 | Produto: ${produtos[0] || '?'}
+MACRO: SELIC ${selicRate}% | IPCA ${ipcaRate}% | USD R$${usdRate.toFixed(2)} | PIB ${pibRate.toFixed(1)}%
+
+DADOS:
+Receita R$${receita.toFixed(2)} | Despesas R$${despesas.toFixed(2)} | Caixa R$${caixa.toFixed(2)}
+Burn Real R$${burnRealIA.toFixed(2)}/mês | Margem ${metrics.margem.toFixed(2)}%${receita === 0 ? ' (ref 30%)' : ''} | Margem Real ${margemRealIA.toFixed(2)}%
+Runway ${metrics.runway >= 999 ? '∞' : metrics.runway.toFixed(1) + 'm'}${metrics.runwayCritico ? ' ⚠CRÍTICO' : ''} | Health ${metrics.healthScore}/100
+LTV R$${metrics.ltv.toFixed(2)} | CAC R$${cacAjustIA.toFixed(2)} | LTV/CAC ${metrics.ltvCac.toFixed(2)}x
+ROI ${metrics.roi.toFixed(2)}% vs CDI ${(selicRate - 0.1).toFixed(1)}%${metrics.roiSemValidacao ? ' ⚠ESTIMADO' : ''}
+Break-even R$${metrics.breakeven.toFixed(2)} | Canal barato: ${bestPlatform?.label ?? 'orgânico'} R$${((bestPlatform?.cpm ?? 0) * usdRate).toFixed(2)}/mil
+${benchmark ? `Ref ${fase}: ${benchmark}` : ''}
+
+Relatório em 4 seções:
+1. DIAGNÓSTICO (2-3 linhas com valores acima)
+2. SEMÁFORO 🔴🟡🟢 (Burn Real, Margem Real, Runway, LTV/CAC, ROI)
+3. PLANO 7/30/90 dias (ações concretas para ${sectorLabelIA})
+4. FRASE EXECUTIVA (1 frase, 3 números)`
+
       const res = await fetch('/api/advisor-chat', {
         method: 'POST',
         signal: controller.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           question,
-          marketContext: `BurnReal R$${burnReal.toFixed(2)} | TaxaReal ${taxaRealExata.toFixed(4)}% | CACajustado R$${cacAjustado.toFixed(2)} | CPM R$${cpmReais.toFixed(2)}/mil | Setor ${sectorLabel} ${sectorHeat}/100`,
+          marketContext: `Burn R$${burnRealIA.toFixed(2)} | TaxaReal ${taxaRealIA.toFixed(2)}% | CAC R$${cacAjustIA.toFixed(2)} | CPM R$${cpmReais.toFixed(2)}/mil | ${sectorLabelIA} ${sectorHeatIA}/100`,
         }),
       })
       const d = await res.json()
       setIaResponse(d.answer ?? 'Sem resposta da IA.')
     } catch (e: unknown) {
       const isAbort = e instanceof Error && e.name === 'AbortError'
-      setIaResponse(isAbort ? 'Tempo limite atingido (25s). Tente novamente — o Groq pode estar sobrecarregado.' : 'Erro ao conectar com a IA.')
+      setIaResponse(isAbort ? 'Tempo limite (25s). Tente novamente.' : 'Erro ao conectar com a IA.')
     } finally {
       clearTimeout(timer)
       setIaLoading(false)

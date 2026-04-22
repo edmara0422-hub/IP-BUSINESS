@@ -125,7 +125,7 @@ Responda APENAS JSON válido:
       method: 'POST',
       headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'llama3-8b-8192',
+        model: 'gemma2-9b-it',
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 1200,
         temperature: 0.25,
