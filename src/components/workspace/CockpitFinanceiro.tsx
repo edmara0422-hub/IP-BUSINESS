@@ -20,24 +20,30 @@ function colorByRange(v: number, g: number, a: number) { return v >= g ? GREEN :
 
 // ── TASK 1: Tabela de benchmarks por modelo de receita ─────────────────────
 const MODEL_BENCHMARKS: Record<string, {
-  label: string; margemRef: number; churnRef: number
+  label: string; exemplo: string; margemRef: number; churnRef: number
   ltvMult: number; cacTeto: number; ticketRef: number; churnDesc: string
 }> = {
-  saas:        { label: 'SaaS / Assinatura',    margemRef: 80, churnRef: 3,  ltvMult: 24,  cacTeto: 3.0,  ticketRef: 97,  churnDesc: 'baixo — recorrência alta' },
-  fisico:      { label: 'Produto Físico',        margemRef: 32, churnRef: 40, ltvMult: 2,   cacTeto: 0.2,  ticketRef: 150, churnDesc: 'alto — compra esporádica' },
-  servico:     { label: 'Serviço / Consultoria', margemRef: 60, churnRef: 15, ltvMult: 6,   cacTeto: 0.5,  ticketRef: 500, churnDesc: 'médio — retenção é chave' },
-  ecommerce:   { label: 'E-commerce',            margemRef: 27, churnRef: 38, ltvMult: 3,   cacTeto: 0.25, ticketRef: 100, churnDesc: 'alto — recompra é desafio' },
-  infoproduto: { label: 'Infoproduto / Curso',   margemRef: 87, churnRef: 60, ltvMult: 1.5, cacTeto: 0.4,  ticketRef: 197, churnDesc: 'muito alto — front-end intenso' },
-  marketplace: { label: 'Marketplace',           margemRef: 15, churnRef: 20, ltvMult: 12,  cacTeto: 2.0,  ticketRef: 50,  churnDesc: 'médio — volume é tudo' },
+  saas:        { label: 'SaaS / Assinatura',      exemplo: 'software, app, plataforma digital com plano mensal/anual',     margemRef: 80, churnRef: 3,  ltvMult: 24,  cacTeto: 3.0,  ticketRef: 97,    churnDesc: 'baixo — recorrência alta' },
+  servico:     { label: 'Serviço / Consultoria',  exemplo: 'agência, consultoria, freelancer, contabilidade, advocacia',    margemRef: 60, churnRef: 15, ltvMult: 6,   cacTeto: 0.5,  ticketRef: 500,   churnDesc: 'médio — retenção é chave' },
+  clinica:     { label: 'Clínica / Saúde',        exemplo: 'médico, psicólogo, dentista, fisioterapeuta, nutricionista',    margemRef: 48, churnRef: 8,  ltvMult: 10,  cacTeto: 1.0,  ticketRef: 280,   churnDesc: 'baixo — vínculo forte com profissional' },
+  educacao:    { label: 'Educação / Mentoria',     exemplo: 'escola, professor particular, mentor, coach, treinamento',     margemRef: 65, churnRef: 18, ltvMult: 5,   cacTeto: 0.6,  ticketRef: 350,   churnDesc: 'médio — resultado percebido é chave' },
+  infoproduto: { label: 'Infoproduto / Curso',    exemplo: 'curso online, ebook, workshop, comunidade, masterclass',        margemRef: 87, churnRef: 60, ltvMult: 1.5, cacTeto: 0.4,  ticketRef: 197,   churnDesc: 'muito alto — front-end intenso' },
+  ecommerce:   { label: 'E-commerce',             exemplo: 'loja online, dropshipping, marketplace próprio, D2C',           margemRef: 27, churnRef: 38, ltvMult: 3,   cacTeto: 0.25, ticketRef: 100,   churnDesc: 'alto — recompra é desafio' },
+  varejo:      { label: 'Varejo Físico / Loja',   exemplo: 'loja física, boutique, papelaria, pet shop, farmácia',          margemRef: 28, churnRef: 45, ltvMult: 2.5, cacTeto: 0.1,  ticketRef: 120,   churnDesc: 'muito alto — tráfego local é chave' },
+  alimentacao: { label: 'Alimentação / Delivery', exemplo: 'restaurante, lanchonete, confeitaria, dark kitchen, marmitex',  margemRef: 22, churnRef: 35, ltvMult: 4,   cacTeto: 0.15, ticketRef: 60,    churnDesc: 'alto — experiência e localização' },
+  fisico:      { label: 'Produto Físico / Indústria', exemplo: 'fabricante, artesão, cosmético próprio, suplemento, roupa', margemRef: 32, churnRef: 40, ltvMult: 2,   cacTeto: 0.2,  ticketRef: 150,   churnDesc: 'alto — compra esporádica' },
+  projetos:    { label: 'Projetos / Obra / Evento', exemplo: 'construtora, arquitetura, eventos, produção audiovisual',    margemRef: 20, churnRef: 70, ltvMult: 1.2, cacTeto: 0.3,  ticketRef: 5000,  churnDesc: 'muito alto — cada projeto é novo cliente' },
+  marketplace: { label: 'Marketplace / Plataforma', exemplo: 'intermediador entre oferta e demanda, hub de serviços',      margemRef: 15, churnRef: 20, ltvMult: 12,  cacTeto: 2.0,  ticketRef: 50,    churnDesc: 'médio — volume e liquidez são tudo' },
+  agro:        { label: 'Agronegócio / Produção', exemplo: 'produtor rural, pecuária, aquicultura, cooperativa agrícola',   margemRef: 18, churnRef: 90, ltvMult: 1.0, cacTeto: 0.05, ticketRef: 10000, churnDesc: 'sazonal — ciclo anual de receita' },
 }
 
-// ── TASK 2: Motor de perfis de maturidade ───────────────────────────────────
+// Perfis de maturidade
 type MaturityProfile = 'ideia' | 'pre-receita' | 'solvencia' | 'fluxo' | 'escala'
 function detectProfile(receita: number, caixa: number, despesas: number, fase: string, motivoCaixaZero: string, margem: number): MaturityProfile {
   if (receita === 0 && despesas === 0 && caixa === 0) return 'ideia'
-  if (receita === 0 && despesas > 0 && (fase === 'validacao' || motivoCaixaZero === 'pre-receita' || motivoCaixaZero === 'lancando')) return 'pre-receita'
-  if (receita > 0 && caixa === 0 && despesas > 0 && motivoCaixaZero !== 'reinvestido') return 'solvencia'
-  if (caixa === 0 && margem > 40 && motivoCaixaZero === 'reinvestido') return 'fluxo'
+  if (receita === 0 && despesas > 0 && (fase === 'validacao' || ['pre-receita', 'lancando'].includes(motivoCaixaZero))) return 'pre-receita'
+  if (receita > 0 && caixa === 0 && despesas > 0 && motivoCaixaZero === 'zerado-problema') return 'solvencia'
+  if (caixa === 0 && margem > 40 && motivoCaixaZero === 'zerado-intencional') return 'fluxo'
   return 'escala'
 }
 
@@ -281,7 +287,7 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
 }
 
 // Input numérico com estado local de string — permite digitar e ver 0 explicitamente
-function NumInput({ label, value, onChange, prefix = 'R$' }: { label: string; value: number; onChange: (v: number) => void; prefix?: string }) {
+function NumInput({ label, value, onChange, prefix = 'R$', info }: { label: string; value: number; onChange: (v: number) => void; prefix?: string; info?: string }) {
   const [str, setStr] = useState(value === 0 ? '' : String(value))
 
   // Sincroniza quando valor externo muda (ex: reset)
@@ -293,7 +299,7 @@ function NumInput({ label, value, onChange, prefix = 'R$' }: { label: string; va
   }
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-1">
       <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.02em' }}>{label}</label>
       <div className="flex items-center gap-2 rounded-lg px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.1)' }}>
         {prefix && <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', userSelect: 'none', flexShrink: 0 }}>{prefix}</span>}
@@ -306,6 +312,7 @@ function NumInput({ label, value, onChange, prefix = 'R$' }: { label: string; va
           style={{ fontSize: 15, fontFamily: 'monospace', color: '#fff', border: 'none' }}
         />
       </div>
+      {info && <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', lineHeight: 1.4, marginTop: 1 }}>{info}</p>}
     </div>
   )
 }
@@ -425,8 +432,9 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const churnManual  = data.churnManual  ?? 0; const setChurnManual  = (v: number) => update({ churnManual: v })
 
   // Calibragem de contexto (Smart Setup) — multi-select com migração de dados legados
-  const modelosReceita: string[] = data.modelosReceita?.length ? data.modelosReceita : (data.modeloReceita ? [data.modeloReceita] : [])
-  const objetivos: string[]      = data.objetivos?.length      ? data.objetivos      : (data.objetivoAtual  ? [data.objetivoAtual]  : [])
+  // Array.isArray preserva [] vazio corretamente (data.modelosReceita?.length falha com [])
+  const modelosReceita: string[] = Array.isArray(data.modelosReceita) ? data.modelosReceita : (data.modeloReceita ? [data.modeloReceita] : [])
+  const objetivos: string[]      = Array.isArray(data.objetivos)      ? data.objetivos      : (data.objetivoAtual  ? [data.objetivoAtual]  : [])
 
   const toggleModelo = (v: string) => {
     const next = modelosReceita.includes(v) ? modelosReceita.filter(x => x !== v) : [...modelosReceita, v]
@@ -571,18 +579,18 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const O_FUND  = { text: 'fundido',      color: '#5dade2' }
 
   const metricCards = useMemo(() => [
-    { label: 'Health Score',   value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: `setor ${sectorHeat}/100 + runway + margem + LTV/CAC + burn`, origin: O_FUND },
-    { label: 'Margem',         value: `${fmtDec(metrics.margem, 2)}%`, color: colorByRange(metrics.margem, 20, 10),   desc: metrics.margemIsEstimada ? 'alvo referência 30% — sem receita real' : '(receita − despesas) / receita', origin: metrics.margemIsEstimada ? O_REF : receita > 0 && despesas > 0 ? O_REAL : O_CALC },
-    { label: 'Runway',         value: metrics.runwayCritico ? '0,0 meses ⚠' : metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway, 2)} meses`, color: metrics.runwayCritico ? RED : colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: metrics.runwayCritico ? 'CRÍTICO — caixa zerado com despesas ativas' : 'Caixa ÷ burn real (SELIC inclusa)', origin: caixa > 0 || despesas > 0 ? O_REAL : O_CALC },
-    { label: 'Lucro Mensal',   value: `R$${fmt(metrics.lucro)}`,     color: metrics.lucro >= 0 ? GREEN : RED,         desc: 'Receita − despesas', origin: receita > 0 || despesas > 0 ? O_REAL : O_CALC },
-    { label: 'Burn Líquido',   value: metrics.burnLiquido > 0 ? `-R$${fmt(metrics.burnLiquido)}/mês` : `+R$${fmt(Math.abs(metrics.burnLiquido))}/mês`, color: metrics.burnLiquido > 0 ? RED : GREEN, desc: 'Despesas − receitas', origin: despesas > 0 ? O_REAL : O_CALC },
-    { label: 'LTV/CAC',        value: `${fmtDec(metrics.ltvCac, 2)}x`, color: colorByRange(metrics.ltvCac, 3, 1),    desc: `LTV R$${metrics.ltv.toFixed(2)}${cacIsEstimado || metrics.margemIsEstimada ? ' · dados estimados' : ''}`, origin: cacIsEstimado || churnIsEstimado ? O_FUND : O_CALC },
-    { label: 'Break-even',     value: `R$${fmt(metrics.breakeven)}`, color: metrics.breakevenAlert ? RED : metrics.breakevenMeta ? AMBER : BLUE, desc: metrics.breakevenAlert ? '⚠ Receita abaixo do break-even!' : metrics.breakevenMeta ? `sobrevivência — você precisa de R$${fmt(metrics.breakeven)}/mês para cobrir custos` : 'BurnReal ÷ (1 − margem)', origin: despesas > 0 ? O_FUND : O_CALC },
-    { label: 'ROI Anualizado', value: `${fmtDec(metrics.roi, 2)}%`,  color: metrics.roiSemValidacao ? AMBER : metrics.roiIneficiente ? AMBER : metrics.roi >= 0 ? GREEN : RED, desc: metrics.roiSemValidacao ? `⚠ ROI Estimado — sem validação real (Receita R$0). Insira receita p/ confirmar.` : metrics.roiIneficiente ? `⚠ ROI < SELIC ${selicRate}% — negócio rende menos que o banco` : '(LTV − CAC) / CAC × 12 meses', origin: O_FUND },
-    { label: 'Ticket Médio',   value: `R$${fmt(ticketEfetivo)}`,     color: ticketMedio > 0 ? BLUE : ticketEfetivo > 0 ? AMBER : AMBER, desc: modoManual ? 'manual' : ticketMedio > 0 ? 'receita ÷ clientes ativos' : ticketProjetado > 0 ? 'ticket projetado' : bm ? `ref. ${bm.label}` : 'insira receita + clientes para calcular', origin: ticketMedio > 0 ? O_REAL : ticketEfetivo > 0 ? O_REF : null },
-    { label: 'CAC',            value: `R$${fmt(cacEfetivo)}`,        color: cac > 0 ? BLUE : AMBER,                  desc: cacIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'verba ÷ novos clientes', origin: cacIsEstimado ? O_REF : O_REAL },
-    { label: 'Churn',          value: `${fmtDec(churnEfetivo, 2)}%`, color: colorByRange(100 - churnEfetivo, 95, 90), desc: churnIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'perdidos ÷ ativos × 100', origin: churnIsEstimado ? O_REF : O_REAL },
-    { label: 'LTV',            value: `R$${fmt(Math.round(metrics.ltv))}`, color: metrics.ltv > 0 ? GREEN : AMBER,  desc: `(Ticket × Margem) ÷ Churn`, origin: churnIsEstimado || ticketMedio === 0 ? O_FUND : O_CALC },
+    { label: 'Health Score',   value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: `Nota geral do negócio (0–100): pondera margem, runway, LTV/CAC, setor e burn. >70 = saudável`, origin: O_FUND },
+    { label: 'Margem',         value: `${fmtDec(metrics.margem, 2)}%`, color: colorByRange(metrics.margem, 20, 10),   desc: metrics.margemIsEstimada ? `Estimada (referência do modelo) — preencha Receita para valor real` : `De cada R$100 de receita, R$${(metrics.margem).toFixed(0)} sobram após pagar as despesas`, origin: metrics.margemIsEstimada ? O_REF : receita > 0 && despesas > 0 ? O_REAL : O_CALC },
+    { label: 'Runway',         value: metrics.runwayCritico ? '0,0 meses ⚠' : metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway, 2)} meses`, color: metrics.runwayCritico ? RED : colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: metrics.runwayCritico ? 'CRÍTICO — o caixa já acabou com despesas ativas' : `Quanto tempo o caixa dura no ritmo atual de gastos. Mínimo saudável: 6 meses`, origin: caixa > 0 || despesas > 0 ? O_REAL : O_CALC },
+    { label: 'Lucro Mensal',   value: `R$${fmt(metrics.lucro)}`,     color: metrics.lucro >= 0 ? GREEN : RED,         desc: `O que sobra (ou falta) no mês: receita menos todas as despesas. Negativo = prejuízo operacional`, origin: receita > 0 || despesas > 0 ? O_REAL : O_CALC },
+    { label: 'Burn Líquido',   value: metrics.burnLiquido > 0 ? `-R$${fmt(metrics.burnLiquido)}/mês` : `+R$${fmt(Math.abs(metrics.burnLiquido))}/mês`, color: metrics.burnLiquido > 0 ? RED : GREEN, desc: metrics.burnLiquido > 0 ? `Você está gastando R$${fmt(metrics.burnLiquido)} a mais do que ganha por mês` : `Você está gerando R$${fmt(Math.abs(metrics.burnLiquido))} de sobra por mês`, origin: despesas > 0 ? O_REAL : O_CALC },
+    { label: 'LTV/CAC',        value: `${fmtDec(metrics.ltvCac, 2)}x`, color: colorByRange(metrics.ltvCac, 3, 1),    desc: `Para cada R$1 gasto para adquirir um cliente, você recupera R$${fmtDec(metrics.ltvCac, 1)}. Meta mínima: 3x${cacIsEstimado || metrics.margemIsEstimada ? ' (dados estimados)' : ''}`, origin: cacIsEstimado || churnIsEstimado ? O_FUND : O_CALC },
+    { label: 'Break-even',     value: `R$${fmt(metrics.breakeven)}`, color: metrics.breakevenAlert ? RED : metrics.breakevenMeta ? AMBER : BLUE, desc: metrics.breakevenAlert ? `⚠ Você precisa aumentar receita em R$${fmt(metrics.breakeven - receita)} para cobrir os custos` : metrics.breakevenMeta ? `Quanto você precisa faturar por mês para sobreviver (cobrir todas as despesas)` : `Receita mínima para cobrir todos os custos com a margem atual`, origin: despesas > 0 ? O_FUND : O_CALC },
+    { label: 'ROI Anualizado', value: `${fmtDec(metrics.roi, 2)}%`,  color: metrics.roiSemValidacao ? AMBER : metrics.roiIneficiente ? AMBER : metrics.roi >= 0 ? GREEN : RED, desc: metrics.roiSemValidacao ? `⚠ Estimado — sem receita real para confirmar. Preencha Receita` : metrics.roiIneficiente ? `⚠ Seu retorno anual é menor que a SELIC ${selicRate}% — o banco paga mais que seu negócio` : `Retorno anual do capital investido em aquisição de clientes`, origin: O_FUND },
+    { label: 'Ticket Médio',   value: `R$${fmt(ticketEfetivo)}`,     color: ticketMedio > 0 ? BLUE : ticketEfetivo > 0 ? AMBER : AMBER, desc: ticketMedio > 0 ? `Valor médio que cada cliente paga por mês (receita ÷ clientes ativos)` : ticketProjetado > 0 ? `Ticket que você projetou na calibragem` : bm ? `Referência do modelo ${bm.label}` : `Preencha Receita + Clientes Ativos para calcular`, origin: ticketMedio > 0 ? O_REAL : ticketEfetivo > 0 ? O_REF : null },
+    { label: 'CAC',            value: `R$${fmt(cacEfetivo)}`,        color: cac > 0 ? BLUE : AMBER,                  desc: cac > 0 ? `Quanto você gasta para conquistar 1 novo cliente (verba ÷ novos clientes)` : `Referência de mercado — preencha Verba Mkt + Novos Clientes para o seu dado real`, origin: cacIsEstimado ? O_REF : O_REAL },
+    { label: 'Churn',          value: `${fmtDec(churnEfetivo, 2)}%`, color: colorByRange(100 - churnEfetivo, 95, 90), desc: churnIsEstimado ? `Referência de mercado — preencha Clientes Ativos + Perdidos para o real` : `% de clientes que saíram este mês. Cada 1% a mais dobra o custo de crescimento`, origin: churnIsEstimado ? O_REF : O_REAL },
+    { label: 'LTV',            value: `R$${fmt(Math.round(metrics.ltv))}`, color: metrics.ltv > 0 ? GREEN : AMBER,  desc: `Quanto um cliente vale no total enquanto fica com você (ticket × margem ÷ churn)`, origin: churnIsEstimado || ticketMedio === 0 ? O_FUND : O_CALC },
   // eslint-disable-next-line react-hooks/exhaustive-deps
   ], [metrics, sectorHeat, receita, despesas, caixa, cacEfetivo, churnEfetivo, ticketMedio, cac, cacIsEstimado, churnIsEstimado, modoManual, selicRate])
 
@@ -729,8 +737,8 @@ Relatório em 4 seções:
     setSavingArq(false)
   }
 
-  const inputNum = (label: string, value: number, setter: (v: number) => void, prefix = 'R$') => (
-    <NumInput label={label} value={value} onChange={setter} prefix={prefix} />
+  const inputNum = (label: string, value: number, setter: (v: number) => void, prefix = 'R$', info?: string) => (
+    <NumInput label={label} value={value} onChange={setter} prefix={prefix} info={info} />
   )
 
   const cdiMensal    = (selicRate - 0.1) / 12
@@ -803,9 +811,16 @@ Relatório em 4 seções:
                     })}
                   </div>
                   {bm && (
-                    <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', lineHeight: 1.4 }}>
-                      {bm.label}: margem ref {bm.margemRef}% · churn {bm.churnRef}%/mês · ticket R${bm.ticketRef} · LTV {bm.ltvMult}x
-                    </p>
+                    <div className="flex flex-col gap-0.5">
+                      {bmList.map(mb => (
+                        <p key={mb.label} style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', lineHeight: 1.5 }}>
+                          <span style={{ color: 'rgba(255,255,255,0.35)' }}>{mb.label}</span> — {mb.exemplo}
+                        </p>
+                      ))}
+                      <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', marginTop: 2 }}>
+                        Benchmarks: margem {bm.margemRef}% · churn {bm.churnRef}%/mês · ticket R${bm.ticketRef} · LTV mult {bm.ltvMult}x
+                      </p>
+                    </div>
                   )}
                 </div>
 
@@ -816,9 +831,13 @@ Relatório em 4 seções:
                     {[
                       { v: 'validar',    label: 'Validar mercado' },
                       { v: 'crescer',    label: 'Crescer receita' },
+                      { v: 'lucrar',     label: 'Aumentar lucratividade' },
                       { v: 'sobreviver', label: 'Sobreviver / reduzir burn' },
+                      { v: 'reter',      label: 'Reter clientes' },
+                      { v: 'organizar',  label: 'Organizar operação' },
                       { v: 'escalar',    label: 'Escalar operação' },
                       { v: 'captar',     label: 'Captar investimento' },
+                      { v: 'vender',     label: 'Preparar para venda / exit' },
                     ].map(({ v: ov, label }) => {
                       const sel = objetivos.includes(ov)
                       return (
@@ -847,20 +866,20 @@ Relatório em 4 seções:
                       <option value="escala" style={{ background: '#0a0f1e' }}>Escala / maturidade</option>
                     </select>
                   </div>
-                  {caixa === 0 && despesas > 0 && (
-                    <div className="flex flex-col gap-1.5">
-                      <label style={{ fontSize: 11, color: AMBER }}>⚠ Caixa R$0 — por quê?</label>
-                      <select value={motivoCaixaZero} onChange={e => setMotivoCaixaZero(e.target.value)}
-                        className="rounded-lg px-3 py-2 outline-none"
-                        style={{ background: `${AMBER}08`, border: `1px solid ${AMBER}40`, fontSize: 12, color: motivoCaixaZero ? '#fff' : AMBER }}>
-                        <option value="">Selecionar...</option>
-                        <option value="pre-receita" style={{ background: '#0a0f1e' }}>Ainda não tenho receita</option>
-                        <option value="lancando" style={{ background: '#0a0f1e' }}>Estou lançando / investindo</option>
-                        <option value="reinvestido" style={{ background: '#0a0f1e' }}>Reinvisto tudo na operação</option>
-                        <option value="problema" style={{ background: '#0a0f1e' }}>Problema de fluxo / dívida</option>
-                      </select>
-                    </div>
-                  )}
+                  <div className="flex flex-col gap-1.5">
+                    <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Situação do caixa</label>
+                    <select value={motivoCaixaZero} onChange={e => setMotivoCaixaZero(e.target.value)}
+                      className="rounded-lg px-3 py-2 outline-none"
+                      style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)', fontSize: 12, color: motivoCaixaZero ? '#fff' : 'rgba(255,255,255,0.3)' }}>
+                      <option value="">Selecionar...</option>
+                      <option value="positivo" style={{ background: '#0a0f1e' }}>Tenho reserva / caixa positivo</option>
+                      <option value="pre-receita" style={{ background: '#0a0f1e' }}>Ainda sem receita / pré-operação</option>
+                      <option value="lancando" style={{ background: '#0a0f1e' }}>Lançando / investindo para crescer</option>
+                      <option value="zerado-intencional" style={{ background: '#0a0f1e' }}>Reinvisto tudo — caixa zerado intencional</option>
+                      <option value="zerado-problema" style={{ background: '#0a0f1e' }}>Caixa zerado por problema de fluxo</option>
+                    </select>
+                    <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', lineHeight: 1.4 }}>Contexto que muda o diagnóstico — "zerado por reinvestimento" é diferente de "zerado por dívida"</p>
+                  </div>
                 </div>
 
                 {/* Personalizar ticket e margem — opcionais, collapsíveis */}
@@ -929,10 +948,10 @@ Relatório em 4 seções:
           </button>
         </div>
         <div className="grid grid-cols-2 gap-2.5">
-          {inputNum('Receita Mensal', receita, setReceita)}
-          {inputNum('Despesas Operacionais', despesas, setDespesas)}
-          {inputNum('Caixa Disponível', caixa, setCaixa)}
-          {inputNum('Verba Mkt/Aquisição', verbaMkt, setVerbaMkt)}
+          {inputNum('Receita Mensal', receita, setReceita, 'R$', 'Tudo que entrou de vendas — não inclua empréstimo ou aporte')}
+          {inputNum('Despesas Operacionais', despesas, setDespesas, 'R$', 'Tudo que você pagou para operar: salários, aluguel, fornecedores, ferramentas')}
+          {inputNum('Caixa Disponível', caixa, setCaixa, 'R$', 'Saldo atual nas contas bancárias — o quanto você pode gastar hoje')}
+          {inputNum('Verba Mkt / Aquisição', verbaMkt, setVerbaMkt, 'R$', 'Gasto com anúncios, tráfego pago, indicação — usado para calcular seu CAC')}
         </div>
       </div>
 
@@ -954,14 +973,14 @@ Relatório em 4 seções:
 
         {!modoManual ? (
           <div className="grid grid-cols-3 gap-2">
-            {inputNum('Ativos', clientesAtivos, setClientesAtivos, '#')}
-            {inputNum('Novos', novosClientes, setNovosClientes, '+')}
-            {inputNum('Perdidos', clientesPerdidos, setClientesPerdidos, '−')}
+            {inputNum('Ativos', clientesAtivos, setClientesAtivos, '#', 'Clientes que pagaram este mês')}
+            {inputNum('Novos', novosClientes, setNovosClientes, '+', 'Que fecharam pela 1ª vez este mês')}
+            {inputNum('Perdidos', clientesPerdidos, setClientesPerdidos, '−', 'Que cancelaram ou não renovaram')}
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-2">
-            {inputNum('CAC (R$)', cacManual, setCacManual)}
-            {inputNum('Ticket Médio (R$)', ticketManual, setTicketManual)}
+            {inputNum('CAC (R$)', cacManual, setCacManual, 'R$', 'Custo por cliente adquirido — verba ÷ novos clientes')}
+            {inputNum('Ticket Médio (R$)', ticketManual, setTicketManual, 'R$', 'Valor médio que cada cliente paga por mês/compra')}
             <div className="flex flex-col gap-1.5">
               <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.02em' }}>Churn Mensal (%) — {fmtDec(churnManual)}%</label>
               <div className="flex items-center gap-3 rounded-lg px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.1)' }}>
