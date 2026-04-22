@@ -18,7 +18,30 @@ function fmt(v: number) { return v.toLocaleString('pt-BR', { minimumFractionDigi
 function fmtDec(v: number, d = 1) { return v.toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }) }
 function colorByRange(v: number, g: number, a: number) { return v >= g ? GREEN : v >= a ? AMBER : RED }
 
-const ZERO_DEFAULT = { receita: 0, despesas: 0, caixa: 0, clientesAtivos: 0, novosClientes: 0, clientesPerdidos: 0, verbaMkt: 0, cacManual: 0, ticketManual: 0, churnManual: 0 }
+// ── TASK 1: Tabela de benchmarks por modelo de receita ─────────────────────
+const MODEL_BENCHMARKS: Record<string, {
+  label: string; margemRef: number; churnRef: number
+  ltvMult: number; cacTeto: number; ticketRef: number; churnDesc: string
+}> = {
+  saas:        { label: 'SaaS / Assinatura',    margemRef: 80, churnRef: 3,  ltvMult: 24,  cacTeto: 3.0,  ticketRef: 97,  churnDesc: 'baixo — recorrência alta' },
+  fisico:      { label: 'Produto Físico',        margemRef: 32, churnRef: 40, ltvMult: 2,   cacTeto: 0.2,  ticketRef: 150, churnDesc: 'alto — compra esporádica' },
+  servico:     { label: 'Serviço / Consultoria', margemRef: 60, churnRef: 15, ltvMult: 6,   cacTeto: 0.5,  ticketRef: 500, churnDesc: 'médio — retenção é chave' },
+  ecommerce:   { label: 'E-commerce',            margemRef: 27, churnRef: 38, ltvMult: 3,   cacTeto: 0.25, ticketRef: 100, churnDesc: 'alto — recompra é desafio' },
+  infoproduto: { label: 'Infoproduto / Curso',   margemRef: 87, churnRef: 60, ltvMult: 1.5, cacTeto: 0.4,  ticketRef: 197, churnDesc: 'muito alto — front-end intenso' },
+  marketplace: { label: 'Marketplace',           margemRef: 15, churnRef: 20, ltvMult: 12,  cacTeto: 2.0,  ticketRef: 50,  churnDesc: 'médio — volume é tudo' },
+}
+
+// ── TASK 2: Motor de perfis de maturidade ───────────────────────────────────
+type MaturityProfile = 'ideia' | 'pre-receita' | 'solvencia' | 'fluxo' | 'escala'
+function detectProfile(receita: number, caixa: number, despesas: number, fase: string, motivoCaixaZero: string, margem: number): MaturityProfile {
+  if (receita === 0 && despesas === 0 && caixa === 0) return 'ideia'
+  if (receita === 0 && despesas > 0 && (fase === 'validacao' || motivoCaixaZero === 'pre-receita' || motivoCaixaZero === 'lancando')) return 'pre-receita'
+  if (receita > 0 && caixa === 0 && despesas > 0 && motivoCaixaZero !== 'reinvestido') return 'solvencia'
+  if (caixa === 0 && margem > 40 && motivoCaixaZero === 'reinvestido') return 'fluxo'
+  return 'escala'
+}
+
+const ZERO_DEFAULT = { receita: 0, despesas: 0, caixa: 0, clientesAtivos: 0, novosClientes: 0, clientesPerdidos: 0, verbaMkt: 0, cacManual: 0, ticketManual: 0, churnManual: 0, modeloReceita: '', faseNegocio: '', motivoCaixaZero: '', ticketProjetado: 0, margemEstimada: 0, objetivoAtual: '' }
 
 // Mapeamento setor onboarding → id mercado (módulo — usado em MarketIntelligence e handleIA)
 const SECTOR_MAP: Record<string, string> = {
@@ -365,6 +388,7 @@ function buildBenchmark(fase: string, setores: string[], produtos: string[], rev
 export default function CockpitFinanceiro({ marketData, userProfile, cockpitAlerts }: { marketData: any; userProfile?: any; cockpitAlerts?: string[] }) {
   const { data, update } = useWorkspaceData('cockpit', ZERO_DEFAULT)
   const { user } = useAuth()
+  const [showCalib,     setShowCalib]     = useState(false)
   const [modoManual,    setModoManual]    = useState(false)
   const [iaLoading,     setIaLoading]     = useState(false)
   const [iaResponse,    setIaResponse]    = useState('')
@@ -391,10 +415,27 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const ticketManual = data.ticketManual ?? 0; const setTicketManual = (v: number) => update({ ticketManual: v })
   const churnManual  = data.churnManual  ?? 0; const setChurnManual  = (v: number) => update({ churnManual: v })
 
+  // Calibragem de contexto (Smart Setup)
+  const modeloReceita   = data.modeloReceita   ?? ''
+  const setModeloReceita = (v: string) => {
+    const bmNew = MODEL_BENCHMARKS[v]
+    update({ modeloReceita: v, ...(!data.margemEstimada && bmNew ? { margemEstimada: bmNew.margemRef } : {}) })
+  }
+  const faseNegocio     = data.faseNegocio     ?? ''; const setFaseNegocio     = (v: string) => update({ faseNegocio: v })
+  const motivoCaixaZero = data.motivoCaixaZero ?? ''; const setMotivoCaixaZero = (v: string) => update({ motivoCaixaZero: v })
+  const ticketProjetado = data.ticketProjetado ?? 0;  const setTicketProjetado = (v: number) => update({ ticketProjetado: v })
+  const margemEstimada  = data.margemEstimada  ?? 0;  const setMargemEstimada  = (v: number) => update({ margemEstimada: v })
+  const objetivoAtual   = data.objetivoAtual   ?? ''; const setObjetivoAtual   = (v: string) => update({ objetivoAtual: v })
+
   // Cálculo automático ou manual
   const ticketMedio = modoManual ? ticketManual : (clientesAtivos > 0 ? receita / clientesAtivos : 0)
   const cac         = modoManual ? cacManual    : (novosClientes > 0  ? verbaMkt / novosClientes  : 0)
   const churnMensal = modoManual ? churnManual  : (clientesAtivos > 0 ? (clientesPerdidos / clientesAtivos) * 100 : 0)
+
+  // 3-layer fallback helpers (Real → Calibragem → Benchmark)
+  const bm = MODEL_BENCHMARKS[modeloReceita] ?? null
+  const ticketEfetivo    = ticketMedio > 0 ? ticketMedio : ticketProjetado > 0 ? ticketProjetado : (bm?.ticketRef ?? 0)
+  const calibragemMargem = margemEstimada > 0 ? margemEstimada / 100 : bm ? bm.margemRef / 100 : 0.30
 
   const selicRate = marketData?.macro?.selic?.value  ?? 14.75
   const ipcaRate  = marketData?.macro?.ipca?.value   ?? 4.14
@@ -444,7 +485,7 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     // ── COALESCE: margem — se receita=0, usa 30% como alvo de consultoria ──
     // Permite que LTV, break-even e health score não colem em zero
     const margemIsEstimada = receita === 0
-    const margemDecimal    = receita > 0 ? (receita - despesas) / receita : 0.30
+    const margemDecimal    = receita > 0 ? (receita - despesas) / receita : calibragemMargem
     const margem           = margemDecimal * 100
     const lucro            = receita - despesas
     const burnLiquido      = despesas - receita
@@ -458,8 +499,11 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
 
     // LTV usa margem efetiva (30% estimada se receita=0) + churnEfetivo
     const margemLtv      = Math.max(margemDecimal, 0.1)
-    const ltv            = ticketMedio > 0 && churnEfetivo > 0
-      ? (ticketMedio * margemLtv) / (churnEfetivo / 100)
+    const ltvMult        = bm?.ltvMult ?? 1
+    const ltv            = ticketEfetivo > 0 && churnEfetivo > 0
+      ? (ticketEfetivo * margemLtv) / (churnEfetivo / 100)
+      : modeloReceita && ticketEfetivo > 0
+      ? ticketEfetivo * margemLtv * ltvMult
       : ltvRefNum
     const ltvCac         = cacEfetivo > 0 && ltv > 0 ? ltv / cacEfetivo : 0
     const burnRatio      = receita > 0 ? 1 - despesas / receita : 0
@@ -493,7 +537,7 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
 
     return { margem, margemIsEstimada, lucro, runway, runwayCritico, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, roiIneficiente, roiSemValidacao, breakevenAlert, breakevenMeta, semDados, margemReal }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receita, despesas, caixa, cacEfetivo, ticketMedio, churnEfetivo, ltvRefNum, sectorHeat, taxaRealExata, burnReal, usdRate, selicRate])
+  }, [receita, despesas, caixa, cacEfetivo, ticketMedio, ticketEfetivo, churnEfetivo, ltvRefNum, sectorHeat, taxaRealExata, burnReal, usdRate, selicRate, calibragemMargem, modeloReceita, bm])
 
   // origem: verde = seus dados, amarelo = ref.mercado, azul = calculado/fundido
   const O_REAL  = { text: 'seus dados',   color: GREEN }
@@ -510,7 +554,7 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     { label: 'LTV/CAC',        value: `${fmtDec(metrics.ltvCac, 2)}x`, color: colorByRange(metrics.ltvCac, 3, 1),    desc: `LTV R$${metrics.ltv.toFixed(2)}${cacIsEstimado || metrics.margemIsEstimada ? ' · dados estimados' : ''}`, origin: cacIsEstimado || churnIsEstimado ? O_FUND : O_CALC },
     { label: 'Break-even',     value: `R$${fmt(metrics.breakeven)}`, color: metrics.breakevenAlert ? RED : metrics.breakevenMeta ? AMBER : BLUE, desc: metrics.breakevenAlert ? '⚠ Receita abaixo do break-even!' : metrics.breakevenMeta ? `sobrevivência — você precisa de R$${fmt(metrics.breakeven)}/mês para cobrir custos` : 'BurnReal ÷ (1 − margem)', origin: despesas > 0 ? O_FUND : O_CALC },
     { label: 'ROI Anualizado', value: `${fmtDec(metrics.roi, 2)}%`,  color: metrics.roiSemValidacao ? AMBER : metrics.roiIneficiente ? AMBER : metrics.roi >= 0 ? GREEN : RED, desc: metrics.roiSemValidacao ? `⚠ ROI Estimado — sem validação real (Receita R$0). Insira receita p/ confirmar.` : metrics.roiIneficiente ? `⚠ ROI < SELIC ${selicRate}% — negócio rende menos que o banco` : '(LTV − CAC) / CAC × 12 meses', origin: O_FUND },
-    { label: 'Ticket Médio',   value: `R$${fmt(ticketMedio)}`,       color: ticketMedio > 0 ? BLUE : AMBER,          desc: modoManual ? 'manual' : ticketMedio === 0 ? 'insira receita + clientes para calcular' : 'receita ÷ clientes ativos', origin: ticketMedio > 0 ? O_REAL : null },
+    { label: 'Ticket Médio',   value: `R$${fmt(ticketEfetivo)}`,     color: ticketMedio > 0 ? BLUE : ticketEfetivo > 0 ? AMBER : AMBER, desc: modoManual ? 'manual' : ticketMedio > 0 ? 'receita ÷ clientes ativos' : ticketProjetado > 0 ? 'ticket projetado' : bm ? `ref. ${bm.label}` : 'insira receita + clientes para calcular', origin: ticketMedio > 0 ? O_REAL : ticketEfetivo > 0 ? O_REF : null },
     { label: 'CAC',            value: `R$${fmt(cacEfetivo)}`,        color: cac > 0 ? BLUE : AMBER,                  desc: cacIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'verba ÷ novos clientes', origin: cacIsEstimado ? O_REF : O_REAL },
     { label: 'Churn',          value: `${fmtDec(churnEfetivo, 2)}%`, color: colorByRange(100 - churnEfetivo, 95, 90), desc: churnIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'perdidos ÷ ativos × 100', origin: churnIsEstimado ? O_REF : O_REAL },
     { label: 'LTV',            value: `R$${fmt(Math.round(metrics.ltv))}`, color: metrics.ltv > 0 ? GREEN : AMBER,  desc: `(Ticket × Margem) ÷ Churn`, origin: churnIsEstimado || ticketMedio === 0 ? O_FUND : O_CALC },
@@ -578,14 +622,25 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
       const cpmReais    = cpmUsd * usdRate
       const margemRealIA = metrics.margem - taxaRealIA
 
+      const modeloBmIA = MODEL_BENCHMARKS[modeloReceita]
+      const calibLineIA = modeloReceita
+        ? `\nModelo: ${modeloBmIA?.label ?? modeloReceita} | Margem ref ${modeloBmIA?.margemRef ?? '?'}% | Churn ref ${modeloBmIA?.churnRef ?? '?'}%/mês | LTV mult ${modeloBmIA?.ltvMult ?? '?'}x`
+        : ''
+      const contextParts = [
+        motivoCaixaZero ? `Caixa R$0: ${motivoCaixaZero}` : '',
+        objetivoAtual   ? `Objetivo: ${objetivoAtual}` : '',
+        ticketProjetado > 0 && receita === 0 ? `Ticket projetado: R$${ticketProjetado.toFixed(2)}` : '',
+        margemEstimada > 0 && receita === 0 ? `Margem estimada: ${margemEstimada}%` : '',
+      ].filter(Boolean).join(' | ')
+
       const question = `Analista financeiro PME Brasil. Responda em PT-BR.
 
-NEGÓCIO: ${nomeNegocio || '?'} | Fase: ${fase || '?'} | Setor: ${sectorLabelIA} ${sectorHeatIA}/100 | Produto: ${produtos[0] || '?'}
-MACRO: SELIC ${selicRate}% | IPCA ${ipcaRate}% | USD R$${usdRate.toFixed(2)} | PIB ${pibRate.toFixed(1)}%
+NEGÓCIO: ${nomeNegocio || '?'} | Fase: ${fase || faseNegocio || '?'} | Setor: ${sectorLabelIA} ${sectorHeatIA}/100 | Produto: ${produtos[0] || '?'}${calibLineIA}
+MACRO: SELIC ${selicRate}% | IPCA ${ipcaRate}% | USD R$${usdRate.toFixed(2)} | PIB ${pibRate.toFixed(1)}%${contextParts ? '\nContexto: ' + contextParts : ''}
 
 DADOS:
 Receita R$${receita.toFixed(2)} | Despesas R$${despesas.toFixed(2)} | Caixa R$${caixa.toFixed(2)}
-Burn Real R$${burnRealIA.toFixed(2)}/mês | Margem ${metrics.margem.toFixed(2)}%${receita === 0 ? ' (ref 30%)' : ''} | Margem Real ${margemRealIA.toFixed(2)}%
+Burn Real R$${burnRealIA.toFixed(2)}/mês | Margem ${metrics.margem.toFixed(2)}%${receita === 0 ? ` (${margemEstimada > 0 ? 'calibrada' : 'ref 30%'})` : ''} | Margem Real ${margemRealIA.toFixed(2)}%
 Runway ${metrics.runway >= 999 ? '∞' : metrics.runway.toFixed(1) + 'm'}${metrics.runwayCritico ? ' ⚠CRÍTICO' : ''} | Health ${metrics.healthScore}/100
 LTV R$${metrics.ltv.toFixed(2)} | CAC R$${cacAjustIA.toFixed(2)} | LTV/CAC ${metrics.ltvCac.toFixed(2)}x
 ROI ${metrics.roi.toFixed(2)}% vs CDI ${(selicRate - 0.1).toFixed(1)}%${metrics.roiSemValidacao ? ' ⚠ESTIMADO' : ''}
@@ -625,7 +680,7 @@ Relatório em 4 seções:
       nome: saveNome.trim() || `${nomeNegocio || 'Diagnóstico'} — ${new Date().toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })}`,
       empresa: nomeNegocio || 'Empresa',
       createdAt: new Date().toISOString(),
-      inputs: { receita, despesas, caixa, verbaMkt, clientesAtivos, novosClientes, clientesPerdidos, cacManual, ticketManual, churnManual },
+      inputs: { receita, despesas, caixa, verbaMkt, clientesAtivos, novosClientes, clientesPerdidos, cacManual, ticketManual, churnManual, modeloReceita, faseNegocio, motivoCaixaZero, ticketProjetado, margemEstimada, objetivoAtual },
       metrics: { healthScore: metrics.healthScore, margem: metrics.margem, runway: metrics.runway, lucro: metrics.lucro, ltvCac: metrics.ltvCac, ltv: metrics.ltv, breakeven: metrics.breakeven, roi: metrics.roi, margemReal: metrics.margemReal, runwayCritico: metrics.runwayCritico, roiIneficiente: metrics.roiIneficiente, breakevenMeta: metrics.breakevenMeta },
       iaResponse, selicRate, ipcaRate, usdRate, sectorLabel, sectorHeat,
     }
@@ -670,6 +725,149 @@ Relatório em 4 seções:
           <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, whiteSpace: 'pre-line' }}>{benchmark}</p>
         </div>
       )}
+
+      {/* ── 0. CALIBRAGEM DE CONTEXTO (Smart Setup) ── */}
+      {(() => {
+        const calibComplete = !!(modeloReceita && objetivoAtual)
+        return (
+          <div>
+            <button
+              onClick={() => setShowCalib(c => !c)}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors"
+              style={{ background: calibComplete ? 'rgba(0,0,0,0.25)' : `${AMBER}10`, border: `1px solid ${calibComplete ? 'rgba(255,255,255,0.08)' : AMBER + '40'}` }}
+            >
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize: 12 }}>⚙</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: calibComplete ? 'rgba(255,255,255,0.55)' : AMBER }}>
+                  Calibragem de Contexto
+                </span>
+                {!calibComplete && (
+                  <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: AMBER, background: `${AMBER}20`, padding: '1px 6px', borderRadius: 3, letterSpacing: '0.08em' }}>
+                    CONFIGURAR
+                  </span>
+                )}
+                {calibComplete && bm && (
+                  <span style={{ fontSize: 9, color: GREEN, background: `${GREEN}18`, padding: '1px 6px', borderRadius: 3 }}>
+                    ✓ {bm.label}
+                  </span>
+                )}
+              </div>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>{showCalib ? '▲' : '▼'}</span>
+            </button>
+
+            {showCalib && (
+              <div className="mt-2 rounded-lg p-4 flex flex-col gap-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Modelo de receita */}
+                  <div className="flex flex-col gap-1.5">
+                    <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Modelo de receita</label>
+                    <select value={modeloReceita} onChange={e => setModeloReceita(e.target.value)}
+                      className="rounded-lg px-3 py-2 outline-none"
+                      style={{ background: 'rgba(0,0,0,0.4)', border: `1px solid ${modeloReceita ? 'rgba(255,255,255,0.15)' : AMBER + '50'}`, fontSize: 12, color: modeloReceita ? '#fff' : 'rgba(255,255,255,0.3)' }}>
+                      <option value="">Selecionar...</option>
+                      {Object.entries(MODEL_BENCHMARKS).map(([k, v]) => (
+                        <option key={k} value={k} style={{ background: '#0a0f1e' }}>{v.label}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Objetivo atual */}
+                  <div className="flex flex-col gap-1.5">
+                    <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Objetivo atual</label>
+                    <select value={objetivoAtual} onChange={e => setObjetivoAtual(e.target.value)}
+                      className="rounded-lg px-3 py-2 outline-none"
+                      style={{ background: 'rgba(0,0,0,0.4)', border: `1px solid ${objetivoAtual ? 'rgba(255,255,255,0.15)' : AMBER + '50'}`, fontSize: 12, color: objetivoAtual ? '#fff' : 'rgba(255,255,255,0.3)' }}>
+                      <option value="">Selecionar...</option>
+                      <option value="validar" style={{ background: '#0a0f1e' }}>Validar mercado</option>
+                      <option value="crescer" style={{ background: '#0a0f1e' }}>Crescer receita</option>
+                      <option value="sobreviver" style={{ background: '#0a0f1e' }}>Sobreviver / reduzir burn</option>
+                      <option value="escalar" style={{ background: '#0a0f1e' }}>Escalar operação</option>
+                      <option value="captar" style={{ background: '#0a0f1e' }}>Captar investimento</option>
+                    </select>
+                  </div>
+
+                  {/* Fase do negócio */}
+                  <div className="flex flex-col gap-1.5">
+                    <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Fase do negócio</label>
+                    <select value={faseNegocio} onChange={e => setFaseNegocio(e.target.value)}
+                      className="rounded-lg px-3 py-2 outline-none"
+                      style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)', fontSize: 12, color: faseNegocio ? '#fff' : 'rgba(255,255,255,0.3)' }}>
+                      <option value="">Selecionar...</option>
+                      <option value="ideia" style={{ background: '#0a0f1e' }}>Ideia / pré-produto</option>
+                      <option value="validacao" style={{ background: '#0a0f1e' }}>Validação</option>
+                      <option value="lancando" style={{ background: '#0a0f1e' }}>Lançando</option>
+                      <option value="crescimento" style={{ background: '#0a0f1e' }}>Crescimento</option>
+                      <option value="escala" style={{ background: '#0a0f1e' }}>Escala / maturidade</option>
+                    </select>
+                  </div>
+
+                  {/* Caixa R$0 — por quê? (só aparece quando relevante) */}
+                  {caixa === 0 && despesas > 0 && (
+                    <div className="flex flex-col gap-1.5">
+                      <label style={{ fontSize: 11, color: AMBER }}>⚠ Caixa R$0 — por quê?</label>
+                      <select value={motivoCaixaZero} onChange={e => setMotivoCaixaZero(e.target.value)}
+                        className="rounded-lg px-3 py-2 outline-none"
+                        style={{ background: `${AMBER}08`, border: `1px solid ${AMBER}40`, fontSize: 12, color: motivoCaixaZero ? '#fff' : AMBER }}>
+                        <option value="">Selecionar...</option>
+                        <option value="pre-receita" style={{ background: '#0a0f1e' }}>Ainda não tenho receita</option>
+                        <option value="lancando" style={{ background: '#0a0f1e' }}>Estou lançando / investindo</option>
+                        <option value="reinvestido" style={{ background: '#0a0f1e' }}>Reinvisto tudo na operação</option>
+                        <option value="problema" style={{ background: '#0a0f1e' }}>Problema de fluxo / dívida</option>
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Ticket projetado — só quando receita=0 */}
+                  {receita === 0 && (
+                    <div className="flex flex-col gap-1.5">
+                      <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
+                        Ticket projetado (R${bm ? ` · ref. ${bm.ticketRef}` : ''})
+                      </label>
+                      <div className="flex items-center gap-2 rounded-lg px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>R$</span>
+                        <input type="number" value={ticketProjetado || ''}
+                          placeholder={bm ? String(bm.ticketRef) : '0'}
+                          onChange={e => setTicketProjetado(parseFloat(e.target.value) || 0)}
+                          className="bg-transparent outline-none flex-1"
+                          style={{ fontSize: 15, fontFamily: 'monospace', color: '#fff', border: 'none' }} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Margem estimada — slider com auto-fill do benchmark */}
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center justify-between">
+                    <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
+                      Margem estimada — {margemEstimada > 0 ? `${fmtDec(margemEstimada)}%` : bm ? `${bm.margemRef}% (benchmark)` : '30% (padrão)'}
+                    </label>
+                    {bm && margemEstimada !== bm.margemRef && (
+                      <button onClick={() => setMargemEstimada(bm.margemRef)}
+                        style={{ fontSize: 9, color: AMBER, background: `${AMBER}18`, padding: '1px 6px', borderRadius: 3, border: 'none', cursor: 'pointer' }}>
+                        ↺ usar {bm.margemRef}%
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 rounded-lg px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <input type="range" min={0} max={100} step={1}
+                      value={margemEstimada || (bm?.margemRef ?? 30)}
+                      onChange={e => setMargemEstimada(Number(e.target.value))}
+                      style={{ flex: 1, accentColor: BLUE, height: 4 }} />
+                    <span style={{ fontSize: 15, fontFamily: 'monospace', color: '#fff', minWidth: 40, textAlign: 'right' }}>
+                      {margemEstimada > 0 ? fmtDec(margemEstimada) : bm ? fmtDec(bm.margemRef) : '30'}%
+                    </span>
+                  </div>
+                  {bm && (
+                    <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', lineHeight: 1.4 }}>
+                      Ref {bm.label}: margem {bm.margemRef}% · churn {bm.churnRef}%/mês ({bm.churnDesc}) · ticket ref R${bm.ticketRef}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      })()}
 
       {/* ── 1. INPUTS FINANCEIROS BASE ── */}
       <div>
@@ -790,7 +988,7 @@ Relatório em 4 seções:
           {[
             { label: 'Burn Real',    value: despesas > 0 ? `R$${burnReal.toFixed(2)}` : '—', color: despesas > 0 ? RED : 'rgba(255,255,255,0.2)', desc: despesas > 0 ? `+R$${(burnReal - despesas).toFixed(2)} impacto SELIC ${selicRate.toFixed(2)}%` : 'preencha despesas', origin: despesas > 0 ? O_FUND : null },
             { label: 'Taxa Real',    value: `${taxaRealExata.toFixed(4)}%`,       color: taxaRealExata > 8 ? RED : AMBER,                              desc: 'Fisher — piso mínimo de ROI válido',              origin: { text: 'mercado puro', color: AMBER } },
-            { label: 'Margem Real',  value: receita > 0 ? `${metrics.margemReal.toFixed(4)}%` : '—', color: metrics.margemReal < 0 ? RED : metrics.margemReal < 5 ? AMBER : GREEN, desc: 'margem bruta − taxa real Fisher', origin: receita > 0 ? O_FUND : null },
+            { label: 'Margem Real',  value: (receita > 0 || margemEstimada > 0 || bm) ? `${metrics.margemReal.toFixed(4)}%` : '—', color: metrics.margemReal < 0 ? RED : metrics.margemReal < 5 ? AMBER : GREEN, desc: receita === 0 && bm ? `ref. ${bm.label}: ${bm.margemRef}% − taxa real Fisher` : 'margem bruta − taxa real Fisher', origin: receita > 0 ? O_FUND : bm ? { text: 'benchmark', color: AMBER } : null },
             { label: 'CAC Ajustado', value: `R$${cacAjustado.toFixed(2)}`,        color: BLUE,                                                          desc: `${cacIsEstimado ? 'ref.mercado' : 'seus dados'} × câmbio R$${usdRate.toFixed(2)}/R$4,50`, origin: cacIsEstimado ? O_FUND : O_REAL },
             ...(cpmReais > 0 ? [{ label: 'CPM em R$', value: `R$${cpmReais.toFixed(2)}/mil`, color: AMBER, desc: `US$${cpmUsdVal.toFixed(2)} × R$${usdRate.toFixed(2)}`, origin: { text: 'mercado puro', color: AMBER } }] : []),
             ...(custoGiroMensal > 0 ? [{ label: 'Custo de Giro', value: `R$${custoGiroMensal.toFixed(2)}/mês`, color: RED, desc: `se financiar via banco a ${(selicRate * 2.5).toFixed(2)}% a.a.`, origin: despesas > 0 ? O_FUND : null }] : []),
@@ -826,15 +1024,50 @@ Relatório em 4 seções:
           metrics.ltvCac > 3 ? 1 : metrics.ltvCac > 1 ? 0 : -1,
         ].reduce((a, b) => a + b, 0)
         const margemDesc = receita > 0 ? `margem real ${metrics.margemReal.toFixed(1)}%` : 'sem receita validada'
+        const matProf = detectProfile(receita, caixa, despesas, faseNegocio || fase, motivoCaixaZero, metrics.margem)
+        const bmRef   = bm
+        const bmLbl   = bmRef?.label ?? ''
+        const semaforo = pts >= 3 ? 'crescer' : pts >= 0 ? 'aguardar' : 'nao'
+        const surgMap: Record<MaturityProfile, Record<string, string>> = {
+          ideia:         {
+            crescer:  `Negócio em ideação${bmLbl ? ` (${bmLbl})` : ''}. Setor ${sectorHeat}/100 favorece entrada — valide receita antes de qualquer escala.`,
+            aguardar: `Negócio em ideação. Foco: primeiro cliente pagante antes de investir em crescimento.`,
+            nao:      `Negócio em ideação. Zero dados para escala — valide proposta de valor primeiro.`,
+          },
+          'pre-receita': {
+            crescer:  `Pré-receita${bmLbl ? ` (${bmLbl})` : ''} com setor aquecido (${sectorHeat}/100). Burn R$${fmt(despesas)}/mês — mantenha baixo e foque no primeiro cliente pagante.`,
+            aguardar: `Pré-receita: R$${fmt(despesas)}/mês de burn, runway ${metrics.runway >= 999 ? '∞' : metrics.runway.toFixed(1) + 'm'}. Meta: primeiro R$1 de receita recorrente.`,
+            nao:      `Burn R$${fmt(despesas)}/mês sem receita${metrics.runwayCritico ? ' — CAIXA CRÍTICO' : ''}. Pare gastos não-essenciais. Meta imediata: cobrir R$${fmt(despesas)}/mês.`,
+          },
+          solvencia:     {
+            crescer:  `Receita R$${fmt(receita)} com caixa zerado — risco de insolvência. Resolva fluxo de caixa antes de escalar.`,
+            aguardar: `Receita existe mas caixa R$0. Prioridade: fluxo de caixa, não crescimento. Renegocie prazos de recebimento.`,
+            nao:      `Risco real de insolvência: receita existe mas caixa zerado. 45% das PMEs fecham por fluxo. Renegocie prazos urgente.`,
+          },
+          fluxo:         {
+            crescer:  `Margem ${metrics.margem.toFixed(1)}% reinvestida + setor ${sectorHeat}/100. Perfil saudável — escale${bmLbl ? ` (${bmLbl})` : ''}.`,
+            aguardar: `Margem ${metrics.margem.toFixed(1)}% reinvestida. Verifique se LTV/CAC ${metrics.ltvCac.toFixed(1)}x suporta o ritmo de reinvestimento.`,
+            nao:      `Margem reinvestida mas unit economics fraco (LTV/CAC ${metrics.ltvCac.toFixed(1)}x). Revise CAC antes de acelerar.`,
+          },
+          escala:        {
+            crescer:  `Setor ${sectorHeat}/100 + ${margemDesc} + runway ${metrics.runway >= 999 ? '∞' : metrics.runway.toFixed(1) + 'm'} = janela aberta${bmLbl ? ` (${bmLbl})` : ''}. Escale agora.`,
+            aguardar: `Unit economics precisa de ajuste. CAC ajustado R$${cacAjustado.toFixed(0)} vs LTV R$${metrics.ltv.toFixed(0)} (${metrics.ltvCac.toFixed(1)}x). Melhore antes de escalar.`,
+            nao:      `Taxa real ${taxaRealExata.toFixed(2)}% pressiona margens. Priorize: cortar burn real (R$${burnReal.toFixed(0)}/mês), proteger caixa e reter clientes.`,
+          },
+        }
+        const surgicalReason = surgMap[matProf]?.[semaforo] ?? ''
         const v = pts >= 3
-          ? { text: 'CRESCER AGORA', color: GREEN, icon: '▲', reason: `Setor ${sectorHeat}/100 + ${margemDesc} + runway ${metrics.runway >= 999 ? '∞' : metrics.runway.toFixed(1) + 'm'} = janela aberta.` }
+          ? { text: 'CRESCER AGORA', color: GREEN, icon: '▲', reason: surgicalReason }
           : pts >= 0
-          ? { text: 'AGUARDAR / TESTAR', color: AMBER, icon: '◆', reason: `Valide unit economics antes de escalar. CAC ajustado R$${cacAjustado.toFixed(0)} precisa de LTV firme (atual ${metrics.ltvCac.toFixed(1)}x).` }
-          : { text: 'NÃO CRESCER AGORA', color: RED, icon: '▼', reason: receita === 0 ? `Receita R$0 + runway crítico. Valide receita antes de qualquer escala. Foco: cobrir os R$${despesas.toFixed(0)}/mês de despesas.` : `Taxa real ${taxaRealExata.toFixed(2)}% pressiona margens. Priorize: cortar burn real (R$${burnReal.toFixed(0)}/mês), proteger caixa e reter clientes.` }
+          ? { text: 'AGUARDAR / TESTAR', color: AMBER, icon: '◆', reason: surgicalReason }
+          : { text: 'NÃO CRESCER AGORA', color: RED, icon: '▼', reason: surgicalReason }
         return (
           <div className="rounded-lg px-4 py-3" style={{ background: `${v.color}08`, border: `1px solid ${v.color}30` }}>
             <div className="flex items-center justify-between mb-2">
-              <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em' }}>VERDICT</span>
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em' }}>VERDICT</span>
+                <span style={{ fontSize: 9, fontFamily: 'monospace', color: 'rgba(255,255,255,0.22)', background: 'rgba(255,255,255,0.04)', padding: '1px 5px', borderRadius: 3 }}>{matProf}</span>
+              </div>
               <div className="flex items-center gap-2">
                 <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: v.color }}>{v.icon}</span>
                 <span style={{ fontSize: 13, fontFamily: 'monospace', fontWeight: 700, color: v.color }}>{v.text}</span>
@@ -859,7 +1092,7 @@ Relatório em 4 seções:
           </div>
           <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.06)' }}>
             {platforms.slice(0, 6).map((p, i) => {
-              const cpmR          = p.cpm * usdRate
+              const cpmR          = (p.cpm ?? 0) * usdRate
               const clientesEst   = verbaMkt > 0 && cpmR > 0 ? Math.floor((verbaMkt / cpmR) * 1000 * 0.02) : 0
               const isBest        = i === 0
               return (
