@@ -609,78 +609,34 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
       `  ${p.label}: US$${p.cpm.toFixed(2)} = R$${(p.cpm * usdRate).toFixed(2)}/mil impressões${p.id === bestPlatform?.id ? ' ← MELHOR CUSTO AGORA' : ''}`
     ).join('\n')
 
-    const question = `Você é analista financeiro sênior de PMEs brasileiras. NUNCA arredonde — use precisão total nos cálculos.
+    const question = `Analista financeiro PME Brasil. Responda em PT-BR, sem arredondamento.
 
-NEGÓCIO: ${nomeNegocio || '?'} | Fase: ${fase || '?'} | Setor: ${sectorLabel} (heat ${sectorHeat}/100) | Produto: ${produtos.join(', ') || '?'}
+NEGÓCIO: ${nomeNegocio || '?'} | Fase: ${fase || '?'} | Setor: ${sectorLabel} ${sectorHeat}/100 | Produto: ${produtos[0] || '?'}
+MACRO: SELIC ${selicRate}% | IPCA ${ipcaRate}% | USD R$${usdRate.toFixed(2)} | PIB ${pibRate.toFixed(1)}%
 
-═══ DADOS OPERACIONAIS × MERCADO — JÁ FUNDIDOS ═══
+DADOS FUNDIDOS:
+Receita R$${receita.toFixed(2)} | Despesas R$${despesas.toFixed(2)} | Caixa R$${caixa.toFixed(2)}
+Burn Real R$${burnReal.toFixed(2)}/mês (SELIC +R$${(despesas * selicRate / 100 * 0.2).toFixed(2)} oculto)
+Margem ${metrics.margem.toFixed(2)}%${receita === 0 ? ' (alvo 30%, receita R$0)' : ''} | Margem Real ${margemReal.toFixed(2)}% | Taxa Fisher ${taxaRealExata.toFixed(2)}%
+Runway ${metrics.runway >= 999 ? '∞' : metrics.runway.toFixed(1) + 'm'}${metrics.runwayCritico ? ' ⚠CRÍTICO' : ''} | Health ${metrics.healthScore}/100
+LTV R$${metrics.ltv.toFixed(2)} | CAC ajust R$${cacAjustado.toFixed(2)} | LTV/CAC ${metrics.ltvCac.toFixed(2)}x
+ROI ${metrics.roi.toFixed(2)}% vs CDI ${(selicRate - 0.1).toFixed(1)}%${metrics.roiSemValidacao ? ' ⚠SEM RECEITA REAL' : ''}
+Break-even R$${metrics.breakeven.toFixed(2)}${metrics.breakevenMeta ? ' (sobrevivência)' : ''}
+Canal mais barato: ${bestPlatform?.label ?? 'orgânico'} R$${((bestPlatform?.cpm ?? 0) * usdRate).toFixed(2)}/mil
+${benchmark ? `Benchmark ${fase}: ${benchmark}` : ''}
 
-BURN REAL (despesas + custo oculto da SELIC):
-  Despesas base: R$${despesas.toFixed(2)}/mês
-  Impacto SELIC ${selicRate}% nos custos (20% das despesas): +R$${(despesas * selicRate / 100 * 0.2).toFixed(2)}/mês
-  → BURN REAL: R$${burnReal.toFixed(2)}/mês
-  Se financiar via banco (${(selicRate * 2.5).toFixed(2)}% a.a.): +R$${custoGiroMensal.toFixed(2)}/mês de juros
+Gere relatório em 4 seções curtas:
+1. DIAGNÓSTICO (2-3 linhas com os valores acima)
+2. SEMÁFORO 🔴🟡🟢 (Burn Real, Margem Real, Runway, LTV/CAC, ROI vs CDI)
+3. PLANO 7/30/90 dias (ações específicas com valores reais do setor ${sectorLabel})
+4. FRASE EXECUTIVA (1 frase, 3 números críticos)`
 
-TAXA REAL E MARGEM:
-  Taxa real Fisher ((1+${selicRate}/100)/(1+${ipcaRate}/100)−1): ${taxaRealExata.toFixed(4)}%
-  Margem bruta: ${metrics.margem.toFixed(4)}%
-  Margem real líquida (margem − taxa real): ${margemReal.toFixed(4)}% ${margemReal < 0 ? '⚠ NEGATIVA' : ''}
-  Break-even inflacionado 12m (IPCA ${ipcaRate}%): R$${breakevenInflado.toFixed(2)}
-  ROI anualizado: ${metrics.roi.toFixed(4)}% | CDI: ${cdiAnual.toFixed(2)}% | Gap ROI−CDI: ${roiCdiGap.toFixed(4)}% ${roiCdiGap < 0 ? '⚠ CAIXA RENDE MAIS QUE O NEGÓCIO' : '✓'}
-
-CAC AJUSTADO AO CÂMBIO:
-  CAC real: R$${cacBase.toFixed(2)} | Fator câmbio (R$${usdRate.toFixed(2)}/R$4,50): ×${(usdRate / 4.50).toFixed(4)}
-  → CAC ajustado: R$${cacAjustado.toFixed(2)}
-  LTV real: R$${metrics.ltv.toFixed(2)} | LTV/CAC: ${metrics.ltvCac.toFixed(4)}x
-  LTV referência mercado: R$${ltvRef} | CAC ref. mercado: R$${cacRef} | Churn ref: ${churnRef}%
-
-AQUISIÇÃO & CANAIS:
-  CPM mercado: US$${cpmUsd.toFixed(2)} × R$${usdRate.toFixed(2)} = R$${cpmReais.toFixed(2)}/mil impressões
-  CPC médio: US$${cpcUsd.toFixed(2)} = R$${(cpcUsd * usdRate).toFixed(2)}
-  Orgânico: ${organicPct.toFixed(1)}% do tráfego (MoM: ${organicDelta > 0 ? '+' : ''}${organicDelta.toFixed(1)}%) ${organicDelta < -3 ? '⚠ QUEDA ACELERADA' : ''}
-  Plataformas disponíveis:
-${platformLines}
-${metaAgent ? `  Meta stock: ${metaAgent.delta >= 0 ? '▲' : '▼'}${Math.abs(metaAgent.delta).toFixed(2)}% — CPM Meta ${metaAgent.delta < 0 ? 'pode cair (janela)' : 'pode subir (cautela)'}` : ''}
-${googleAgent ? `  Google stock: ${googleAgent.delta >= 0 ? '▲' : '▼'}${Math.abs(googleAgent.delta).toFixed(2)}% — CPC Google em pressão` : ''}
-
-INDICADORES COMPLETOS:
-  Receita: R$${receita.toFixed(2)} | Despesas: R$${despesas.toFixed(2)} | Caixa: R$${caixa.toFixed(2)}
-  Lucro: R$${metrics.lucro.toFixed(2)} | Runway: ${metrics.runway >= 999 ? '∞ (lucrativo)' : metrics.runway.toFixed(2) + ' meses'}
-  Ticket médio: R$${ticketMedio.toFixed(2)} | CAC: R$${cacBase.toFixed(2)} | Churn: ${churnMensal.toFixed(4)}%/mês
-  Health Score: ${metrics.healthScore}/100
-  ${metrics.breakevenAlert ? `⚠ RECEITA ABAIXO DO BREAK-EVEN: falta R$${(metrics.breakeven - receita).toFixed(2)}/mês para cobrir custos` : ''}
-
-SETOR: ${sectorLabel} — ${sectorHeat}/100 ${sectorHeat >= 75 ? '(AQUECIDO — janela de crescimento aberta)' : sectorHeat >= 50 ? '(FAVORÁVEL — crescimento moderado)' : sectorHeat >= 30 ? '(NEUTRO — cautela)' : '(PRESSIONADO — contenção máxima)'}
-PIB: ${pibRate.toFixed(2)}% | SELIC: ${selicRate}% | IPCA: ${ipcaRate}% | USD: R$${usdRate.toFixed(2)}
-${petroleo ? `Petróleo: $${petroleo.value?.toFixed(2) ?? '?'} (${petroleo.delta > 0 ? '▲' : '▼'}${Math.abs(petroleo.delta ?? 0).toFixed(2)}%) — impacto em frete` : ''}
-${briefing ? `Briefing macro: ${briefing}` : ''}
-Benchmarks fase ${fase}: ${benchmark}
-
-════════════════════════════════════════════
-
-Gere relatório executivo usando os dados FUNDIDOS acima (nunca os brutos separados):
-
-1. DIAGNÓSTICO — cite os valores calculados: burn real R$${burnReal.toFixed(2)}, margem real ${margemReal.toFixed(2)}%, CAC ajustado R$${cacAjustado.toFixed(2)}, taxa real ${taxaRealExata.toFixed(2)}%
-
-2. SEMÁFORO (use valores fundidos, não brutos):
-🔴 CRÍTICO / 🟡 ATENÇÃO / 🟢 SAUDÁVEL
-Avalie: Burn Real, Margem Real, CAC Ajustado, CPM R$, Runway, LTV/CAC, ROI vs CDI, Churn, Orgânico
-
-3. PLANO 7/30/90 — OBRIGATÓRIO diferenciar pelo setor ${sectorLabel} (${sectorHeat}/100):
-${sectorHeat >= 70
-  ? `Setor AQUECIDO: use a janela. Ações de escala com caixa protegido. Canal mais barato: ${bestPlatform?.label ?? 'orgânico'} (R$${((bestPlatform?.cpm ?? 0) * usdRate).toFixed(2)}/mil impressões).`
-  : sectorHeat >= 40
-  ? `Setor NEUTRO: eficiência antes de escala. Cortar CAC atual de R$${cacAjustado.toFixed(2)} e proteger margem real de ${margemReal.toFixed(2)}%.`
-  : `Setor PRESSIONADO: contenção máxima. Com taxa real ${taxaRealExata.toFixed(2)}%, cada real em caixa rende mais que risco. Proteja runway.`}
-Use valores reais nos prazos (ex: "reduzir CAC de R$${cacAjustado.toFixed(2)} para R$${(cacAjustado * 0.82).toFixed(2)} migrando para ${bestPlatform?.label ?? 'canal mais barato'}").
-
-4. FRASE EXECUTIVA — 1 frase com os 3 números mais críticos fundidos.
-
-REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
-
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 25000)
     try {
       const res = await fetch('/api/advisor-chat', {
         method: 'POST',
+        signal: controller.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           question,
@@ -689,9 +645,11 @@ REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
       })
       const d = await res.json()
       setIaResponse(d.answer ?? 'Sem resposta da IA.')
-    } catch {
-      setIaResponse('Erro ao conectar com a IA.')
+    } catch (e: unknown) {
+      const isAbort = e instanceof Error && e.name === 'AbortError'
+      setIaResponse(isAbort ? 'Tempo limite atingido (25s). Tente novamente — o Groq pode estar sobrecarregado.' : 'Erro ao conectar com a IA.')
     } finally {
+      clearTimeout(timer)
       setIaLoading(false)
     }
   }
