@@ -185,7 +185,7 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
           className={`flex items-center justify-center gap-1 rounded-[0.8rem] px-2 py-1.5 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'estudo' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
         >
           <BookOpen className="h-3 w-3" />
-          <span>STUDY</span>
+          <span>INTELLIGENCE</span>
         </button>
 
         <button
