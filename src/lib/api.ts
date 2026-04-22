@@ -1,12 +1,13 @@
-export async function apiFetch(path: string): Promise<Response> {
-  // Em ambiente Capacitor (app nativo), tenta .json local empacotado
-  if (typeof window !== 'undefined' && (window as any).Capacitor) {
-    try {
-      const res = await fetch(`${path}.json`)
-      if (res.ok) return res
-    } catch {}
+export async function apiFetch(path: string, options?: RequestInit): Promise<Response> {
+  // Em ambiente Capacitor com GET, tenta .json local empacotado
+  if (!options?.method || options.method === 'GET') {
+    if (typeof window !== 'undefined' && (window as any).Capacitor) {
+      try {
+        const res = await fetch(`${path}.json`)
+        if (res.ok) return res
+      } catch {}
+    }
   }
 
-  // Busca dados dinâmicos da API (tempo real)
-  return fetch(path, { cache: 'no-store' })
+  return fetch(path, { cache: 'no-store', ...options })
 }

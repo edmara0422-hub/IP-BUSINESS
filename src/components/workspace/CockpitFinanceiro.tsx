@@ -16,6 +16,172 @@ function colorByRange(v: number, g: number, a: number) { return v >= g ? GREEN :
 
 const ZERO_DEFAULT = { receita: 0, despesas: 0, caixa: 0, clientesAtivos: 0, novosClientes: 0, clientesPerdidos: 0, verbaMkt: 0, cacManual: 0, ticketManual: 0, churnManual: 0 }
 
+// ── Componente de inteligência de mercado rico ─────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, despesas, cdiMensal, cdiRendimento, decisaoCDI, cockpitAlerts, userProfile }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  marketData: any; selicRate: number; ipcaRate: number; usdRate: number
+  caixa: number; despesas: number; cdiMensal: number; cdiRendimento: number; decisaoCDI: boolean
+  cockpitAlerts?: string[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  userProfile?: any
+}) {
+  const [sectorTab, setSectorTab] = useState<'setores' | 'cascatas'>('setores')
+
+  // Cascatas cruzamento de indicadores (copiado da lógica do MacroSection)
+  const cascatas = useMemo(() => {
+    const taxaReal = (selicRate - ipcaRate).toFixed(2)
+    const meta = marketData?.globalAgents?.find((a: any) => a.id === 'meta')
+    const cacD = marketData?.marketing?.cacTrend?.delta ?? 12
+    const retailHeat = marketData?.sectors?.find((s: any) => s.id === 'retail')?.heat ?? 20
+    const techHeat = marketData?.sectors?.find((s: any) => s.id === 'tech')?.heat ?? 70
+    const pib = marketData?.macro?.pib?.value ?? 1.86
+    const result: Array<{ cross: string; insight: string; color: string }> = []
+
+    result.push({
+      cross: `SELIC ${selicRate.toFixed(2)}% + IPCA ${ipcaRate.toFixed(2)}%`,
+      insight: `Taxa real ${taxaReal}% — ${parseFloat(taxaReal) > 8 ? 'um dos maiores juros reais do mundo. Renda fixa paga mais que bolsa.' : parseFloat(taxaReal) > 5 ? 'juro real elevado. Investimento produtivo perde pra renda fixa.' : 'juro real moderado.'}`,
+      color: parseFloat(taxaReal) > 8 ? RED : parseFloat(taxaReal) > 5 ? AMBER : GREEN,
+    })
+    if (meta) {
+      const cpmImpact = ((usdRate / 4.5 - 1) * 100).toFixed(0)
+      result.push({
+        cross: `Dólar R$${usdRate.toFixed(2)} + Meta ${meta.delta > 0 ? '▲' : '▼'}${Math.abs(meta.delta).toFixed(1)}%`,
+        insight: `CPM em reais sobe ${cpmImpact}% pelo câmbio${meta.delta > 0 ? ' + leilão competitivo' : ''}. ${cacD > 10 ? `CAC subindo ${cacD.toFixed(0)}% — custo de aquisição piora.` : 'CAC ainda gerenciável.'}`,
+        color: cacD > 15 ? RED : cacD > 8 ? AMBER : GREEN,
+      })
+    }
+    if (selicRate > 12 && retailHeat < 40) {
+      result.push({
+        cross: `SELIC ${selicRate.toFixed(2)}% + Varejo heat ${retailHeat}/100`,
+        insight: `Juro alto mata crédito ao consumidor → varejo contrai. Cada ponto acima de 10% retira ~3% da demanda discricionária.`,
+        color: RED,
+      })
+    }
+    if (techHeat > 75) {
+      result.push({
+        cross: `Tech ${techHeat}/100 + PIB +${pib.toFixed(1)}%`,
+        insight: `Setor tech aquecido = janela para produtos digitais. Momento de captar e escalar.`,
+        color: GREEN,
+      })
+    }
+    return result
+  }, [marketData, selicRate, ipcaRate, usdRate])
+
+  const sectors = (marketData?.sectors ?? []) as Array<{ id: string; label?: string; heat: number; change: number; trend?: string }>
+  const maxHeat = Math.max(...sectors.map(s => s.heat), 1)
+
+  // Setor do usuário
+  const userSectorId = useMemo(() => {
+    if (!userProfile?.sectors?.length) return null
+    const m: Record<string, string> = { 'Tecnologia': 'tech', 'Consultoria': 'services', 'Saúde': 'health', 'Varejo': 'retail', 'Financeiro': 'fintech', 'Logística': 'logistics', 'Agronegócio': 'agro' }
+    return m[userProfile.sectors[0]] ?? null
+  }, [userProfile])
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center gap-2">
+        <TrendingUp size={16} style={{ color: GREEN }} />
+        <span style={{ fontSize: 14, fontWeight: 600 }}>Inteligência de Mercado</span>
+      </div>
+
+      {/* 4 cards macro com impacto nos seus números */}
+      <div className="grid grid-cols-2 gap-2">
+        {[
+          {
+            label: 'SELIC', value: `${fmtDec(selicRate)}%`, color: selicRate > 12 ? RED : GREEN,
+            desc: `Crédito: ${fmtDec(selicRate * 2.5)}% a.a.${despesas > 0 ? ` · +R$${fmt(Math.round(despesas * (selicRate * 2.5 / 100) / 12))}/mês se financiar` : ''}`,
+          },
+          {
+            label: 'IPCA', value: `${fmtDec(ipcaRate)}%`, color: ipcaRate > 4 ? AMBER : GREEN,
+            desc: despesas > 0 ? `Despesas em 12m: R$${fmt(Math.round(despesas * (1 + ipcaRate / 100)))} (+R$${fmt(Math.round(despesas * ipcaRate / 100))})` : 'Poder de compra: ' + (ipcaRate > 4.75 ? 'caindo' : 'estável'),
+          },
+          {
+            label: 'USD/BRL', value: `R$${fmtDec(usdRate, 2)}`, color: usdRate > 5.5 ? RED : usdRate > 5 ? AMBER : GREEN,
+            desc: `Insumos importados ${usdRate > 5.5 ? `${((usdRate / 4.5 - 1) * 100).toFixed(0)}% mais caros` : 'controlados'}`,
+          },
+          {
+            label: 'CDI vs ROI', value: decisaoCDI ? '⚠ CDI > ROI' : '✓ ROI > CDI', color: decisaoCDI ? AMBER : GREEN,
+            desc: caixa > 0 ? `Caixa rende R$${fmt(Math.round(cdiRendimento))}/mês (${fmtDec(cdiMensal, 2)}%/mês)` : 'Insira o caixa para calcular',
+          },
+        ].map(c => (
+          <div key={c.label} className="rounded-lg p-2.5" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `3px solid ${c.color}` }}>
+            <div style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: c.color, marginBottom: 2 }}>{c.label}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, fontFamily: 'monospace', color: c.color }}>{c.value}</div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 2, lineHeight: 1.4 }}>{c.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Tabs: setores / cascatas */}
+      <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="flex border-b border-white/5">
+          {[{ key: 'setores', label: 'SETORES' }, { key: 'cascatas', label: 'CASCATAS' }].map(t => (
+            <button key={t.key} onClick={() => setSectorTab(t.key as any)}
+              className="flex-1 py-2 font-mono text-[10px] font-bold tracking-widest transition-colors"
+              style={{ color: sectorTab === t.key ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)', background: sectorTab === t.key ? 'rgba(255,255,255,0.04)' : 'transparent', borderBottom: sectorTab === t.key ? `2px solid ${BLUE}` : '2px solid transparent' }}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="px-3 py-2.5">
+          {sectorTab === 'setores' && (
+            <div className="flex flex-col gap-1.5">
+              {sectors.map(s => {
+                const isUser = s.id === userSectorId
+                const color = (s.change > 0) ? GREEN : (s.change < 0) ? RED : AMBER
+                const barW = Math.max(4, (s.heat / maxHeat) * 100)
+                return (
+                  <div key={s.id} className="rounded-md overflow-hidden" style={{ background: isUser ? 'rgba(93,173,226,0.06)' : 'rgba(0,0,0,0.15)', borderLeft: `3px solid ${isUser ? '#5dade2' : color}` }}>
+                    <div className="px-2.5 py-1.5">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-1.5">
+                          <span style={{ fontSize: 12, fontWeight: 600, color: isUser ? '#5dade2' : 'rgba(255,255,255,0.6)' }}>{s.label ?? s.id}</span>
+                          {isUser && <span style={{ fontSize: 9, fontFamily: 'monospace', color: '#5dade2', background: 'rgba(93,173,226,0.12)', padding: '0 4px', borderRadius: 3 }}>seu setor</span>}
+                        </div>
+                        <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color }}>{s.heat}/100</span>
+                      </div>
+                      <div className="h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                        <motion.div className="h-full rounded-full" style={{ background: isUser ? '#5dade2' : color }}
+                          initial={{ width: 0 }} animate={{ width: `${barW}%` }} transition={{ duration: 0.6 }} />
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          {sectorTab === 'cascatas' && (
+            <div className="flex flex-col gap-2">
+              {cascatas.map((c, i) => (
+                <div key={i} className="rounded-md px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.2)', borderLeft: `3px solid ${c.color}` }}>
+                  <div style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: c.color, marginBottom: 3 }}>{c.cross}</div>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.4 }}>{c.insight}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Alertas de mercado (da Intelligence) */}
+      {cockpitAlerts && cockpitAlerts.length > 0 && (
+        <div className="rounded-lg px-3 py-2.5" style={{ background: `${AMBER}08`, border: `1px solid ${AMBER}25` }}>
+          <p style={{ fontSize: 10, color: AMBER, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '0.1em', marginBottom: 6 }}>⚡ ALERTAS — BUSINESS CONECTADO</p>
+          <div className="flex flex-col gap-1.5">
+            {cockpitAlerts.map((alert, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <span style={{ fontSize: 10, color: AMBER, marginTop: 1, flexShrink: 0 }}>▸</span>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5 }}>{alert}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Benchmarks por fase + setor combinados
 function buildBenchmark(fase: string, setores: string[], produtos: string[], revenue: string, nome: string): string {
   const setor = setores[0] ?? ''
@@ -249,11 +415,11 @@ Seja direto, use os números reais, compare com os benchmarks informados.`
           <Calculator size={16} style={{ color: BLUE }} />
           <span style={{ fontSize: 14, fontWeight: 600 }}>Dados financeiros</span>
         </div>
-        <div className="flex flex-col gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5">
           {inputNum('Receita Mensal', receita, setReceita)}
           {inputNum('Despesas Operacionais', despesas, setDespesas)}
           {inputNum('Caixa Disponível', caixa, setCaixa)}
-          {inputNum('Verba Marketing/Aquisição', verbaMkt, setVerbaMkt)}
+          {inputNum('Verba Mkt/Aquisição', verbaMkt, setVerbaMkt)}
         </div>
       </div>
 
@@ -274,13 +440,13 @@ Seja direto, use os números reais, compare com os benchmarks informados.`
         </div>
 
         {!modoManual ? (
-          <div className="flex flex-col gap-2.5">
-            {inputNum('Clientes Ativos', clientesAtivos, setClientesAtivos, '#')}
-            {inputNum('Novos Clientes (mês)', novosClientes, setNovosClientes, '+')}
-            {inputNum('Clientes Perdidos (mês)', clientesPerdidos, setClientesPerdidos, '−')}
+          <div className="grid grid-cols-3 gap-2">
+            {inputNum('Ativos', clientesAtivos, setClientesAtivos, '#')}
+            {inputNum('Novos', novosClientes, setNovosClientes, '+')}
+            {inputNum('Perdidos', clientesPerdidos, setClientesPerdidos, '−')}
           </div>
         ) : (
-          <div className="flex flex-col gap-2.5">
+          <div className="grid grid-cols-2 gap-2">
             {inputNum('CAC (R$)', cacManual, setCacManual)}
             {inputNum('Ticket Médio (R$)', ticketManual, setTicketManual)}
             <div className="flex flex-col gap-1.5">
@@ -337,50 +503,15 @@ Seja direto, use os números reais, compare com os benchmarks informados.`
         </div>
       </div>
 
-      {/* ── 4. IMPACTO DE MERCADO ── */}
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <TrendingUp size={16} style={{ color: GREEN }} />
-          <span style={{ fontSize: 14, fontWeight: 600 }}>Impacto do mercado nos seus números</span>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.2)', borderLeft: `3px solid ${selicRate > 12 ? RED : GREEN}` }}>
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>SELIC {fmtDec(selicRate)}%</div>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Custo crédito: {fmtDec(selicRate * 2.5)}% a.a.</div>
-            {despesas > 0 && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Financia R${fmt(despesas)} → +R${fmt(Math.round((despesas * (selicRate * 2.5 / 100)) / 12))}/mês juros</div>}
-          </div>
-          <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.2)', borderLeft: `3px solid ${ipcaRate > 4 ? AMBER : GREEN}` }}>
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>IPCA {fmtDec(ipcaRate)}%</div>
-            {despesas > 0 && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Despesas em 12m: R${fmt(Math.round(despesas * (1 + ipcaRate / 100)))} (+R${fmt(Math.round(despesas * ipcaRate / 100))}/mês)</div>}
-          </div>
-          <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.2)', borderLeft: `3px solid ${decisaoCDI ? AMBER : GREEN}` }}>
-            <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>CDI vs. ROI</div>
-            {caixa > 0 && <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>Caixa rendendo: R${fmt(Math.round(cdiRendimento))}/mês ({fmtDec(cdiMensal, 2)}%/mês)</div>}
-            <div style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: decisaoCDI ? AMBER : GREEN }}>
-              {decisaoCDI ? `⚠ CDI bate seu ROI — avalie realocar caixa` : `✓ ROI marketing supera CDI`}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── 4.5 ALERTAS DE MERCADO AUTOMÁTICOS ── */}
-      {cockpitAlerts && cockpitAlerts.length > 0 && (
-        <div className="rounded-lg overflow-hidden" style={{ border: `1px solid ${AMBER}30` }}>
-          <div className="px-3 py-2" style={{ background: `${AMBER}10` }}>
-            <p style={{ fontSize: 10, color: AMBER, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '0.1em', marginBottom: 6 }}>
-              ⚡ ALERTAS DE MERCADO — conectado ao Business
-            </p>
-            <div className="flex flex-col gap-2">
-              {cockpitAlerts.map((alert, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <span style={{ fontSize: 11, color: AMBER, marginTop: 1 }}>▸</span>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5 }}>{alert}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ── 4. INTELIGÊNCIA DE MERCADO ── */}
+      <MarketIntelligence
+        marketData={marketData}
+        selicRate={selicRate} ipcaRate={ipcaRate} usdRate={usdRate}
+        caixa={caixa} despesas={despesas}
+        cdiMensal={cdiMensal} cdiRendimento={cdiRendimento} decisaoCDI={decisaoCDI}
+        cockpitAlerts={cockpitAlerts}
+        userProfile={userProfile}
+      />
 
       {/* ── 5. IA + PDF ── */}
       <div>
