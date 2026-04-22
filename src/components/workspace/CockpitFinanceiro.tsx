@@ -18,58 +18,16 @@ const ZERO_DEFAULT = { receita: 0, despesas: 0, caixa: 0, clientesAtivos: 0, nov
 
 // ── Componente de inteligência de mercado rico ─────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, despesas, cdiMensal, cdiRendimento, decisaoCDI, cockpitAlerts, userProfile }: {
+function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, despesas, cdiMensal, cdiRendimento, decisaoCDI, userProfile, receita, margem, runway, ltvCac, cac, churnMensal }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   marketData: any; selicRate: number; ipcaRate: number; usdRate: number
   caixa: number; despesas: number; cdiMensal: number; cdiRendimento: number; decisaoCDI: boolean
-  cockpitAlerts?: string[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   userProfile?: any
+  receita: number; margem: number; runway: number; ltvCac: number; cac: number; churnMensal: number
 }) {
-  const [sectorTab, setSectorTab] = useState<'setores' | 'cascatas'>('setores')
-
-  // Cascatas cruzamento de indicadores (copiado da lógica do MacroSection)
-  const cascatas = useMemo(() => {
-    const taxaReal = (selicRate - ipcaRate).toFixed(2)
-    const meta = marketData?.globalAgents?.find((a: any) => a.id === 'meta')
-    const cacD = marketData?.marketing?.cacTrend?.delta ?? 12
-    const retailHeat = marketData?.sectors?.find((s: any) => s.id === 'retail')?.heat ?? 20
-    const techHeat = marketData?.sectors?.find((s: any) => s.id === 'tech')?.heat ?? 70
-    const pib = marketData?.macro?.pib?.value ?? 1.86
-    const result: Array<{ cross: string; insight: string; color: string }> = []
-
-    result.push({
-      cross: `SELIC ${selicRate.toFixed(2)}% + IPCA ${ipcaRate.toFixed(2)}%`,
-      insight: `Taxa real ${taxaReal}% — ${parseFloat(taxaReal) > 8 ? 'um dos maiores juros reais do mundo. Renda fixa paga mais que bolsa.' : parseFloat(taxaReal) > 5 ? 'juro real elevado. Investimento produtivo perde pra renda fixa.' : 'juro real moderado.'}`,
-      color: parseFloat(taxaReal) > 8 ? RED : parseFloat(taxaReal) > 5 ? AMBER : GREEN,
-    })
-    if (meta) {
-      const cpmImpact = ((usdRate / 4.5 - 1) * 100).toFixed(0)
-      result.push({
-        cross: `Dólar R$${usdRate.toFixed(2)} + Meta ${meta.delta > 0 ? '▲' : '▼'}${Math.abs(meta.delta).toFixed(1)}%`,
-        insight: `CPM em reais sobe ${cpmImpact}% pelo câmbio${meta.delta > 0 ? ' + leilão competitivo' : ''}. ${cacD > 10 ? `CAC subindo ${cacD.toFixed(0)}% — custo de aquisição piora.` : 'CAC ainda gerenciável.'}`,
-        color: cacD > 15 ? RED : cacD > 8 ? AMBER : GREEN,
-      })
-    }
-    if (selicRate > 12 && retailHeat < 40) {
-      result.push({
-        cross: `SELIC ${selicRate.toFixed(2)}% + Varejo heat ${retailHeat}/100`,
-        insight: `Juro alto mata crédito ao consumidor → varejo contrai. Cada ponto acima de 10% retira ~3% da demanda discricionária.`,
-        color: RED,
-      })
-    }
-    if (techHeat > 75) {
-      result.push({
-        cross: `Tech ${techHeat}/100 + PIB +${pib.toFixed(1)}%`,
-        insight: `Setor tech aquecido = janela para produtos digitais. Momento de captar e escalar.`,
-        color: GREEN,
-      })
-    }
-    return result
-  }, [marketData, selicRate, ipcaRate, usdRate])
 
   const sectors = (marketData?.sectors ?? []) as Array<{ id: string; label?: string; heat: number; change: number; trend?: string }>
-  const maxHeat = Math.max(...sectors.map(s => s.heat), 1)
 
   // Mapeamento setor onboarding → id mercado
   const SECTOR_MAP: Record<string, string> = {
@@ -91,6 +49,94 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userProfile?.sectors, userProfile?.product])
 
+  // Análise cruzada: seus dados reais × mercado — não repete macro cards, gera impacto específico
+  const crossInsights = useMemo(() => {
+    const insights: Array<{ cross: string; insight: string; color: string }> = []
+    const taxaReal = selicRate - ipcaRate
+    const userSectorObj = userSectorId ? sectors.find(s => s.id === userSectorId) : null
+    const cacTrendDelta = marketData?.marketing?.cacTrend?.delta ?? 0
+    const cpmPressure = ((usdRate / 4.5 - 1) * 100)
+
+    // 1. Runway curto + SELIC alta → custo de oportunidade real
+    if (receita > 0 && runway < 12 && runway > 0) {
+      insights.push({
+        cross: `Runway ${fmtDec(runway)}m + SELIC ${selicRate.toFixed(1)}%`,
+        insight: `Com runway curto, cada mês de burn consome capital que renderia R$${fmt(Math.round(cdiRendimento))}/mês no CDI. Aumentar receita é mais barato que captar agora.`,
+        color: runway < 4 ? RED : AMBER,
+      })
+    }
+
+    // 2. Margem baixa + IPCA → erosão real da margem
+    if (receita > 0 && margem > 0 && margem < ipcaRate * 4) {
+      insights.push({
+        cross: `Margem ${fmtDec(margem)}% + IPCA ${ipcaRate.toFixed(1)}%`,
+        insight: `Sua margem real é apenas ${fmtDec(margem - ipcaRate)}% após inflação. Sem reajuste de preço este ano, você perde ${fmtDec(ipcaRate)}pp de margem — em 12 meses R$${fmt(Math.round(receita * ipcaRate / 100))} sumidos.`,
+        color: margem < ipcaRate * 2 ? RED : AMBER,
+      })
+    }
+
+    // 3. CAC + pressão cambial no paid
+    if (cac > 0 && cpmPressure > 5) {
+      const cacProjected = Math.round(cac * (1 + cpmPressure / 100))
+      insights.push({
+        cross: `CAC R$${fmt(cac)} + Dólar R$${usdRate.toFixed(2)}`,
+        insight: `Câmbio ${((usdRate / 4.5 - 1) * 100).toFixed(0)}% acima do R$4,50 pressiona CPM. Mantendo mesmo canal paid, seu CAC pode subir para ~R$${fmt(cacProjected)}. Diversifique aquisição orgânica.`,
+        color: cpmPressure > 15 ? RED : AMBER,
+      })
+    }
+
+    // 4. Churn + setor pressionado → acelerador de perda
+    if (churnMensal > 2 && userSectorObj && userSectorObj.heat < 50) {
+      insights.push({
+        cross: `Churn ${fmtDec(churnMensal)}%/mês + ${userSectorObj.label ?? userSectorObj.id} PRESSIONADO`,
+        insight: `Setor fraco amplifica churn — clientes com pressão financeira cancelam mais. Retenção custa 5x menos que reativação. Prioridade: onboarding e suporte proativo.`,
+        color: RED,
+      })
+    }
+
+    // 5. LTV/CAC saudável + setor aquecido → sinal de escala
+    if (ltvCac > 3 && userSectorObj && userSectorObj.heat > 70) {
+      insights.push({
+        cross: `LTV/CAC ${fmtDec(ltvCac)}x + ${userSectorObj.label ?? userSectorObj.id} AQUECIDO`,
+        insight: `Equação de aquisição saudável em setor aquecido. Janela ideal para escalar paid media com controle — cada R$1 em CAC retorna R$${fmtDec(ltvCac)} em LTV.`,
+        color: GREEN,
+      })
+    }
+
+    // 6. ROI abaixo da taxa real → capital mal alocado
+    if (receita > 0 && caixa > 0) {
+      const roiMensal = (receita - despesas) * 12 / caixa * 100
+      if (roiMensal < taxaReal) {
+        insights.push({
+          cross: `ROI ${fmtDec(roiMensal)}% vs Taxa Real ${fmtDec(taxaReal)}%`,
+          insight: `Seu retorno anual está abaixo dos juros reais. O CDI paga ${fmtDec(taxaReal)}% real sem risco — você precisa de ${fmtDec(taxaReal - roiMensal)}pp de melhoria operacional para justificar o capital alocado.`,
+          color: RED,
+        })
+      }
+    }
+
+    // 7. CAC subindo por tendência + margem apertada
+    if (cacTrendDelta > 8 && cac > 0 && margem < 30) {
+      insights.push({
+        cross: `Tendência CAC +${cacTrendDelta.toFixed(0)}% + Margem ${fmtDec(margem)}%`,
+        insight: `CAC do mercado subindo ${cacTrendDelta.toFixed(0)}% enquanto sua margem já está em ${fmtDec(margem)}%. Compressão dupla: custo de aquisição sobe, margem cai. Reveja precificação antes de escalar.`,
+        color: AMBER,
+      })
+    }
+
+    // Fallback mínimo se sem dados operacionais
+    if (insights.length === 0) {
+      insights.push({
+        cross: `Taxa Real ${fmtDec(taxaReal)}% (SELIC − IPCA)`,
+        insight: `Um dos maiores juros reais do mundo. Qualquer investimento precisa superar ${fmtDec(taxaReal)}% real para criar valor — preencha seus dados para ver o impacto específico no seu negócio.`,
+        color: taxaReal > 8 ? RED : AMBER,
+      })
+    }
+
+    return insights
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [receita, despesas, caixa, margem, runway, ltvCac, cac, churnMensal, selicRate, ipcaRate, usdRate, cdiRendimento, sectors, userSectorId, marketData])
+
   // Contexto por setor — explica o score e a influência no negócio
   const SECTOR_CONTEXT: Record<string, { why: string; impact: (h: number) => string }> = {
     tech:      { why: 'IA e cloud computing puxam crescimento. Empresas que adotam tech escalam mais rápido.', impact: h => h > 70 ? 'Momento favorável para lançar produto digital e captar investimento.' : h > 40 ? 'Crescimento moderado — foque em retenção antes de escalar.' : 'Setor desacelerando — corte burn e proteja caixa.' },
@@ -105,7 +151,6 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
   }
 
   const userSector = userSectorId ? sectors.find(s => s.id === userSectorId) : null
-  const otherSectors = sectors.filter(s => s.id !== userSectorId)
 
   const heatLabel = (h: number) => h >= 75 ? { text: 'AQUECIDO', color: GREEN } : h >= 50 ? { text: 'FAVORÁVEL', color: GREEN } : h >= 30 ? { text: 'NEUTRO', color: AMBER } : { text: 'PRESSIONADO', color: RED }
 
@@ -179,72 +224,20 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
         )
       })()}
 
-      {/* Tabs: todos setores / cascatas */}
+      {/* Impactos cruzados: seus dados × mercado */}
       <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="flex border-b border-white/5">
-          {[{ key: 'setores', label: 'TODOS SETORES' }, { key: 'cascatas', label: 'CASCATAS' }].map(t => (
-            <button key={t.key} onClick={() => setSectorTab(t.key as 'setores' | 'cascatas')}
-              className="flex-1 py-2 font-mono text-[10px] font-bold tracking-widest transition-colors"
-              style={{ color: sectorTab === t.key ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)', background: sectorTab === t.key ? 'rgba(255,255,255,0.04)' : 'transparent', borderBottom: sectorTab === t.key ? `2px solid ${BLUE}` : '2px solid transparent' }}>
-              {t.label}
-            </button>
+        <div className="px-3 pt-2.5 pb-1 border-b border-white/5">
+          <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em' }}>IMPACTO NO SEU NEGÓCIO</span>
+        </div>
+        <div className="px-3 py-2.5 flex flex-col gap-2">
+          {crossInsights.map((c, i) => (
+            <div key={i} className="rounded-md px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.2)', borderLeft: `3px solid ${c.color}` }}>
+              <div style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: c.color, marginBottom: 3 }}>{c.cross}</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5 }}>{c.insight}</div>
+            </div>
           ))}
         </div>
-        <div className="px-3 py-2.5">
-          {sectorTab === 'setores' && (
-            <div className="flex flex-col gap-2">
-              {(userSectorId ? otherSectors : sectors).map(s => {
-                const hl = heatLabel(s.heat)
-                const ctx = SECTOR_CONTEXT[s.id]
-                const barW = Math.max(4, (s.heat / maxHeat) * 100)
-                return (
-                  <div key={s.id} className="rounded-md overflow-hidden" style={{ background: 'rgba(0,0,0,0.15)', borderLeft: `3px solid ${hl.color}` }}>
-                    <div className="px-2.5 py-2">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.65)' }}>{s.label ?? s.id}</span>
-                        <div className="flex items-center gap-1.5">
-                          <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: hl.color }}>{hl.text}</span>
-                          <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: hl.color }}>{s.heat}/100</span>
-                        </div>
-                      </div>
-                      <div className="h-[3px] rounded-full overflow-hidden mb-1.5" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                        <motion.div className="h-full rounded-full" style={{ background: hl.color }}
-                          initial={{ width: 0 }} animate={{ width: `${barW}%` }} transition={{ duration: 0.6 }} />
-                      </div>
-                      {ctx && <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', lineHeight: 1.4 }}>{ctx.why}</p>}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-          {sectorTab === 'cascatas' && (
-            <div className="flex flex-col gap-2">
-              {cascatas.map((c, i) => (
-                <div key={i} className="rounded-md px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.2)', borderLeft: `3px solid ${c.color}` }}>
-                  <div style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: c.color, marginBottom: 3 }}>{c.cross}</div>
-                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.4 }}>{c.insight}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
-
-      {/* Alertas de mercado (da Intelligence) */}
-      {cockpitAlerts && cockpitAlerts.length > 0 && (
-        <div className="rounded-lg px-3 py-2.5" style={{ background: `${AMBER}08`, border: `1px solid ${AMBER}25` }}>
-          <p style={{ fontSize: 10, color: AMBER, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '0.1em', marginBottom: 6 }}>⚡ ALERTAS — BUSINESS CONECTADO</p>
-          <div className="flex flex-col gap-1.5">
-            {cockpitAlerts.map((alert, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <span style={{ fontSize: 10, color: AMBER, marginTop: 1, flexShrink: 0 }}>▸</span>
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', lineHeight: 1.5 }}>{alert}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }
@@ -576,8 +569,9 @@ Seja direto, use os números reais, compare com os benchmarks informados.`
         selicRate={selicRate} ipcaRate={ipcaRate} usdRate={usdRate}
         caixa={caixa} despesas={despesas}
         cdiMensal={cdiMensal} cdiRendimento={cdiRendimento} decisaoCDI={decisaoCDI}
-        cockpitAlerts={cockpitAlerts}
         userProfile={userProfile}
+        receita={receita} margem={metrics.margem} runway={metrics.runway}
+        ltvCac={metrics.ltvCac} cac={cac} churnMensal={churnMensal}
       />
 
       {/* ── 5. IA + PDF ── */}
