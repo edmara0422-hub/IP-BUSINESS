@@ -70,9 +70,10 @@ function clamp(n: number, min: number, max: number) { return Math.max(min, Math.
 function r2(n: number) { return parseFloat(n.toFixed(2)) }
 function r1(n: number) { return parseFloat(n.toFixed(1)) }
 
-export const dynamic = 'force-dynamic'
+// Vercel CDN cacheia 5min — sobrevive cold starts
+export const revalidate = 300
 
-// Cache em memória — 5 minutos. Evita bater nas APIs externas a cada request.
+// Cache em memória — fallback intra-instância (warm requests)
 let _cache: { data: unknown; ts: number } | null = null
 const CACHE_TTL = 5 * 60 * 1000
 
@@ -324,7 +325,7 @@ export async function GET() {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET',
       'X-Cache': 'MISS',
-      'Cache-Control': 'public, max-age=300',
+      'Cache-Control': 'public, max-age=300, stale-while-revalidate=60',
     },
   })
 }

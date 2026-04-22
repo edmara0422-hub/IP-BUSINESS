@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@keyframes tickerScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
 /* App nativo */
 html {
   -webkit-text-size-adjust: 100%;

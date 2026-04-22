@@ -29,6 +29,19 @@ const SECTOR_MAP: Record<string, string> = {
   'Mídia': 'media', 'Comunicação': 'media', 'Mídia Impressa': 'media',
 }
 
+// Contexto por setor — módulo-level (não recria a cada render)
+const SECTOR_CONTEXT: Record<string, { why: string; impact: (h: number) => string }> = {
+  tech:      { why: 'IA e cloud computing puxam crescimento. Empresas que adotam tech escalam mais rápido.', impact: h => h > 70 ? 'Momento favorável para lançar produto digital e captar investimento.' : h > 40 ? 'Crescimento moderado — foque em retenção antes de escalar.' : 'Setor desacelerando — corte burn e proteja caixa.' },
+  agro:      { why: 'Dólar alto favorece exportador mas encarece insumos importados. PIB agro sólido.', impact: h => h > 70 ? 'Oportunidade B2B: produtores com dinheiro procuram ferramentas de gestão.' : h > 40 ? 'Cautela — commodities voláteis impactam margens do cliente.' : 'Setor pressionado por câmbio e clima.' },
+  health:    { why: 'MedTech e telemedicina crescem pós-pandemia. Mercado resiliente a recessões.', impact: h => h > 70 ? 'Procura por saúde não para — bom para crescer ticket médio.' : h > 40 ? 'Regulação pesada pode travar expansão rápida.' : 'Regulação + SELIC alto encarecem capex em saúde.' },
+  energy:    { why: 'Transição energética acelera. Solar e eólica crescem 20%+/a.a.', impact: h => h > 70 ? 'Projetos de energia renovável com captação facilitada.' : h > 40 ? 'Petróleo volátil — custo de frete incerto.' : 'Custo de energia pressionando margens do setor.' },
+  fintech:   { why: 'Pix, open banking e crédito digital transformam o setor. SELIC alta aumenta spread.', impact: h => h > 70 ? 'SELIC alta = spread bancário alto = oportunidade para alternativas de crédito.' : h > 40 ? 'Regulação do BC aumenta compliance — custo operacional sobe.' : 'Capital de risco seco para fintech em cenário de juro alto.' },
+  logistics: { why: 'E-commerce impulsiona logística last-mile. Frota elétrica e automação crescem.', impact: h => h > 70 ? 'E-commerce aquecido = volume de entregas crescendo — bom para operadores.' : h > 40 ? 'Combustível volátil corrói margem operacional.' : 'Dólar alto encarece peças e frota. Revisar precificação.' },
+  services:  { why: 'Setor sensível a PIB. Cresce quando economia expande, contrai rápido em recessão.', impact: h => h > 70 ? 'PIB crescendo = consumidor com renda. Momento de conquistar novos clientes.' : h > 40 ? 'Crescimento fraco — foque em LTV e upsell da base existente.' : 'SELIC alta trava consumo de serviços discricionários. Cautela.' },
+  retail:    { why: 'Varejo físico perde espaço para e-commerce. SELIC alta mata crédito ao consumidor.', impact: h => h > 50 ? 'Exceção no setor — foco em experiência ou nicho premium.' : h > 25 ? 'Juro alto comprime vendas a prazo. Revisar mix e giro de estoque.' : 'Setor crítico: juro alto + e-commerce corroendo share. Pivotar ou focar em sobrevivência.' },
+  media:     { why: 'Mídia tradicional em colapso estrutural. Audiência migrou para digital.', impact: () => 'Modelo de negócio legado. Reconversão para digital é única saída sustentável.' },
+}
+
 // ── Componente de inteligência de mercado rico ─────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, despesas, cdiMensal, cdiRendimento, decisaoCDI, userProfile, receita, margem, runway, ltvCac, cac, churnMensal, taxaRealExata, burnReal, cacAjustado, margemReal }: {
@@ -138,19 +151,6 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
     return insights
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [receita, despesas, margem, runway, ltvCac, cac, churnMensal, selicRate, ipcaRate, usdRate, cdiRendimento, taxaRealExata, burnReal, cacAjustado, margemReal, sectors, userSectorId, marketData])
-
-  // Contexto por setor — explica o score e a influência no negócio
-  const SECTOR_CONTEXT: Record<string, { why: string; impact: (h: number) => string }> = {
-    tech:      { why: 'IA e cloud computing puxam crescimento. Empresas que adotam tech escalam mais rápido.', impact: h => h > 70 ? 'Momento favorável para lançar produto digital e captar investimento.' : h > 40 ? 'Crescimento moderado — foque em retenção antes de escalar.' : 'Setor desacelerando — corte burn e proteja caixa.' },
-    agro:      { why: 'Dólar alto favorece exportador mas encarece insumos importados. PIB agro sólido.', impact: h => h > 70 ? 'Oportunidade B2B: produtores com dinheiro procuram ferramentas de gestão.' : h > 40 ? 'Cautela — commodities voláteis impactam margens do cliente.' : 'Setor pressionado por câmbio e clima.' },
-    health:    { why: 'MedTech e telemedicina crescem pós-pandemia. Mercado resiliente a recessões.', impact: h => h > 70 ? 'Procura por saúde não para — bom para crescer ticket médio.' : h > 40 ? 'Regulação pesada pode travar expansão rápida.' : 'Regulação + SELIC alto encarecem capex em saúde.' },
-    energy:    { why: 'Transição energética acelera. Solar e eólica crescem 20%+/a.a.', impact: h => h > 70 ? 'Projetos de energia renovável com captação facilitada.' : h > 40 ? 'Petróleo volátil — custo de frete incerto.' : 'Custo de energia pressionando margens do setor.' },
-    fintech:   { why: 'Pix, open banking e crédito digital transformam o setor. SELIC alta aumenta spread.', impact: h => h > 70 ? 'SELIC alta = spread bancário alto = oportunidade para alternativas de crédito.' : h > 40 ? 'Regulação do BC aumenta compliance — custo operacional sobe.' : 'Capital de risco seco para fintech em cenário de juro alto.' },
-    logistics: { why: 'E-commerce impulsiona logística last-mile. Frota elétrica e automação crescem.', impact: h => h > 70 ? 'E-commerce aquecido = volume de entregas crescendo — bom para operadores.' : h > 40 ? 'Combustível volátil corrói margem operacional.' : 'Dólar alto encarece peças e frota. Revisar precificação.' },
-    services:  { why: 'Setor sensível a PIB. Cresce quando economia expande, contrai rápido em recessão.', impact: h => h > 70 ? 'PIB crescendo = consumidor com renda. Momento de conquistar novos clientes.' : h > 40 ? 'Crescimento fraco — foque em LTV e upsell da base existente.' : 'SELIC alta trava consumo de serviços discricionários. Cautela.' },
-    retail:    { why: 'Varejo físico perde espaço para e-commerce. SELIC alta mata crédito ao consumidor.', impact: h => h > 50 ? 'Exceção no setor — foco em experiência ou nicho premium.' : h > 25 ? 'Juro alto comprime vendas a prazo. Revisar mix e giro de estoque.' : 'Setor crítico: juro alto + e-commerce corroendo share. Pivotar ou focar em sobrevivência.' },
-    media:     { why: 'Mídia tradicional em colapso estrutural. Audiência migrou para digital.', impact: () => 'Modelo de negócio legado. Reconversão para digital é única saída sustentável.' },
-  }
 
   const userSector = userSectorId ? sectors.find(s => s.id === userSectorId) : null
 
@@ -278,17 +278,18 @@ function NumInput({ label, value, onChange, prefix = 'R$' }: { label: string; va
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function AgentsTicker({ marketData }: { marketData: any }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const agents     = (marketData?.globalAgents  ?? []) as Array<{ id: string; label: string; delta: number; value?: number }>
+  const agents = (marketData?.globalAgents ?? []) as Array<{ id: string; label: string; delta: number; value?: number }>
+  // commodities vem como objeto {gold:{...}, oil:{...}} — convertemos para array
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const commodities = (marketData?.commodities  ?? []) as Array<{ id: string; label: string; delta: number; value?: number }>
+  const commodities = Object.entries(marketData?.commodities ?? {}).map(([id, c]: [string, any]) => ({ id, ...c })) as Array<{ id: string; label: string; delta: number; value?: number }>
 
   const AGENT_IMPACT: Record<string, (d: number) => string> = {
-    meta:     d => d < 0 ? `Meta ▼${Math.abs(d).toFixed(2)}% — CPM pode cair: janela para escalar ads` : `Meta ▲${d.toFixed(2)}% — CPM subindo: cautela em paid media`,
-    google:   d => d < 0 ? `Google ▼${Math.abs(d).toFixed(2)}% — CPC pode cair: oportunidade em search` : `Google ▲${d.toFixed(2)}% — CPC subindo: revisar bids`,
-    apple:    d => d < 0 ? `Apple ▼${Math.abs(d).toFixed(2)}% — consumidor premium recuando: demanda discricionária cai` : `Apple ▲${d.toFixed(2)}% — consumo premium aquecido`,
-    amazon:   d => d < 0 ? `Amazon ▼${Math.abs(d).toFixed(2)}% — e-commerce desacelerando: menos demanda inbound` : `Amazon ▲${d.toFixed(2)}% — e-commerce aquecido`,
-    vale:     d => d < 0 ? `Vale ▼${Math.abs(d).toFixed(2)}% — China desacelerando: câmbio pode pressionar` : `Vale ▲${d.toFixed(2)}% — commodities aquecidas: PIB favorável`,
-    petrobras:d => d < 0 ? `Petrobras ▼${Math.abs(d).toFixed(2)}% — combustível pode cair: frete mais barato` : `Petrobras ▲${d.toFixed(2)}% — combustível subindo: frete mais caro`,
+    meta:  d => d < 0 ? `Meta ▼${Math.abs(d).toFixed(2)}% — CPM pode cair: janela para escalar ads` : `Meta ▲${d.toFixed(2)}% — CPM subindo: cautela em paid media`,
+    googl: d => d < 0 ? `Google ▼${Math.abs(d).toFixed(2)}% — CPC pode cair: oportunidade em search` : `Google ▲${d.toFixed(2)}% — CPC subindo: revisar bids`,
+    aapl:  d => d < 0 ? `Apple ▼${Math.abs(d).toFixed(2)}% — consumidor premium recuando: demanda discricionária cai` : `Apple ▲${d.toFixed(2)}% — consumo premium aquecido`,
+    amzn:  d => d < 0 ? `Amazon ▼${Math.abs(d).toFixed(2)}% — e-commerce desacelerando: menos demanda inbound` : `Amazon ▲${d.toFixed(2)}% — e-commerce aquecido`,
+    vale:  d => d < 0 ? `Vale ▼${Math.abs(d).toFixed(2)}% — China desacelerando: câmbio pode pressionar` : `Vale ▲${d.toFixed(2)}% — commodities aquecidas: PIB favorável`,
+    petr:  d => d < 0 ? `Petrobras ▼${Math.abs(d).toFixed(2)}% — combustível pode cair: frete mais barato` : `Petrobras ▲${d.toFixed(2)}% — combustível subindo: frete mais caro`,
   }
   const COMMODITY_IMPACT: Record<string, (d: number, v?: number) => string> = {
     oil:    (d, v) => d < 0 ? `Petróleo $${v?.toFixed(2) ?? '?'} ▼${Math.abs(d).toFixed(2)}% — frete ~2% mais barato nos próximos 7 dias` : `Petróleo $${v?.toFixed(2) ?? '?'} ▲${d.toFixed(2)}% — custo de energia e frete subindo`,
@@ -312,7 +313,6 @@ function AgentsTicker({ marketData }: { marketData: any }) {
   return (
     <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}>
       <div style={{ overflow: 'hidden', position: 'relative' }}>
-        <style>{`@keyframes tickerScroll { from { transform: translateX(0) } to { transform: translateX(-50%) } }`}</style>
         <div style={{ display: 'flex', gap: 0, animation: `tickerScroll ${Math.max(items.length * 8, 30)}s linear infinite`, width: 'max-content' }}>
           {allItems.map((item, i) => (
             <div key={i} className="flex items-center gap-2 px-4 py-2" style={{ borderRight: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
@@ -399,15 +399,15 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const revenue  = userProfile?.revenue ?? ''
 
   // ── Referências de mercado (fallback quando dado do usuário é 0) ───────────
-  const cacRefNum    = marketData?.marketing?.cac?.value     ?? 49
-  const churnRefNum  = marketData?.marketing?.churn?.value   ?? 4.2
-  const ltvRefNum    = marketData?.marketing?.ltv?.value     ?? 156
-  const cpmUsdVal    = marketData?.marketing?.cpm?.value     ?? 0
-  const cpcUsdVal    = marketData?.marketing?.cpc?.value     ?? 0
+  const cacRefNum    = marketData?.marketing?.cacTrend?.value     ?? 49
+  const churnRefNum  = 4.2
+  const ltvRefNum    = 156
+  const cpmUsdVal    = marketData?.marketing?.cpmGlobal?.value    ?? 0
+  const cpcUsdVal    = marketData?.marketing?.cpcGlobal?.value    ?? 0
   const organicPct   = marketData?.marketing?.organicShare?.value ?? 0
   const organicDelta = marketData?.marketing?.organicShare?.delta ?? 0
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const platforms    = (marketData?.marketing?.platforms ?? []) as Array<{ id: string; label: string; cpm: number; delta: number }>
+  const platforms    = (marketData?.platforms ?? []) as Array<{ id: string; label: string; cpm: number; delta: number }>
 
   // Setor do usuário no mercado
   const userSectorIdMain = SECTOR_MAP[setores[0] ?? ''] ?? null
@@ -465,7 +465,7 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const O_CALC  = { text: 'calculado',    color: '#5dade2' }
   const O_FUND  = { text: 'fundido',      color: '#5dade2' }
 
-  const metricCards = [
+  const metricCards = useMemo(() => [
     { label: 'Health Score',   value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: `setor ${sectorHeat}/100 + runway + margem + LTV/CAC + burn`, origin: O_FUND },
     { label: 'Margem',         value: `${fmtDec(metrics.margem, 2)}%`, color: colorByRange(metrics.margem, 20, 10),   desc: '(receita − despesas) / receita', origin: receita > 0 && despesas > 0 ? O_REAL : O_CALC },
     { label: 'Runway',         value: metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway, 2)} meses`, color: colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: 'Caixa ÷ burn real', origin: caixa > 0 || despesas > 0 ? O_REAL : O_CALC },
@@ -478,9 +478,14 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     { label: 'CAC',            value: `R$${fmt(cacEfetivo)}`,        color: cac > 0 ? BLUE : AMBER,                  desc: cacIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'verba ÷ novos clientes', origin: cacIsEstimado ? O_REF : O_REAL },
     { label: 'Churn',          value: `${fmtDec(churnEfetivo, 2)}%`, color: colorByRange(100 - churnEfetivo, 95, 90), desc: churnIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'perdidos ÷ ativos × 100', origin: churnIsEstimado ? O_REF : O_REAL },
     { label: 'LTV',            value: `R$${fmt(Math.round(metrics.ltv))}`, color: metrics.ltv > 0 ? GREEN : AMBER,  desc: `(Ticket × Margem) ÷ Churn`, origin: churnIsEstimado || ticketMedio === 0 ? O_FUND : O_CALC },
-  ]
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ], [metrics, sectorHeat, receita, despesas, caixa, cacEfetivo, churnEfetivo, ticketMedio, cac, cacIsEstimado, churnIsEstimado, modoManual])
 
-  const benchmark = fase ? buildBenchmark(fase, setores, produtos, revenue, nomeNegocio) : ''
+  const benchmark = useMemo(
+    () => fase ? buildBenchmark(fase, setores, produtos, revenue, nomeNegocio) : '',
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [fase, setores.join(','), produtos.join(','), revenue, nomeNegocio]
+  )
 
   const exportPDF = async () => {
     if (!pdfRef.current) return
@@ -517,21 +522,21 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
 
     // ── Extração completa de marketData ────────────────────────────────────
     const pibRate      = marketData?.macro?.pib?.value              ?? 1.9
-    const cpmUsd       = marketData?.marketing?.cpm?.value          ?? 0
-    const cpcUsd       = marketData?.marketing?.cpc?.value          ?? 0
+    const cpmUsd       = marketData?.marketing?.cpmGlobal?.value    ?? 0
+    const cpcUsd       = marketData?.marketing?.cpcGlobal?.value    ?? 0
     const organicPct   = marketData?.marketing?.organicShare?.value ?? 0
     const organicDelta = marketData?.marketing?.organicShare?.delta ?? 0
-    const cacRef       = marketData?.marketing?.cac?.value          ?? 0
-    const ltvRef       = marketData?.marketing?.ltv?.value          ?? 0
-    const churnRef     = marketData?.marketing?.churn?.value        ?? 0
+    const cacRef       = marketData?.marketing?.cacTrend?.value     ?? 0
+    const ltvRef       = 156
+    const churnRef     = 4.2
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const platforms    = (marketData?.marketing?.platforms ?? []) as Array<{ id: string; label: string; cpm: number; delta: number }>
+    const platforms    = (marketData?.platforms ?? []) as Array<{ id: string; label: string; cpm: number; delta: number }>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const metaAgent    = marketData?.globalAgents?.find((a: any) => a.id === 'meta')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const googleAgent  = marketData?.globalAgents?.find((a: any) => a.id === 'google')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const petroleo     = marketData?.commodities?.find((c: any) => c.id === 'oil')
+    const googleAgent  = marketData?.globalAgents?.find((a: any) => a.id === 'googl')
+    // commodities é objeto {oil:{...}} — acesso direto pela chave
+    const petroleo     = marketData?.commodities?.oil
     const briefing     = marketData?.briefing ?? ''
 
     const userSectorIdIA = SECTOR_MAP[setores[0] ?? ''] ?? null
@@ -769,8 +774,8 @@ REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
           </div>
         )}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {metricCards.map((m, i) => (
-            <motion.div key={m.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+          {metricCards.map((m) => (
+            <div key={m.label}
               className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${m.color}` }}>
               <div className="flex items-center justify-between mb-1">
                 <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{m.label}</div>
@@ -782,7 +787,7 @@ REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
               </div>
               <div className="truncate" style={{ fontSize: 15, fontWeight: 700, color: m.color, fontFamily: 'monospace', lineHeight: 1.2 }}>{m.value}</div>
               <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 4, lineHeight: 1.3 }}>{m.desc}</div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
