@@ -31,13 +31,14 @@ const SECTOR_MAP: Record<string, string> = {
 
 // ── Componente de inteligência de mercado rico ─────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, despesas, cdiMensal, cdiRendimento, decisaoCDI, userProfile, receita, margem, runway, ltvCac, cac, churnMensal }: {
+function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, despesas, cdiMensal, cdiRendimento, decisaoCDI, userProfile, receita, margem, runway, ltvCac, cac, churnMensal, taxaRealExata, burnReal, cacAjustado, margemReal }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   marketData: any; selicRate: number; ipcaRate: number; usdRate: number
   caixa: number; despesas: number; cdiMensal: number; cdiRendimento: number; decisaoCDI: boolean
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   userProfile?: any
   receita: number; margem: number; runway: number; ltvCac: number; cac: number; churnMensal: number
+  taxaRealExata: number; burnReal: number; cacAjustado: number; margemReal: number
 }) {
 
   const sectors = (marketData?.sectors ?? []) as Array<{ id: string; label?: string; heat: number; change: number; trend?: string }>
@@ -52,90 +53,91 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
   // Análise cruzada: seus dados reais × mercado — não repete macro cards, gera impacto específico
   const crossInsights = useMemo(() => {
     const insights: Array<{ cross: string; insight: string; color: string }> = []
-    const taxaReal = selicRate - ipcaRate
     const userSectorObj = userSectorId ? sectors.find(s => s.id === userSectorId) : null
     const cacTrendDelta = marketData?.marketing?.cacTrend?.delta ?? 0
-    const cpmPressure = ((usdRate / 4.5 - 1) * 100)
+    const cpmPressure   = ((usdRate / 4.5 - 1) * 100)
 
-    // 1. Runway curto + SELIC alta → custo de oportunidade real
-    if (receita > 0 && runway < 12 && runway > 0) {
-      insights.push({
-        cross: `Runway ${fmtDec(runway)}m + SELIC ${selicRate.toFixed(1)}%`,
-        insight: `Com runway curto, cada mês de burn consome capital que renderia R$${fmt(Math.round(cdiRendimento))}/mês no CDI. Aumentar receita é mais barato que captar agora.`,
-        color: runway < 4 ? RED : AMBER,
-      })
-    }
+    // ── INSIGHTS DE MERCADO PURO (disparam sempre, independem de dados do usuário) ──
 
-    // 2. Margem baixa + IPCA → erosão real da margem
-    if (receita > 0 && margem > 0 && margem < ipcaRate * 4) {
-      insights.push({
-        cross: `Margem ${fmtDec(margem)}% + IPCA ${ipcaRate.toFixed(1)}%`,
-        insight: `Sua margem real é apenas ${fmtDec(margem - ipcaRate)}% após inflação. Sem reajuste de preço este ano, você perde ${fmtDec(ipcaRate)}pp de margem — em 12 meses R$${fmt(Math.round(receita * ipcaRate / 100))} sumidos.`,
-        color: margem < ipcaRate * 2 ? RED : AMBER,
-      })
-    }
+    // M1. Taxa real Fisher — sempre relevante
+    insights.push({
+      cross: `Taxa Real Fisher ${taxaRealExata.toFixed(4)}% (SELIC ${selicRate}% − IPCA ${ipcaRate}%)`,
+      insight: `Um dos maiores juros reais do mundo. Qualquer ROI abaixo de ${taxaRealExata.toFixed(2)}% é destruição de valor real${margemReal < 0 ? ` — sua margem real atual é ${margemReal.toFixed(2)}% (negativa)` : receita > 0 ? ` — sua margem real é ${margemReal.toFixed(2)}%` : ''}.`,
+      color: taxaRealExata > 8 ? RED : AMBER,
+    })
 
-    // 3. CAC + pressão cambial no paid
-    if (cac > 0 && cpmPressure > 5) {
-      const cacProjected = Math.round(cac * (1 + cpmPressure / 100))
+    // M2. Burn Real com SELIC — dispara se tem despesas
+    if (burnReal > 0) {
       insights.push({
-        cross: `CAC R$${fmt(cac)} + Dólar R$${usdRate.toFixed(2)}`,
-        insight: `Câmbio ${((usdRate / 4.5 - 1) * 100).toFixed(0)}% acima do R$4,50 pressiona CPM. Mantendo mesmo canal paid, seu CAC pode subir para ~R$${fmt(cacProjected)}. Diversifique aquisição orgânica.`,
-        color: cpmPressure > 15 ? RED : AMBER,
-      })
-    }
-
-    // 4. Churn + setor pressionado → acelerador de perda
-    if (churnMensal > 2 && userSectorObj && userSectorObj.heat < 50) {
-      insights.push({
-        cross: `Churn ${fmtDec(churnMensal)}%/mês + ${userSectorObj.label ?? userSectorObj.id} PRESSIONADO`,
-        insight: `Setor fraco amplifica churn — clientes com pressão financeira cancelam mais. Retenção custa 5x menos que reativação. Prioridade: onboarding e suporte proativo.`,
+        cross: `Burn Real R$${burnReal.toFixed(2)} vs Declarado R$${despesas.toFixed(2)}`,
+        insight: `SELIC ${selicRate}% adiciona R$${(burnReal - despesas).toFixed(2)}/mês de custo oculto em crédito e fornecedores. Se financiar via banco: +R$${(despesas * (selicRate * 2.5 / 100) / 12).toFixed(2)}/mês adicionais.`,
         color: RED,
       })
     }
 
-    // 5. LTV/CAC saudável + setor aquecido → sinal de escala
-    if (ltvCac > 3 && userSectorObj && userSectorObj.heat > 70) {
+    // M3. CAC Ajustado ao câmbio — sempre
+    insights.push({
+      cross: `CAC Ajustado R$${cacAjustado.toFixed(2)} (câmbio R$${usdRate.toFixed(2)}/R$4,50)`,
+      insight: `Pressão cambial de ${((usdRate / 4.5 - 1) * 100).toFixed(1)}% encarece paid media em reais. CAC base R$${cac.toFixed(2)} → ajustado R$${cacAjustado.toFixed(2)}. Canal mais barato do mercado para reduzir este impacto.`,
+      color: cpmPressure > 15 ? RED : AMBER,
+    })
+
+    // ── INSIGHTS COM DADOS DO USUÁRIO (quando disponíveis) ──
+
+    // U1. Runway curto + CDI
+    if (runway > 0 && runway < 12) {
       insights.push({
-        cross: `LTV/CAC ${fmtDec(ltvCac)}x + ${userSectorObj.label ?? userSectorObj.id} AQUECIDO`,
-        insight: `Equação de aquisição saudável em setor aquecido. Janela ideal para escalar paid media com controle — cada R$1 em CAC retorna R$${fmtDec(ltvCac)} em LTV.`,
-        color: GREEN,
+        cross: `Runway ${fmtDec(runway)}m + CDI ${(selicRate - 0.1).toFixed(2)}% a.a.`,
+        insight: `Com runway curto, cada mês de burn consome R$${fmt(Math.round(cdiRendimento))}/mês que o CDI pagaria parado. Receita antes de captação — captar agora custa ${(selicRate * 2.5).toFixed(2)}% a.a.`,
+        color: runway < 4 ? RED : AMBER,
       })
     }
 
-    // 6. ROI abaixo da taxa real → capital mal alocado
-    if (receita > 0 && caixa > 0) {
-      const roiMensal = (receita - despesas) * 12 / caixa * 100
-      if (roiMensal < taxaReal) {
-        insights.push({
-          cross: `ROI ${fmtDec(roiMensal)}% vs Taxa Real ${fmtDec(taxaReal)}%`,
-          insight: `Seu retorno anual está abaixo dos juros reais. O CDI paga ${fmtDec(taxaReal)}% real sem risco — você precisa de ${fmtDec(taxaReal - roiMensal)}pp de melhoria operacional para justificar o capital alocado.`,
-          color: RED,
-        })
-      }
-    }
-
-    // 7. CAC subindo por tendência + margem apertada
-    if (cacTrendDelta > 8 && cac > 0 && margem < 30) {
+    // U2. Margem real negativa
+    if (receita > 0 && margemReal < 0) {
       insights.push({
-        cross: `Tendência CAC +${cacTrendDelta.toFixed(0)}% + Margem ${fmtDec(margem)}%`,
-        insight: `CAC do mercado subindo ${cacTrendDelta.toFixed(0)}% enquanto sua margem já está em ${fmtDec(margem)}%. Compressão dupla: custo de aquisição sobe, margem cai. Reveja precificação antes de escalar.`,
+        cross: `Margem Real ${margemReal.toFixed(2)}% (margem ${fmtDec(margem)}% − taxa real ${taxaRealExata.toFixed(2)}%)`,
+        insight: `Margem real negativa: seu negócio destrói valor em termos reais. Sem reajuste de preço este ano, perde R$${fmt(Math.round(receita * Math.abs(margemReal) / 100))}/mês em poder aquisitivo.`,
+        color: RED,
+      })
+    } else if (receita > 0 && margem > 0 && margem < ipcaRate * 4) {
+      insights.push({
+        cross: `Margem ${fmtDec(margem)}% + IPCA ${ipcaRate.toFixed(1)}%`,
+        insight: `Margem real de ${margemReal.toFixed(2)}%. Sem reajuste este ano, R$${fmt(Math.round(receita * ipcaRate / 100))} sumidos em 12 meses. Reajuste mínimo necessário: ${ipcaRate.toFixed(2)}%.`,
         color: AMBER,
       })
     }
 
-    // Fallback mínimo se sem dados operacionais
-    if (insights.length === 0) {
+    // U3. Churn + setor pressionado
+    if (churnMensal > 2 && userSectorObj && userSectorObj.heat < 50) {
       insights.push({
-        cross: `Taxa Real ${fmtDec(taxaReal)}% (SELIC − IPCA)`,
-        insight: `Um dos maiores juros reais do mundo. Qualquer investimento precisa superar ${fmtDec(taxaReal)}% real para criar valor — preencha seus dados para ver o impacto específico no seu negócio.`,
-        color: taxaReal > 8 ? RED : AMBER,
+        cross: `Churn ${fmtDec(churnMensal)}%/mês + ${userSectorObj.label ?? userSectorObj.id} PRESSIONADO`,
+        insight: `Setor fraco amplifica churn — clientes com pressão financeira cancelam primeiro. Retenção custa 5× menos que reativação. Foco: onboarding e suporte ativo.`,
+        color: RED,
+      })
+    }
+
+    // U4. LTV/CAC + setor aquecido
+    if (ltvCac > 3 && userSectorObj && userSectorObj.heat > 70) {
+      insights.push({
+        cross: `LTV/CAC ${fmtDec(ltvCac)}x + ${userSectorObj.label ?? userSectorObj.id} AQUECIDO`,
+        insight: `Equação saudável em setor aquecido. Janela para escalar paid — cada R$1 de CAC retorna R$${fmtDec(ltvCac)} em LTV. Canal mais barato do mercado para maximizar escala.`,
+        color: GREEN,
+      })
+    }
+
+    // U5. CAC subindo + margem apertada
+    if (cacTrendDelta > 8 && margem < 30 && receita > 0) {
+      insights.push({
+        cross: `Tendência CAC mkt +${cacTrendDelta.toFixed(0)}% + Margem ${fmtDec(margem)}%`,
+        insight: `CAC do mercado subindo ${cacTrendDelta.toFixed(0)}% com margem já em ${fmtDec(margem)}%. Compressão dupla — reveja precificação antes de escalar paid.`,
+        color: AMBER,
       })
     }
 
     return insights
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receita, despesas, caixa, margem, runway, ltvCac, cac, churnMensal, selicRate, ipcaRate, usdRate, cdiRendimento, sectors, userSectorId, marketData])
+  }, [receita, despesas, margem, runway, ltvCac, cac, churnMensal, selicRate, ipcaRate, usdRate, cdiRendimento, taxaRealExata, burnReal, cacAjustado, margemReal, sectors, userSectorId, marketData])
 
   // Contexto por setor — explica o score e a influência no negócio
   const SECTOR_CONTEXT: Record<string, { why: string; impact: (h: number) => string }> = {
@@ -337,47 +339,90 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const ipcaRate  = marketData?.macro?.ipca?.value   ?? 4.14
   const usdRate   = marketData?.macro?.usdBrl?.value ?? 4.98
 
-  const metrics = useMemo(() => {
-    const margemDecimal = receita > 0 ? (receita - despesas) / receita : 0
-    const margem   = margemDecimal * 100
-    const lucro    = receita - despesas
-    const burnLiquido = despesas - receita
-    const runway   = burnLiquido > 0 ? caixa / burnLiquido : (lucro >= 0 ? 999 : caixa / despesas)
-    const ltv      = churnMensal > 0 ? (ticketMedio * margemDecimal) / (churnMensal / 100) : 0
-    const ltvCac   = cac > 0 && ltv > 0 ? ltv / cac : 0
-    const burnRatio   = receita > 0 ? 1 - despesas / receita : 0
-    const runwayNorm  = Math.min((runway === 999 ? 24 : runway) / 24, 1) * 100
-    const ltvCacNorm  = Math.min(ltvCac / 5, 1) * 100
-    const burnNorm    = Math.max(burnRatio, 0) * 100
-    const semDados    = receita === 0 && despesas === 0 && caixa === 0
-    const healthScore = semDados ? 0 : Math.round(margem * 0.25 + runwayNorm * 0.4 + ltvCacNorm * 0.2 + burnNorm * 0.15)
-    const breakeven   = margemDecimal > 0 ? despesas / margemDecimal : 0
-    const roi         = caixa > 0 ? (lucro * 12) / caixa * 100 : 0
-    const breakevenAlert = breakeven > receita && receita > 0
-    return { margem, lucro, runway, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, breakevenAlert, semDados }
-  }, [receita, despesas, caixa, cac, ticketMedio, churnMensal])
-
-  const metricCards = [
-    { label: 'Health Score',    value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: 'Score ponderado: runway 40%, margem 25%, LTV/CAC 20%, burn 15%' },
-    { label: 'Margem',          value: `${fmtDec(metrics.margem)}%`,  color: colorByRange(metrics.margem, 20, 10),      desc: '(receita − despesas) / receita' },
-    { label: 'Runway',          value: metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway)} meses`, color: colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: 'Caixa ÷ burn rate líquido' },
-    { label: 'Lucro Mensal',    value: `R$${fmt(metrics.lucro)}`,     color: metrics.lucro >= 0 ? GREEN : RED,          desc: 'Receita − despesas operacionais' },
-    { label: 'Burn Líquido',    value: metrics.burnLiquido > 0 ? `-R$${fmt(metrics.burnLiquido)}/mês` : `+R$${fmt(Math.abs(metrics.burnLiquido))}/mês`, color: metrics.burnLiquido > 0 ? RED : GREEN, desc: 'Despesas − receitas' },
-    { label: 'LTV/CAC',         value: `${fmtDec(metrics.ltvCac)}x`, color: colorByRange(metrics.ltvCac, 3, 1),        desc: `(Ticket×Margem)/Churn — LTV R$${fmt(Math.round(metrics.ltv))}` },
-    { label: 'Break-even',      value: `R$${fmt(metrics.breakeven)}`, color: metrics.breakevenAlert ? RED : BLUE,       desc: metrics.breakevenAlert ? '⚠ Receita abaixo do break-even!' : 'Receita necessária para cobrir custos' },
-    { label: 'ROI Anualizado',  value: `${fmtDec(metrics.roi)}%`,    color: metrics.roi >= 0 ? GREEN : RED,            desc: 'Retorno sobre capital investido (anual)' },
-    { label: 'Ticket Médio',    value: `R$${fmt(ticketMedio)}`,       color: ticketMedio > 0 ? BLUE : AMBER,            desc: modoManual ? 'inserido manualmente' : 'receita ÷ clientes ativos' },
-    { label: 'CAC',             value: `R$${fmt(cac)}`,               color: cac > 0 ? BLUE : AMBER,                   desc: modoManual ? 'inserido manualmente' : 'verba marketing ÷ novos clientes' },
-    { label: 'Churn Mensal',    value: `${fmtDec(churnMensal)}%`,     color: colorByRange(100 - churnMensal, 95, 90),   desc: modoManual ? 'inserido manualmente' : 'clientes perdidos ÷ ativos × 100' },
-    { label: 'LTV',             value: `R$${fmt(Math.round(metrics.ltv))}`, color: metrics.ltv > 0 ? GREEN : AMBER,   desc: '(Ticket Médio × Margem) ÷ Churn%' },
-  ]
-
-  // Contexto completo do onboarding
+  // Contexto do onboarding — necessário antes das refs de mercado
   const nomeNegocio = userProfile?.nomeNegocio || userProfile?.nome_negocio || userProfile?.sectors?.[0] || ''
-  const fase   = userProfile?.subtype   ?? ''
+  const fase    = userProfile?.subtype  ?? ''
   const setores = userProfile?.sectors  ?? []
   const produtos = userProfile?.product ?? []
   const revenue  = userProfile?.revenue ?? ''
+
+  // ── Referências de mercado (fallback quando dado do usuário é 0) ───────────
+  const cacRefNum    = marketData?.marketing?.cac?.value     ?? 49
+  const churnRefNum  = marketData?.marketing?.churn?.value   ?? 4.2
+  const ltvRefNum    = marketData?.marketing?.ltv?.value     ?? 156
+  const cpmUsdVal    = marketData?.marketing?.cpm?.value     ?? 0
+  const cpcUsdVal    = marketData?.marketing?.cpc?.value     ?? 0
+  const organicPct   = marketData?.marketing?.organicShare?.value ?? 0
+  const organicDelta = marketData?.marketing?.organicShare?.delta ?? 0
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const platforms    = (marketData?.marketing?.platforms ?? []) as Array<{ id: string; label: string; cpm: number; delta: number }>
+
+  // Setor do usuário no mercado
+  const userSectorIdMain = SECTOR_MAP[setores[0] ?? ''] ?? null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userSectorMain   = userSectorIdMain ? (marketData?.sectors ?? []).find((s: any) => s.id === userSectorIdMain) : null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sectorHeat       = (userSectorMain as any)?.heat ?? 50
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sectorLabel      = (userSectorMain as any)?.label ?? setores[0] ?? ''
+
+  // Valores efetivos: dado real do usuário ou referência de mercado
+  const cacEfetivo       = cac > 0 ? cac : cacRefNum
+  const churnEfetivo     = churnMensal > 0 ? churnMensal : churnRefNum
+  const cacIsEstimado    = cac === 0
+  const churnIsEstimado  = churnMensal === 0
+
+  // Fórmulas de sensibilidade (sempre calculadas, independem de dados completos)
+  const taxaRealExata    = ((1 + selicRate / 100) / (1 + ipcaRate / 100) - 1) * 100
+  const burnReal         = despesas > 0 ? despesas + despesas * (selicRate / 100) * 0.2 : 0
+  const cacAjustado      = cacEfetivo * (usdRate / 4.50)
+  const cpmReais         = cpmUsdVal * usdRate
+  const custoGiroMensal  = despesas > 0 ? despesas * (selicRate * 2.5 / 100) / 12 : 0
+
+  const metrics = useMemo(() => {
+    const margemDecimal  = receita > 0 ? (receita - despesas) / receita : 0
+    const margem         = margemDecimal * 100
+    const lucro          = receita - despesas
+    const burnLiquido    = despesas - receita
+    const runway         = burnLiquido > 0 ? caixa / burnLiquido : (lucro >= 0 ? 999 : caixa / despesas)
+    // LTV usa churnEfetivo — não retorna 0 quando churn não foi preenchido
+    const margemLtv      = Math.max(margemDecimal, 0.1)
+    const ltv            = ticketMedio > 0 && churnEfetivo > 0
+      ? (ticketMedio * margemLtv) / (churnEfetivo / 100)
+      : ltvRefNum
+    const ltvCac         = cacEfetivo > 0 && ltv > 0 ? ltv / cacEfetivo : 0
+    const burnRatio      = receita > 0 ? 1 - despesas / receita : 0
+    const runwayNorm     = Math.min((runway === 999 ? 24 : runway) / 24, 1) * 100
+    const ltvCacNorm     = Math.min(ltvCac / 5, 1) * 100
+    const burnNorm       = Math.max(burnRatio, 0) * 100
+    const semDados       = receita === 0 && despesas === 0 && caixa === 0
+    // Health Score inclui setor como fator de mercado (15% do peso)
+    const healthBase     = semDados ? 0 : Math.round(margem * 0.22 + runwayNorm * 0.35 + ltvCacNorm * 0.18 + burnNorm * 0.12)
+    const sectorBonus    = Math.round((sectorHeat / 100) * 13)
+    const healthScore    = semDados ? 0 : Math.min(100, healthBase + sectorBonus)
+    const breakeven      = margemDecimal > 0 ? despesas / margemDecimal : 0
+    const roi            = caixa > 0 ? (lucro * 12) / caixa * 100 : 0
+    const breakevenAlert = breakeven > receita && receita > 0
+    const margemReal     = margem - taxaRealExata
+    return { margem, lucro, runway, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, breakevenAlert, semDados, margemReal }
+  }, [receita, despesas, caixa, cacEfetivo, ticketMedio, churnEfetivo, ltvRefNum, sectorHeat, taxaRealExata])
+
+  const est = (isEst: boolean) => isEst ? ' · ref.mercado' : ''
+  const metricCards = [
+    { label: 'Health Score',    value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: `runway+margem+LTV/CAC+burn+setor ${sectorHeat}/100` },
+    { label: 'Margem',          value: `${fmtDec(metrics.margem)}%`,  color: colorByRange(metrics.margem, 20, 10),      desc: '(receita − despesas) / receita' },
+    { label: 'Runway',          value: metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway)} meses`, color: colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: 'Caixa ÷ burn real' },
+    { label: 'Lucro Mensal',    value: `R$${fmt(metrics.lucro)}`,     color: metrics.lucro >= 0 ? GREEN : RED,          desc: 'Receita − despesas' },
+    { label: 'Burn Líquido',    value: metrics.burnLiquido > 0 ? `-R$${fmt(metrics.burnLiquido)}/mês` : `+R$${fmt(Math.abs(metrics.burnLiquido))}/mês`, color: metrics.burnLiquido > 0 ? RED : GREEN, desc: 'Despesas − receitas' },
+    { label: 'LTV/CAC',         value: `${fmtDec(metrics.ltvCac)}x`, color: colorByRange(metrics.ltvCac, 3, 1),        desc: `LTV R$${fmt(Math.round(metrics.ltv))}${churnIsEstimado ? ' · churn ref.' : ''}` },
+    { label: 'Break-even',      value: `R$${fmt(metrics.breakeven)}`, color: metrics.breakevenAlert ? RED : BLUE,       desc: metrics.breakevenAlert ? '⚠ Receita abaixo do break-even!' : 'Receita mínima para cobrir custos' },
+    { label: 'ROI Anualizado',  value: `${fmtDec(metrics.roi)}%`,    color: metrics.roi >= 0 ? GREEN : RED,            desc: 'Retorno sobre capital investido (anual)' },
+    { label: 'Ticket Médio',    value: `R$${fmt(ticketMedio)}`,       color: ticketMedio > 0 ? BLUE : AMBER,            desc: modoManual ? 'manual' : 'receita ÷ clientes ativos' },
+    { label: `CAC${est(cacIsEstimado)}`,   value: `R$${fmt(cacEfetivo)}`,   color: cac > 0 ? BLUE : AMBER, desc: cacIsEstimado ? `ref. mercado — insira seus dados` : modoManual ? 'manual' : 'verba ÷ novos clientes' },
+    { label: `Churn${est(churnIsEstimado)}`, value: `${fmtDec(churnEfetivo)}%`, color: colorByRange(100 - churnEfetivo, 95, 90), desc: churnIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'perdidos ÷ ativos × 100' },
+    { label: 'LTV',             value: `R$${fmt(Math.round(metrics.ltv))}`, color: metrics.ltv > 0 ? GREEN : AMBER,   desc: `(Ticket × Margem) ÷ Churn${churnIsEstimado ? ' ref.' : ''}` },
+  ]
+
   const benchmark = fase ? buildBenchmark(fase, setores, produtos, revenue, nomeNegocio) : ''
 
   const exportPDF = async () => {
@@ -675,7 +720,141 @@ REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
         </div>
       </div>
 
-      {/* ── 4. INTELIGÊNCIA DE MERCADO ── */}
+      {/* ── 4a. ANÁLISE FUNDIDA (operacional × mercado) ── */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <TrendingUp size={16} style={{ color: '#5dade2' }} />
+          <span style={{ fontSize: 14, fontWeight: 600 }}>Análise Fundida</span>
+          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>seus dados × mercado</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2.5">
+          <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${despesas > 0 ? RED : 'rgba(255,255,255,0.1)'}` }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Burn Real</div>
+            <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: despesas > 0 ? RED : 'rgba(255,255,255,0.2)' }}>
+              {despesas > 0 ? `R$${burnReal.toFixed(2)}` : '—'}
+            </div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3, lineHeight: 1.3 }}>
+              {despesas > 0 ? `+R$${(burnReal - despesas).toFixed(2)} impacto SELIC ${selicRate}%` : 'preencha despesas'}
+            </div>
+          </div>
+          <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${taxaRealExata > 8 ? RED : AMBER}` }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Taxa Real</div>
+            <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: taxaRealExata > 8 ? RED : AMBER }}>{taxaRealExata.toFixed(4)}%</div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3, lineHeight: 1.3 }}>Fisher — piso mínimo de ROI válido</div>
+          </div>
+          <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${metrics.margemReal < 0 ? RED : metrics.margemReal < 5 ? AMBER : GREEN}` }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Margem Real</div>
+            <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: metrics.margemReal < 0 ? RED : metrics.margemReal < 5 ? AMBER : GREEN }}>
+              {receita > 0 ? `${metrics.margemReal.toFixed(4)}%` : '—'}
+            </div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3, lineHeight: 1.3 }}>margem bruta − taxa real Fisher</div>
+          </div>
+          <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${BLUE}` }}>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>CAC Ajustado</div>
+            <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: BLUE }}>R${cacAjustado.toFixed(2)}</div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3, lineHeight: 1.3 }}>
+              {cacIsEstimado ? 'ref.mercado' : 'seus dados'} × câmbio R${usdRate.toFixed(2)}/R$4,50
+            </div>
+          </div>
+          {cpmReais > 0 && (
+            <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${AMBER}` }}>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>CPM em R$</div>
+              <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: AMBER }}>R${cpmReais.toFixed(2)}/mil</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3, lineHeight: 1.3 }}>US${cpmUsdVal.toFixed(2)} × R${usdRate.toFixed(2)}</div>
+            </div>
+          )}
+          {custoGiroMensal > 0 && (
+            <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${RED}` }}>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Custo de Giro</div>
+              <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: RED }}>R${custoGiroMensal.toFixed(2)}/mês</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3, lineHeight: 1.3 }}>se financiar via banco a {(selicRate * 2.5).toFixed(2)}% a.a.</div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── 4b. VERDICT — CRESCER AGORA? ── */}
+      {(despesas > 0 || receita > 0) && (() => {
+        const cdiAnual  = selicRate - 0.1
+        const roiVsCdi  = metrics.roi - cdiAnual
+        const pts = [
+          metrics.runway > 6 ? 1 : metrics.runway > 3 ? 0 : -1,
+          sectorHeat > 70 ? 1 : sectorHeat > 40 ? 0 : -1,
+          metrics.margemReal > 5 ? 1 : metrics.margemReal > 0 ? 0 : -1,
+          roiVsCdi > 5 ? 1 : roiVsCdi > -5 ? 0 : -1,
+          metrics.ltvCac > 3 ? 1 : metrics.ltvCac > 1 ? 0 : -1,
+        ].reduce((a, b) => a + b, 0)
+        const v = pts >= 3
+          ? { text: 'CRESCER AGORA', color: GREEN, icon: '▲', reason: `Setor ${sectorHeat}/100 + margem real ${metrics.margemReal.toFixed(1)}% + runway ${metrics.runway >= 999 ? '∞' : metrics.runway.toFixed(1) + 'm'} = janela aberta.` }
+          : pts >= 0
+          ? { text: 'AGUARDAR / TESTAR', color: AMBER, icon: '◆', reason: `Valide unit economics antes de escalar. CAC ajustado R$${cacAjustado.toFixed(0)} precisa de LTV firme (atual ${metrics.ltvCac.toFixed(1)}x).` }
+          : { text: 'NÃO CRESCER AGORA', color: RED, icon: '▼', reason: `Taxa real ${taxaRealExata.toFixed(2)}% pressiona margens. Priorize: cortar burn real (R$${burnReal.toFixed(0)}/mês), proteger caixa e reter clientes.` }
+        return (
+          <div className="rounded-lg px-4 py-3" style={{ background: `${v.color}08`, border: `1px solid ${v.color}30` }}>
+            <div className="flex items-center justify-between mb-2">
+              <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em' }}>VERDICT</span>
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: v.color }}>{v.icon}</span>
+                <span style={{ fontSize: 13, fontFamily: 'monospace', fontWeight: 700, color: v.color }}>{v.text}</span>
+              </div>
+            </div>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>{v.reason}</p>
+          </div>
+        )
+      })()}
+
+      {/* ── 4c. CANAL DE AQUISIÇÃO (verba × plataformas) ── */}
+      {platforms.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <TrendingUp size={16} style={{ color: GREEN }} />
+            <span style={{ fontSize: 14, fontWeight: 600 }}>Canal de Aquisição</span>
+            {organicPct > 0 && (
+              <span style={{ fontSize: 10, color: organicDelta < -3 ? RED : 'rgba(255,255,255,0.3)' }}>
+                Orgânico {organicPct.toFixed(0)}% {organicDelta < 0 ? `▼${Math.abs(organicDelta).toFixed(1)}%` : `▲${organicDelta.toFixed(1)}%`}
+              </span>
+            )}
+          </div>
+          <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            {platforms.slice(0, 6).map((p, i) => {
+              const cpmR          = p.cpm * usdRate
+              const clientesEst   = verbaMkt > 0 && cpmR > 0 ? Math.floor((verbaMkt / cpmR) * 1000 * 0.02) : 0
+              const isBest        = i === 0
+              return (
+                <div key={p.id} className="flex items-center justify-between px-3 py-2.5"
+                  style={{ borderBottom: i < Math.min(platforms.length, 6) - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none', background: isBest ? `${GREEN}08` : 'transparent' }}>
+                  <div className="flex items-center gap-2">
+                    {isBest && <span style={{ fontSize: 9, color: GREEN, fontFamily: 'monospace', fontWeight: 700 }}>MELHOR</span>}
+                    <span style={{ fontSize: 12, color: isBest ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.4)' }}>{p.label}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span style={{ fontSize: 11, fontFamily: 'monospace', color: 'rgba(255,255,255,0.3)' }}>R${cpmR.toFixed(2)}/mil</span>
+                    {verbaMkt > 0 && (
+                      <span style={{ fontSize: 12, fontFamily: 'monospace', fontWeight: isBest ? 700 : 400, color: isBest ? GREEN : 'rgba(255,255,255,0.3)', minWidth: 60, textAlign: 'right' }}>
+                        ~{clientesEst} clientes
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+            {verbaMkt > 0 && (
+              <div className="px-3 py-2 border-t border-white/5">
+                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', lineHeight: 1.4 }}>
+                  R${verbaMkt.toFixed(0)}/mês de verba · conv. 2% estimada · valores reais dependem da campanha
+                </p>
+              </div>
+            )}
+            {verbaMkt === 0 && (
+              <div className="px-3 py-2 border-t border-white/5">
+                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', lineHeight: 1.4 }}>Preencha Verba Mkt/Aquisição para ver estimativa de clientes por canal</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── 5. INTELIGÊNCIA DE MERCADO ── */}
       <MarketIntelligence
         marketData={marketData}
         selicRate={selicRate} ipcaRate={ipcaRate} usdRate={usdRate}
@@ -683,7 +862,9 @@ REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
         cdiMensal={cdiMensal} cdiRendimento={cdiRendimento} decisaoCDI={decisaoCDI}
         userProfile={userProfile}
         receita={receita} margem={metrics.margem} runway={metrics.runway}
-        ltvCac={metrics.ltvCac} cac={cac} churnMensal={churnMensal}
+        ltvCac={metrics.ltvCac} cac={cacEfetivo} churnMensal={churnEfetivo}
+        taxaRealExata={taxaRealExata} burnReal={burnReal} cacAjustado={cacAjustado}
+        margemReal={metrics.margemReal}
       />
 
       {/* ── 5. IA + PDF ── */}
