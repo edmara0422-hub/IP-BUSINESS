@@ -98,7 +98,7 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     const breakeven   = margemDecimal > 0 ? despesas / margemDecimal : 0
     const roi         = caixa > 0 ? (lucro * 12) / caixa * 100 : 0
     const breakevenAlert = breakeven > receita && receita > 0
-    return { margem, lucro, runway, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, breakevenAlert }
+    return { margem, lucro, runway, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, breakevenAlert, semDados }
   }, [receita, despesas, caixa, cac, ticketMedio, churnMensal])
 
   const metricCards = [
@@ -210,12 +210,18 @@ Seja direto, use os números reais, compare com os benchmarks informados.`
   }
 
   const inputNum = (label: string, value: number, setter: (v: number) => void, prefix = 'R$') => (
-    <div className="flex flex-col gap-1">
-      <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>{label}</label>
-      <div className="flex items-center gap-1 rounded-lg px-3 py-2" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
-        {prefix && <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', fontFamily: 'monospace' }}>{prefix}</span>}
-        <input type="number" value={value} onChange={e => setter(Number(e.target.value) || 0)}
-          className="bg-transparent outline-none w-full" style={{ fontSize: 14, fontFamily: 'monospace', color: '#fff' }} />
+    <div className="flex flex-col gap-1.5">
+      <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.02em' }}>{label}</label>
+      <div className="flex items-center gap-2 rounded-lg px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.1)' }}>
+        {prefix && <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', userSelect: 'none', flexShrink: 0 }}>{prefix}</span>}
+        <input
+          type="number"
+          value={value === 0 ? '' : value}
+          placeholder="0"
+          onChange={e => setter(e.target.value === '' ? 0 : Number(e.target.value) || 0)}
+          className="bg-transparent outline-none flex-1 min-w-0"
+          style={{ fontSize: 15, fontFamily: 'monospace', color: '#fff', border: 'none' }}
+        />
       </div>
     </div>
   )
@@ -243,7 +249,7 @@ Seja direto, use os números reais, compare com os benchmarks informados.`
           <Calculator size={16} style={{ color: BLUE }} />
           <span style={{ fontSize: 14, fontWeight: 600 }}>Dados financeiros</span>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-col gap-2.5">
           {inputNum('Receita Mensal', receita, setReceita)}
           {inputNum('Despesas Operacionais', despesas, setDespesas)}
           {inputNum('Caixa Disponível', caixa, setCaixa)}
@@ -268,21 +274,21 @@ Seja direto, use os números reais, compare com os benchmarks informados.`
         </div>
 
         {!modoManual ? (
-          <div className="grid grid-cols-3 gap-3">
+          <div className="flex flex-col gap-2.5">
             {inputNum('Clientes Ativos', clientesAtivos, setClientesAtivos, '#')}
-            {inputNum('Novos Clientes', novosClientes, setNovosClientes, '+')}
-            {inputNum('Clientes Perdidos', clientesPerdidos, setClientesPerdidos, '-')}
+            {inputNum('Novos Clientes (mês)', novosClientes, setNovosClientes, '+')}
+            {inputNum('Clientes Perdidos (mês)', clientesPerdidos, setClientesPerdidos, '−')}
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-3">
+          <div className="flex flex-col gap-2.5">
             {inputNum('CAC (R$)', cacManual, setCacManual)}
             {inputNum('Ticket Médio (R$)', ticketManual, setTicketManual)}
-            <div className="flex flex-col gap-1">
-              <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>Churn Mensal (%)</label>
-              <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="flex flex-col gap-1.5">
+              <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.02em' }}>Churn Mensal (%) — {fmtDec(churnManual)}%</label>
+              <div className="flex items-center gap-3 rounded-lg px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.1)' }}>
                 <input type="range" min={0} max={50} step={0.5} value={churnManual} onChange={e => setChurnManual(Number(e.target.value))}
                   style={{ flex: 1, accentColor: BLUE, height: 4 }} />
-                <span style={{ fontSize: 13, fontFamily: 'monospace', color: '#fff', minWidth: 36, textAlign: 'right' }}>{fmtDec(churnManual)}%</span>
+                <span style={{ fontSize: 15, fontFamily: 'monospace', color: '#fff', minWidth: 40, textAlign: 'right' }}>{fmtDec(churnManual)}%</span>
               </div>
             </div>
           </div>
@@ -378,9 +384,14 @@ Seja direto, use os números reais, compare com os benchmarks informados.`
 
       {/* ── 5. IA + PDF ── */}
       <div>
-        <button onClick={handleIA} disabled={iaLoading}
-          className="w-full rounded-lg py-3 flex items-center justify-center gap-2 transition-opacity hover:opacity-90 disabled:opacity-50"
-          style={{ background: BLUE, color: '#fff', fontSize: 14, fontWeight: 600, cursor: iaLoading ? 'wait' : 'pointer' }}>
+        {metrics.semDados && (
+          <div className="mb-3 rounded-lg px-3 py-2.5 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.1)' }}>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>Preencha Receita, Despesas ou Caixa para ativar o diagnóstico IA</p>
+          </div>
+        )}
+        <button onClick={handleIA} disabled={iaLoading || metrics.semDados}
+          className="w-full rounded-lg py-3 flex items-center justify-center gap-2 transition-opacity hover:opacity-90 disabled:opacity-40"
+          style={{ background: BLUE, color: '#fff', fontSize: 14, fontWeight: 600, cursor: (iaLoading || metrics.semDados) ? 'not-allowed' : 'pointer' }}>
           {iaLoading ? <Loader2 size={16} className="animate-spin" /> : <Brain size={16} />}
           {iaLoading ? 'Analisando...' : 'Analisar com IA — Diagnóstico completo'}
         </button>
