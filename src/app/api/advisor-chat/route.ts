@@ -25,7 +25,7 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gemma2-9b-it',
+        model: 'llama-3.1-8b-instant',
         messages: [
           { role: 'system', content: systemMsg },
           { role: 'user',   content: question },
