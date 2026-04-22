@@ -71,12 +71,43 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
   const sectors = (marketData?.sectors ?? []) as Array<{ id: string; label?: string; heat: number; change: number; trend?: string }>
   const maxHeat = Math.max(...sectors.map(s => s.heat), 1)
 
-  // Setor do usuário
+  // Mapeamento setor onboarding → id mercado
+  const SECTOR_MAP: Record<string, string> = {
+    'Tecnologia': 'tech', 'App/SaaS': 'tech', 'Digital/SaaS': 'tech',
+    'Consultoria': 'services', 'Agência': 'services', 'Serviços': 'services',
+    'Saúde': 'health', 'MedTech': 'health',
+    'Varejo': 'retail', 'E-commerce': 'retail',
+    'Financeiro': 'fintech', 'Fintech': 'fintech',
+    'Logística': 'logistics',
+    'Agronegócio': 'agro', 'Agricultura': 'agro',
+    'Energia': 'energy',
+    'Mídia': 'media', 'Comunicação': 'media',
+  }
+
   const userSectorId = useMemo(() => {
-    if (!userProfile?.sectors?.length) return null
-    const m: Record<string, string> = { 'Tecnologia': 'tech', 'Consultoria': 'services', 'Saúde': 'health', 'Varejo': 'retail', 'Financeiro': 'fintech', 'Logística': 'logistics', 'Agronegócio': 'agro' }
-    return m[userProfile.sectors[0]] ?? null
-  }, [userProfile])
+    const setor = userProfile?.sectors?.[0] ?? userProfile?.product?.[0] ?? ''
+    if (!setor) return null
+    return SECTOR_MAP[setor] ?? null
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userProfile?.sectors, userProfile?.product])
+
+  // Contexto por setor — explica o score e a influência no negócio
+  const SECTOR_CONTEXT: Record<string, { why: string; impact: (h: number) => string }> = {
+    tech:      { why: 'IA e cloud computing puxam crescimento. Empresas que adotam tech escalam mais rápido.', impact: h => h > 70 ? 'Momento favorável para lançar produto digital e captar investimento.' : h > 40 ? 'Crescimento moderado — foque em retenção antes de escalar.' : 'Setor desacelerando — corte burn e proteja caixa.' },
+    agro:      { why: 'Dólar alto favorece exportador mas encarece insumos importados. PIB agro sólido.', impact: h => h > 70 ? 'Oportunidade B2B: produtores com dinheiro procuram ferramentas de gestão.' : h > 40 ? 'Cautela — commodities voláteis impactam margens do cliente.' : 'Setor pressionado por câmbio e clima.' },
+    health:    { why: 'MedTech e telemedicina crescem pós-pandemia. Mercado resiliente a recessões.', impact: h => h > 70 ? 'Procura por saúde não para — bom para crescer ticket médio.' : h > 40 ? 'Regulação pesada pode travar expansão rápida.' : 'Regulação + SELIC alto encarecem capex em saúde.' },
+    energy:    { why: 'Transição energética acelera. Solar e eólica crescem 20%+/a.a.', impact: h => h > 70 ? 'Projetos de energia renovável com captação facilitada.' : h > 40 ? 'Petróleo volátil — custo de frete incerto.' : 'Custo de energia pressionando margens do setor.' },
+    fintech:   { why: 'Pix, open banking e crédito digital transformam o setor. SELIC alta aumenta spread.', impact: h => h > 70 ? 'SELIC alta = spread bancário alto = oportunidade para alternativas de crédito.' : h > 40 ? 'Regulação do BC aumenta compliance — custo operacional sobe.' : 'Capital de risco seco para fintech em cenário de juro alto.' },
+    logistics: { why: 'E-commerce impulsiona logística last-mile. Frota elétrica e automação crescem.', impact: h => h > 70 ? 'E-commerce aquecido = volume de entregas crescendo — bom para operadores.' : h > 40 ? 'Combustível volátil corrói margem operacional.' : 'Dólar alto encarece peças e frota. Revisar precificação.' },
+    services:  { why: 'Setor sensível a PIB. Cresce quando economia expande, contrai rápido em recessão.', impact: h => h > 70 ? 'PIB crescendo = consumidor com renda. Momento de conquistar novos clientes.' : h > 40 ? 'Crescimento fraco — foque em LTV e upsell da base existente.' : 'SELIC alta trava consumo de serviços discricionários. Cautela.' },
+    retail:    { why: 'Varejo físico perde espaço para e-commerce. SELIC alta mata crédito ao consumidor.', impact: h => h > 50 ? 'Exceção no setor — foco em experiência ou nicho premium.' : h > 25 ? 'Juro alto comprime vendas a prazo. Revisar mix e giro de estoque.' : 'Setor crítico: juro alto + e-commerce corroendo share. Pivotar ou focar em sobrevivência.' },
+    media:     { why: 'Mídia tradicional em colapso estrutural. Audiência migrou para digital.', impact: () => 'Modelo de negócio legado. Reconversão para digital é única saída sustentável.' },
+  }
+
+  const userSector = userSectorId ? sectors.find(s => s.id === userSectorId) : null
+  const otherSectors = sectors.filter(s => s.id !== userSectorId)
+
+  const heatLabel = (h: number) => h >= 75 ? { text: 'AQUECIDO', color: GREEN } : h >= 50 ? { text: 'FAVORÁVEL', color: GREEN } : h >= 30 ? { text: 'NEUTRO', color: AMBER } : { text: 'PRESSIONADO', color: RED }
 
   return (
     <div className="flex flex-col gap-3">
@@ -90,34 +121,69 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
         {[
           {
             label: 'SELIC', value: `${fmtDec(selicRate)}%`, color: selicRate > 12 ? RED : GREEN,
-            desc: `Crédito: ${fmtDec(selicRate * 2.5)}% a.a.${despesas > 0 ? ` · +R$${fmt(Math.round(despesas * (selicRate * 2.5 / 100) / 12))}/mês se financiar` : ''}`,
+            desc: `Crédito: ${fmtDec(selicRate * 2.5)}% a.a.${despesas > 0 ? ` — se financiar R$${fmt(despesas)}, paga +R$${fmt(Math.round(despesas * (selicRate * 2.5 / 100) / 12))}/mês de juros` : ' — capital de giro inviável para PME'}`,
           },
           {
             label: 'IPCA', value: `${fmtDec(ipcaRate)}%`, color: ipcaRate > 4 ? AMBER : GREEN,
-            desc: despesas > 0 ? `Despesas em 12m: R$${fmt(Math.round(despesas * (1 + ipcaRate / 100)))} (+R$${fmt(Math.round(despesas * ipcaRate / 100))})` : 'Poder de compra: ' + (ipcaRate > 4.75 ? 'caindo' : 'estável'),
+            desc: despesas > 0 ? `Suas despesas em 12 meses serão R$${fmt(Math.round(despesas * (1 + ipcaRate / 100)))} — R$${fmt(Math.round(despesas * ipcaRate / 100))} a mais pelo IPCA` : `Inflação ${ipcaRate > 4.75 ? 'acima da meta — poder de compra do cliente caindo' : 'dentro da meta — consumo estável'}`,
           },
           {
             label: 'USD/BRL', value: `R$${fmtDec(usdRate, 2)}`, color: usdRate > 5.5 ? RED : usdRate > 5 ? AMBER : GREEN,
-            desc: `Insumos importados ${usdRate > 5.5 ? `${((usdRate / 4.5 - 1) * 100).toFixed(0)}% mais caros` : 'controlados'}`,
+            desc: `Insumos importados ${usdRate > 5.5 ? `${((usdRate / 4.5 - 1) * 100).toFixed(0)}% mais caros vs R$4,50 (2022)` : usdRate > 5 ? 'atenção ao câmbio — pressão moderada' : 'câmbio favorável para importação'}`,
           },
           {
             label: 'CDI vs ROI', value: decisaoCDI ? '⚠ CDI > ROI' : '✓ ROI > CDI', color: decisaoCDI ? AMBER : GREEN,
-            desc: caixa > 0 ? `Caixa rende R$${fmt(Math.round(cdiRendimento))}/mês (${fmtDec(cdiMensal, 2)}%/mês)` : 'Insira o caixa para calcular',
+            desc: caixa > 0 ? `Caixa de R$${fmt(caixa)} rende R$${fmt(Math.round(cdiRendimento))}/mês no CDI (${fmtDec(cdiMensal, 2)}%/mês)${decisaoCDI ? ' — mais que seu ROI' : ''}` : 'Insira o Caixa Disponível para comparar com o CDI',
           },
         ].map(c => (
           <div key={c.label} className="rounded-lg p-2.5" style={{ background: 'rgba(0,0,0,0.25)', borderLeft: `3px solid ${c.color}` }}>
             <div style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: c.color, marginBottom: 2 }}>{c.label}</div>
             <div style={{ fontSize: 14, fontWeight: 700, fontFamily: 'monospace', color: c.color }}>{c.value}</div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 2, lineHeight: 1.4 }}>{c.desc}</div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 3, lineHeight: 1.5 }}>{c.desc}</div>
           </div>
         ))}
       </div>
 
-      {/* Tabs: setores / cascatas */}
+      {/* Setor do usuário em destaque */}
+      {userSector && (() => {
+        const ctx = SECTOR_CONTEXT[userSector.id]
+        const hl = heatLabel(userSector.heat)
+        return (
+          <div className="rounded-lg p-3" style={{ background: 'rgba(93,173,226,0.06)', border: '1px solid rgba(93,173,226,0.2)' }}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#5dade2', boxShadow: '0 0 5px #5dade2' }} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#5dade2' }}>Seu setor: {userSector.label ?? userSector.id}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: hl.color, background: `${hl.color}18`, padding: '1px 6px', borderRadius: 4 }}>{hl.text}</span>
+                <span style={{ fontSize: 13, fontFamily: 'monospace', fontWeight: 700, color: hl.color }}>{userSector.heat}/100</span>
+              </div>
+            </div>
+            <div className="h-[3px] rounded-full overflow-hidden mb-2" style={{ background: 'rgba(255,255,255,0.06)' }}>
+              <motion.div className="h-full rounded-full" style={{ background: '#5dade2' }}
+                initial={{ width: 0 }} animate={{ width: `${(userSector.heat / 100) * 100}%` }} transition={{ duration: 0.7 }} />
+            </div>
+            {ctx && (
+              <>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5, marginBottom: 6 }}>{ctx.why}</p>
+                <div className="rounded-md px-2.5 py-2" style={{ background: `${hl.color}10`, borderLeft: `2px solid ${hl.color}` }}>
+                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>
+                    <span style={{ color: hl.color, fontWeight: 700 }}>O que isso significa para você: </span>
+                    {ctx.impact(userSector.heat)}
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        )
+      })()}
+
+      {/* Tabs: todos setores / cascatas */}
       <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="flex border-b border-white/5">
-          {[{ key: 'setores', label: 'SETORES' }, { key: 'cascatas', label: 'CASCATAS' }].map(t => (
-            <button key={t.key} onClick={() => setSectorTab(t.key as any)}
+          {[{ key: 'setores', label: 'TODOS SETORES' }, { key: 'cascatas', label: 'CASCATAS' }].map(t => (
+            <button key={t.key} onClick={() => setSectorTab(t.key as 'setores' | 'cascatas')}
               className="flex-1 py-2 font-mono text-[10px] font-bold tracking-widest transition-colors"
               style={{ color: sectorTab === t.key ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)', background: sectorTab === t.key ? 'rgba(255,255,255,0.04)' : 'transparent', borderBottom: sectorTab === t.key ? `2px solid ${BLUE}` : '2px solid transparent' }}>
               {t.label}
@@ -126,25 +192,26 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
         </div>
         <div className="px-3 py-2.5">
           {sectorTab === 'setores' && (
-            <div className="flex flex-col gap-1.5">
-              {sectors.map(s => {
-                const isUser = s.id === userSectorId
-                const color = (s.change > 0) ? GREEN : (s.change < 0) ? RED : AMBER
+            <div className="flex flex-col gap-2">
+              {(userSectorId ? otherSectors : sectors).map(s => {
+                const hl = heatLabel(s.heat)
+                const ctx = SECTOR_CONTEXT[s.id]
                 const barW = Math.max(4, (s.heat / maxHeat) * 100)
                 return (
-                  <div key={s.id} className="rounded-md overflow-hidden" style={{ background: isUser ? 'rgba(93,173,226,0.06)' : 'rgba(0,0,0,0.15)', borderLeft: `3px solid ${isUser ? '#5dade2' : color}` }}>
-                    <div className="px-2.5 py-1.5">
-                      <div className="flex items-center justify-between mb-1">
+                  <div key={s.id} className="rounded-md overflow-hidden" style={{ background: 'rgba(0,0,0,0.15)', borderLeft: `3px solid ${hl.color}` }}>
+                    <div className="px-2.5 py-2">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.65)' }}>{s.label ?? s.id}</span>
                         <div className="flex items-center gap-1.5">
-                          <span style={{ fontSize: 12, fontWeight: 600, color: isUser ? '#5dade2' : 'rgba(255,255,255,0.6)' }}>{s.label ?? s.id}</span>
-                          {isUser && <span style={{ fontSize: 9, fontFamily: 'monospace', color: '#5dade2', background: 'rgba(93,173,226,0.12)', padding: '0 4px', borderRadius: 3 }}>seu setor</span>}
+                          <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: hl.color }}>{hl.text}</span>
+                          <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: hl.color }}>{s.heat}/100</span>
                         </div>
-                        <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color }}>{s.heat}/100</span>
                       </div>
-                      <div className="h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                        <motion.div className="h-full rounded-full" style={{ background: isUser ? '#5dade2' : color }}
+                      <div className="h-[3px] rounded-full overflow-hidden mb-1.5" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                        <motion.div className="h-full rounded-full" style={{ background: hl.color }}
                           initial={{ width: 0 }} animate={{ width: `${barW}%` }} transition={{ duration: 0.6 }} />
                       </div>
+                      {ctx && <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', lineHeight: 1.4 }}>{ctx.why}</p>}
                     </div>
                   </div>
                 )
