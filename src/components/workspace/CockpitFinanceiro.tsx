@@ -459,20 +459,25 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     return { margem, lucro, runway, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, breakevenAlert, semDados, margemReal }
   }, [receita, despesas, caixa, cacEfetivo, ticketMedio, churnEfetivo, ltvRefNum, sectorHeat, taxaRealExata])
 
-  const est = (isEst: boolean) => isEst ? ' · ref.mercado' : ''
+  // origem: verde = seus dados, amarelo = ref.mercado, azul = calculado/fundido
+  const O_REAL  = { text: 'seus dados',   color: GREEN }
+  const O_REF   = { text: 'ref. mercado', color: AMBER }
+  const O_CALC  = { text: 'calculado',    color: '#5dade2' }
+  const O_FUND  = { text: 'fundido',      color: '#5dade2' }
+
   const metricCards = [
-    { label: 'Health Score',    value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: `runway+margem+LTV/CAC+burn+setor ${sectorHeat}/100` },
-    { label: 'Margem',          value: `${fmtDec(metrics.margem, 2)}%`,  color: colorByRange(metrics.margem, 20, 10),      desc: '(receita − despesas) / receita' },
-    { label: 'Runway',          value: metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway, 2)} meses`, color: colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: 'Caixa ÷ burn real' },
-    { label: 'Lucro Mensal',    value: `R$${fmt(metrics.lucro)}`,     color: metrics.lucro >= 0 ? GREEN : RED,          desc: 'Receita − despesas' },
-    { label: 'Burn Líquido',    value: metrics.burnLiquido > 0 ? `-R$${fmt(metrics.burnLiquido)}/mês` : `+R$${fmt(Math.abs(metrics.burnLiquido))}/mês`, color: metrics.burnLiquido > 0 ? RED : GREEN, desc: 'Despesas − receitas' },
-    { label: 'LTV/CAC',         value: `${fmtDec(metrics.ltvCac, 2)}x`, color: colorByRange(metrics.ltvCac, 3, 1),      desc: `LTV R$${metrics.ltv.toFixed(2)}${churnIsEstimado ? ' · churn ref.' : ''}` },
-    { label: 'Break-even',      value: `R$${fmt(metrics.breakeven)}`, color: metrics.breakevenAlert ? RED : BLUE,       desc: metrics.breakevenAlert ? '⚠ Receita abaixo do break-even!' : 'Receita mínima para cobrir custos' },
-    { label: 'ROI Anualizado',  value: `${fmtDec(metrics.roi, 2)}%`,    color: metrics.roi >= 0 ? GREEN : RED,          desc: 'Retorno sobre capital investido (anual)' },
-    { label: 'Ticket Médio',    value: `R$${fmt(ticketMedio)}`,       color: ticketMedio > 0 ? BLUE : AMBER,            desc: modoManual ? 'manual' : 'receita ÷ clientes ativos' },
-    { label: `CAC${est(cacIsEstimado)}`,   value: `R$${fmt(cacEfetivo)}`,   color: cac > 0 ? BLUE : AMBER, desc: cacIsEstimado ? `ref. mercado — insira seus dados` : modoManual ? 'manual' : 'verba ÷ novos clientes' },
-    { label: `Churn${est(churnIsEstimado)}`, value: `${fmtDec(churnEfetivo, 2)}%`, color: colorByRange(100 - churnEfetivo, 95, 90), desc: churnIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'perdidos ÷ ativos × 100' },
-    { label: 'LTV',             value: `R$${fmt(Math.round(metrics.ltv))}`, color: metrics.ltv > 0 ? GREEN : AMBER,   desc: `(Ticket × Margem) ÷ Churn${churnIsEstimado ? ' ref.' : ''}` },
+    { label: 'Health Score',   value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: `setor ${sectorHeat}/100 + runway + margem + LTV/CAC + burn`, origin: O_FUND },
+    { label: 'Margem',         value: `${fmtDec(metrics.margem, 2)}%`, color: colorByRange(metrics.margem, 20, 10),   desc: '(receita − despesas) / receita', origin: receita > 0 && despesas > 0 ? O_REAL : O_CALC },
+    { label: 'Runway',         value: metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway, 2)} meses`, color: colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: 'Caixa ÷ burn real', origin: caixa > 0 || despesas > 0 ? O_REAL : O_CALC },
+    { label: 'Lucro Mensal',   value: `R$${fmt(metrics.lucro)}`,     color: metrics.lucro >= 0 ? GREEN : RED,         desc: 'Receita − despesas', origin: receita > 0 || despesas > 0 ? O_REAL : O_CALC },
+    { label: 'Burn Líquido',   value: metrics.burnLiquido > 0 ? `-R$${fmt(metrics.burnLiquido)}/mês` : `+R$${fmt(Math.abs(metrics.burnLiquido))}/mês`, color: metrics.burnLiquido > 0 ? RED : GREEN, desc: 'Despesas − receitas', origin: despesas > 0 ? O_REAL : O_CALC },
+    { label: 'LTV/CAC',        value: `${fmtDec(metrics.ltvCac, 2)}x`, color: colorByRange(metrics.ltvCac, 3, 1),    desc: `LTV R$${metrics.ltv.toFixed(2)}`, origin: cacIsEstimado || churnIsEstimado ? O_FUND : O_CALC },
+    { label: 'Break-even',     value: `R$${fmt(metrics.breakeven)}`, color: metrics.breakevenAlert ? RED : BLUE,      desc: metrics.breakevenAlert ? '⚠ Receita abaixo do break-even!' : 'Receita mínima para cobrir custos', origin: receita > 0 && despesas > 0 ? O_REAL : O_CALC },
+    { label: 'ROI Anualizado', value: `${fmtDec(metrics.roi, 2)}%`,  color: metrics.roi >= 0 ? GREEN : RED,          desc: 'Retorno sobre capital investido (anual)', origin: caixa > 0 && (receita > 0 || despesas > 0) ? O_REAL : O_CALC },
+    { label: 'Ticket Médio',   value: `R$${fmt(ticketMedio)}`,       color: ticketMedio > 0 ? BLUE : AMBER,          desc: modoManual ? 'manual' : 'receita ÷ clientes ativos', origin: ticketMedio > 0 ? O_REAL : null },
+    { label: 'CAC',            value: `R$${fmt(cacEfetivo)}`,        color: cac > 0 ? BLUE : AMBER,                  desc: cacIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'verba ÷ novos clientes', origin: cacIsEstimado ? O_REF : O_REAL },
+    { label: 'Churn',          value: `${fmtDec(churnEfetivo, 2)}%`, color: colorByRange(100 - churnEfetivo, 95, 90), desc: churnIsEstimado ? 'ref. mercado — insira seus dados' : modoManual ? 'manual' : 'perdidos ÷ ativos × 100', origin: churnIsEstimado ? O_REF : O_REAL },
+    { label: 'LTV',            value: `R$${fmt(Math.round(metrics.ltv))}`, color: metrics.ltv > 0 ? GREEN : AMBER,  desc: `(Ticket × Margem) ÷ Churn`, origin: churnIsEstimado || ticketMedio === 0 ? O_FUND : O_CALC },
   ]
 
   const benchmark = fase ? buildBenchmark(fase, setores, produtos, revenue, nomeNegocio) : ''
@@ -767,7 +772,14 @@ REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
           {metricCards.map((m, i) => (
             <motion.div key={m.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
               className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${m.color}` }}>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>{m.label}</div>
+              <div className="flex items-center justify-between mb-1">
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{m.label}</div>
+                {m.origin && (
+                  <span style={{ fontSize: 8, fontFamily: 'monospace', fontWeight: 700, color: m.origin.color, background: `${m.origin.color}15`, padding: '1px 5px', borderRadius: 3, letterSpacing: '0.05em' }}>
+                    {m.origin.text}
+                  </span>
+                )}
+              </div>
               <div className="truncate" style={{ fontSize: 15, fontWeight: 700, color: m.color, fontFamily: 'monospace', lineHeight: 1.2 }}>{m.value}</div>
               <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 4, lineHeight: 1.3 }}>{m.desc}</div>
             </motion.div>
@@ -783,48 +795,27 @@ REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
           <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>seus dados × mercado</span>
         </div>
         <div className="grid grid-cols-2 gap-2.5">
-          <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${despesas > 0 ? RED : 'rgba(255,255,255,0.1)'}` }}>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Burn Real</div>
-            <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: despesas > 0 ? RED : 'rgba(255,255,255,0.2)' }}>
-              {despesas > 0 ? `R$${burnReal.toFixed(2)}` : '—'}
+          {[
+            { label: 'Burn Real',    value: despesas > 0 ? `R$${burnReal.toFixed(2)}` : '—', color: despesas > 0 ? RED : 'rgba(255,255,255,0.2)', desc: despesas > 0 ? `+R$${(burnReal - despesas).toFixed(2)} impacto SELIC ${selicRate.toFixed(2)}%` : 'preencha despesas', origin: despesas > 0 ? O_FUND : null },
+            { label: 'Taxa Real',    value: `${taxaRealExata.toFixed(4)}%`,       color: taxaRealExata > 8 ? RED : AMBER,                              desc: 'Fisher — piso mínimo de ROI válido',              origin: { text: 'mercado puro', color: AMBER } },
+            { label: 'Margem Real',  value: receita > 0 ? `${metrics.margemReal.toFixed(4)}%` : '—', color: metrics.margemReal < 0 ? RED : metrics.margemReal < 5 ? AMBER : GREEN, desc: 'margem bruta − taxa real Fisher', origin: receita > 0 ? O_FUND : null },
+            { label: 'CAC Ajustado', value: `R$${cacAjustado.toFixed(2)}`,        color: BLUE,                                                          desc: `${cacIsEstimado ? 'ref.mercado' : 'seus dados'} × câmbio R$${usdRate.toFixed(2)}/R$4,50`, origin: cacIsEstimado ? O_FUND : O_REAL },
+            ...(cpmReais > 0 ? [{ label: 'CPM em R$', value: `R$${cpmReais.toFixed(2)}/mil`, color: AMBER, desc: `US$${cpmUsdVal.toFixed(2)} × R$${usdRate.toFixed(2)}`, origin: { text: 'mercado puro', color: AMBER } }] : []),
+            ...(custoGiroMensal > 0 ? [{ label: 'Custo de Giro', value: `R$${custoGiroMensal.toFixed(2)}/mês`, color: RED, desc: `se financiar via banco a ${(selicRate * 2.5).toFixed(2)}% a.a.`, origin: despesas > 0 ? O_FUND : null }] : []),
+          ].map((card, i) => (
+            <div key={i} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${card.color}` }}>
+              <div className="flex items-center justify-between mb-1">
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{card.label}</div>
+                {card.origin && (
+                  <span style={{ fontSize: 8, fontFamily: 'monospace', fontWeight: 700, color: card.origin.color, background: `${card.origin.color}15`, padding: '1px 5px', borderRadius: 3 }}>
+                    {card.origin.text}
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: card.color }}>{card.value}</div>
+              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3, lineHeight: 1.3 }}>{card.desc}</div>
             </div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3, lineHeight: 1.3 }}>
-              {despesas > 0 ? `+R$${(burnReal - despesas).toFixed(2)} impacto SELIC ${selicRate}%` : 'preencha despesas'}
-            </div>
-          </div>
-          <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${taxaRealExata > 8 ? RED : AMBER}` }}>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Taxa Real</div>
-            <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: taxaRealExata > 8 ? RED : AMBER }}>{taxaRealExata.toFixed(4)}%</div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3, lineHeight: 1.3 }}>Fisher — piso mínimo de ROI válido</div>
-          </div>
-          <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${metrics.margemReal < 0 ? RED : metrics.margemReal < 5 ? AMBER : GREEN}` }}>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Margem Real</div>
-            <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: metrics.margemReal < 0 ? RED : metrics.margemReal < 5 ? AMBER : GREEN }}>
-              {receita > 0 ? `${metrics.margemReal.toFixed(4)}%` : '—'}
-            </div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3, lineHeight: 1.3 }}>margem bruta − taxa real Fisher</div>
-          </div>
-          <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${BLUE}` }}>
-            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>CAC Ajustado</div>
-            <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: BLUE }}>R${cacAjustado.toFixed(2)}</div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3, lineHeight: 1.3 }}>
-              {cacIsEstimado ? 'ref.mercado' : 'seus dados'} × câmbio R${usdRate.toFixed(2)}/R$4,50
-            </div>
-          </div>
-          {cpmReais > 0 && (
-            <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${AMBER}` }}>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>CPM em R$</div>
-              <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: AMBER }}>R${cpmReais.toFixed(2)}/mil</div>
-              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3, lineHeight: 1.3 }}>US${cpmUsdVal.toFixed(2)} × R${usdRate.toFixed(2)}</div>
-            </div>
-          )}
-          {custoGiroMensal > 0 && (
-            <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${RED}` }}>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>Custo de Giro</div>
-              <div style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: RED }}>R${custoGiroMensal.toFixed(2)}/mês</div>
-              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 3, lineHeight: 1.3 }}>se financiar via banco a {(selicRate * 2.5).toFixed(2)}% a.a.</div>
-            </div>
-          )}
+          ))}
         </div>
       </div>
 
