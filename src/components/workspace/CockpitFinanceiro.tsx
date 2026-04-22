@@ -41,7 +41,16 @@ function detectProfile(receita: number, caixa: number, despesas: number, fase: s
   return 'escala'
 }
 
-const ZERO_DEFAULT = { receita: 0, despesas: 0, caixa: 0, clientesAtivos: 0, novosClientes: 0, clientesPerdidos: 0, verbaMkt: 0, cacManual: 0, ticketManual: 0, churnManual: 0, modeloReceita: '', faseNegocio: '', motivoCaixaZero: '', ticketProjetado: 0, margemEstimada: 0, objetivoAtual: '' }
+const ZERO_DEFAULT = {
+  receita: 0, despesas: 0, caixa: 0, clientesAtivos: 0, novosClientes: 0,
+  clientesPerdidos: 0, verbaMkt: 0, cacManual: 0, ticketManual: 0, churnManual: 0,
+  // Calibragem multi-select
+  modelosReceita: [] as string[], objetivos: [] as string[],
+  faseNegocio: '', motivoCaixaZero: '',
+  ticketProjetado: 0, margemEstimada: 0,
+  // Legacy (migration compat)
+  modeloReceita: '', objetivoAtual: '',
+}
 
 // Mapeamento setor onboarding → id mercado (módulo — usado em MarketIntelligence e handleIA)
 const SECTOR_MAP: Record<string, string> = {
@@ -415,17 +424,23 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const ticketManual = data.ticketManual ?? 0; const setTicketManual = (v: number) => update({ ticketManual: v })
   const churnManual  = data.churnManual  ?? 0; const setChurnManual  = (v: number) => update({ churnManual: v })
 
-  // Calibragem de contexto (Smart Setup)
-  const modeloReceita   = data.modeloReceita   ?? ''
-  const setModeloReceita = (v: string) => {
-    const bmNew = MODEL_BENCHMARKS[v]
-    update({ modeloReceita: v, ...(!data.margemEstimada && bmNew ? { margemEstimada: bmNew.margemRef } : {}) })
+  // Calibragem de contexto (Smart Setup) — multi-select com migração de dados legados
+  const modelosReceita: string[] = data.modelosReceita?.length ? data.modelosReceita : (data.modeloReceita ? [data.modeloReceita] : [])
+  const objetivos: string[]      = data.objetivos?.length      ? data.objetivos      : (data.objetivoAtual  ? [data.objetivoAtual]  : [])
+
+  const toggleModelo = (v: string) => {
+    const next = modelosReceita.includes(v) ? modelosReceita.filter(x => x !== v) : [...modelosReceita, v]
+    update({ modelosReceita: next })
   }
+  const toggleObjetivo = (v: string) => {
+    const next = objetivos.includes(v) ? objetivos.filter(x => x !== v) : [...objetivos, v]
+    update({ objetivos: next })
+  }
+
   const faseNegocio     = data.faseNegocio     ?? ''; const setFaseNegocio     = (v: string) => update({ faseNegocio: v })
   const motivoCaixaZero = data.motivoCaixaZero ?? ''; const setMotivoCaixaZero = (v: string) => update({ motivoCaixaZero: v })
   const ticketProjetado = data.ticketProjetado ?? 0;  const setTicketProjetado = (v: number) => update({ ticketProjetado: v })
   const margemEstimada  = data.margemEstimada  ?? 0;  const setMargemEstimada  = (v: number) => update({ margemEstimada: v })
-  const objetivoAtual   = data.objetivoAtual   ?? ''; const setObjetivoAtual   = (v: string) => update({ objetivoAtual: v })
 
   // Cálculo automático ou manual
   const ticketMedio = modoManual ? ticketManual : (clientesAtivos > 0 ? receita / clientesAtivos : 0)
@@ -433,7 +448,17 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const churnMensal = modoManual ? churnManual  : (clientesAtivos > 0 ? (clientesPerdidos / clientesAtivos) * 100 : 0)
 
   // 3-layer fallback helpers (Real → Calibragem → Benchmark)
-  const bm = MODEL_BENCHMARKS[modeloReceita] ?? null
+  // Agrega múltiplos modelos em 1 benchmark combinado
+  const bmList = modelosReceita.map(m => MODEL_BENCHMARKS[m]).filter(Boolean) as Array<typeof MODEL_BENCHMARKS[string]>
+  const bm = bmList.length === 0 ? null : bmList.length === 1 ? bmList[0] : {
+    label:     bmList.map(b => b.label.split(' /')[0]).join(' + '),
+    margemRef: Math.round(bmList.reduce((s, b) => s + b.margemRef, 0) / bmList.length),
+    churnRef:  Math.round(bmList.reduce((s, b) => s + b.churnRef,  0) / bmList.length),
+    ltvMult:   Math.max(...bmList.map(b => b.ltvMult)),
+    cacTeto:   Math.min(...bmList.map(b => b.cacTeto)),
+    ticketRef: Math.round(bmList.reduce((s, b) => s + b.ticketRef, 0) / bmList.length),
+    churnDesc: 'combinado',
+  }
   const ticketEfetivo    = ticketMedio > 0 ? ticketMedio : ticketProjetado > 0 ? ticketProjetado : (bm?.ticketRef ?? 0)
   const calibragemMargem = margemEstimada > 0 ? margemEstimada / 100 : bm ? bm.margemRef / 100 : 0.30
 
@@ -502,7 +527,7 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     const ltvMult        = bm?.ltvMult ?? 1
     const ltv            = ticketEfetivo > 0 && churnEfetivo > 0
       ? (ticketEfetivo * margemLtv) / (churnEfetivo / 100)
-      : modeloReceita && ticketEfetivo > 0
+      : bm && ticketEfetivo > 0
       ? ticketEfetivo * margemLtv * ltvMult
       : ltvRefNum
     const ltvCac         = cacEfetivo > 0 && ltv > 0 ? ltv / cacEfetivo : 0
@@ -537,7 +562,7 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
 
     return { margem, margemIsEstimada, lucro, runway, runwayCritico, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, roiIneficiente, roiSemValidacao, breakevenAlert, breakevenMeta, semDados, margemReal }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receita, despesas, caixa, cacEfetivo, ticketMedio, ticketEfetivo, churnEfetivo, ltvRefNum, sectorHeat, taxaRealExata, burnReal, usdRate, selicRate, calibragemMargem, modeloReceita, bm])
+  }, [receita, despesas, caixa, cacEfetivo, ticketMedio, ticketEfetivo, churnEfetivo, ltvRefNum, sectorHeat, taxaRealExata, burnReal, usdRate, selicRate, calibragemMargem, bm])
 
   // origem: verde = seus dados, amarelo = ref.mercado, azul = calculado/fundido
   const O_REAL  = { text: 'seus dados',   color: GREEN }
@@ -622,13 +647,12 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
       const cpmReais    = cpmUsd * usdRate
       const margemRealIA = metrics.margem - taxaRealIA
 
-      const modeloBmIA = MODEL_BENCHMARKS[modeloReceita]
-      const calibLineIA = modeloReceita
-        ? `\nModelo: ${modeloBmIA?.label ?? modeloReceita} | Margem ref ${modeloBmIA?.margemRef ?? '?'}% | Churn ref ${modeloBmIA?.churnRef ?? '?'}%/mês | LTV mult ${modeloBmIA?.ltvMult ?? '?'}x`
+      const calibLineIA = bm
+        ? `\nModelos: ${bm.label} | Margem ref ${bm.margemRef}% | Churn ref ${bm.churnRef}%/mês | LTV mult ${bm.ltvMult}x`
         : ''
       const contextParts = [
         motivoCaixaZero ? `Caixa R$0: ${motivoCaixaZero}` : '',
-        objetivoAtual   ? `Objetivo: ${objetivoAtual}` : '',
+        objetivos.length > 0 ? `Objetivos: ${objetivos.join(', ')}` : '',
         ticketProjetado > 0 && receita === 0 ? `Ticket projetado: R$${ticketProjetado.toFixed(2)}` : '',
         margemEstimada > 0 && receita === 0 ? `Margem estimada: ${margemEstimada}%` : '',
       ].filter(Boolean).join(' | ')
@@ -680,7 +704,7 @@ Relatório em 4 seções:
       nome: saveNome.trim() || `${nomeNegocio || 'Diagnóstico'} — ${new Date().toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })}`,
       empresa: nomeNegocio || 'Empresa',
       createdAt: new Date().toISOString(),
-      inputs: { receita, despesas, caixa, verbaMkt, clientesAtivos, novosClientes, clientesPerdidos, cacManual, ticketManual, churnManual, modeloReceita, faseNegocio, motivoCaixaZero, ticketProjetado, margemEstimada, objetivoAtual },
+      inputs: { receita, despesas, caixa, verbaMkt, clientesAtivos, novosClientes, clientesPerdidos, cacManual, ticketManual, churnManual, modelosReceita, objetivos, faseNegocio, motivoCaixaZero, ticketProjetado, margemEstimada },
       metrics: { healthScore: metrics.healthScore, margem: metrics.margem, runway: metrics.runway, lucro: metrics.lucro, ltvCac: metrics.ltvCac, ltv: metrics.ltv, breakeven: metrics.breakeven, roi: metrics.roi, margemReal: metrics.margemReal, runwayCritico: metrics.runwayCritico, roiIneficiente: metrics.roiIneficiente, breakevenMeta: metrics.breakevenMeta },
       iaResponse, selicRate, ipcaRate, usdRate, sectorLabel, sectorHeat,
     }
@@ -727,66 +751,89 @@ Relatório em 4 seções:
       )}
 
       {/* ── 0. CALIBRAGEM DE CONTEXTO (Smart Setup) ── */}
-      {(() => {
-        const calibComplete = !!(modeloReceita && objetivoAtual)
-        return (
-          <div>
+      <div>
             <button
               onClick={() => setShowCalib(c => !c)}
               className="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors"
-              style={{ background: calibComplete ? 'rgba(0,0,0,0.25)' : `${AMBER}10`, border: `1px solid ${calibComplete ? 'rgba(255,255,255,0.08)' : AMBER + '40'}` }}
+              style={{ background: modelosReceita.length > 0 ? 'rgba(0,0,0,0.25)' : `${AMBER}10`, border: `1px solid ${modelosReceita.length > 0 ? 'rgba(255,255,255,0.08)' : AMBER + '40'}` }}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span style={{ fontSize: 12 }}>⚙</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: calibComplete ? 'rgba(255,255,255,0.55)' : AMBER }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: modelosReceita.length > 0 ? 'rgba(255,255,255,0.55)' : AMBER }}>
                   Calibragem de Contexto
                 </span>
-                {!calibComplete && (
+                {modelosReceita.length === 0 && (
                   <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: AMBER, background: `${AMBER}20`, padding: '1px 6px', borderRadius: 3, letterSpacing: '0.08em' }}>
                     CONFIGURAR
                   </span>
                 )}
-                {calibComplete && bm && (
-                  <span style={{ fontSize: 9, color: GREEN, background: `${GREEN}18`, padding: '1px 6px', borderRadius: 3 }}>
-                    ✓ {bm.label}
+                {modelosReceita.length > 0 && (
+                  <span style={{ fontSize: 9, color: GREEN, background: `${GREEN}18`, padding: '1px 5px', borderRadius: 3 }}>
+                    ✓ {modelosReceita.length === 1 ? bm?.label : `${modelosReceita.length} modelos`}
+                  </span>
+                )}
+                {objetivos.length > 0 && (
+                  <span style={{ fontSize: 9, color: BLUE, background: `${BLUE}20`, padding: '1px 5px', borderRadius: 3 }}>
+                    {objetivos.join(' · ')}
                   </span>
                 )}
               </div>
-              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>{showCalib ? '▲' : '▼'}</span>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', flexShrink: 0 }}>{showCalib ? '▲' : '▼'}</span>
             </button>
 
             {showCalib && (
-              <div className="mt-2 rounded-lg p-4 flex flex-col gap-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div className="mt-2 rounded-lg p-4 flex flex-col gap-4" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
+
+                {/* Modelo de receita — chips multi-select */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>Modelo de receita <span style={{ color: 'rgba(255,255,255,0.25)' }}>— selecione todos que se aplicam</span></label>
+                    {modelosReceita.length > 0 && <button onClick={() => update({ modelosReceita: [] })} style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', background: 'none', border: 'none', cursor: 'pointer' }}>limpar</button>}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {Object.entries(MODEL_BENCHMARKS).map(([k, mb]) => {
+                      const sel = modelosReceita.includes(k)
+                      return (
+                        <button key={k} onClick={() => toggleModelo(k)}
+                          className="px-2.5 py-1 rounded-full transition-all"
+                          style={{ fontSize: 11, border: `1px solid ${sel ? GREEN + '70' : 'rgba(255,255,255,0.1)'}`, background: sel ? `${GREEN}18` : 'rgba(255,255,255,0.03)', color: sel ? GREEN : 'rgba(255,255,255,0.45)', fontWeight: sel ? 600 : 400 }}>
+                          {sel ? '✓ ' : ''}{mb.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {bm && (
+                    <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', lineHeight: 1.4 }}>
+                      {bm.label}: margem ref {bm.margemRef}% · churn {bm.churnRef}%/mês · ticket R${bm.ticketRef} · LTV {bm.ltvMult}x
+                    </p>
+                  )}
+                </div>
+
+                {/* Objetivo — chips multi-select */}
+                <div className="flex flex-col gap-2">
+                  <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>Objetivo atual <span style={{ color: 'rgba(255,255,255,0.25)' }}>— pode ter mais de um</span></label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { v: 'validar',    label: 'Validar mercado' },
+                      { v: 'crescer',    label: 'Crescer receita' },
+                      { v: 'sobreviver', label: 'Sobreviver / reduzir burn' },
+                      { v: 'escalar',    label: 'Escalar operação' },
+                      { v: 'captar',     label: 'Captar investimento' },
+                    ].map(({ v: ov, label }) => {
+                      const sel = objetivos.includes(ov)
+                      return (
+                        <button key={ov} onClick={() => toggleObjetivo(ov)}
+                          className="px-2.5 py-1 rounded-full transition-all"
+                          style={{ fontSize: 11, border: `1px solid ${sel ? BLUE + '70' : 'rgba(255,255,255,0.1)'}`, background: sel ? `${BLUE}18` : 'rgba(255,255,255,0.03)', color: sel ? '#5dade2' : 'rgba(255,255,255,0.45)', fontWeight: sel ? 600 : 400 }}>
+                          {sel ? '✓ ' : ''}{label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                {/* Fase + Caixa R$0 — linha compacta */}
                 <div className="grid grid-cols-2 gap-3">
-                  {/* Modelo de receita */}
-                  <div className="flex flex-col gap-1.5">
-                    <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Modelo de receita</label>
-                    <select value={modeloReceita} onChange={e => setModeloReceita(e.target.value)}
-                      className="rounded-lg px-3 py-2 outline-none"
-                      style={{ background: 'rgba(0,0,0,0.4)', border: `1px solid ${modeloReceita ? 'rgba(255,255,255,0.15)' : AMBER + '50'}`, fontSize: 12, color: modeloReceita ? '#fff' : 'rgba(255,255,255,0.3)' }}>
-                      <option value="">Selecionar...</option>
-                      {Object.entries(MODEL_BENCHMARKS).map(([k, v]) => (
-                        <option key={k} value={k} style={{ background: '#0a0f1e' }}>{v.label}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Objetivo atual */}
-                  <div className="flex flex-col gap-1.5">
-                    <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Objetivo atual</label>
-                    <select value={objetivoAtual} onChange={e => setObjetivoAtual(e.target.value)}
-                      className="rounded-lg px-3 py-2 outline-none"
-                      style={{ background: 'rgba(0,0,0,0.4)', border: `1px solid ${objetivoAtual ? 'rgba(255,255,255,0.15)' : AMBER + '50'}`, fontSize: 12, color: objetivoAtual ? '#fff' : 'rgba(255,255,255,0.3)' }}>
-                      <option value="">Selecionar...</option>
-                      <option value="validar" style={{ background: '#0a0f1e' }}>Validar mercado</option>
-                      <option value="crescer" style={{ background: '#0a0f1e' }}>Crescer receita</option>
-                      <option value="sobreviver" style={{ background: '#0a0f1e' }}>Sobreviver / reduzir burn</option>
-                      <option value="escalar" style={{ background: '#0a0f1e' }}>Escalar operação</option>
-                      <option value="captar" style={{ background: '#0a0f1e' }}>Captar investimento</option>
-                    </select>
-                  </div>
-
-                  {/* Fase do negócio */}
                   <div className="flex flex-col gap-1.5">
                     <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Fase do negócio</label>
                     <select value={faseNegocio} onChange={e => setFaseNegocio(e.target.value)}
@@ -800,8 +847,6 @@ Relatório em 4 seções:
                       <option value="escala" style={{ background: '#0a0f1e' }}>Escala / maturidade</option>
                     </select>
                   </div>
-
-                  {/* Caixa R$0 — por quê? (só aparece quando relevante) */}
                   {caixa === 0 && despesas > 0 && (
                     <div className="flex flex-col gap-1.5">
                       <label style={{ fontSize: 11, color: AMBER }}>⚠ Caixa R$0 — por quê?</label>
@@ -816,58 +861,59 @@ Relatório em 4 seções:
                       </select>
                     </div>
                   )}
+                </div>
 
-                  {/* Ticket projetado — só quando receita=0 */}
-                  {receita === 0 && (
+                {/* Personalizar ticket e margem — opcionais, collapsíveis */}
+                {(receita === 0 || margemEstimada > 0) && (
+                  <div className="flex flex-col gap-3 pt-2 border-t border-white/5">
+                    <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)' }}>
+                      Opcional — sem preenchimento, o sistema usa os benchmarks do modelo automaticamente
+                    </p>
+                    {receita === 0 && (
+                      <div className="flex flex-col gap-1.5">
+                        <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
+                          Ticket projetado{bm ? ` — deixe em branco para usar R$${bm.ticketRef} (ref. ${bm.label})` : ''}
+                        </label>
+                        <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', fontFamily: 'monospace' }}>R$</span>
+                          <input type="number" value={ticketProjetado || ''}
+                            placeholder={bm ? `${bm.ticketRef} (benchmark)` : 'opcional'}
+                            onChange={e => setTicketProjetado(parseFloat(e.target.value) || 0)}
+                            className="bg-transparent outline-none flex-1"
+                            style={{ fontSize: 14, fontFamily: 'monospace', color: '#fff', border: 'none' }} />
+                          {ticketProjetado > 0 && <button onClick={() => setTicketProjetado(0)} style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>}
+                        </div>
+                      </div>
+                    )}
                     <div className="flex flex-col gap-1.5">
-                      <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
-                        Ticket projetado (R${bm ? ` · ref. ${bm.ticketRef}` : ''})
-                      </label>
-                      <div className="flex items-center gap-2 rounded-lg px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>R$</span>
-                        <input type="number" value={ticketProjetado || ''}
-                          placeholder={bm ? String(bm.ticketRef) : '0'}
-                          onChange={e => setTicketProjetado(parseFloat(e.target.value) || 0)}
-                          className="bg-transparent outline-none flex-1"
-                          style={{ fontSize: 15, fontFamily: 'monospace', color: '#fff', border: 'none' }} />
+                      <div className="flex items-center justify-between">
+                        <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
+                          Margem estimada {margemEstimada === 0 ? `— usando ${bm ? bm.margemRef + '%' : '30%'} automaticamente` : `— ${fmtDec(margemEstimada)}%`}
+                        </label>
+                        {margemEstimada > 0 && <button onClick={() => setMargemEstimada(0)} style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', background: 'none', border: 'none', cursor: 'pointer' }}>↺ usar benchmark</button>}
+                      </div>
+                      <div className="flex items-center gap-3 rounded-lg px-3 py-2" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <input type="range" min={0} max={100} step={1}
+                          value={margemEstimada || (bm?.margemRef ?? 30)}
+                          onChange={e => setMargemEstimada(Number(e.target.value))}
+                          style={{ flex: 1, accentColor: BLUE, height: 4 }} />
+                        <span style={{ fontSize: 14, fontFamily: 'monospace', color: margemEstimada > 0 ? '#fff' : 'rgba(255,255,255,0.3)', minWidth: 36, textAlign: 'right' }}>
+                          {margemEstimada > 0 ? fmtDec(margemEstimada) : bm ? fmtDec(bm.margemRef) : '30'}%
+                        </span>
                       </div>
                     </div>
-                  )}
-                </div>
-
-                {/* Margem estimada — slider com auto-fill do benchmark */}
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center justify-between">
-                    <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>
-                      Margem estimada — {margemEstimada > 0 ? `${fmtDec(margemEstimada)}%` : bm ? `${bm.margemRef}% (benchmark)` : '30% (padrão)'}
-                    </label>
-                    {bm && margemEstimada !== bm.margemRef && (
-                      <button onClick={() => setMargemEstimada(bm.margemRef)}
-                        style={{ fontSize: 9, color: AMBER, background: `${AMBER}18`, padding: '1px 6px', borderRadius: 3, border: 'none', cursor: 'pointer' }}>
-                        ↺ usar {bm.margemRef}%
-                      </button>
-                    )}
                   </div>
-                  <div className="flex items-center gap-3 rounded-lg px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                    <input type="range" min={0} max={100} step={1}
-                      value={margemEstimada || (bm?.margemRef ?? 30)}
-                      onChange={e => setMargemEstimada(Number(e.target.value))}
-                      style={{ flex: 1, accentColor: BLUE, height: 4 }} />
-                    <span style={{ fontSize: 15, fontFamily: 'monospace', color: '#fff', minWidth: 40, textAlign: 'right' }}>
-                      {margemEstimada > 0 ? fmtDec(margemEstimada) : bm ? fmtDec(bm.margemRef) : '30'}%
-                    </span>
-                  </div>
-                  {bm && (
-                    <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', lineHeight: 1.4 }}>
-                      Ref {bm.label}: margem {bm.margemRef}% · churn {bm.churnRef}%/mês ({bm.churnDesc}) · ticket ref R${bm.ticketRef}
-                    </p>
-                  )}
-                </div>
+                )}
+                {receita > 0 && margemEstimada === 0 && (
+                  <button onClick={() => setMargemEstimada(bm?.margemRef ?? 30)}
+                    className="text-left"
+                    style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                    + personalizar margem estimada
+                  </button>
+                )}
               </div>
             )}
-          </div>
-        )
-      })()}
+      </div>
 
       {/* ── 1. INPUTS FINANCEIROS BASE ── */}
       <div>
