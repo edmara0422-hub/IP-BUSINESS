@@ -274,6 +274,58 @@ function NumInput({ label, value, onChange, prefix = 'R$' }: { label: string; va
   )
 }
 
+// Ticker de agentes globais e commodities com impacto no negócio
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function AgentsTicker({ marketData }: { marketData: any }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const agents     = (marketData?.globalAgents  ?? []) as Array<{ id: string; label: string; delta: number; value?: number }>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const commodities = (marketData?.commodities  ?? []) as Array<{ id: string; label: string; delta: number; value?: number }>
+
+  const AGENT_IMPACT: Record<string, (d: number) => string> = {
+    meta:     d => d < 0 ? `Meta ▼${Math.abs(d).toFixed(2)}% — CPM pode cair: janela para escalar ads` : `Meta ▲${d.toFixed(2)}% — CPM subindo: cautela em paid media`,
+    google:   d => d < 0 ? `Google ▼${Math.abs(d).toFixed(2)}% — CPC pode cair: oportunidade em search` : `Google ▲${d.toFixed(2)}% — CPC subindo: revisar bids`,
+    apple:    d => d < 0 ? `Apple ▼${Math.abs(d).toFixed(2)}% — consumidor premium recuando: demanda discricionária cai` : `Apple ▲${d.toFixed(2)}% — consumo premium aquecido`,
+    amazon:   d => d < 0 ? `Amazon ▼${Math.abs(d).toFixed(2)}% — e-commerce desacelerando: menos demanda inbound` : `Amazon ▲${d.toFixed(2)}% — e-commerce aquecido`,
+    vale:     d => d < 0 ? `Vale ▼${Math.abs(d).toFixed(2)}% — China desacelerando: câmbio pode pressionar` : `Vale ▲${d.toFixed(2)}% — commodities aquecidas: PIB favorável`,
+    petrobras:d => d < 0 ? `Petrobras ▼${Math.abs(d).toFixed(2)}% — combustível pode cair: frete mais barato` : `Petrobras ▲${d.toFixed(2)}% — combustível subindo: frete mais caro`,
+  }
+  const COMMODITY_IMPACT: Record<string, (d: number, v?: number) => string> = {
+    oil:    (d, v) => d < 0 ? `Petróleo $${v?.toFixed(2) ?? '?'} ▼${Math.abs(d).toFixed(2)}% — frete ~2% mais barato nos próximos 7 dias` : `Petróleo $${v?.toFixed(2) ?? '?'} ▲${d.toFixed(2)}% — custo de energia e frete subindo`,
+    gold:   (d)   => d < 0 ? `Ouro ▼${Math.abs(d).toFixed(2)}% — confiança aumenta: capital volta ao risco` : `Ouro ▲${d.toFixed(2)}% — busca por segurança: aversão a risco`,
+    copper: (d)   => d < 0 ? `Cobre ▼${Math.abs(d).toFixed(2)}% — desaceleração industrial: indicador antecedente de recessão` : `Cobre ▲${d.toFixed(2)}% — demanda industrial aquecida`,
+    lithium:(d)   => d < 0 ? `Lítio ▼${Math.abs(d).toFixed(2)}% — excesso de oferta de EVs: tecnologia de bateria barateia` : `Lítio ▲${d.toFixed(2)}% — mercado de EVs aquecido`,
+    silver: (d)   => d < 0 ? `Prata ▼${Math.abs(d).toFixed(2)}% — menor demanda industrial` : `Prata ▲${d.toFixed(2)}% — demanda industrial ou proteção`,
+    grains: (d)   => d < 0 ? `Grãos ▼${Math.abs(d).toFixed(2)}% — alívio na cesta básica: poder de compra do consumidor melhora` : `Grãos ▲${d.toFixed(2)}% — pressão na cesta básica: consumo discreto cai`,
+  }
+
+  const items = [
+    ...agents.map(a => ({ text: AGENT_IMPACT[a.id]?.(a.delta) ?? `${a.label} ${a.delta >= 0 ? '▲' : '▼'}${Math.abs(a.delta).toFixed(2)}%`, urgent: Math.abs(a.delta) > 1 })),
+    ...commodities.map(c => ({ text: COMMODITY_IMPACT[c.id]?.(c.delta, c.value) ?? `${c.label} ${c.delta >= 0 ? '▲' : '▼'}${Math.abs(c.delta).toFixed(2)}%`, urgent: Math.abs(c.delta) > 2 })),
+  ].filter(i => i.text)
+
+  if (items.length === 0) return null
+
+  // Duplicate for seamless loop
+  const allItems = [...items, ...items]
+
+  return (
+    <div className="rounded-lg overflow-hidden" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.05)' }}>
+      <div style={{ overflow: 'hidden', position: 'relative' }}>
+        <style>{`@keyframes tickerScroll { from { transform: translateX(0) } to { transform: translateX(-50%) } }`}</style>
+        <div style={{ display: 'flex', gap: 0, animation: `tickerScroll ${Math.max(items.length * 8, 30)}s linear infinite`, width: 'max-content' }}>
+          {allItems.map((item, i) => (
+            <div key={i} className="flex items-center gap-2 px-4 py-2" style={{ borderRight: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
+              <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: item.urgent ? '#e74c3c' : 'rgba(255,255,255,0.25)', letterSpacing: '0.05em' }}>◆</span>
+              <span style={{ fontSize: 11, fontFamily: 'monospace', color: item.urgent ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.35)', whiteSpace: 'nowrap' }}>{item.text}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Benchmarks por fase + setor combinados
 function buildBenchmark(fase: string, setores: string[], produtos: string[], revenue: string, nome: string): string {
   const setor = setores[0] ?? ''
@@ -610,6 +662,9 @@ REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
   return (
     <motion.div ref={pdfRef} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
       className="flex flex-col gap-6 p-4" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
+
+      {/* ── TICKER DE AGENTES E COMMODITIES ── */}
+      <AgentsTicker marketData={marketData} />
 
       {/* ── CONTEXTO DO ONBOARDING COMPLETO ── */}
       {benchmark && (
