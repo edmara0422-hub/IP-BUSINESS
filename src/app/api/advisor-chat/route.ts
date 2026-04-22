@@ -11,24 +11,11 @@ export async function POST(request: Request) {
   try {
     const { question, marketContext } = await request.json()
 
-    const prompt = `Você é o IA Advisor do IPB — Intelligence Platform Business. Você tem acesso aos dados de mercado em tempo real do Brasil.
-
-DADOS DE MERCADO AGORA:
-${marketContext}
-
-REGRAS:
-1. Responda em português brasileiro, direto e objetivo
-2. USE os dados de mercado acima para fundamentar sua resposta — cite números reais
-3. Cada resposta deve ter: diagnóstico + por que + o que fazer agora
-4. Não seja genérico — seja específico com os dados
-5. Máximo 3-4 parágrafos
-6. Se o usuário perguntar sobre precificação, use IPCA e câmbio reais
-7. Se perguntar sobre crédito/financiamento, use SELIC real
-8. Se perguntar sobre setor, use os dados de heat e variação
-9. Termine com uma ação concreta: "AÇÃO: [o que fazer agora]"
-
-PERGUNTA DO USUÁRIO:
-${question}`
+    // O question do cockpit já contém todas as instruções e dados — não duplicar sistema.
+    // marketContext é usado como contexto breve no system message.
+    const systemMsg = marketContext
+      ? `Você é analista financeiro sênior de PMEs brasileiras. Dados de mercado atuais: ${marketContext}. NUNCA arredonde valores — use precisão total.`
+      : `Você é analista financeiro sênior de PMEs brasileiras. Responda em português, cite números reais, seja direto. NUNCA arredonde valores.`
 
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -38,8 +25,11 @@ ${question}`
       },
       body: JSON.stringify({
         model: 'llama-3.1-8b-instant',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 600,
+        messages: [
+          { role: 'system', content: systemMsg },
+          { role: 'user',   content: question },
+        ],
+        max_tokens: 1800,
         temperature: 0.4,
       }),
     })
