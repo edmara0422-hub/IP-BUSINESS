@@ -71,10 +71,19 @@ function r2(n: number) { return parseFloat(n.toFixed(2)) }
 function r1(n: number) { return parseFloat(n.toFixed(1)) }
 
 export const dynamic = 'force-dynamic'
-export const revalidate = 300 // cache 5 minutos no Vercel
+
+// Cache em memória — 5 minutos. Evita bater nas APIs externas a cada request.
+let _cache: { data: unknown; ts: number } | null = null
+const CACHE_TTL = 5 * 60 * 1000
 
 // ══════════════════════════════════════════════════════════════════════════
 export async function GET() {
+  // Serve do cache se ainda válido
+  if (_cache && Date.now() - _cache.ts < CACHE_TTL) {
+    return NextResponse.json(_cache.data, {
+      headers: { 'X-Cache': 'HIT', 'Cache-Control': 'public, max-age=300' },
+    })
+  }
 
   // ── Defaults (usados se qualquer fetch falhar) ──────────────────────────
   let usdBrl = 4.98, usdDelta = 0.02
@@ -241,7 +250,7 @@ export async function GET() {
   const urgPib     = clamp(Math.round(50 + pib * 5), 10, 99)
   const urgAgro    = clamp(Math.round(50 + dAgro * 5), 10, 99)
 
-  return NextResponse.json({
+  const payload = {
     macro: {
       usdBrl: { value: r2(usdBrl), delta: r2(usdDelta),           sentiment: usdDelta > 0.05 ? 'up' : usdDelta < -0.05 ? 'down' : 'neutral' },
       ipca:   { value: r2(ipca),   delta: r2(ipca - 4.62),        sentiment: ipca > 5 ? 'up' : ipca < 3.5 ? 'down' : 'neutral' },
@@ -306,10 +315,16 @@ export async function GET() {
       { id: 'agro_boom',  label: `Agro ${dAgro >= 0 ? '+' : ''}${dAgro.toFixed(1)}% hoje — oportunidade B2B em agritech`,                            urgency: urgAgro,   type: 'setor' },
     ],
     updatedAt: new Date().toISOString(),
-  }, {
+  }
+
+  _cache = { data: payload, ts: Date.now() }
+
+  return NextResponse.json(payload, {
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET',
+      'X-Cache': 'MISS',
+      'Cache-Control': 'public, max-age=300',
     },
   })
 }
