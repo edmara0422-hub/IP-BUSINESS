@@ -16,6 +16,19 @@ function colorByRange(v: number, g: number, a: number) { return v >= g ? GREEN :
 
 const ZERO_DEFAULT = { receita: 0, despesas: 0, caixa: 0, clientesAtivos: 0, novosClientes: 0, clientesPerdidos: 0, verbaMkt: 0, cacManual: 0, ticketManual: 0, churnManual: 0 }
 
+// Mapeamento setor onboarding → id mercado (módulo — usado em MarketIntelligence e handleIA)
+const SECTOR_MAP: Record<string, string> = {
+  'Tecnologia': 'tech', 'App/SaaS': 'tech', 'Digital/SaaS': 'tech', 'Tecnologia & IA': 'tech',
+  'Consultoria': 'services', 'Agência': 'services', 'Serviços': 'services',
+  'Saúde': 'health', 'MedTech': 'health', 'Saúde & MedTech': 'health',
+  'Varejo': 'retail', 'E-commerce': 'retail', 'Varejo Tradicional': 'retail',
+  'Financeiro': 'fintech', 'Fintech': 'fintech',
+  'Logística': 'logistics', 'Logística Smart': 'logistics',
+  'Agronegócio': 'agro', 'Agricultura': 'agro',
+  'Energia': 'energy', 'Energia Renovável': 'energy',
+  'Mídia': 'media', 'Comunicação': 'media', 'Mídia Impressa': 'media',
+}
+
 // ── Componente de inteligência de mercado rico ─────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, despesas, cdiMensal, cdiRendimento, decisaoCDI, userProfile, receita, margem, runway, ltvCac, cac, churnMensal }: {
@@ -28,19 +41,6 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
 }) {
 
   const sectors = (marketData?.sectors ?? []) as Array<{ id: string; label?: string; heat: number; change: number; trend?: string }>
-
-  // Mapeamento setor onboarding → id mercado
-  const SECTOR_MAP: Record<string, string> = {
-    'Tecnologia': 'tech', 'App/SaaS': 'tech', 'Digital/SaaS': 'tech',
-    'Consultoria': 'services', 'Agência': 'services', 'Serviços': 'services',
-    'Saúde': 'health', 'MedTech': 'health',
-    'Varejo': 'retail', 'E-commerce': 'retail',
-    'Financeiro': 'fintech', 'Fintech': 'fintech',
-    'Logística': 'logistics',
-    'Agronegócio': 'agro', 'Agricultura': 'agro',
-    'Energia': 'energy',
-    'Mídia': 'media', 'Comunicação': 'media',
-  }
 
   const userSectorId = useMemo(() => {
     const setor = userProfile?.sectors?.[0] ?? userProfile?.product?.[0] ?? ''
@@ -412,51 +412,139 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const handleIA = async () => {
     setIaLoading(true)
     setIaResponse('')
-    const question = `Você é analista financeiro especializado em PMEs brasileiras. Analise o Cockpit Financeiro.
 
-PERFIL DO NEGÓCIO (onboarding completo):
-  Nome: ${nomeNegocio || 'não informado'}
-  Fase: ${fase || 'não informada'}
-  Setor(es): ${setores.join(', ') || 'não informado'}
-  Produto/Serviço: ${produtos.join(', ') || 'não informado'}
-  Faturamento declarado: ${revenue || 'não informado'}
+    // ── Extração completa de marketData ────────────────────────────────────
+    const pibRate      = marketData?.macro?.pib?.value              ?? 1.9
+    const cpmUsd       = marketData?.marketing?.cpm?.value          ?? 0
+    const cpcUsd       = marketData?.marketing?.cpc?.value          ?? 0
+    const organicPct   = marketData?.marketing?.organicShare?.value ?? 0
+    const organicDelta = marketData?.marketing?.organicShare?.delta ?? 0
+    const cacRef       = marketData?.marketing?.cac?.value          ?? 0
+    const ltvRef       = marketData?.marketing?.ltv?.value          ?? 0
+    const churnRef     = marketData?.marketing?.churn?.value        ?? 0
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const platforms    = (marketData?.marketing?.platforms ?? []) as Array<{ id: string; label: string; cpm: number; delta: number }>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const metaAgent    = marketData?.globalAgents?.find((a: any) => a.id === 'meta')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const googleAgent  = marketData?.globalAgents?.find((a: any) => a.id === 'google')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const petroleo     = marketData?.commodities?.find((c: any) => c.id === 'oil')
+    const briefing     = marketData?.briefing ?? ''
 
-BENCHMARKS DESTA FASE+SETOR:
-  ${benchmark || 'sem referência'}
+    const userSectorIdIA = SECTOR_MAP[setores[0] ?? ''] ?? null
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const userSectorData = userSectorIdIA ? (marketData?.sectors ?? []).find((s: any) => s.id === userSectorIdIA) : null
+    const sectorHeat  = (userSectorData as any)?.heat  ?? 0
+    const sectorLabel = (userSectorData as any)?.label ?? setores[0] ?? 'não definido'
 
-DADOS FINANCEIROS REAIS:
-  Receita Mensal: R$${fmt(receita)}
-  Despesas Operacionais: R$${fmt(despesas)}
-  Caixa Disponível: R$${fmt(caixa)}
-  Clientes Ativos: ${clientesAtivos} | Novos: ${novosClientes} | Perdidos: ${clientesPerdidos}
-  Verba Marketing: R$${fmt(verbaMkt)}
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const bestPlatform = platforms.length > 0 ? platforms.reduce((a: any, b: any) => a.cpm < b.cpm ? a : b) : null
 
-INDICADORES CALCULADOS:
-  Ticket Médio: R$${fmt(ticketMedio)} ${modoManual ? '(manual)' : '(automático)'}
-  CAC: R$${fmt(cac)} ${modoManual ? '(manual)' : '(automático)'}
-  Churn: ${fmtDec(churnMensal)}%/mês ${modoManual ? '(manual)' : '(automático)'}
-  Margem: ${fmtDec(metrics.margem)}%
-  Runway: ${metrics.runway >= 999 ? 'lucrativo' : fmtDec(metrics.runway) + ' meses'}
-  LTV: R$${fmt(Math.round(metrics.ltv))} | LTV/CAC: ${fmtDec(metrics.ltvCac)}x
+    // ── Fórmulas de sensibilidade (precisão máxima, sem arredondamento) ────
+    // Taxa real exata — fórmula Fisher: ((1+SELIC)/(1+IPCA))−1
+    const taxaRealExata   = ((1 + selicRate / 100) / (1 + ipcaRate / 100) - 1) * 100
+    // Burn real: despesas + impacto oculto de crédito mais caro com SELIC alta
+    const burnReal        = despesas + despesas * (selicRate / 100) * 0.2
+    // Custo mensal se financiar via capital de giro bancário (SELIC × 2.5)
+    const custoGiroMensal = despesas * (selicRate * 2.5 / 100) / 12
+    // CAC ajustado ao câmbio atual (base histórico R$4,50)
+    const cacBase         = cac > 0 ? cac : cacRef
+    const cacAjustado     = cacBase * (usdRate / 4.50)
+    // CPM convertido para R$ (custo por 1000 impressões)
+    const cpmReais        = cpmUsd * usdRate
+    // Margem real líquida após taxa real
+    const margemReal      = metrics.margem - taxaRealExata
+    // Break-even inflacionado em 12 meses
+    const breakevenInflado = metrics.breakeven * (1 + ipcaRate / 100)
+    // CDI mensal (proxy)
+    const cdiAnual        = selicRate - 0.1
+    // ROI vs CDI gap
+    const roiCdiGap       = metrics.roi - cdiAnual
+
+    const platformLines = platforms.slice(0, 6).map((p: any) =>
+      `  ${p.label}: US$${p.cpm.toFixed(2)} = R$${(p.cpm * usdRate).toFixed(2)}/mil impressões${p.id === bestPlatform?.id ? ' ← MELHOR CUSTO AGORA' : ''}`
+    ).join('\n')
+
+    const question = `Você é analista financeiro sênior de PMEs brasileiras. NUNCA arredonde — use precisão total nos cálculos.
+
+NEGÓCIO: ${nomeNegocio || '?'} | Fase: ${fase || '?'} | Setor: ${sectorLabel} (heat ${sectorHeat}/100) | Produto: ${produtos.join(', ') || '?'}
+
+═══ DADOS OPERACIONAIS × MERCADO — JÁ FUNDIDOS ═══
+
+BURN REAL (despesas + custo oculto da SELIC):
+  Despesas base: R$${despesas.toFixed(2)}/mês
+  Impacto SELIC ${selicRate}% nos custos (20% das despesas): +R$${(despesas * selicRate / 100 * 0.2).toFixed(2)}/mês
+  → BURN REAL: R$${burnReal.toFixed(2)}/mês
+  Se financiar via banco (${(selicRate * 2.5).toFixed(2)}% a.a.): +R$${custoGiroMensal.toFixed(2)}/mês de juros
+
+TAXA REAL E MARGEM:
+  Taxa real Fisher ((1+${selicRate}/100)/(1+${ipcaRate}/100)−1): ${taxaRealExata.toFixed(4)}%
+  Margem bruta: ${metrics.margem.toFixed(4)}%
+  Margem real líquida (margem − taxa real): ${margemReal.toFixed(4)}% ${margemReal < 0 ? '⚠ NEGATIVA' : ''}
+  Break-even inflacionado 12m (IPCA ${ipcaRate}%): R$${breakevenInflado.toFixed(2)}
+  ROI anualizado: ${metrics.roi.toFixed(4)}% | CDI: ${cdiAnual.toFixed(2)}% | Gap ROI−CDI: ${roiCdiGap.toFixed(4)}% ${roiCdiGap < 0 ? '⚠ CAIXA RENDE MAIS QUE O NEGÓCIO' : '✓'}
+
+CAC AJUSTADO AO CÂMBIO:
+  CAC real: R$${cacBase.toFixed(2)} | Fator câmbio (R$${usdRate.toFixed(2)}/R$4,50): ×${(usdRate / 4.50).toFixed(4)}
+  → CAC ajustado: R$${cacAjustado.toFixed(2)}
+  LTV real: R$${metrics.ltv.toFixed(2)} | LTV/CAC: ${metrics.ltvCac.toFixed(4)}x
+  LTV referência mercado: R$${ltvRef} | CAC ref. mercado: R$${cacRef} | Churn ref: ${churnRef}%
+
+AQUISIÇÃO & CANAIS:
+  CPM mercado: US$${cpmUsd.toFixed(2)} × R$${usdRate.toFixed(2)} = R$${cpmReais.toFixed(2)}/mil impressões
+  CPC médio: US$${cpcUsd.toFixed(2)} = R$${(cpcUsd * usdRate).toFixed(2)}
+  Orgânico: ${organicPct.toFixed(1)}% do tráfego (MoM: ${organicDelta > 0 ? '+' : ''}${organicDelta.toFixed(1)}%) ${organicDelta < -3 ? '⚠ QUEDA ACELERADA' : ''}
+  Plataformas disponíveis:
+${platformLines}
+${metaAgent ? `  Meta stock: ${metaAgent.delta >= 0 ? '▲' : '▼'}${Math.abs(metaAgent.delta).toFixed(2)}% — CPM Meta ${metaAgent.delta < 0 ? 'pode cair (janela)' : 'pode subir (cautela)'}` : ''}
+${googleAgent ? `  Google stock: ${googleAgent.delta >= 0 ? '▲' : '▼'}${Math.abs(googleAgent.delta).toFixed(2)}% — CPC Google em pressão` : ''}
+
+INDICADORES COMPLETOS:
+  Receita: R$${receita.toFixed(2)} | Despesas: R$${despesas.toFixed(2)} | Caixa: R$${caixa.toFixed(2)}
+  Lucro: R$${metrics.lucro.toFixed(2)} | Runway: ${metrics.runway >= 999 ? '∞ (lucrativo)' : metrics.runway.toFixed(2) + ' meses'}
+  Ticket médio: R$${ticketMedio.toFixed(2)} | CAC: R$${cacBase.toFixed(2)} | Churn: ${churnMensal.toFixed(4)}%/mês
   Health Score: ${metrics.healthScore}/100
-  Break-even: R$${fmt(metrics.breakeven)}${metrics.breakevenAlert ? ' ⚠ ABAIXO DO BREAK-EVEN' : ''}
-  Burn Líquido: ${metrics.burnLiquido > 0 ? '-R$' + fmt(metrics.burnLiquido) + '/mês' : 'positivo'}
-  ROI Anualizado: ${fmtDec(metrics.roi)}%
+  ${metrics.breakevenAlert ? `⚠ RECEITA ABAIXO DO BREAK-EVEN: falta R$${(metrics.breakeven - receita).toFixed(2)}/mês para cobrir custos` : ''}
 
-CONTEXTO DE MERCADO:
-  SELIC: ${selicRate}% | IPCA: ${ipcaRate}% | USD/BRL: R$${usdRate}
+SETOR: ${sectorLabel} — ${sectorHeat}/100 ${sectorHeat >= 75 ? '(AQUECIDO — janela de crescimento aberta)' : sectorHeat >= 50 ? '(FAVORÁVEL — crescimento moderado)' : sectorHeat >= 30 ? '(NEUTRO — cautela)' : '(PRESSIONADO — contenção máxima)'}
+PIB: ${pibRate.toFixed(2)}% | SELIC: ${selicRate}% | IPCA: ${ipcaRate}% | USD: R$${usdRate.toFixed(2)}
+${petroleo ? `Petróleo: $${petroleo.value?.toFixed(2) ?? '?'} (${petroleo.delta > 0 ? '▲' : '▼'}${Math.abs(petroleo.delta ?? 0).toFixed(2)}%) — impacto em frete` : ''}
+${briefing ? `Briefing macro: ${briefing}` : ''}
+Benchmarks fase ${fase}: ${benchmark}
 
-Gere relatório executivo:
-1. DIAGNÓSTICO — parágrafo objetivo sobre saúde financeira, citando números reais e comparando com benchmarks da fase
-2. SEMÁFORO — liste: 🔴 CRÍTICO / 🟡 ATENÇÃO / 🟢 SAUDÁVEL para cada indicador relevante
-3. PLANO DE AÇÃO — 3 ações com prazo: 7 dias / 30 dias / 90 dias, específicas para essa fase e setor
-4. FRASE EXECUTIVA — 1 frase de conclusão para o relatório
+════════════════════════════════════════════
 
-Seja direto, use os números reais, compare com os benchmarks informados.`
+Gere relatório executivo usando os dados FUNDIDOS acima (nunca os brutos separados):
+
+1. DIAGNÓSTICO — cite os valores calculados: burn real R$${burnReal.toFixed(2)}, margem real ${margemReal.toFixed(2)}%, CAC ajustado R$${cacAjustado.toFixed(2)}, taxa real ${taxaRealExata.toFixed(2)}%
+
+2. SEMÁFORO (use valores fundidos, não brutos):
+🔴 CRÍTICO / 🟡 ATENÇÃO / 🟢 SAUDÁVEL
+Avalie: Burn Real, Margem Real, CAC Ajustado, CPM R$, Runway, LTV/CAC, ROI vs CDI, Churn, Orgânico
+
+3. PLANO 7/30/90 — OBRIGATÓRIO diferenciar pelo setor ${sectorLabel} (${sectorHeat}/100):
+${sectorHeat >= 70
+  ? `Setor AQUECIDO: use a janela. Ações de escala com caixa protegido. Canal mais barato: ${bestPlatform?.label ?? 'orgânico'} (R$${((bestPlatform?.cpm ?? 0) * usdRate).toFixed(2)}/mil impressões).`
+  : sectorHeat >= 40
+  ? `Setor NEUTRO: eficiência antes de escala. Cortar CAC atual de R$${cacAjustado.toFixed(2)} e proteger margem real de ${margemReal.toFixed(2)}%.`
+  : `Setor PRESSIONADO: contenção máxima. Com taxa real ${taxaRealExata.toFixed(2)}%, cada real em caixa rende mais que risco. Proteja runway.`}
+Use valores reais nos prazos (ex: "reduzir CAC de R$${cacAjustado.toFixed(2)} para R$${(cacAjustado * 0.82).toFixed(2)} migrando para ${bestPlatform?.label ?? 'canal mais barato'}").
+
+4. FRASE EXECUTIVA — 1 frase com os 3 números mais críticos fundidos.
+
+REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
 
     try {
-      const res  = await fetch('/api/advisor-chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question, marketContext: `SELIC ${selicRate}% | IPCA ${ipcaRate}% | USD R$${usdRate}` }) })
-      const d    = await res.json()
+      const res = await fetch('/api/advisor-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question,
+          marketContext: `BurnReal R$${burnReal.toFixed(2)} | TaxaReal ${taxaRealExata.toFixed(4)}% | CACajustado R$${cacAjustado.toFixed(2)} | CPM R$${cpmReais.toFixed(2)}/mil | Setor ${sectorLabel} ${sectorHeat}/100`,
+        }),
+      })
+      const d = await res.json()
       setIaResponse(d.answer ?? 'Sem resposta da IA.')
     } catch {
       setIaResponse('Erro ao conectar com a IA.')
