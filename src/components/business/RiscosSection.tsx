@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import UserContextBanner from '@/components/business/UserContextBanner'
 
 const RED   = '#c0392b'
 const GREEN = '#1e8449'
@@ -838,7 +839,7 @@ function SectionDivider({ label, color }: { label: string; color: string }) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function RiscosSection({ data, ai }: { data: any; ai?: any }) {
+export default function RiscosSection({ data, ai, userProfile }: { data: any; ai?: any; userProfile?: any }) {
   const chains = useMemo(() => buildCausalChains(data), [data])
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
@@ -856,8 +857,12 @@ export default function RiscosSection({ data, ai }: { data: any; ai?: any }) {
 
   const toggle = (id: string) => setExpandedId(prev => prev === id ? null : id)
 
+  const riscosInsight = ai?.riscos?.[0] ?? undefined
+
   return (
     <div className="flex flex-col gap-3 px-4 pb-8">
+
+      <UserContextBanner userProfile={userProfile} sectionInsight={riscosInsight} />
 
       {/* 1. Question Header */}
       <div className="text-center mb-4">
@@ -886,13 +891,26 @@ export default function RiscosSection({ data, ai }: { data: any; ai?: any }) {
               <div className="w-1.5 h-1.5 rounded-full" style={{ background: RED, boxShadow: `0 0 6px ${RED}` }} />
               <span className="font-mono text-[10px] font-bold tracking-[0.2em]" style={{ color: RED }}>ANÁLISE IA — RISCOS IDENTIFICADOS</span>
             </div>
-            <div className="flex flex-col gap-2">
-              {ai.riscos.map((insight: string, i: number) => (
-                <div key={i} className="flex items-start gap-2">
-                  <span className="font-mono text-[11px] shrink-0 mt-0.5" style={{ color: RED }}>{'\u2192'}</span>
-                  <p className="text-[12px] text-white/55 leading-relaxed">{insight}</p>
-                </div>
-              ))}
+            <div className="flex flex-col gap-3">
+              {ai.riscos.map((insight: string, i: number) => {
+                const parts = insight.split('Como lucrar:')
+                const risco = parts[0]?.trim() ?? insight
+                const lucro = parts[1]?.trim() ?? ''
+                return (
+                  <div key={i} className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${RED}20` }}>
+                    <div className="flex items-start gap-2 mb-1.5">
+                      <span className="font-mono text-[11px] shrink-0 mt-0.5" style={{ color: RED }}>→</span>
+                      <p className="text-[12px] text-white/60 leading-relaxed">{risco}</p>
+                    </div>
+                    {lucro && (
+                      <div className="flex items-start gap-2 mt-1.5 pt-1.5" style={{ borderTop: `1px solid rgba(30,132,73,0.2)` }}>
+                        <span className="font-mono text-[10px] shrink-0 mt-0.5 font-bold" style={{ color: '#1e8449' }}>💡</span>
+                        <p className="text-[11px] leading-relaxed font-medium" style={{ color: '#1e8449' }}>Como lucrar: {lucro}</p>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
         </motion.div>

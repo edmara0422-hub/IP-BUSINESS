@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import UserContextBanner from '@/components/business/UserContextBanner'
 
 // ── Cores ──────────────────────────────────────────────────────────────────
 const RED   = '#c0392b'
@@ -92,7 +93,7 @@ interface Platform {
 // ══════════════════════════════════════════════════════════════════════════
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function MarketingSection({ data, ai }: { data: any; ai?: any }) {
+export default function MarketingSection({ data, ai, userProfile }: { data: any; ai?: any; userProfile?: any }) {
   const [expandedPlatform, setExpandedPlatform] = useState<string | null>(null)
 
   const platforms = data.platforms as Platform[]
@@ -203,8 +204,18 @@ export default function MarketingSection({ data, ai }: { data: any; ai?: any }) 
   // Bar color gradient: green for cheapest, amber for middle, red for most expensive
   const barColors = [GREEN, GREEN, AMBER, AMBER, RED, RED]
 
+  // Veredicto personalizado para o setor do usuário
+  const mktInsight = useMemo(() => {
+    if (!ai?.marketing_insights?.length) return undefined
+    const verdict = ai.marketing_insights[0] ?? ''
+    if (!userProfile?.sectors?.length) return verdict
+    return verdict
+  }, [ai, userProfile])
+
   return (
     <div className="flex flex-col gap-5 px-4 pb-8">
+
+      <UserContextBanner userProfile={userProfile} sectionInsight={mktInsight} />
 
       {/* ── 1. Question Header ── */}
       <div className="text-center mb-4">
@@ -492,30 +503,45 @@ export default function MarketingSection({ data, ai }: { data: any; ai?: any }) 
       </div>
 
       {/* ══ AI INSIGHTS ══ */}
-      {ai?.marketing_insights?.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="rounded-lg overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, rgba(26,82,118,0.12) 0%, rgba(0,0,0,0.3) 100%)', border: '1px solid rgba(26,82,118,0.2)' }}
-        >
-          <div className="px-4 py-3">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#5dade2', boxShadow: '0 0 6px #5dade2' }} />
-              <span className="font-mono text-[10px] font-bold tracking-[0.2em]" style={{ color: '#5dade2' }}>ANÁLISE IA — CRUZAMENTO DE DADOS</span>
-            </div>
-            <div className="flex flex-col gap-2">
-              {ai.marketing_insights.map((insight: string, i: number) => (
-                <div key={i} className="flex items-start gap-2">
-                  <span className="font-mono text-[11px] shrink-0 mt-0.5" style={{ color: '#5dade2' }}>{'\u2192'}</span>
-                  <p className="text-[12px] text-white/55 leading-relaxed">{insight}</p>
+      {ai?.marketing_insights?.length > 0 && (() => {
+        const first: string = ai.marketing_insights[0] ?? ''
+        const isSim = first.toUpperCase().includes('CRESCER AGORA: SIM')
+        const isNao = first.toUpperCase().includes('CRESCER AGORA: NÃO') || first.toUpperCase().includes('CRESCER AGORA: NAO')
+        const hasVerdict = isSim || isNao
+        const verdictColor = isSim ? '#1e8449' : isNao ? '#c0392b' : '#5dade2'
+        const verdictLabel = isSim ? '✓ CRESCER AGORA: SIM' : isNao ? '✗ CRESCER AGORA: NÃO' : 'ANÁLISE IA'
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="rounded-lg overflow-hidden"
+            style={{ background: `linear-gradient(135deg, ${verdictColor}10 0%, rgba(0,0,0,0.3) 100%)`, border: `1px solid ${verdictColor}30` }}
+          >
+            <div className="px-4 py-3">
+              {hasVerdict && (
+                <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg" style={{ background: `${verdictColor}15`, border: `1px solid ${verdictColor}40` }}>
+                  <span className="font-mono text-[13px] font-bold" style={{ color: verdictColor }}>{verdictLabel}</span>
                 </div>
-              ))}
+              )}
+              {!hasVerdict && (
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: verdictColor, boxShadow: `0 0 6px ${verdictColor}` }} />
+                  <span className="font-mono text-[10px] font-bold tracking-[0.2em]" style={{ color: verdictColor }}>ANÁLISE IA — CRUZAMENTO DE DADOS</span>
+                </div>
+              )}
+              <div className="flex flex-col gap-2">
+                {ai.marketing_insights.map((insight: string, i: number) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <span className="font-mono text-[11px] shrink-0 mt-0.5" style={{ color: verdictColor }}>→</span>
+                    <p className="text-[12px] text-white/55 leading-relaxed">{insight}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        </motion.div>
-      )}
+          </motion.div>
+        )
+      })()}
 
       {/* ══ 6. OPORTUNIDADES (compact) ══ */}
       <div>

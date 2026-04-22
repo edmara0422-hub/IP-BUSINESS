@@ -2,6 +2,7 @@
 // v2 — setores com contexto inteligente
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import UserContextBanner from '@/components/business/UserContextBanner'
 
 const RED   = '#c0392b'
 const GREEN = '#1e8449'
@@ -318,12 +319,29 @@ function BottomPanel({ data }: { data: any }) {
 // ══════════════════════════════════════════════════════════════════════════
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function MacroSection({ data, ai }: { data: any; ai?: any }) {
+export default function MacroSection({ data, ai, userProfile }: { data: any; ai?: any; userProfile?: any }) {
   const headline = useMemo(() => buildHeadline(data), [data])
   const insights = useMemo(() => buildInsights(data), [data])
 
+  // Insight personalizado para o setor do usuário
+  const userSectorInsight = useMemo(() => {
+    if (!userProfile?.sectors?.length) return undefined
+    const s = userProfile.sectors[0]
+    const sectorMap: Record<string, string> = {
+      'Tecnologia': 'tech', 'Consultoria': 'services', 'Agência': 'services',
+      'Saúde': 'health', 'Agro': 'agro', 'Varejo': 'retail',
+      'Financeiro': 'fintech', 'Logística': 'logistics', 'Energia': 'energy',
+    }
+    const sid = sectorMap[s]
+    const sData = data.sectors?.find((x: {id:string}) => x.id === sid)
+    if (!sData) return `Setor ${s} — acompanhe os indicadores macro relevantes para seu negócio`
+    return `Seu setor (${s}): heat ${sData.heat}/100, variação ${sData.change > 0 ? '+' : ''}${sData.change?.toFixed(1)}% — ${sData.heat > 70 ? 'momento favorável' : sData.heat > 40 ? 'atenção ao cenário' : 'setor pressionado'}`
+  }, [userProfile, data.sectors])
+
   return (
     <div className="flex flex-col gap-4 px-4 pb-8">
+
+      <UserContextBanner userProfile={userProfile} sectionInsight={userSectorInsight} />
 
       {/* ── 1. DYNAMIC HEADLINE ── */}
       <motion.div

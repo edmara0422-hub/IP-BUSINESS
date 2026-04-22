@@ -9,6 +9,7 @@ export interface IntelligenceData {
   marketing_insights: string[]
   riscos: string[]
   oportunidades: string[]
+  cockpit_alerts: string[]
 }
 
 const EMPTY: IntelligenceData = {
@@ -17,10 +18,11 @@ const EMPTY: IntelligenceData = {
   marketing_insights: [],
   riscos: [],
   oportunidades: [],
+  cockpit_alerts: [],
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function useIntelligence(marketData: any) {
+export function useIntelligence(marketData: any, userProfile?: any) {
   const [data, setData] = useState<IntelligenceData>(EMPTY)
   const [loading, setLoading] = useState(false)
 
@@ -31,7 +33,7 @@ export function useIntelligence(marketData: any) {
       const res = await apiFetch('/api/intelligence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(marketData),
+        body: JSON.stringify({ ...marketData, userProfile }),
       })
       if (res.ok) {
         const json = await res.json()
@@ -39,7 +41,8 @@ export function useIntelligence(marketData: any) {
       }
     } catch { /* silently fail */ }
     finally { setLoading(false) }
-  }, [marketData])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [marketData, userProfile?.subtype, userProfile?.sectors?.join(',')])
 
   useEffect(() => {
     fetch()

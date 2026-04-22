@@ -5,6 +5,7 @@ import { motion, useSpring, useTransform, AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { apiFetch } from '@/lib/api'
 import BusinessClock from '@/components/business/BusinessClock'
+import UserContextBanner from '@/components/business/UserContextBanner'
 
 const Globe3D = dynamic(() => import('./Globe3D'), { ssr: false, loading: () => <div className="flex h-full items-center justify-center"><span className="text-[10px] text-white/20">Carregando globo...</span></div> })
 
@@ -433,12 +434,14 @@ function NewsFeed({ marketData }: { marketData?: any }) {
 // ══════════════════════════════════════════════════════════════════════════
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function PanoramaSection({ data, ai }: { data: any; ai?: any }) {
+export default function PanoramaSection({ data, ai, userProfile }: { data: any; ai?: any; userProfile?: any }) {
   const agents = data.globalAgents as Array<{ id: string; label: string; delta: number; impact: string }>
   const commodities = data.commodities as Record<string, { value: number; delta: number; label: string }>
 
   return (
     <div className="flex flex-col gap-3 px-4 pb-8">
+
+      <UserContextBanner userProfile={userProfile} sectionInsight={ai?.panorama || undefined} />
 
       {/* ── Relógio estático acima do globo ── */}
       <div className="px-0">

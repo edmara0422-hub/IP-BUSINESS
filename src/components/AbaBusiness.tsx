@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import BusinessSectionNav from '@/components/business/BusinessSectionNav'
 import PanoramaSection from '@/components/business/PanoramaSection'
@@ -10,6 +10,8 @@ import MarketingSection from '@/components/business/MarketingSection'
 import { useBusinessStore } from '@/store/business-store'
 import { useIntelligence } from '@/hooks/useIntelligence'
 import { useMarketData } from '@/hooks/useMarketData'
+import { useAuth } from '@/hooks/useAuth'
+import { createClient } from '@/lib/supabase/client'
 
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -108,10 +110,23 @@ export default function AbaBusiness() {
   const { marketData: rawData } = useMarketData()
   const [sim, setSim] = useState<SimOffsets>({ selic: 0, cambio: 0, ipca: 0, pib: 0 })
   const activeSection = useBusinessStore((s) => s.businessActiveSection)
+  const { user } = useAuth()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [userProfile, setUserProfile] = useState<any>(null)
+
+  useEffect(() => {
+    if (!user) return
+    const sb = createClient()
+    sb.from('workspace_profiles').select('*').eq('user_id', user.id).maybeSingle()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then(({ data: d }: { data: any }) => {
+        if (d) setUserProfile({ ...d, nomeNegocio: d.nome_negocio ?? '' })
+      })
+  }, [user?.id])
 
   const hasSim = sim.selic !== 0 || sim.cambio !== 0 || sim.ipca !== 0 || sim.pib !== 0
   const data = useMemo(() => rawData ? (hasSim ? applySimulation(rawData as MarketData, sim) : rawData as MarketData) : null, [rawData, sim, hasSim])
-  const { intelligence } = useIntelligence(rawData)
+  const { intelligence } = useIntelligence(rawData, userProfile)
 
   if (!data) return (
     <div className="flex min-h-[60vh] items-center justify-center">
@@ -130,10 +145,10 @@ export default function AbaBusiness() {
 
       {/* ── Conteúdo da seção ativa ── */}
       <div className="flex-1 overflow-y-auto pt-1">
-        {activeSection === 'panorama' && <PanoramaSection data={data} ai={intelligence} />}
-        {activeSection === 'macro' && <MacroSection data={data} ai={intelligence} />}
-        {activeSection === 'plataformas' && <MarketingSection data={data} ai={intelligence} />}
-        {activeSection === 'problemas' && <RiscosSection data={data} ai={intelligence} />}
+        {activeSection === 'panorama' && <PanoramaSection data={data} ai={intelligence} userProfile={userProfile} />}
+        {activeSection === 'macro' && <MacroSection data={data} ai={intelligence} userProfile={userProfile} />}
+        {activeSection === 'plataformas' && <MarketingSection data={data} ai={intelligence} userProfile={userProfile} />}
+        {activeSection === 'problemas' && <RiscosSection data={data} ai={intelligence} userProfile={userProfile} />}
       </div>
     </motion.div>
   )
