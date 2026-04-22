@@ -740,9 +740,6 @@ REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
     <motion.div ref={pdfRef} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
       className="flex flex-col gap-6 p-4" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
 
-      {/* ── TICKER DE AGENTES E COMMODITIES ── */}
-      <AgentsTicker marketData={marketData} />
-
       {/* ── CONTEXTO DO ONBOARDING COMPLETO ── */}
       {benchmark && (
         <div className="rounded-lg px-4 py-3" style={{ background: `${BLUE}12`, border: `1px solid ${BLUE}35` }}>

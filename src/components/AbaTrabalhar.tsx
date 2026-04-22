@@ -8,7 +8,7 @@ import {
   Brain, LayoutDashboard, Activity, Tag, Zap,
   ShieldCheck, Globe, Users, Target, Lightbulb,
   MessageSquare, AlertTriangle, BookOpen,
-  TrendingUp, UserCheck,
+  TrendingUp, UserCheck, FolderOpen,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useAccessibility, type AccessibilityMode } from '@/hooks/useAccessibility'
@@ -17,6 +17,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { WorkspaceProfile } from '@/components/WorkspaceOnboarding'
 
 const IAAdvisor = dynamic(() => import('@/components/workspace/IAAdvisor'), { ssr: false })
+const AbaArquivos = dynamic(() => import('@/components/AbaArquivos'), { ssr: false })
 const CockpitFinanceiro = dynamic(() => import('@/components/workspace/CockpitFinanceiro'), { ssr: false })
 const CenariosForecast = dynamic(() => import('@/components/workspace/CenariosForecast'), { ssr: false })
 const SmartPricing = dynamic(() => import('@/components/workspace/SmartPricing'), { ssr: false })
@@ -32,7 +33,7 @@ const ModoConsultoria = dynamic(() => import('@/components/workspace/ModoConsult
 // Tipos e constantes
 // ─────────────────────────────────────────────
 
-type ContextMode = 'gestao' | 'consultoria' | 'estudo'
+type ContextMode = 'gestao' | 'consultoria' | 'estudo' | 'arquivos'
 type LayerType = 'sio' | 'sig' | 'sie' | 'compliance'
 
 interface ModuleMeta {
@@ -79,6 +80,7 @@ const CONTEXT_SWITCHES: { id: ContextMode; label: string; short: string; icon: R
   { id: 'gestao',      label: 'Meu Negócio',     short: 'Gestão',     icon: TrendingUp,  color: '#10b981', desc: 'Runway · OKRs · TRL',    mood: 'Pragmática — foco em sobrevivência e crescimento' },
   { id: 'consultoria', label: 'Modo Ghost',       short: 'Ghost',      icon: UserCheck,   color: '#f59e0b', desc: 'OBI · Diagnóstico',       mood: 'Analítica — diagnóstico e valor para o cliente' },
   { id: 'estudo',      label: 'Estudo & Teoria',  short: 'Estudo',     icon: BookOpen,    color: '#6366f1', desc: 'Rezende · Peter · OBI',   mood: 'Inspiradora — teoria, conceitos e curadoria' },
+  { id: 'arquivos',    label: 'Arquivos',         short: 'Arquivos',   icon: FolderOpen,  color: '#1a5276', desc: 'Relatórios do Cockpit',    mood: 'Histórico de análises — Cockpit Financeiro' },
 ]
 
 // Setores/produtos que habilitam cada switch extra
@@ -130,7 +132,8 @@ export default function AbaTrabalhar() {
   const showEstudo     = isAdmin || allSectors.some(s => ESTUDO_TRIGGERS.includes(s))     || allProducts.some(p => ESTUDO_TRIGGERS.includes(p))
 
   const visibleSwitches = CONTEXT_SWITCHES.filter(sw =>
-    sw.id === 'gestao' || (sw.id === 'consultoria' && showConsultoria) || (sw.id === 'estudo' && showEstudo)
+    sw.id === 'gestao' || sw.id === 'arquivos' ||
+    (sw.id === 'consultoria' && showConsultoria) || (sw.id === 'estudo' && showEstudo)
   )
   const supabase = createClient()
 
@@ -157,8 +160,8 @@ export default function AbaTrabalhar() {
   const { marketData } = useMarketData()
   const { intelligence } = useIntelligence(marketData)
 
-  // Quando muda para consultoria, vai pro módulo consultoria
-  const effectiveActiveId = contextMode === 'consultoria' ? 'consultoria' : activeId
+  // Quando muda para consultoria/arquivos, vai pro módulo correspondente
+  const effectiveActiveId = contextMode === 'consultoria' ? 'consultoria' : contextMode === 'arquivos' ? 'arquivos' : activeId
 
   const active = MODULES.find(m => m.id === effectiveActiveId) ?? MODULES[0]
 
@@ -168,6 +171,9 @@ export default function AbaTrabalhar() {
 
     // Estudo: IA Advisor em modo pesquisador
     if (contextMode === 'estudo') return <IAAdvisor marketData={marketData} userProfile={userProfile} contextMode="estudo" />
+
+    // Arquivos: relatórios salvos do Cockpit
+    if (contextMode === 'arquivos') return <AbaArquivos />
 
     switch (activeId) {
       case 'ia':         return <IAAdvisor marketData={marketData} userProfile={userProfile} contextMode="gestao" />
