@@ -242,6 +242,36 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
   )
 }
 
+// Input numérico com estado local de string — permite digitar e ver 0 explicitamente
+function NumInput({ label, value, onChange, prefix = 'R$' }: { label: string; value: number; onChange: (v: number) => void; prefix?: string }) {
+  const [str, setStr] = useState(value === 0 ? '' : String(value))
+
+  // Sincroniza quando valor externo muda (ex: reset)
+  const prevRef = useRef(value)
+  if (prevRef.current !== value) {
+    prevRef.current = value
+    const parsed = str === '' ? 0 : parseFloat(str) || 0
+    if (parsed !== value) setStr(value === 0 ? '' : String(value))
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.02em' }}>{label}</label>
+      <div className="flex items-center gap-2 rounded-lg px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.1)' }}>
+        {prefix && <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', userSelect: 'none', flexShrink: 0 }}>{prefix}</span>}
+        <input
+          type="number"
+          value={str}
+          placeholder="0"
+          onChange={e => { setStr(e.target.value); onChange(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0) }}
+          className="bg-transparent outline-none flex-1 min-w-0"
+          style={{ fontSize: 15, fontFamily: 'monospace', color: '#fff', border: 'none' }}
+        />
+      </div>
+    </div>
+  )
+}
+
 // Benchmarks por fase + setor combinados
 function buildBenchmark(fase: string, setores: string[], produtos: string[], revenue: string, nome: string): string {
   const setor = setores[0] ?? ''
@@ -436,20 +466,7 @@ Seja direto, use os números reais, compare com os benchmarks informados.`
   }
 
   const inputNum = (label: string, value: number, setter: (v: number) => void, prefix = 'R$') => (
-    <div className="flex flex-col gap-1.5">
-      <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.02em' }}>{label}</label>
-      <div className="flex items-center gap-2 rounded-lg px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.1)' }}>
-        {prefix && <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', userSelect: 'none', flexShrink: 0 }}>{prefix}</span>}
-        <input
-          type="number"
-          value={value === 0 ? '' : value}
-          placeholder="0"
-          onChange={e => setter(e.target.value === '' ? 0 : Number(e.target.value) || 0)}
-          className="bg-transparent outline-none flex-1 min-w-0"
-          style={{ fontSize: 15, fontFamily: 'monospace', color: '#fff', border: 'none' }}
-        />
-      </div>
-    </div>
+    <NumInput label={label} value={value} onChange={setter} prefix={prefix} />
   )
 
   const cdiMensal    = (selicRate - 0.1) / 12
@@ -471,9 +488,16 @@ Seja direto, use os números reais, compare com os benchmarks informados.`
 
       {/* ── 1. INPUTS FINANCEIROS BASE ── */}
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <Calculator size={16} style={{ color: BLUE }} />
-          <span style={{ fontSize: 14, fontWeight: 600 }}>Dados financeiros</span>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Calculator size={16} style={{ color: BLUE }} />
+            <span style={{ fontSize: 14, fontWeight: 600 }}>Dados financeiros</span>
+          </div>
+          <button onClick={() => { update(ZERO_DEFAULT); setIaResponse('') }}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg transition-opacity hover:opacity-80"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>
+            ✕ Limpar tudo
+          </button>
         </div>
         <div className="grid grid-cols-2 gap-2.5">
           {inputNum('Receita Mensal', receita, setReceita)}
