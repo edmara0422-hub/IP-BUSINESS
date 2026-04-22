@@ -124,18 +124,64 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
     }
   }
 
+  const PHASE_BENCH: Record<string, string> = {
+    validacao: 'Fase Validação — foco em Runway e Burn Rate. Receita pode ser R$0. Meta: primeiro cliente pagante.',
+    mei:       'Fase MEI — foco em Margem (>20%) e CAC controlado. Runway mínimo 3 meses.',
+    slu:       'Fase SLU — foco em LTV/CAC (>3x) e Margem (>25%). Runway mínimo 6 meses.',
+    startup:   'Fase Startup — foco em crescimento com runway >12 meses. LTV/CAC >3x é crítico.',
+    ltda:      'Fase LTDA — foco em ROI, CDI vs. Marketing e eficiência operacional.',
+  }
+
   const handleIA = async () => {
     setIaLoading(true)
     setIaResponse('')
-    const question = `Analise estes dados financeiros: Receita R$${fmt(receita)}, Despesas R$${fmt(despesas)}, Caixa R$${fmt(caixa)}, CAC R$${fmt(cac)}, Ticket Médio R$${fmt(ticketMedio)}, Churn ${churnMensal}%/mês, Margem ${fmtDec(metrics.margem)}%, Runway ${metrics.runway >= 999 ? 'lucrativo' : fmtDec(metrics.runway)+' meses'}, LTV/CAC ${fmtDec(metrics.ltvCac)}x, Health Score ${metrics.healthScore}/100, Break-even R$${fmt(metrics.breakeven)}${metrics.breakevenAlert ? ' (ALERTA: receita abaixo do break-even)' : ''}. Dê um diagnóstico e 3 ações prioritárias.`
+    const nomeNegocio = userProfile?.nomeNegocio || userProfile?.nome_negocio || userProfile?.sectors?.[0] || 'o negócio'
+    const fase = userProfile?.subtype ?? 'não informada'
+    const setor = userProfile?.sectors?.join(', ') || 'não informado'
+    const benchFase = PHASE_BENCH[fase] ?? ''
+
+    const question = `Você é analista financeiro especializado em PMEs brasileiras. Analise o Cockpit Financeiro de "${nomeNegocio}".
+
+CONTEXTO DO NEGÓCIO:
+  Fase: ${fase} | Setor: ${setor}
+  ${benchFase}
+
+DADOS FINANCEIROS REAIS:
+  Receita Mensal: R$${fmt(receita)}
+  Despesas Operacionais: R$${fmt(despesas)}
+  Caixa Disponível: R$${fmt(caixa)}
+  CAC: R$${fmt(cac)} | Ticket Médio: R$${fmt(ticketMedio)} | Churn: ${churnMensal}%/mês
+
+INDICADORES CALCULADOS:
+  Margem: ${fmtDec(metrics.margem)}%
+  Runway: ${metrics.runway >= 999 ? 'lucrativo (burn zerado)' : fmtDec(metrics.runway) + ' meses'}
+  LTV/CAC: ${fmtDec(metrics.ltvCac)}x (LTV R$${fmt(Math.round(metrics.ltv))})
+  Health Score: ${metrics.healthScore}/100
+  Break-even: R$${fmt(metrics.breakeven)}${metrics.breakevenAlert ? ' ⚠ ALERTA: receita abaixo do break-even' : ''}
+  Burn Líquido: ${metrics.burnLiquido > 0 ? '-R$' + fmt(metrics.burnLiquido) + '/mês' : 'positivo'}
+  ROI Anualizado: ${fmtDec(metrics.roi)}%
+
+CONTEXTO DE MERCADO:
+  SELIC: ${selicRate}% | IPCA: ${ipcaRate}% | USD/BRL: R$${usdRate}
+
+Gere um relatório executivo com:
+1. DIAGNÓSTICO — 1 parágrafo objetivo sobre a saúde financeira atual, citando os números reais
+2. ALERTAS — semáforo: o que está CRÍTICO (vermelho), ATENÇÃO (amarelo), SAUDÁVEL (verde)
+3. PLANO DE AÇÃO — 3 ações prioritárias específicas para essa fase e setor, com prazo (7 dias / 30 dias / 90 dias)
+4. FRASE EXECUTIVA — 1 frase de conclusão para o relatório PDF
+
+Seja direto, use os números reais, não seja genérico.`
+
+    const marketContext = `SELIC: ${selicRate}% | IPCA: ${ipcaRate}% | USD/BRL: R$${usdRate}`
+
     try {
       const res = await fetch('/api/advisor-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: question }] }),
+        body: JSON.stringify({ question, marketContext }),
       })
       const data = await res.json()
-      setIaResponse(data.response ?? data.content ?? 'Sem resposta da IA.')
+      setIaResponse(data.answer ?? 'Sem resposta da IA.')
     } catch {
       setIaResponse('Erro ao conectar com a IA. Tente novamente.')
     } finally {
@@ -180,20 +226,9 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
     >
       {/* 1. Inputs */}
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Calculator size={16} style={{ color: BLUE }} />
-            <span style={{ fontSize: 14, fontWeight: 600 }}>Seus dados</span>
-          </div>
-          <button
-            onClick={exportPDF}
-            disabled={pdfLoading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40"
-            style={{ background: 'rgba(26,82,118,0.25)', border: '1px solid rgba(26,82,118,0.5)', fontSize: 11, color: 'rgba(255,255,255,0.6)' }}
-          >
-            {pdfLoading ? <Loader2 size={12} className="animate-spin" /> : <FileDown size={12} />}
-            {pdfLoading ? 'Gerando...' : 'Salvar PDF'}
-          </button>
+        <div className="flex items-center gap-2 mb-3">
+          <Calculator size={16} style={{ color: BLUE }} />
+          <span style={{ fontSize: 14, fontWeight: 600 }}>Seus dados</span>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {inputField('Receita Mensal (R$)', receita, setReceita)}
@@ -218,6 +253,15 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
           </div>
         )}
       </div>
+
+      {/* 1.5 Phase context */}
+      {userProfile?.subtype && PHASE_BENCH[userProfile.subtype] && (
+        <div className="rounded-lg px-3 py-2.5" style={{ background: `${BLUE}12`, border: `1px solid ${BLUE}30` }}>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', fontFamily: 'monospace' }}>
+            📍 {PHASE_BENCH[userProfile.subtype]}
+          </span>
+        </div>
+      )}
 
       {/* 2. Calculated Metrics */}
       <div>
@@ -319,7 +363,7 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
         </div>
       </div>
 
-      {/* 5. IA Analysis */}
+      {/* 5. IA Analysis + PDF */}
       <div>
         <button
           onClick={handleIA}
@@ -336,10 +380,25 @@ export default function CockpitFinanceiro({ marketData, userProfile }: { marketD
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             className="rounded-lg p-4 mt-3"
-            style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap', color: 'rgba(255,255,255,0.75)' }}
+            style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${BLUE}40`, fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap', color: 'rgba(255,255,255,0.75)' }}
           >
+            <div className="flex items-center gap-2 mb-2" style={{ fontSize: 10, color: BLUE, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '0.1em' }}>
+              ✦ ANÁLISE IPB · {new Date().toLocaleDateString('pt-BR')}
+            </div>
             {iaResponse}
           </motion.div>
+        )}
+
+        {iaResponse && (
+          <button
+            onClick={exportPDF}
+            disabled={pdfLoading}
+            className="w-full mt-3 rounded-lg py-3 flex items-center justify-center gap-2 transition-opacity hover:opacity-90 disabled:opacity-40"
+            style={{ background: 'rgba(26,82,118,0.3)', border: `1px solid ${BLUE}50`, color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: 600 }}
+          >
+            {pdfLoading ? <Loader2 size={15} className="animate-spin" /> : <FileDown size={15} />}
+            {pdfLoading ? 'Gerando PDF...' : 'Salvar relatório em PDF'}
+          </button>
         )}
       </div>
     </motion.div>
