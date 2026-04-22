@@ -3,17 +3,18 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bell, BookOpen, Briefcase, Globe, Search, LogOut, Shield, Settings } from 'lucide-react'
+import { Bell, BookOpen, Briefcase, FolderOpen, Globe, Search, LogOut, Shield, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { useAccessibility } from '@/hooks/useAccessibility'
 import { createClient } from '@/lib/supabase/client'
 
-type Tab = 'business' | 'estudo' | 'admin'
+type Tab = 'business' | 'estudo' | 'arquivos' | 'admin'
 
-const AbaBusiness = dynamic(() => import('@/components/AbaBusiness'), { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
-const AbaEstudo = dynamic(() => import('@/components/AbaEstudo'), { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
-const AbaWorkspace = dynamic(() => import('@/components/AbaTrabalhar'), { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
+const AbaBusiness  = dynamic(() => import('@/components/AbaBusiness'),   { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
+const AbaEstudo    = dynamic(() => import('@/components/AbaEstudo'),     { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
+const AbaArquivos  = dynamic(() => import('@/components/AbaArquivos'),   { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
+const AbaWorkspace = dynamic(() => import('@/components/AbaTrabalhar'),  { ssr: false, loading: () => <div className="glass-card min-h-[32rem] p-6" /> })
 const WorkspaceOnboarding = dynamic(() => import('@/components/WorkspaceOnboarding'), { ssr: false, loading: () => null })
 
 function ShellBackdrop() {
@@ -173,7 +174,7 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, delay: 0.14, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="chrome-pill mx-auto grid max-w-7xl grid-cols-3 gap-1 rounded-[1.2rem] p-0.5 md:rounded-[1.4rem]">
+      <div className="chrome-pill mx-auto grid max-w-7xl grid-cols-4 gap-1 rounded-[1.2rem] p-0.5 md:rounded-[1.4rem]">
         <button
           onClick={() => onSwitch('business')}
           className={`flex items-center justify-center gap-1 rounded-[0.8rem] px-2 py-1.5 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'business' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
@@ -187,7 +188,15 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
           className={`flex items-center justify-center gap-1 rounded-[0.8rem] px-2 py-1.5 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'estudo' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
         >
           <BookOpen className="h-3 w-3" />
-          <span>INTELLIGENCE</span>
+          <span>STUDY</span>
+        </button>
+
+        <button
+          onClick={() => onSwitch('arquivos')}
+          className={`flex items-center justify-center gap-1 rounded-[0.8rem] px-2 py-1.5 text-[9px] font-semibold tracking-[0.1em] transition-all duration-300 ${active === 'arquivos' ? 'chrome-active text-[#050505]' : 'text-white/78 hover:text-white'}`}
+        >
+          <FolderOpen className="h-3 w-3" />
+          <span>FILES</span>
         </button>
 
         <button
@@ -249,8 +258,9 @@ export default function MainApp() {
       <div className="relative z-10 mx-auto max-w-7xl px-2 mt-[5rem] mb-[12rem] md:px-8 md:mt-[5rem] md:mb-[8rem]">
         <div className="w-full rounded-[2.2rem]">
           <AnimatePresence mode="wait">
-            {activeTab === 'business' && <AbaBusiness key="business" />}
-            {activeTab === 'estudo'   && <AbaEstudo key="estudo" />}
+            {activeTab === 'business'  && <AbaBusiness key="business" />}
+            {activeTab === 'estudo'    && <AbaEstudo key="estudo" />}
+            {activeTab === 'arquivos'  && <AbaArquivos key="arquivos" />}
             {activeTab === 'admin' && (
               workspaceLoading
                 ? <div key="ws-loading" className="glass-card min-h-[32rem] p-6 flex items-center justify-center"><span className="text-[0.7rem] uppercase tracking-[0.3em] text-white/30">Carregando workspace...</span></div>

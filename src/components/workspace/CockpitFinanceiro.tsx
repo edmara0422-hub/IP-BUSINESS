@@ -2,8 +2,12 @@
 
 import { useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Calculator, TrendingUp, AlertTriangle, Brain, Loader2, FileDown, ToggleLeft, ToggleRight } from 'lucide-react'
+import { Calculator, TrendingUp, AlertTriangle, Brain, FolderPlus, Loader2, FileDown, ToggleLeft, ToggleRight } from 'lucide-react'
 import { useWorkspaceData } from '@/hooks/useWorkspaceData'
+import { useAuth } from '@/hooks/useAuth'
+import { createClient } from '@/lib/supabase/client'
+import type { CockpitSnapshot } from '@/components/AbaArquivos'
+import { ARQUIVOS_MODULE } from '@/components/AbaArquivos'
 
 const RED   = '#c0392b'
 const GREEN = '#1e8449'
@@ -360,10 +364,15 @@ function buildBenchmark(fase: string, setores: string[], produtos: string[], rev
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function CockpitFinanceiro({ marketData, userProfile, cockpitAlerts }: { marketData: any; userProfile?: any; cockpitAlerts?: string[] }) {
   const { data, update } = useWorkspaceData('cockpit', ZERO_DEFAULT)
-  const [modoManual, setModoManual] = useState(false)
-  const [iaLoading, setIaLoading]   = useState(false)
-  const [iaResponse, setIaResponse] = useState('')
-  const [pdfLoading, setPdfLoading] = useState(false)
+  const { user } = useAuth()
+  const [modoManual,    setModoManual]    = useState(false)
+  const [iaLoading,     setIaLoading]     = useState(false)
+  const [iaResponse,    setIaResponse]    = useState('')
+  const [pdfLoading,    setPdfLoading]    = useState(false)
+  const [showSave,      setShowSave]      = useState(false)
+  const [saveNome,      setSaveNome]      = useState('')
+  const [savingArq,     setSavingArq]     = useState(false)
+  const [savedOk,       setSavedOk]       = useState(false)
   const pdfRef = useRef<HTMLDivElement>(null)
 
   // Inputs financeiros base
@@ -686,6 +695,38 @@ REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
     }
   }
 
+  const handleSalvarArquivo = async () => {
+    setSavingArq(true)
+    const snapshot: CockpitSnapshot = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      nome: saveNome.trim() || `${nomeNegocio || 'Diagnóstico'} — ${new Date().toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })}`,
+      empresa: nomeNegocio || 'Empresa',
+      createdAt: new Date().toISOString(),
+      inputs: { receita, despesas, caixa, verbaMkt, clientesAtivos, novosClientes, clientesPerdidos, cacManual, ticketManual, churnManual },
+      metrics: { healthScore: metrics.healthScore, margem: metrics.margem, runway: metrics.runway, lucro: metrics.lucro, ltvCac: metrics.ltvCac, ltv: metrics.ltv, breakeven: metrics.breakeven, roi: metrics.roi, margemReal: metrics.margemReal, runwayCritico: metrics.runwayCritico, roiIneficiente: metrics.roiIneficiente, breakevenMeta: metrics.breakevenMeta },
+      iaResponse, selicRate, ipcaRate, usdRate, sectorLabel, sectorHeat,
+    }
+    try {
+      const sb = createClient()
+      let existing: CockpitSnapshot[] = []
+      if (!user) {
+        const raw = localStorage.getItem(`ws_${ARQUIVOS_MODULE}`)
+        existing = raw ? (JSON.parse(raw)?.snapshots ?? []) : []
+      } else {
+        const { data: row } = await sb.from('workspace_data').select('data').eq('user_id', user.id).eq('module_id', ARQUIVOS_MODULE).maybeSingle()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        existing = (row?.data as any)?.snapshots ?? []
+      }
+      const payload = { snapshots: [snapshot, ...existing] }
+      if (!user) { localStorage.setItem(`ws_${ARQUIVOS_MODULE}`, JSON.stringify(payload)) }
+      else { await sb.from('workspace_data').upsert({ user_id: user.id, module_id: ARQUIVOS_MODULE, data: payload, updated_at: new Date().toISOString() }, { onConflict: 'user_id,module_id' }) }
+      setShowSave(false)
+      setSavedOk(true)
+      setTimeout(() => setSavedOk(false), 3500)
+    } catch (e) { console.error('[salvar arquivo]', e) }
+    setSavingArq(false)
+  }
+
   const inputNum = (label: string, value: number, setter: (v: number) => void, prefix = 'R$') => (
     <NumInput label={label} value={value} onChange={setter} prefix={prefix} />
   )
@@ -975,6 +1016,40 @@ REGRA: nunca arredonde. Use os decimais dos cálculos acima.`
               {pdfLoading ? <Loader2 size={15} className="animate-spin" /> : <FileDown size={15} />}
               {pdfLoading ? 'Gerando PDF...' : 'Salvar relatório em PDF'}
             </button>
+
+            {/* ── Salvar em Arquivos ── */}
+            {!showSave && !savedOk && (
+              <button onClick={() => { setSaveNome(`${nomeNegocio || 'Diagnóstico'} — ${new Date().toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })}`); setShowSave(true) }}
+                className="w-full mt-2 rounded-lg py-2.5 flex items-center justify-center gap-2 transition-opacity hover:opacity-80"
+                style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.08)', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+                <FolderPlus size={14} /> Salvar em Arquivos
+              </button>
+            )}
+            {showSave && (
+              <div className="mt-2 rounded-lg p-3 flex flex-col gap-2" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <input type="text" value={saveNome} onChange={e => setSaveNome(e.target.value)}
+                  placeholder="Nome do arquivo..."
+                  className="bg-transparent outline-none w-full"
+                  style={{ fontSize: 13, color: '#fff', border: 'none' }} />
+                <div className="flex gap-2">
+                  <button onClick={handleSalvarArquivo} disabled={savingArq}
+                    className="flex-1 rounded-lg py-2 text-center transition-opacity hover:opacity-80 disabled:opacity-40"
+                    style={{ background: BLUE, fontSize: 12, color: '#fff', fontWeight: 600 }}>
+                    {savingArq ? 'Salvando...' : 'Salvar'}
+                  </button>
+                  <button onClick={() => setShowSave(false)}
+                    className="px-4 rounded-lg transition-opacity hover:opacity-80"
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
+            {savedOk && (
+              <div className="mt-2 rounded-lg px-3 py-2.5 text-center" style={{ background: 'rgba(30,132,73,0.1)', border: '1px solid rgba(30,132,73,0.25)' }}>
+                <span style={{ fontSize: 12, color: GREEN }}>✓ Salvo em Arquivos — abra a aba FILES para ver</span>
+              </div>
+            )}
           </>
         )}
       </div>
