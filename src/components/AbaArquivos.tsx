@@ -143,8 +143,24 @@ export default function AbaArquivos() {
       if (!groups[key]) groups[key] = []
       groups[key].push(s)
     }
+    // Ordena cada grupo do mais recente para o mais antigo
+    for (const k of Object.keys(groups)) groups[k].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     return groups
   }, [snapshots])
+
+  // Delta entre snapshot atual e o anterior da mesma empresa
+  const getDelta = (snaps: CockpitSnapshot[], idx: number) => {
+    if (idx >= snaps.length - 1) return null
+    const curr = snaps[idx]; const prev = snaps[idx + 1]
+    return {
+      health:  curr.metrics.healthScore - prev.metrics.healthScore,
+      margem:  curr.metrics.margem      - prev.metrics.margem,
+      runway:  curr.metrics.runway >= 999 || prev.metrics.runway >= 999 ? null : curr.metrics.runway - prev.metrics.runway,
+      ltvCac:  curr.metrics.ltvCac      - prev.metrics.ltvCac,
+      lucro:   curr.metrics.lucro       - prev.metrics.lucro,
+      dias:    Math.round((new Date(curr.createdAt).getTime() - new Date(prev.createdAt).getTime()) / 86400000),
+    }
+  }
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-[20rem]">
@@ -180,7 +196,9 @@ export default function AbaArquivos() {
             {empresa.toUpperCase()}
           </div>
 
-          {snaps.map(s => (
+          {snaps.map((s, idx) => {
+            const delta = getDelta(snaps, idx)
+            return (
             <div key={s.id} className="rounded-xl overflow-hidden"
               style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.07)' }}>
 
@@ -194,7 +212,28 @@ export default function AbaArquivos() {
                   <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.8)' }}>{s.nome}</span>
                   <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', fontFamily: 'monospace' }}>
                     {new Date(s.createdAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    {delta && <span style={{ marginLeft: 6, color: 'rgba(255,255,255,0.18)' }}>· {delta.dias}d atrás</span>}
                   </span>
+                  {/* Delta badges */}
+                  {delta && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {[
+                        { label: 'Health', v: delta.health, fmt: (n: number) => `${n > 0 ? '+' : ''}${n}pts` },
+                        { label: 'Margem', v: delta.margem, fmt: (n: number) => `${n > 0 ? '+' : ''}${n.toFixed(1)}%` },
+                        delta.runway !== null ? { label: 'Runway', v: delta.runway, fmt: (n: number) => `${n > 0 ? '+' : ''}${n.toFixed(1)}m` } : null,
+                        { label: 'LTV/CAC', v: delta.ltvCac, fmt: (n: number) => `${n > 0 ? '+' : ''}${n.toFixed(1)}x` },
+                      ].filter(Boolean).map((d) => {
+                        if (!d) return null
+                        const up = d.v > 0; const neutral = Math.abs(d.v) < 0.5
+                        const col = neutral ? 'rgba(255,255,255,0.2)' : up ? GREEN : RED
+                        return (
+                          <span key={d.label} style={{ fontSize: 9, fontFamily: 'monospace', color: col, background: `${col}18`, padding: '1px 5px', borderRadius: 3 }}>
+                            {d.label} {d.fmt(d.v)}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: colorByRange(s.metrics.healthScore, 70, 40) }}>
@@ -273,7 +312,7 @@ export default function AbaArquivos() {
                 )}
               </AnimatePresence>
             </div>
-          ))}
+          )})}
         </div>
       ))}
     </div>

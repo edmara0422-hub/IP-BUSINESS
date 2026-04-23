@@ -89,6 +89,8 @@ export async function GET() {
   // ── Defaults (usados se qualquer fetch falhar) ──────────────────────────
   let usdBrl = 4.98, usdDelta = 0.02
   let ipca = 4.14, pib = 1.86, selic = 14.75
+  // BCB taxas de crédito PJ por setor (% a.a.) — séries SGS
+  let creditPjTotal = 28.5, creditPjIndustria = 19.2, creditPjAgro = 12.8, creditPjComercio = 30.4, creditPjServicos = 26.7
 
   // commodities
   let goldP = 4817, goldD = 0
@@ -111,6 +113,7 @@ export async function GET() {
   try {
     const [
       fxRes, selicRes, ipcaRes, pibRes,
+      creditTotalRes, creditIndRes, creditAgroRes, creditComRes, creditSvcRes,
       goldRes, silverRes, oilRes,
       petr4D, vale3D, itub4D, totvs3D, slce3D, rdor3D, egie3D, mglu3D, rail3D,
     ] = await Promise.allSettled([
@@ -119,6 +122,12 @@ export async function GET() {
       safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/1?formato=json'),
       safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.13522/dados/ultimos/1?formato=json'),
       safeFetch('https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?$filter=Indicador%20eq%20%27PIB%20Total%27%20and%20DataReferencia%20eq%20%272026%27&$top=1&$orderby=Data%20desc&$format=json'),
+      // BCB crédito PJ por setor (séries SGS — taxa média a.a.)
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20714/dados/ultimos/1?formato=json'),  // Total PJ
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20754/dados/ultimos/1?formato=json'),  // Indústria
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20756/dados/ultimos/1?formato=json'),  // Agropecuária
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20758/dados/ultimos/1?formato=json'),  // Comércio
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20760/dados/ultimos/1?formato=json'),  // Serviços
       // Commodities (AwesomeAPI + Yahoo Finance)
       safeFetch('https://economia.awesomeapi.com.br/json/last/XAU-USD'),
       safeFetch('https://economia.awesomeapi.com.br/json/last/XAG-USD'),
@@ -164,6 +173,21 @@ export async function GET() {
         if (Number.isFinite(val)) pib = val
       } catch { /* fallback */ }
     }
+
+    // ── Parse BCB crédito PJ por setor ──────────────────────────────────
+    const parseBcbRate = async (r: PromiseSettledResult<Response | null>): Promise<number | null> => {
+      if (r.status !== 'fulfilled' || !r.value) return null
+      try { const d = await r.value.json(); const v = parseFloat(d?.[0]?.valor); return Number.isFinite(v) ? v : null } catch { return null }
+    }
+    const [rTotal, rInd, rAgro, rCom, rSvc] = await Promise.all([
+      parseBcbRate(creditTotalRes), parseBcbRate(creditIndRes), parseBcbRate(creditAgroRes),
+      parseBcbRate(creditComRes),   parseBcbRate(creditSvcRes),
+    ])
+    if (rTotal !== null) creditPjTotal = rTotal
+    if (rInd !== null)   creditPjIndustria = rInd
+    if (rAgro !== null)  creditPjAgro = rAgro
+    if (rCom !== null)   creditPjComercio = rCom
+    if (rSvc !== null)   creditPjServicos = rSvc
 
     // ── Parse commodities (AwesomeAPI) ──────────────────────────────────
     if (goldRes.status === 'fulfilled' && goldRes.value) {
@@ -315,6 +339,13 @@ export async function GET() {
       { id: 'organic',    label: 'SEO + conteúdo orgânico reduz dependência de paid',                                                                   urgency: 62,        type: 'canal' },
       { id: 'agro_boom',  label: `Agro ${dAgro >= 0 ? '+' : ''}${dAgro.toFixed(1)}% hoje — oportunidade B2B em agritech`,                            urgency: urgAgro,   type: 'setor' },
     ],
+    creditRates: {
+      total:      { value: r2(creditPjTotal),     label: 'PJ Total',      unit: '% a.a.' },
+      industria:  { value: r2(creditPjIndustria), label: 'Indústria',     unit: '% a.a.' },
+      agro:       { value: r2(creditPjAgro),      label: 'Agropecuária',  unit: '% a.a.' },
+      comercio:   { value: r2(creditPjComercio),  label: 'Comércio',      unit: '% a.a.' },
+      servicos:   { value: r2(creditPjServicos),  label: 'Serviços',      unit: '% a.a.' },
+    },
     updatedAt: new Date().toISOString(),
   }
 

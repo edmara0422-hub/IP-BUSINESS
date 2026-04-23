@@ -443,6 +443,11 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const [saveNome,      setSaveNome]      = useState('')
   const [savingArq,     setSavingArq]     = useState(false)
   const [savedOk,       setSavedOk]       = useState(false)
+  // Task 7: benchmarks anônimos da base
+  const [baseBm, setBaseBm] = useState<{ count: number; benchmarks: { margem: { median: number; p75: number }; runway: { median: number }; healthScore: { median: number } } | null } | null>(null)
+  useEffect(() => {
+    fetch('/api/base-benchmarks').then(r => r.json()).then(setBaseBm).catch(() => {})
+  }, [])
   const pdfRef = useRef<HTMLDivElement>(null)
 
   // Inputs financeiros base
@@ -862,13 +867,37 @@ Relatório em 4 seções:
 3. PLANO 7/30/90 dias — ações concretas baseadas no perfil ${matProfIA} e objetivos (${objetivos.join(', ') || 'não definidos'})
 4. FRASE EXECUTIVA — 1 frase, máx 3 números, verdadeiros`
 
+      // Task 4: últimos 2 snapshots para contexto histórico na IA
+      let snapshotHistory: Array<{ date: string; healthScore: number; margem: number; runway: number; lucro: number; ltvCac: number }> = []
+      try {
+        const sb = createClient()
+        let existingSnaps: CockpitSnapshot[] = []
+        if (!user) {
+          const raw = localStorage.getItem(`ws_${ARQUIVOS_MODULE}`)
+          existingSnaps = raw ? (JSON.parse(raw)?.snapshots ?? []) : []
+        } else {
+          const { data: row } = await sb.from('workspace_data').select('data').eq('user_id', user.id).eq('module_id', ARQUIVOS_MODULE).maybeSingle()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          existingSnaps = (row?.data as any)?.snapshots ?? []
+        }
+        snapshotHistory = existingSnaps.slice(0, 2).map(s => ({
+          date: new Date(s.createdAt).toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' }),
+          healthScore: s.metrics.healthScore,
+          margem: s.metrics.margem,
+          runway: s.metrics.runway,
+          lucro: s.metrics.lucro,
+          ltvCac: s.metrics.ltvCac,
+        }))
+      } catch { /* falha silenciosa — análise continua sem histórico */ }
+
       const res = await fetch('/api/advisor-chat', {
         method: 'POST',
         signal: controller.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           question,
-          marketContext: `Burn R$${burnRealIA.toFixed(2)} | TaxaReal ${taxaRealIA.toFixed(2)}% | CAC R$${cacAjustIA.toFixed(2)} | CPM R$${cpmReais.toFixed(2)}/mil | ${sectorLabelIA} ${sectorHeatIA}/100`,
+          marketContext: `Burn R$${burnRealIA.toFixed(2)} | TaxaReal ${taxaRealIA.toFixed(2)}% | CAC R$${cacAjustIA.toFixed(2)} | CPM R$${cpmReais.toFixed(2)}/mil | ${sectorLabelIA} ${sectorHeatIA}/100 | CréditoPJ ${(marketData?.creditRates?.total?.value ?? 28.5).toFixed(1)}%a.a.`,
+          snapshotHistory,
         }),
       })
       const d = await res.json()
@@ -1386,6 +1415,23 @@ Relatório em 4 seções:
             </span>
           </div>
         )}
+        {/* Task 8: Alerta inteligente — runway < 3 meses (zona de perigo real) */}
+        {metrics.runway > 0 && metrics.runway < 3 && !metrics.runwayProtegido && !metrics.runwayExplicado && (
+          <div className="mb-3 rounded-lg px-3 py-2.5 flex items-center gap-2.5" style={{ background: `${RED}20`, border: `1px solid ${RED}60` }}>
+            <AlertTriangle size={14} style={{ color: RED, flexShrink: 0 }} />
+            <span style={{ fontSize: 12, color: RED, fontFamily: 'monospace', fontWeight: 700 }}>
+              RUNWAY {fmtDec(metrics.runway)}m — ZONA DE PERIGO — priorize caixa acima de tudo. Menos de 3 meses para o dinheiro acabar.
+            </span>
+          </div>
+        )}
+        {metrics.runwayCritico && (
+          <div className="mb-3 rounded-lg px-3 py-2.5 flex items-center gap-2.5" style={{ background: `${RED}25`, border: `1px solid ${RED}70` }}>
+            <AlertTriangle size={14} style={{ color: RED, flexShrink: 0 }} />
+            <span style={{ fontSize: 12, color: RED, fontFamily: 'monospace', fontWeight: 700 }}>
+              CAIXA VAZIO COM BURN ATIVO — R${fmt(despesas)}/mês. O negócio pode parar em dias se não houver entrada de caixa imediata.
+            </span>
+          </div>
+        )}
         {sanityAlerts.length > 0 ? (
           <div className="rounded-xl p-5 flex flex-col items-center gap-2" style={{ background: 'rgba(154,125,10,0.06)', border: `1px solid ${AMBER}25` }}>
             <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: AMBER, letterSpacing: '0.08em' }}>INDICADORES OCULTOS</span>
@@ -1455,14 +1501,27 @@ Relatório em 4 seções:
 
         // ── Semáforo — só calcula se dados são confiáveis e há receita ──────
         const dadosInvalidos = sanityAlerts.length > 0
-        const margemPts = receita > 0 ? (metrics.margemReal > 5 ? 1 : metrics.margemReal > 0 ? 0 : -1) : -1
-        const roiPts    = metrics.roiSemValidacao ? -1 : (roiVsCdi > 5 ? 1 : roiVsCdi > -5 ? 0 : -1)
-        // LTV/CAC só conta no semáforo quando tem receita real — sem receita é estimado
-        const ltvCacPts = receita > 0 ? (metrics.ltvCac > 3 ? 1 : metrics.ltvCac > 1 ? 0 : -1) : 0
+        // Task 6: scoring usa benchmark do modelo, não limiares fixos
+        const margemRefBm  = bm?.margemRef ?? 30
+        const ltvCacRefBm  = bm?.ltvMult   ?? 3
+        // Margem: compara com referência do modelo (±20% de tolerância)
+        const margemPts = receita > 0
+          ? (metrics.margem >= margemRefBm * 0.8 && metrics.margemReal > 0 ? 1
+            : metrics.margem >= margemRefBm * 0.5 && metrics.margemReal > -2 ? 0 : -1)
+          : -1
+        // ROI: +2 se excepcional (>CDI+10), penaliza mais se muito negativo
+        const roiPts = metrics.roiSemValidacao ? -1
+          : (roiVsCdi > 10 ? 2 : roiVsCdi > 5 ? 1 : roiVsCdi > -5 ? 0 : -2)
+        // LTV/CAC: threshold adaptado ao modelo (venda única requer 1.5x; recorrente usa mult ref)
+        const ltvCacMin = naturezaCobranca === 'unica' ? 1.5 : Math.max(2, ltvCacRefBm * 0.4)
+        const ltvCacPts = receita > 0 ? (metrics.ltvCac >= ltvCacMin * 1.5 ? 1 : metrics.ltvCac >= ltvCacMin ? 0 : -1) : 0
+        // Churn excessivo penaliza (só modelos recorrentes com churn conhecido)
+        const churnPts  = receita > 0 && naturezaCobranca === 'recorrente' && bm && churnEfetivo > 0
+          ? (churnEfetivo <= bm.churnRef ? 1 : churnEfetivo <= bm.churnRef * 2 ? 0 : -1) : 0
         const pts = dadosInvalidos ? -99 : [
           metrics.runwayCritico ? -2 : metrics.runwayExplicado ? 0 : metrics.runwayProtegido ? 1 : metrics.runway > 6 ? 1 : metrics.runway > 3 ? 0 : -1,
           sectorHeat > 70 ? 1 : sectorHeat > 40 ? 0 : -1,
-          margemPts, roiPts, ltvCacPts,
+          margemPts, roiPts, ltvCacPts, churnPts,
         ].reduce((a, b) => a + b, 0)
         const semaforo = dadosInvalidos ? 'invalido' : pts >= 3 ? 'crescer' : pts >= 0 ? 'aguardar' : 'nao'
         // Perfil pré-receita/ideia: não usa semáforo de crescimento — fase é validação
@@ -1700,6 +1759,32 @@ Relatório em 4 seções:
                       <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>{a}</span>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Task 7: Benchmarks da base — só aparece quando há dados suficientes e receita real */}
+            {baseBm?.benchmarks && baseBm.count >= 3 && receita > 0 && (
+              <div className="px-4 py-2.5" style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <p style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.08em', marginBottom: 5 }}>VS BASE ({baseBm.count} empresas)</p>
+                <div className="flex gap-4 flex-wrap">
+                  {[
+                    { label: 'Margem', yours: metrics.margem, median: baseBm.benchmarks.margem.median, p75: baseBm.benchmarks.margem.p75, unit: '%' },
+                    { label: 'Health', yours: metrics.healthScore, median: baseBm.benchmarks.healthScore.median, unit: 'pts' },
+                    { label: 'Runway', yours: metrics.runway >= 999 ? 24 : metrics.runway, median: baseBm.benchmarks.runway.median, unit: 'm' },
+                  ].map(({ label, yours, median, p75, unit }) => {
+                    const above = yours > (p75 ?? median)
+                    const below = yours < median
+                    const c = above ? GREEN : below ? RED : AMBER
+                    const pos = above ? 'top 25%' : below ? 'abaixo da mediana' : 'mediana'
+                    return (
+                      <div key={label} className="flex flex-col gap-0.5">
+                        <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, fontFamily: 'monospace', color: c }}>{typeof yours === 'number' && yours >= 999 ? '∞' : (typeof yours === 'number' ? yours.toFixed(1) : yours)}{unit}</span>
+                        <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)' }}>mediana {median}{unit} · {pos}</span>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )}
