@@ -686,10 +686,14 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
            : metrics.runwayExplicado  ? BLUE
            : metrics.runwayCritico    ? RED
            : colorByRange(Math.min(metrics.runway, 99), 6, 3),
-      desc: metrics.runwayProtegido ? `Aporte R$${fmt(aporteMensal)}/mês cobre o burn — sem prazo de extinção imediato`
-          : metrics.runwayExplicado  ? (motivoCaixaZero === 'zerado-intencional' ? 'Caixa zerado por escolha — você reinveste tudo. Risco: sem reserva para imprevistos.' : motivoCaixaZero === 'lancando' ? 'Caixa consumido pelo investimento no crescimento. Controle o burn rate.' : 'Fase pré-receita — sem caixa operacional ainda, normal nesta fase.')
-          : metrics.runwayCritico    ? 'CRÍTICO — o caixa zerou com despesas ativas. Sem receita ou aporte, o negócio para.'
-          : `Quantos meses o caixa aguenta no ritmo atual de gastos. Mínimo saudável: 6 meses`,
+      desc: metrics.runwayProtegido ? `Aporte R$${fmt(aporteMensal)}/mês cobre o burn de R$${fmt(despesas)}/mês — sem prazo de extinção imediato`
+          : metrics.runwayExplicado  ? (
+              motivoCaixaZero === 'zerado-intencional' ? `Reinvestindo tudo — queimando R$${fmt(despesas)}/mês por escolha. Risco: sem reserva para imprevistos.`
+            : motivoCaixaZero === 'lancando'           ? `Investindo para crescer — burn R$${fmt(despesas)}/mês. Controle o ritmo: cada mês conta.`
+            :                                            `Queimando R$${fmt(despesas)}/mês sem receita. Fase declarada como pré-operação — o burn não para enquanto não há 1ª venda.`
+            )
+          : metrics.runwayCritico    ? `CRÍTICO — caixa zerado com R$${fmt(despesas)}/mês de burn ativo. Sem receita ou aporte, o negócio para.`
+          : `Quantos meses o caixa aguenta no ritmo atual (R$${fmt(despesas)}/mês). Mínimo saudável: 6 meses`,
       origin: caixa > 0 || despesas > 0 || aporteMensal > 0 ? O_REAL : O_CALC },
     { label: 'Lucro Mensal',   value: `R$${fmt(metrics.lucro)}`,     color: metrics.lucro >= 0 ? GREEN : RED,         desc: `O que sobra (ou falta) no mês: receita menos todas as despesas. Negativo = prejuízo operacional`, origin: receita > 0 || despesas > 0 ? O_REAL : O_CALC },
     { label: 'Burn Líquido',   value: metrics.burnLiquido > 0 ? `-R$${fmt(metrics.burnLiquido)}/mês` : `+R$${fmt(Math.abs(metrics.burnLiquido))}/mês`, color: metrics.burnLiquido > 0 ? RED : GREEN, desc: metrics.burnLiquido > 0 ? `Você está gastando R$${fmt(metrics.burnLiquido)} a mais do que ganha por mês` : `Você está gerando R$${fmt(Math.abs(metrics.burnLiquido))} de sobra por mês`, origin: despesas > 0 ? O_REAL : O_CALC },
