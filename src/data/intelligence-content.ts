@@ -941,6 +941,136 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
             },
           },
 
+          {
+            id: 'M1-0-cap8',
+            type: 'chapter',
+            number: 8,
+            title: 'Inteligência Organizacional e Projeto de BI',
+            subtitle: 'Do OBI ao protótipo funcional — como dados viram decisões estratégicas',
+            opening: {
+              leadText: 'Business Intelligence não é um software isolado — é uma {{capacidade organizacional}}. O OBI (Organizational Business Intelligence) integra dados de toda a empresa para transformar cada decisão gerencial em ação baseada em evidência. Um projeto de BI transforma essa intenção em realidade operacional mensurável.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'O conceito de Inteligência Organizacional (OBI) vai além dos relatórios operacionais tradicionais. Enquanto o BI clássico foca em dados transacionais — vendas, estoque, financeiro — o OBI integra dimensões {{humanas e processuais}}: desempenho de equipes, eficiência de fluxos, padrões de colaboração e saúde organizacional. O resultado é uma visão 360° que conecta operação, pessoas e estratégia em um único ambiente analítico.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'William Inmon (1990), considerado o "pai do Data Warehouse", definiu que a inteligência organizacional começa pela separação entre sistemas {{transacionais}} (OLTP — registro de eventos) e sistemas {{analíticos}} (OLAP — análise de padrões). Misturar os dois é o erro mais comum — e mais caro — em projetos de BI: relatórios lentos, decisões atrasadas e dados inconsistentes.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'As 4 camadas do OBI',
+                pillars: [
+                  { icon: '🗄️', title: 'Camada de Dados', description: 'Coleta e armazenamento de dados brutos — transacionais, operacionais e {{comportamentais}}. ERP, CRM, IoT, planilhas. A qualidade aqui determina tudo o que vem depois.', metric: { value: '70%', label: 'do tempo do projeto é ETL' } },
+                  { icon: '🔄', title: 'Camada de Integração', description: 'ETL (Extract, Transform, Load) padroniza e consolida dados de fontes heterogêneas. {{Qualidade de dados}} determina qualidade das decisões. Garbage in = garbage out.', metric: { value: '80%', label: 'dos projetos falham nessa etapa' } },
+                  { icon: '🧠', title: 'Camada Analítica', description: 'OLAP, modelos preditivos e algoritmos de IA transformam dados em {{padrões acionáveis}}. Aqui nascem os insights — análise dimensional, drill-down, slice and dice.', metric: { value: '10x', label: 'mais rápido que SQL direto' } },
+                  { icon: '📊', title: 'Camada de Apresentação', description: 'Dashboards, relatórios e alertas entregam informação {{no momento certo}}, para a pessoa certa, no formato certo. KPI = pergunta + métrica + meta + frequência.', metric: { value: '1 insight', label: 'por tela — regra de ouro' } },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Projeto de Software de BI — Ciclo de Vida',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Um projeto de BI bem executado começa pelo negócio, não pela tecnologia. O maior erro é começar pelo software — antes de entender {{o que precisa ser decidido}}. Ralph Kimball (1996) definiu o padrão ouro: dimensional modeling primeiro, ferramenta depois. Seu livro "The Data Warehouse Toolkit" é a referência mais citada da área até hoje e ainda guia projetos modernos em cloud.',
+              },
+              {
+                kind: 'step-flow',
+                title: 'Ciclo de vida do projeto de BI (metodologia Kimball)',
+                steps: [
+                  { number: 1, title: 'Levantamento de Requisitos', description: 'Entender quais {{decisões}} precisam ser suportadas. Entrevistar stakeholders, mapear fontes de dados, definir KPIs prioritários. Sem essa fase, projetos entregam dados sem impacto.', caseSnippet: 'Magazine Luiza: levantamento revelou que gerentes de loja precisavam de sell-through por SKU — não de receita total.' },
+                  { number: 2, title: 'Modelagem Dimensional', description: 'Definir fatos (o que medir) e dimensões (como analisar). Star Schema ou Snowflake Schema. A {{granularidade}} define o nível de detalhe e o desempenho das consultas.', caseSnippet: 'Kimball (1996): "Escolha a granularidade mais baixa possível — você pode sempre agregar, nunca desagregar."' },
+                  { number: 3, title: 'ETL — Extração, Transformação e Carga', description: 'Conectar fontes, limpar e padronizar dados, carregar no Data Warehouse. {{70% do tempo}} de projetos de BI é gasto aqui — e é onde a maioria dos problemas se esconde.', caseSnippet: 'Renner: dados de estoque vinham de 3 sistemas com nomenclaturas diferentes. Harmonização levou 4 meses.' },
+                  { number: 4, title: 'Desenvolvimento de Visualizações', description: 'Construir dashboards, relatórios e alertas. Regra: {{1 insight por tela}}. Complexidade visual mata a adoção. Stephen Few (2006): bons dashboards comunicam, não impressionam.', caseSnippet: 'Ambev: reduziu painel de 40 métricas para 7 KPIs — adoção subiu de 30% para 85% em 90 dias.' },
+                  { number: 5, title: 'Deploy e Governança', description: 'Publicar, criar política de acesso (RBAC), treinar usuários, definir ciclo de atualização. BI sem governança vira {{caos de versões}} — cada área com "a sua verdade".', caseSnippet: 'DAMA-DMBOK (2017): Data Governance = pessoas + processos + tecnologia. Tecnologia é a menor parte.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Prototipagem em BI',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Prototipar antes de construir é a prática que mais reduz retrabalho em projetos de BI. O custo de mudar um wireframe é zero. O custo de mudar um modelo dimensional em produção pode ser meses de trabalho. Protótipos definem {{expectativas reais}} entre analistas e stakeholders antes de qualquer linha de código ou query SQL — e evitam o cenário clássico: "não era isso que eu queria."',
+              },
+              {
+                kind: 'pillar-grid',
+                title: '3 fases da prototipagem em BI',
+                pillars: [
+                  { icon: '✏️', title: 'Wireframe (Baixa Fidelidade)', description: 'Esboço visual das telas e layouts. Sem dados reais — apenas {{estrutura}}. Ferramentas: papel, Balsamiq, Figma sketch. Valida: o que aparece onde e qual hierarquia de informação.' },
+                  { icon: '🎨', title: 'Mockup (Média Fidelidade)', description: 'Design visual com dados fictícios. Simula a aparência final — cores, tipografia, ícones. Ferramentas: {{Figma, Adobe XD}}. Valida: linguagem visual e consistência antes de codar.' },
+                  { icon: '⚡', title: 'Protótipo Funcional (Alta Fidelidade)', description: 'Dashboard real com amostra de dados reais. Ferramentas: Power BI, Tableau, Metabase. Valida: {{usabilidade e valor}} do insight antes do deploy completo — expõe problemas de dados cedo.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Ferramentas de BI no Mercado',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A escolha da ferramenta de BI deve seguir o contexto, não a moda. Três variáveis determinam a escolha certa: {{maturidade da equipe}}, volume de dados e integração com sistemas existentes. Power BI domina o mercado corporativo (especialmente ecossistema Microsoft), Tableau é referência em visualização avançada, e ferramentas open-source como Metabase e Apache Superset atendem equipes técnicas com orçamento limitado. Gartner (2024): Power BI e Tableau lideram o Quadrante Mágico de Analytics por 9 anos consecutivos.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'As 4 principais ferramentas de BI',
+                pillars: [
+                  { icon: '🟡', title: 'Power BI (Microsoft)', description: 'Integração nativa com Excel, Azure e Teams. Curva de aprendizado {{mais baixa}}. Licenciamento por usuário (Microsoft 365). Ideal: empresas já no ecossistema Microsoft.', metric: { value: '#1', label: 'mercado corporativo global (2024)' } },
+                  { icon: '🔵', title: 'Tableau (Salesforce)', description: 'Referência em {{visualização avançada}} e análise exploratória. Maior curva de aprendizado. Ideal: analistas avançados que precisam de flexibilidade visual sem limite.', metric: { value: '94', label: 'NPS entre analistas de dados' } },
+                  { icon: '🟢', title: 'Metabase (Open-source)', description: 'Gratuito, deploy rápido, acessível para não-técnicos. Ideal: startups e equipes com {{orçamento limitado}} que precisam de agilidade sem complexidade de licenciamento.', metric: { value: 'Grátis', label: 'open-source, pago no cloud' } },
+                  { icon: '🟠', title: 'Qlik Sense', description: 'Motor de associação único: navega por dados sem joins predefinidos. {{Descoberta de dados}} mais intuitiva. Forte em Europa — menor adoção no Brasil.', metric: { value: '#3', label: 'Gartner Magic Quadrant 2024' } },
+                ],
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Star Schema vs Snowflake Schema são as duas estruturas principais de modelagem dimensional. Entenda as diferenças e classifique os componentes de OBI.',
+              compare: {
+                columnHeaders: ['Star Schema', 'Snowflake Schema'],
+                rows: [
+                  { label: 'Dimensões', values: ['Desnormalizadas (1 tabela)', 'Normalizadas (sub-tabelas)'] },
+                  { label: 'Performance', values: ['Consultas mais rápidas', 'Mais joins = mais lento'] },
+                  { label: 'Storage', values: ['Maior (dados redundantes)', 'Menor (sem redundância)'] },
+                  { label: 'Manutenção', values: ['Mais simples', 'Mais complexa'] },
+                  { label: 'Uso ideal', values: ['Dashboards e relatórios', 'Hierarquias e análises complexas'] },
+                ],
+              },
+              drag: {
+                instruction: 'Classifique cada elemento na camada OBI correta:',
+                zones: [
+                  { id: 'dado', label: 'Camada de Dados' },
+                  { id: 'integ', label: 'Camada de Integração' },
+                  { id: 'anali', label: 'Camada Analítica' },
+                  { id: 'apres', label: 'Camada de Apresentação' },
+                ],
+                items: [
+                  { id: 'erp', label: 'ERP SAP (sistema transacional)', correctZone: 'dado', correctFeedback: 'Certo. ERP é fonte de dados — Camada de Dados.', wrongFeedback: 'ERP é sistema de origem — pertence à Camada de Dados.' },
+                  { id: 'etl', label: 'Pipeline ETL (Apache Airflow)', correctZone: 'integ', correctFeedback: 'Certo. ETL orquestra a integração entre fontes e DW.', wrongFeedback: 'Apache Airflow orquestra ETL — Camada de Integração.' },
+                  { id: 'olap', label: 'Cubo OLAP (análise multidimensional)', correctZone: 'anali', correctFeedback: 'Certo. OLAP processa análises dimensionais.', wrongFeedback: 'OLAP é motor analítico — Camada Analítica.' },
+                  { id: 'dash', label: 'Dashboard Power BI (executivo)', correctZone: 'apres', correctFeedback: 'Certo. Dashboard entrega o insight — Camada de Apresentação.', wrongFeedback: 'Power BI exibe dados — pertence à Camada de Apresentação.' },
+                  { id: 'dw', label: 'Data Warehouse (repositório central)', correctZone: 'dado', correctFeedback: 'Certo. O DW armazena dados processados — Camada de Dados.', wrongFeedback: 'Data Warehouse é repositório — Camada de Dados.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'OBI transforma a empresa em uma organização que aprende com seus próprios dados. As {{4 camadas}} (Dados → Integração → Analítica → Apresentação) formam o pipeline completo. Um projeto de BI segue o ciclo Kimball: requisitos → modelagem → ETL → visualização → governança. {{Prototipar}} antes de construir é a decisão mais inteligente.',
+              keyInsights: [
+                'Inmon vs Kimball: dois paradigmas de DW. Kimball (dimensional) é mais adotado para {{BI ágil}}. Inmon (normalizado) para ambientes enterprise de longo prazo.',
+                'Regra de ouro do dashboard: {{1 insight por tela}}. Múltiplas métricas competindo = nenhuma decisão clara.',
+                'Star Schema: mais rápido, mais simples. Snowflake: mais econômico em storage, mas mais {{joins}}. Para BI operacional: Star vence na maioria dos casos.',
+              ],
+            },
+          },
+          {
+            id: 'M1-0-s1',
+            type: 'simulation',
+            title: 'Construtor de Projeto OBI — Do Problema ao Dashboard',
+            simulationId: 'obi-project-builder',
+            description: 'Receba cenários empresariais reais. Defina modelagem, ferramenta e KPIs do seu projeto de BI.',
+          },
+
 ],
       },
       {
