@@ -1381,95 +1381,113 @@ Relatório em 4 seções:
         const matProf  = detectProfile(receita, caixa, despesas, faseNegocio || fase, motivoCaixaZero, metrics.margem)
         const bmLbl    = bm?.label ?? ''
 
-        // ── Pontuação para semáforo ────────────────────────────────────────
+        // ── Semáforo — só calcula se dados são confiáveis ─────────────────
+        const dadosInvalidos = sanityAlerts.length > 0
         const margemPts = receita > 0 ? (metrics.margemReal > 5 ? 1 : metrics.margemReal > 0 ? 0 : -1) : -1
         const roiPts    = metrics.roiSemValidacao ? -1 : (roiVsCdi > 5 ? 1 : roiVsCdi > -5 ? 0 : -1)
-        const pts = [
+        const pts = dadosInvalidos ? -99 : [
           metrics.runwayCritico ? -2 : metrics.runwayExplicado ? 0 : metrics.runwayProtegido ? 1 : metrics.runway > 6 ? 1 : metrics.runway > 3 ? 0 : -1,
           sectorHeat > 70 ? 1 : sectorHeat > 40 ? 0 : -1,
           margemPts, roiPts,
           metrics.ltvCac > 3 ? 1 : metrics.ltvCac > 1 ? 0 : -1,
         ].reduce((a, b) => a + b, 0)
-        const semaforo = pts >= 3 ? 'crescer' : pts >= 0 ? 'aguardar' : 'nao'
+        const semaforo = dadosInvalidos ? 'invalido' : pts >= 3 ? 'crescer' : pts >= 0 ? 'aguardar' : 'nao'
         const v = semaforo === 'crescer'
           ? { text: 'CRESCER AGORA',     color: GREEN, icon: '▲' }
           : semaforo === 'aguardar'
           ? { text: 'AGUARDAR / TESTAR', color: AMBER, icon: '◆' }
+          : semaforo === 'invalido'
+          ? { text: 'CORRIJA OS DADOS',  color: AMBER, icon: '⚠' }
           : { text: 'NÃO CRESCER AGORA', color: RED,   icon: '▼' }
 
-        // ── Achados: lê todos os dados e calibragem ────────────────────────
+        // ── Achados ────────────────────────────────────────────────────────
         type Finding = { ok: boolean; label: string; detail: string }
         const findings: Finding[] = []
 
-        // Qualidade dos dados
-        if (sanityAlerts.length > 0) {
-          findings.push({ ok: false, label: 'Dados incompletos', detail: sanityAlerts.map(a => a.msg).join(' · ') })
-        }
-
-        // Runway / sobrevivência
-        if (metrics.runwayProtegido) {
-          findings.push({ ok: true, label: `Runway protegido`, detail: `Aporte R$${fmt(aporteMensal)}/mês cobre o burn — sem prazo de extinção imediato` })
-        } else if (metrics.runwayExplicado) {
-          const ctx = motivoCaixaZero === 'zerado-intencional' ? 'reinvestindo tudo por escolha — sem reserva para imprevistos'
-                    : motivoCaixaZero === 'lancando'           ? 'consumindo caixa para crescer — burn deve ser intencional e controlado'
-                    :                                            'pré-receita, sem caixa operacional ainda'
-          findings.push({ ok: true, label: 'Caixa zerado por contexto', detail: ctx })
-        } else if (metrics.runwayCritico) {
-          findings.push({ ok: false, label: 'Runway ZERO', detail: `R$${fmt(despesas)}/mês de burn com caixa vazio e sem receita — sem aporte, o negócio para` })
-        } else if (metrics.runway < 3) {
-          findings.push({ ok: false, label: `Runway ${fmtDec(metrics.runway)}m`, detail: `Menos de 3 meses de fôlego — prioridade máxima é aumentar caixa` })
-        } else if (metrics.runway < 6) {
-          findings.push({ ok: false, label: `Runway ${fmtDec(metrics.runway)}m`, detail: `Abaixo do mínimo saudável (6 meses) — não é hora de escalar paid` })
-        } else if (metrics.runway < 999) {
-          findings.push({ ok: true, label: `Runway ${fmtDec(metrics.runway)}m`, detail: `Fôlego adequado para testar e iterar` })
+        if (dadosInvalidos) {
+          // Dados inválidos: só mostra o que vem de declaração do usuário
+          sanityAlerts.forEach(a => findings.push({ ok: false, label: a.field, detail: a.msg }))
+          // Runway: baseado em calibragem declarada, não em cálculo
+          if (metrics.runwayExplicado) {
+            const ctx = motivoCaixaZero === 'zerado-intencional' ? 'reinvestindo tudo — contexto declarado'
+                      : motivoCaixaZero === 'lancando'           ? 'consumindo caixa para crescer — fase declarada'
+                      :                                            'pré-receita declarada — sem caixa operacional ainda'
+            findings.push({ ok: true, label: 'Caixa zerado por contexto', detail: ctx })
+          } else if (metrics.runwayCritico) {
+            findings.push({ ok: false, label: 'Runway ZERO', detail: `R$${fmt(despesas)}/mês de burn com caixa vazio — risco real` })
+          }
+          if (receita === 0 && despesas > 0) {
+            findings.push({ ok: false, label: 'Receita R$0', detail: `Nenhuma validação de mercado — corrija os dados e reavalie` })
+          }
+          // Não mostra LTV/CAC, margem, ROI, setor, benchmark — todos dependem de dados inválidos
         } else {
-          findings.push({ ok: true, label: 'Runway ∞', detail: 'Receita cobre despesas — sem prazo de extinção' })
-        }
+          // Dados confiáveis: avalia tudo
 
-        // Receita / validação de mercado
-        if (receita === 0 && despesas > 0) {
-          findings.push({ ok: false, label: 'Receita R$0', detail: `Burn R$${fmt(despesas)}/mês sem validação de mercado — nenhuma métrica abaixo pode ser confirmada` })
-        } else if (receita > 0) {
-          if (metrics.margemReal < 0) {
-            findings.push({ ok: false, label: `Margem real ${fmtDec(metrics.margemReal)}%`, detail: `Margem bruta ${fmtDec(metrics.margem)}% menos taxa Fisher ${taxaRealExata.toFixed(2)}% = negativa — você perde poder aquisitivo` })
-          } else if (metrics.margem < 15) {
-            findings.push({ ok: false, label: `Margem ${fmtDec(metrics.margem)}%`, detail: `Abaixo de 15% — insuficiente para reinvestir em crescimento` })
+          // Runway / sobrevivência
+          if (metrics.runwayProtegido) {
+            findings.push({ ok: true, label: `Runway protegido`, detail: `Aporte R$${fmt(aporteMensal)}/mês cobre o burn — sem prazo de extinção imediato` })
+          } else if (metrics.runwayExplicado) {
+            const ctx = motivoCaixaZero === 'zerado-intencional' ? 'reinvestindo tudo por escolha — sem reserva para imprevistos'
+                      : motivoCaixaZero === 'lancando'           ? 'consumindo caixa para crescer — burn deve ser intencional e controlado'
+                      :                                            'pré-receita, sem caixa operacional ainda'
+            findings.push({ ok: true, label: 'Caixa zerado por contexto', detail: ctx })
+          } else if (metrics.runwayCritico) {
+            findings.push({ ok: false, label: 'Runway ZERO', detail: `R$${fmt(despesas)}/mês de burn com caixa vazio e sem receita — sem aporte, o negócio para` })
+          } else if (metrics.runway < 3) {
+            findings.push({ ok: false, label: `Runway ${fmtDec(metrics.runway)}m`, detail: `Menos de 3 meses de fôlego — prioridade máxima é aumentar caixa` })
+          } else if (metrics.runway < 6) {
+            findings.push({ ok: false, label: `Runway ${fmtDec(metrics.runway)}m`, detail: `Abaixo do mínimo saudável (6 meses) — não é hora de escalar paid` })
+          } else if (metrics.runway < 999) {
+            findings.push({ ok: true, label: `Runway ${fmtDec(metrics.runway)}m`, detail: `Fôlego adequado para testar e iterar` })
           } else {
-            findings.push({ ok: true, label: `Margem ${fmtDec(metrics.margem)}%`, detail: `Real ${fmtDec(metrics.margemReal)}% após taxa Fisher — ${cargaTributaria > 0 ? `já descontado ${fmtDec(cargaTributaria)}% de impostos` : 'adicione carga tributária na calibragem para margem real pura'}` })
+            findings.push({ ok: true, label: 'Runway ∞', detail: 'Receita cobre despesas — sem prazo de extinção' })
           }
-        }
 
-        // LTV/CAC
-        if (metrics.ltvCac > 0) {
-          if (metrics.ltvCac >= 3) {
-            findings.push({ ok: true, label: `LTV/CAC ${fmtDec(metrics.ltvCac)}x`, detail: `Cada R$1 de CAC retorna R$${fmtDec(metrics.ltvCac)} em LTV — unidade econômica sustentável` })
-          } else if (metrics.ltvCac >= 1) {
-            findings.push({ ok: false, label: `LTV/CAC ${fmtDec(metrics.ltvCac)}x`, detail: `Abaixo de 3x (mínimo para escala) — ${naturezaCobranca === 'unica' ? 'venda única depende de volume constante para compensar' : 'reduza CAC ou aumente retenção'}` })
-          } else {
-            findings.push({ ok: false, label: `LTV/CAC ${fmtDec(metrics.ltvCac)}x`, detail: `Cada cliente custa mais do que vale — escalar agora queima caixa sem retorno` })
+          // Receita / validação de mercado
+          if (receita === 0 && despesas > 0) {
+            findings.push({ ok: false, label: 'Receita R$0', detail: `Burn R$${fmt(despesas)}/mês sem validação de mercado — nenhuma métrica abaixo pode ser confirmada` })
+          } else if (receita > 0) {
+            if (metrics.margemReal < 0) {
+              findings.push({ ok: false, label: `Margem real ${fmtDec(metrics.margemReal)}%`, detail: `Margem bruta ${fmtDec(metrics.margem)}% menos taxa Fisher ${taxaRealExata.toFixed(2)}% = negativa — você perde poder aquisitivo` })
+            } else if (metrics.margem < 15) {
+              findings.push({ ok: false, label: `Margem ${fmtDec(metrics.margem)}%`, detail: `Abaixo de 15% — insuficiente para reinvestir em crescimento` })
+            } else {
+              findings.push({ ok: true, label: `Margem ${fmtDec(metrics.margem)}%`, detail: `Real ${fmtDec(metrics.margemReal)}% após taxa Fisher — ${cargaTributaria > 0 ? `já descontado ${fmtDec(cargaTributaria)}% de impostos` : 'adicione carga tributária na calibragem para margem real pura'}` })
+            }
           }
-        }
 
-        // Setor
-        if (sectorLabel) {
-          findings.push({ ok: sectorHeat >= 50, label: `Setor ${sectorHeat}/100`, detail: sectorHeat > 70 ? `${sectorLabel} aquecido — janela favorável para entrada` : sectorHeat > 40 ? `${sectorLabel} neutro — crescimento possível mas sem vento a favor` : `${sectorLabel} pressionado — crescer em setor fraco exige unit economics muito forte` })
-        }
-
-        // CAC cambial (se tem verba)
-        if (verbaMkt > 0 && cac > 0) {
-          const cacDelta = cacAjustado - cac
-          if (cacDelta > cac * 0.1) {
-            findings.push({ ok: false, label: `CAC ajustado R$${fmt(Math.round(cacAjustado))}`, detail: `USD ${usdRate.toFixed(2)} encarece paid media em ${((usdRate / 4.5 - 1) * 100).toFixed(0)}% — CAC real R$${fmt(Math.round(cac))} → R$${fmt(Math.round(cacAjustado))}` })
+          // LTV/CAC
+          if (metrics.ltvCac > 0) {
+            if (metrics.ltvCac >= 3) {
+              findings.push({ ok: true, label: `LTV/CAC ${fmtDec(metrics.ltvCac)}x`, detail: `Cada R$1 de CAC retorna R$${fmtDec(metrics.ltvCac)} em LTV — unidade econômica sustentável` })
+            } else if (metrics.ltvCac >= 1) {
+              findings.push({ ok: false, label: `LTV/CAC ${fmtDec(metrics.ltvCac)}x`, detail: `Abaixo de 3x (mínimo para escala) — ${naturezaCobranca === 'unica' ? 'venda única depende de volume constante para compensar' : 'reduza CAC ou aumente retenção'}` })
+            } else {
+              findings.push({ ok: false, label: `LTV/CAC ${fmtDec(metrics.ltvCac)}x`, detail: `Cada cliente custa mais do que vale — escalar agora queima caixa sem retorno` })
+            }
           }
-        }
 
-        // Calibragem de contexto
-        if (bmLbl) {
-          const bmMargemRef = bm!.margemRef
-          findings.push({ ok: metrics.margem >= bmMargemRef * 0.8 || receita === 0, label: `Modelo: ${bmLbl}`, detail: receita === 0 ? `Benchmark de referência: margem ${bm!.margemRef}%, churn ${bm!.churnRef}%/mês, LTV mult ${bm!.ltvMult}x` : `Margem ${fmtDec(metrics.margem)}% vs benchmark ${bmMargemRef}% — ${metrics.margem >= bmMargemRef * 0.8 ? 'dentro do esperado' : 'abaixo do benchmark do modelo'}` })
-        }
-        if (objetivos.length > 0) {
-          findings.push({ ok: true, label: `Objetivos: ${objetivos.join(', ')}`, detail: '' })
+          // Setor
+          if (sectorLabel) {
+            findings.push({ ok: sectorHeat >= 50, label: `Setor ${sectorHeat}/100`, detail: sectorHeat > 70 ? `${sectorLabel} aquecido — janela favorável para entrada` : sectorHeat > 40 ? `${sectorLabel} neutro — crescimento possível mas sem vento a favor` : `${sectorLabel} pressionado — crescer em setor fraco exige unit economics muito forte` })
+          }
+
+          // CAC cambial (se tem verba)
+          if (verbaMkt > 0 && cac > 0) {
+            const cacDelta = cacAjustado - cac
+            if (cacDelta > cac * 0.1) {
+              findings.push({ ok: false, label: `CAC ajustado R$${fmt(Math.round(cacAjustado))}`, detail: `USD ${usdRate.toFixed(2)} encarece paid media em ${((usdRate / 4.5 - 1) * 100).toFixed(0)}% — CAC real R$${fmt(Math.round(cac))} → R$${fmt(Math.round(cacAjustado))}` })
+            }
+          }
+
+          // Calibragem de contexto
+          if (bmLbl) {
+            const bmMargemRef = bm!.margemRef
+            findings.push({ ok: metrics.margem >= bmMargemRef * 0.8 || receita === 0, label: `Modelo: ${bmLbl}`, detail: receita === 0 ? `Benchmark de referência: margem ${bm!.margemRef}%, churn ${bm!.churnRef}%/mês, LTV mult ${bm!.ltvMult}x` : `Margem ${fmtDec(metrics.margem)}% vs benchmark ${bmMargemRef}% — ${metrics.margem >= bmMargemRef * 0.8 ? 'dentro do esperado' : 'abaixo do benchmark do modelo'}` })
+          }
+          if (objetivos.length > 0) {
+            findings.push({ ok: true, label: `Objetivos: ${objetivos.join(', ')}`, detail: '' })
+          }
         }
 
         // ── Gargalo principal: primeiro achado negativo crítico ────────────
