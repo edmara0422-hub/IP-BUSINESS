@@ -293,6 +293,17 @@ function MarketIntelligence({ marketData, selicRate, ipcaRate, usdRate, caixa, d
 }
 
 // Input numérico com estado local de string — permite digitar e ver 0 explicitamente
+function parseBR(v: string): number {
+  const s = v.trim()
+  if (!s) return 0
+  // "1.500,50" ou "1500,50" → vírgula = decimal
+  if (s.includes(',')) return parseFloat(s.replace(/\./g, '').replace(',', '.')) || 0
+  // "1.500" com 3 dígitos após ponto → separador de milhar
+  const parts = s.split('.')
+  if (parts.length === 2 && parts[1].length === 3 && !parts[1].includes(',')) return parseFloat(s.replace('.', '')) || 0
+  return parseFloat(s) || 0
+}
+
 function NumInput({ label, value, onChange, prefix = 'R$', info }: { label: string; value: number; onChange: (v: number) => void; prefix?: string; info?: string }) {
   const [str, setStr] = useState(value === 0 ? '' : String(value))
 
@@ -300,7 +311,7 @@ function NumInput({ label, value, onChange, prefix = 'R$', info }: { label: stri
   const prevRef = useRef(value)
   if (prevRef.current !== value) {
     prevRef.current = value
-    const parsed = str === '' ? 0 : parseFloat(str) || 0
+    const parsed = str === '' ? 0 : parseBR(str)
     if (parsed !== value) setStr(value === 0 ? '' : String(value))
   }
 
@@ -310,10 +321,11 @@ function NumInput({ label, value, onChange, prefix = 'R$', info }: { label: stri
       <div className="flex items-center gap-2 rounded-lg px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.1)' }}>
         {prefix && <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', userSelect: 'none', flexShrink: 0 }}>{prefix}</span>}
         <input
-          type="number"
+          type="text"
+          inputMode="decimal"
           value={str}
           placeholder="0"
-          onChange={e => { setStr(e.target.value); onChange(e.target.value === '' ? 0 : parseFloat(e.target.value) || 0) }}
+          onChange={e => { setStr(e.target.value); onChange(parseBR(e.target.value)) }}
           className="bg-transparent outline-none flex-1 min-w-0"
           style={{ fontSize: 15, fontFamily: 'monospace', color: '#fff', border: 'none' }}
         />
@@ -1027,9 +1039,9 @@ Relatório em 4 seções:
                         Ciclo médio de permanência do cliente{cicloMedioMeses > 0 ? ` — ${cicloMedioMeses} meses (churn implícito ${fmtDec(100 / cicloMedioMeses, 1)}%/mês)` : ' — opcional'}
                       </label>
                       <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                        <input type="number" min={0} value={cicloMedioMeses || ''}
+                        <input type="text" inputMode="decimal" value={cicloMedioMeses || ''}
                           placeholder="ex: 6 meses"
-                          onChange={e => setCicloMedioMeses(parseFloat(e.target.value) || 0)}
+                          onChange={e => setCicloMedioMeses(parseBR(e.target.value))}
                           className="bg-transparent outline-none flex-1"
                           style={{ fontSize: 14, fontFamily: 'monospace', color: '#fff', border: 'none' }} />
                         <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>meses</span>
@@ -1104,10 +1116,10 @@ Relatório em 4 seções:
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', fontFamily: 'monospace' }}>R$</span>
                     <input
                       key={`aporte-${aporteMensal === 0 ? 'vazio' : 'set'}`}
-                      type="number" min={0}
+                      type="text" inputMode="decimal"
                       defaultValue={aporteMensal > 0 ? aporteMensal : ''}
                       placeholder="deixe em branco se não há aporte"
-                      onBlur={e => setAporteMensal(parseFloat(e.target.value) || 0)}
+                      onBlur={e => setAporteMensal(parseBR(e.target.value))}
                       className="bg-transparent outline-none flex-1"
                       style={{ fontSize: 14, fontFamily: 'monospace', color: '#fff', border: 'none' }} />
                     <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>/mês</span>
@@ -1153,9 +1165,9 @@ Relatório em 4 seções:
                         </label>
                         <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
                           <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', fontFamily: 'monospace' }}>R$</span>
-                          <input type="number" value={ticketProjetado || ''}
+                          <input type="text" inputMode="decimal" value={ticketProjetado || ''}
                             placeholder={bm ? `${bm.ticketRef} (benchmark)` : 'opcional'}
-                            onChange={e => setTicketProjetado(parseFloat(e.target.value) || 0)}
+                            onChange={e => setTicketProjetado(parseBR(e.target.value))}
                             className="bg-transparent outline-none flex-1"
                             style={{ fontSize: 14, fontFamily: 'monospace', color: '#fff', border: 'none' }} />
                           {ticketProjetado > 0 && <button onClick={() => setTicketProjetado(0)} style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>}
