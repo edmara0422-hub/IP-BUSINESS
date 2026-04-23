@@ -562,7 +562,10 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
       : burnEfetivo > 0
         ? (cobertura >= burnParaRunway ? 999 : Math.max(0, caixa / burnEfetivo))
         : (lucro >= 0 ? 999 : 0)
-    const runwayCritico     = runway === 0 && despesas > 0 && !runwayProtegido
+    // Caixa zerado explicado pelo usuário → não é crise, é contexto
+    const runwayExplicado   = runway === 0 && despesas > 0 && !runwayProtegido &&
+      ['zerado-intencional', 'lancando', 'pre-receita'].includes(motivoCaixaZero)
+    const runwayCritico     = runway === 0 && despesas > 0 && !runwayProtegido && !runwayExplicado
 
     // ── LTV por natureza de cobrança ──────────────────────────────────────
     const margemLtv      = Math.max(margemDecimal, 0.1)
@@ -605,9 +608,9 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     // ── ENGRENAGEM 4: Margem Real Fisher ──────────────────────────────────
     const margemReal     = margem - taxaRealExata
 
-    return { margem, margemIsEstimada, lucro, runway, runwayCritico, runwayProtegido, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, roiIneficiente, roiSemValidacao, breakevenAlert, breakevenMeta, semDados, margemReal }
+    return { margem, margemIsEstimada, lucro, runway, runwayCritico, runwayProtegido, runwayExplicado, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, roiIneficiente, roiSemValidacao, breakevenAlert, breakevenMeta, semDados, margemReal }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receita, despesas, caixa, cacEfetivo, ticketMedio, ticketEfetivo, churnEfetivo, churnParaLTV, ltvRefNum, sectorHeat, taxaRealExata, burnReal, usdRate, selicRate, calibragemMargem, bm, aporteMensal, cargaTributaria, naturezaCobranca])
+  }, [receita, despesas, caixa, cacEfetivo, ticketMedio, ticketEfetivo, churnEfetivo, churnParaLTV, ltvRefNum, sectorHeat, taxaRealExata, burnReal, usdRate, selicRate, calibragemMargem, bm, aporteMensal, cargaTributaria, naturezaCobranca, motivoCaixaZero])
 
   // origem: verde = seus dados, amarelo = ref.mercado, azul = calculado/fundido
   const O_REAL  = { text: 'seus dados',   color: GREEN }
@@ -653,7 +656,21 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   const metricCards = useMemo(() => [
     { label: 'Health Score',   value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: sanityAlerts.length > 0 ? `⚠ Dados incompletos — corrija os avisos abaixo para um diagnóstico confiável` : `Nota geral do negócio (0–100): pondera margem, runway, LTV/CAC, setor e burn. >70 = saudável`, origin: O_FUND },
     { label: 'Margem',         value: `${fmtDec(metrics.margem, 2)}%`, color: colorByRange(metrics.margem, 20, 10),   desc: metrics.margemIsEstimada ? `Estimada (referência do modelo) — preencha Receita para valor real` : `De cada R$100 de receita, R$${(metrics.margem).toFixed(0)} sobram após pagar as despesas`, origin: metrics.margemIsEstimada ? O_REF : receita > 0 && despesas > 0 ? O_REAL : O_CALC },
-    { label: 'Runway',         value: metrics.runwayProtegido ? 'Protegido — aporte ativo' : metrics.runwayCritico ? '0,0 meses ⚠' : metrics.runway >= 999 ? '∞ meses' : `${fmtDec(metrics.runway, 2)} meses`, color: metrics.runwayProtegido ? GREEN : metrics.runwayCritico ? RED : colorByRange(Math.min(metrics.runway, 99), 6, 3), desc: metrics.runwayProtegido ? `Aporte mensal de R$${fmt(aporteMensal)} cobre o burn — sem prazo de extinção imediato` : metrics.runwayCritico ? 'CRÍTICO — o caixa já acabou com despesas ativas' : `Quanto tempo o caixa dura no ritmo atual de gastos. Mínimo saudável: 6 meses`, origin: caixa > 0 || despesas > 0 || aporteMensal > 0 ? O_REAL : O_CALC },
+    { label: 'Runway',
+      value: metrics.runwayProtegido ? 'Protegido — aporte ativo'
+           : metrics.runwayExplicado  ? (motivoCaixaZero === 'zerado-intencional' ? 'Zerado — reinvestindo' : motivoCaixaZero === 'lancando' ? 'Investindo agora' : 'Pré-receita')
+           : metrics.runwayCritico    ? '0,0 meses ⚠'
+           : metrics.runway >= 999    ? '∞ meses'
+           : `${fmtDec(metrics.runway, 2)} meses`,
+      color: metrics.runwayProtegido ? GREEN
+           : metrics.runwayExplicado  ? BLUE
+           : metrics.runwayCritico    ? RED
+           : colorByRange(Math.min(metrics.runway, 99), 6, 3),
+      desc: metrics.runwayProtegido ? `Aporte R$${fmt(aporteMensal)}/mês cobre o burn — sem prazo de extinção imediato`
+          : metrics.runwayExplicado  ? (motivoCaixaZero === 'zerado-intencional' ? 'Caixa zerado por escolha — você reinveste tudo. Risco: sem reserva para imprevistos.' : motivoCaixaZero === 'lancando' ? 'Caixa consumido pelo investimento no crescimento. Controle o burn rate.' : 'Fase pré-receita — sem caixa operacional ainda, normal nesta fase.')
+          : metrics.runwayCritico    ? 'CRÍTICO — o caixa zerou com despesas ativas. Sem receita ou aporte, o negócio para.'
+          : `Quantos meses o caixa aguenta no ritmo atual de gastos. Mínimo saudável: 6 meses`,
+      origin: caixa > 0 || despesas > 0 || aporteMensal > 0 ? O_REAL : O_CALC },
     { label: 'Lucro Mensal',   value: `R$${fmt(metrics.lucro)}`,     color: metrics.lucro >= 0 ? GREEN : RED,         desc: `O que sobra (ou falta) no mês: receita menos todas as despesas. Negativo = prejuízo operacional`, origin: receita > 0 || despesas > 0 ? O_REAL : O_CALC },
     { label: 'Burn Líquido',   value: metrics.burnLiquido > 0 ? `-R$${fmt(metrics.burnLiquido)}/mês` : `+R$${fmt(Math.abs(metrics.burnLiquido))}/mês`, color: metrics.burnLiquido > 0 ? RED : GREEN, desc: metrics.burnLiquido > 0 ? `Você está gastando R$${fmt(metrics.burnLiquido)} a mais do que ganha por mês` : `Você está gerando R$${fmt(Math.abs(metrics.burnLiquido))} de sobra por mês`, origin: despesas > 0 ? O_REAL : O_CALC },
     { label: 'LTV/CAC',        value: `${fmtDec(metrics.ltvCac, 2)}x`, color: colorByRange(metrics.ltvCac, 3, 1),    desc: `Para cada R$1 gasto para adquirir um cliente, você recupera R$${fmtDec(metrics.ltvCac, 1)}. Meta mínima: 3x${cacIsEstimado || metrics.margemIsEstimada ? ' (dados estimados)' : ''}`, origin: cacIsEstimado || churnIsEstimado ? O_FUND : O_CALC },
@@ -664,7 +681,7 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     { label: 'Churn',          value: `${fmtDec(churnEfetivo, 2)}%`, color: colorByRange(100 - churnEfetivo, 95, 90), desc: churnIsEstimado ? `Referência de mercado — preencha Clientes Ativos + Perdidos para o real` : `% de clientes que saíram este mês. Cada 1% a mais dobra o custo de crescimento`, origin: churnIsEstimado ? O_REF : O_REAL },
     { label: 'LTV',            value: `R$${fmt(Math.round(metrics.ltv))}`, color: metrics.ltv > 0 ? GREEN : AMBER,  desc: `Quanto um cliente vale no total enquanto fica com você (ticket × margem ÷ churn)`, origin: churnIsEstimado || ticketMedio === 0 ? O_FUND : O_CALC },
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [metrics, sanityAlerts, sectorHeat, receita, despesas, caixa, cacEfetivo, churnEfetivo, ticketMedio, cac, cacIsEstimado, churnIsEstimado, modoManual, selicRate])
+  ], [metrics, sanityAlerts, sectorHeat, receita, despesas, caixa, cacEfetivo, churnEfetivo, ticketMedio, cac, cacIsEstimado, churnIsEstimado, modoManual, selicRate, motivoCaixaZero, aporteMensal])
 
   const benchmark = useMemo(
     () => fase ? buildBenchmark(fase, setores, produtos, revenue, nomeNegocio) : '',
