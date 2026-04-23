@@ -57,7 +57,7 @@ const ZERO_DEFAULT = {
   // Calibragem profunda
   naturezaCobranca: '',   // 'recorrente' | 'unica' | 'hibrida'
   cicloMedioMeses: 0,     // permanência média do cliente em meses
-  complexidadeVenda: '',  // 'self-service' | 'consultivo'
+  complexidadeVenda: [] as string[],  // ['self-service', 'consultivo']
   aporteMensal: 0,        // injeção mensal do sócio/bootstrap (R$)
   cargaTributaria: 0,     // % de impostos + taxas de transação
   // Legacy (migration compat)
@@ -466,7 +466,11 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
   // Calibragem profunda
   const naturezaCobranca  = data.naturezaCobranca  ?? ''; const setNaturezaCobranca  = (v: string) => update({ naturezaCobranca: v })
   const cicloMedioMeses   = data.cicloMedioMeses   ?? 0;  const setCicloMedioMeses   = (v: number) => update({ cicloMedioMeses: v })
-  const complexidadeVenda = data.complexidadeVenda ?? ''; const setComplexidadeVenda = (v: string) => update({ complexidadeVenda: v })
+  const complexidadeVenda: string[] = Array.isArray(data.complexidadeVenda) ? data.complexidadeVenda : (data.complexidadeVenda ? [data.complexidadeVenda as string] : [])
+  const toggleComplexidade = (v: string) => {
+    const next = complexidadeVenda.includes(v) ? complexidadeVenda.filter(x => x !== v) : [...complexidadeVenda, v]
+    update({ complexidadeVenda: next })
+  }
   const aporteMensal      = data.aporteMensal      ?? 0;  const setAporteMensal      = (v: number) => update({ aporteMensal: v })
   const cargaTributaria   = data.cargaTributaria   ?? 0;  const setCargaTributaria   = (v: number) => update({ cargaTributaria: v })
 
@@ -616,34 +620,35 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     if (despesas > 0 && despesas < 150) {
       alerts.push({
         field: 'Despesas',
-        msg: `R$${fmtDec(despesas, 2)} em despesas parece incompleto`,
-        tip: 'Inclua: pró-labore ou salários, aluguel/home office, ferramentas/software, impostos, fornecedores, plataformas, marketing',
+        msg: `Despesas R$${fmtDec(despesas, 2)} — valor impossível para operar`,
+        tip: 'O que você esqueceu de incluir: pró-labore ou horas suas, aluguel/home office, ferramentas e softwares, impostos e taxas, fornecedores, plataformas de venda, marketing',
       })
     }
     if (receita > 0 && despesas === 0) {
       alerts.push({
         field: 'Despesas',
-        msg: 'Receita cadastrada mas despesas zeradas',
-        tip: 'Todo negócio tem custos — sem eles o lucro e a margem estão artificialmente inflados',
+        msg: `Receita R$${fmt(receita)} com despesas R$0 — impossível`,
+        tip: 'Todo negócio tem custos. Inclua pelo menos: pró-labore, ferramentas, impostos e custo de entrega do produto ou serviço',
       })
     }
     if (receita > 0 && despesas > 0 && metrics.margem > 95) {
       alerts.push({
         field: 'Margem',
-        msg: `Margem de ${fmtDec(metrics.margem, 1)}% é improvável`,
-        tip: 'Apenas infoprodutos chegam perto de 87% — revise se impostos, plataformas e suporte estão incluídos nas despesas',
+        msg: `Margem ${fmtDec(metrics.margem, 1)}% — número irreal`,
+        tip: 'Só infoprodutos chegam perto de 87%. Revise: impostos, gateway de pagamento, custo de suporte e entrega estão nas despesas?',
       })
     }
-    if (complexidadeVenda === 'consultivo' && cacEfetivo > 0 && ticketEfetivo > 0 && cacEfetivo > ticketEfetivo * 0.2) {
+    if (complexidadeVenda.includes('consultivo') && cacEfetivo > 0 && ticketEfetivo > 0 && cacEfetivo > ticketEfetivo * 0.2) {
       alerts.push({
         field: 'CAC × Ticket',
-        msg: `CAC R$${fmt(Math.round(cacEfetivo))} acima de 20% do ticket R$${fmt(Math.round(ticketEfetivo))} em venda consultiva`,
-        tip: 'Venda consultiva (reuniões, SDR, proposta) tem custo alto — ticket precisa ser alto o suficiente para sustentá-la. Meta: CAC < 20% do ticket',
+        msg: `CAC R$${fmt(Math.round(cacEfetivo))} = ${fmtDec(cacEfetivo / ticketEfetivo * 100, 0)}% do ticket — modelo consultivo insustentável`,
+        tip: 'Venda consultiva exige vendedor, proposta e reuniões — custo alto que precisa de ticket alto para compensar. Meta: CAC < 20% do ticket',
       })
     }
     return alerts
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receita, despesas, metrics.margem, complexidadeVenda, cacEfetivo, ticketEfetivo])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [receita, despesas, metrics.margem, complexidadeVenda.join(','), cacEfetivo, ticketEfetivo])
 
   const metricCards = useMemo(() => [
     { label: 'Health Score',   value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: sanityAlerts.length > 0 ? `⚠ Dados incompletos — corrija os avisos abaixo para um diagnóstico confiável` : `Nota geral do negócio (0–100): pondera margem, runway, LTV/CAC, setor e burn. >70 = saudável`, origin: O_FUND },
@@ -1013,28 +1018,58 @@ Relatório em 4 seções:
 
                 {/* ── Complexidade de Venda ── */}
                 <div className="flex flex-col gap-2">
-                  <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>Como você fecha vendas</label>
-                  <div className="flex gap-2">
-                    {[
-                      { v: 'self-service', label: 'Self-service', desc: 'cliente compra sozinho, sem reunião' },
-                      { v: 'consultivo',   label: 'Consultivo',    desc: 'reunião, proposta, SDR, negociação' },
-                    ].map(({ v, label, desc }) => {
-                      const sel = complexidadeVenda === v
-                      return (
-                        <button key={v} onClick={() => setComplexidadeVenda(sel ? '' : v)}
-                          className="flex flex-col flex-1 px-3 py-2 rounded-lg transition-all"
-                          style={{ border: `1px solid ${sel ? AMBER + '60' : 'rgba(255,255,255,0.1)'}`, background: sel ? `${AMBER}12` : 'rgba(255,255,255,0.03)', textAlign: 'left' }}>
-                          <span style={{ fontSize: 11, color: sel ? AMBER : 'rgba(255,255,255,0.5)', fontWeight: sel ? 600 : 400 }}>{sel ? '✓ ' : ''}{label}</span>
-                          <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)' }}>{desc}</span>
-                        </button>
-                      )
-                    })}
+                  <div className="flex items-center justify-between">
+                    <label style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>Como você fecha vendas <span style={{ color: 'rgba(255,255,255,0.25)' }}>— pode marcar os dois</span></label>
+                    {complexidadeVenda.length > 0 && <button onClick={() => update({ complexidadeVenda: [] })} style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', background: 'none', border: 'none', cursor: 'pointer' }}>limpar</button>}
                   </div>
-                  {complexidadeVenda === 'consultivo' && (
-                    <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', lineHeight: 1.5 }}>
-                      CAC consultivo inclui custo de vendedor + tempo de proposta. Meta: CAC &lt; 20% do ticket.
-                    </p>
-                  )}
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex gap-2">
+                      {[
+                        { v: 'nao-vende',    label: 'Ainda não vendo', desc: 'pré-venda, validando, ideação' },
+                        { v: 'self-service', label: 'Self-service',     desc: 'compra sozinho, sem reunião' },
+                        { v: 'consultivo',   label: 'Consultivo',       desc: 'reunião, proposta, SDR' },
+                      ].map(({ v, label, desc }) => {
+                        const isNaoVende = v === 'nao-vende'
+                        const sel = isNaoVende
+                          ? complexidadeVenda.includes('nao-vende')
+                          : complexidadeVenda.includes(v)
+                        const disabled = isNaoVende
+                          ? (complexidadeVenda.includes('self-service') || complexidadeVenda.includes('consultivo'))
+                          : complexidadeVenda.includes('nao-vende')
+                        return (
+                          <button key={v}
+                            onClick={() => {
+                              if (isNaoVende) update({ complexidadeVenda: sel ? [] : ['nao-vende'] })
+                              else if (!disabled) toggleComplexidade(v)
+                            }}
+                            className="flex flex-col flex-1 px-3 py-2 rounded-lg transition-all"
+                            style={{
+                              border: `1px solid ${sel ? (isNaoVende ? 'rgba(255,255,255,0.3)' : AMBER + '60') : 'rgba(255,255,255,0.1)'}`,
+                              background: sel ? (isNaoVende ? 'rgba(255,255,255,0.06)' : `${AMBER}12`) : 'rgba(255,255,255,0.03)',
+                              textAlign: 'left', opacity: disabled ? 0.3 : 1, cursor: disabled ? 'default' : 'pointer',
+                            }}>
+                            <span style={{ fontSize: 11, color: sel ? (isNaoVende ? 'rgba(255,255,255,0.6)' : AMBER) : 'rgba(255,255,255,0.5)', fontWeight: sel ? 600 : 400 }}>{sel ? '✓ ' : ''}{label}</span>
+                            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.2)' }}>{desc}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                    {complexidadeVenda.includes('nao-vende') && (
+                      <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', lineHeight: 1.5 }}>
+                        Fase pré-receita — CAC e ticket não se aplicam ainda. Foco: validar proposta de valor antes de montar processo de vendas.
+                      </p>
+                    )}
+                    {complexidadeVenda.includes('self-service') && complexidadeVenda.includes('consultivo') && (
+                      <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', lineHeight: 1.5 }}>
+                        Híbrido: self-service para ticket baixo, consultivo para contas maiores.
+                      </p>
+                    )}
+                    {complexidadeVenda.includes('consultivo') && !complexidadeVenda.includes('self-service') && (
+                      <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', lineHeight: 1.5 }}>
+                        CAC consultivo inclui vendedor + proposta. Meta: CAC &lt; 20% do ticket.
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 {/* ── Aporte Mensal ── */}
@@ -1044,9 +1079,12 @@ Relatório em 4 seções:
                   </label>
                   <div className="flex items-center gap-2 rounded-lg px-3 py-2" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', fontFamily: 'monospace' }}>R$</span>
-                    <input type="number" min={0} value={aporteMensal || ''}
-                      placeholder="0"
-                      onChange={e => setAporteMensal(parseFloat(e.target.value) || 0)}
+                    <input
+                      key={`aporte-${aporteMensal === 0 ? 'vazio' : 'set'}`}
+                      type="number" min={0}
+                      defaultValue={aporteMensal > 0 ? aporteMensal : ''}
+                      placeholder="deixe em branco se não há aporte"
+                      onBlur={e => setAporteMensal(parseFloat(e.target.value) || 0)}
                       className="bg-transparent outline-none flex-1"
                       style={{ fontSize: 14, fontFamily: 'monospace', color: '#fff', border: 'none' }} />
                     <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>/mês</span>
@@ -1215,12 +1253,22 @@ Relatório em 4 seções:
         </div>
 
         {sanityAlerts.length > 0 && (
-          <div className="mb-3 rounded-lg p-3 flex flex-col gap-2" style={{ background: `${AMBER}10`, border: `1px solid ${AMBER}40` }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: AMBER, letterSpacing: '0.05em' }}>⚠ DADOS INCOMPLETOS — diagnóstico pouco confiável</p>
+          <div className="mb-3 rounded-lg p-3 flex flex-col gap-3" style={{ background: `${AMBER}10`, border: `1px solid ${AMBER}40` }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: AMBER, letterSpacing: '0.05em' }}>⚠ DIAGNÓSTICO BLOQUEADO — dados insuficientes</p>
             {sanityAlerts.map(a => (
-              <div key={a.field} className="flex flex-col gap-0.5">
-                <span style={{ fontSize: 12, color: AMBER }}>{a.msg}</span>
-                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', lineHeight: 1.5 }}>{a.tip}</span>
+              <div key={a.field} className="flex flex-col gap-1.5">
+                <div className="flex items-start gap-2">
+                  <span style={{ fontSize: 13, color: RED, flexShrink: 0 }}>✕</span>
+                  <div className="flex flex-col gap-0.5">
+                    <span style={{ fontSize: 12, fontWeight: 600, color: AMBER }}>{a.msg}</span>
+                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', lineHeight: 1.55 }}>{a.tip}</span>
+                  </div>
+                </div>
+                <div className="rounded px-2.5 py-1.5" style={{ background: 'rgba(0,0,0,0.3)', borderLeft: `2px solid ${RED}60` }}>
+                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>
+                    <span style={{ color: RED }}>Impacto:</span> Health Score, Runway e Margem calculados agora refletem {a.field === 'Despesas' ? 'um negócio quase sem custo, não o seu negócio real' : 'uma margem irreal que não existe na prática'}. Corrija antes de usar os números abaixo para tomar decisões.
+                  </span>
+                </div>
               </div>
             ))}
           </div>
