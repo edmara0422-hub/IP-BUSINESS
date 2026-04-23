@@ -774,25 +774,42 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
         margemEstimada > 0 && receita === 0 ? `Margem estimada: ${margemEstimada}%` : '',
       ].filter(Boolean).join(' | ')
 
+      const runwayStatusIA = metrics.runwayProtegido ? `Protegido — aporte R$${fmt(aporteMensal)}/mês cobre o burn`
+        : metrics.runwayExplicado  ? `${motivoCaixaZero === 'zerado-intencional' ? 'Zerado intencional (reinvestindo)' : motivoCaixaZero === 'lancando' ? 'Zerado investindo para crescer' : 'Pré-receita — zero por contexto, não por crise'}`
+        : metrics.runwayCritico    ? `CRÍTICO — caixa zerado com despesas ativas`
+        : metrics.runway >= 999    ? '∞ — receita cobre burn'
+        : `${metrics.runway.toFixed(1)} meses`
+      const matProfIA = detectProfile(receita, caixa, despesas, faseNegocio || fase, motivoCaixaZero, metrics.margem)
+      const calibCompleta = [
+        bm ? `Modelos: ${bm.label}` : '',
+        naturezaCobranca ? `Cobrança: ${naturezaCobranca}` : '',
+        complexidadeVenda.length > 0 ? `Vendas: ${complexidadeVenda.join('+')}` : '',
+        aporteMensal > 0 ? `Aporte: R$${fmt(aporteMensal)}/mês` : '',
+        cargaTributaria > 0 ? `Impostos: ${cargaTributaria}%` : '',
+        objetivos.length > 0 ? `Objetivos: ${objetivos.join(', ')}` : '',
+      ].filter(Boolean).join(' | ')
+
       const question = `Analista financeiro PME Brasil. Responda em PT-BR.
 
-NEGÓCIO: ${nomeNegocio || '?'} | Fase: ${fase || faseNegocio || '?'} | Setor: ${sectorLabelIA} ${sectorHeatIA}/100 | Produto: ${produtos[0] || '?'}${calibLineIA}
-MACRO: SELIC ${selicRate}% | IPCA ${ipcaRate}% | USD R$${usdRate.toFixed(2)} | PIB ${pibRate.toFixed(1)}%${contextParts ? '\nContexto: ' + contextParts : ''}
+NEGÓCIO: ${nomeNegocio || '?'} | Perfil: ${matProfIA} | Fase: ${fase || faseNegocio || '?'} | Setor: ${sectorLabelIA} ${sectorHeatIA}/100
+CALIBRAGEM: ${calibCompleta || 'não definida'}
+MACRO: SELIC ${selicRate}% | IPCA ${ipcaRate}% | USD R$${usdRate.toFixed(2)} | PIB ${pibRate.toFixed(1)}%
 
-DADOS:
-Receita R$${receita.toFixed(2)} | Despesas R$${despesas.toFixed(2)} | Caixa R$${caixa.toFixed(2)}
-Burn Real R$${burnRealIA.toFixed(2)}/mês | Margem ${metrics.margem.toFixed(2)}%${receita === 0 ? ` (${margemEstimada > 0 ? 'calibrada' : 'ref 30%'})` : ''} | Margem Real ${margemRealIA.toFixed(2)}%
-Runway ${metrics.runway >= 999 ? '∞' : metrics.runway.toFixed(1) + 'm'}${metrics.runwayCritico ? ' ⚠CRÍTICO' : ''} | Health ${metrics.healthScore}/100
-LTV R$${metrics.ltv.toFixed(2)} | CAC R$${cacAjustIA.toFixed(2)} | LTV/CAC ${metrics.ltvCac.toFixed(2)}x
-ROI ${metrics.roi.toFixed(2)}% vs CDI ${(selicRate - 0.1).toFixed(1)}%${metrics.roiSemValidacao ? ' ⚠ESTIMADO' : ''}
-Break-even R$${metrics.breakeven.toFixed(2)} | Canal barato: ${bestPlatform?.label ?? 'orgânico'} R$${((bestPlatform?.cpm ?? 0) * usdRate).toFixed(2)}/mil
-${benchmark ? `Ref ${fase}: ${benchmark}` : ''}
+DADOS FINANCEIROS:
+Receita R$${receita.toFixed(2)}${receita === 0 ? ' (PRÉ-RECEITA — sem validação de mercado ainda)' : ''} | Despesas R$${despesas.toFixed(2)} | Caixa R$${caixa.toFixed(2)}
+Burn Real R$${burnRealIA.toFixed(2)}/mês (inclui impacto SELIC) | Break-even R$${metrics.breakeven.toFixed(2)}
+Margem ${metrics.margem.toFixed(2)}%${receita === 0 ? ' (ESTIMADA de benchmark — não real)' : ''} | Margem Real ${margemRealIA.toFixed(4)}%
+Runway: ${runwayStatusIA} | Health Score ${metrics.healthScore}/100
+LTV/CAC ${metrics.ltvCac.toFixed(2)}x${receita === 0 ? ' (ESTIMADO — sem receita para confirmar)' : ''} | ROI ${metrics.roi.toFixed(2)}%${metrics.roiSemValidacao ? ' (ESTIMADO — sem receita real)' : ' vs CDI ' + (selicRate - 0.1).toFixed(1) + '%'}
+${verbaMkt > 0 ? `Verba mkt R$${verbaMkt.toFixed(2)}/mês | CAC ajust. câmbio R$${cacAjustIA.toFixed(2)} | Canal mais barato: ${bestPlatform?.label ?? 'orgânico'}` : ''}
+
+IMPORTANTE: métricas marcadas como ESTIMADO são de benchmark de mercado, não do negócio real. Não trate como se fossem dados reais.
 
 Relatório em 4 seções:
-1. DIAGNÓSTICO (2-3 linhas com valores acima)
-2. SEMÁFORO 🔴🟡🟢 (Burn Real, Margem Real, Runway, LTV/CAC, ROI)
-3. PLANO 7/30/90 dias (ações concretas para ${sectorLabelIA})
-4. FRASE EXECUTIVA (1 frase, 3 números)`
+1. DIAGNÓSTICO — leia o PERFIL (${matProfIA}) e calibragem antes de diagnosticar. 2-3 linhas precisas.
+2. SEMÁFORO 🔴🟡🟢 — avalie: Burn Real, Margem Real, Runway (use o status textual acima, não o número 0), LTV/CAC (se estimado, marque), ROI (se estimado, marque)
+3. PLANO 7/30/90 dias — ações concretas baseadas no perfil ${matProfIA} e objetivos (${objetivos.join(', ') || 'não definidos'})
+4. FRASE EXECUTIVA — 1 frase, máx 3 números, verdadeiros`
 
       const res = await fetch('/api/advisor-chat', {
         method: 'POST',
@@ -1544,23 +1561,31 @@ Relatório em 4 seções:
           acoes.push('Fluxo de caixa é emergência — renegocie prazo de recebimento com clientes já ativos')
           acoes.push('Antecipe recebíveis ou abra crédito rotativo antes de perder fornecedores')
           acoes.push('Zero gastos não-essenciais até caixa ter pelo menos 45 dias de cobertura')
+          if (temObj('sobreviver')) acoes.push('Sobrevivência primeiro: corte qualquer gasto sem retorno direto em caixa nos próximos 30 dias')
         } else if (matProf === 'fluxo') {
           if (metrics.ltvCac < 3) acoes.push(`LTV/CAC ${fmtDec(metrics.ltvCac)}x — melhore retenção antes de reinvestir em aquisição`)
           acoes.push('Construa reserva de 3 meses antes de acelerar — reinvestimento sem reserva é risco desnecessário')
           if (temObj('crescer')) acoes.push('Crescimento orgânico primeiro: referências e upsell da base custarão menos que paid agora')
+          if (temObj('reter')) acoes.push(`Churn ${fmtDec(churnEfetivo)}%/mês — cada cliente retido poupa o custo de aquisição de um novo. Implemente onboarding e check-in ativo`)
+          if (temObj('organizar')) acoes.push('Organize: dashboards de CAC, LTV e churn mensais antes de escalar — sem visibilidade, decisões erradas se repetem')
         } else {
           // escala
           if (semaforo === 'crescer') {
             acoes.push(verbaMkt > 0 ? `Escale paid com cuidado cambial — CAC ajustado R$${fmt(Math.round(cacAjustado))} vs base R$${fmt(Math.round(cac))}` : 'Ative canal pago — unit economics suporta escala agora')
             if (temMod('saas') || naturezaCobranca === 'recorrente') acoes.push(`Churn ${fmtDec(churnEfetivo)}%/mês: cada 1% reduzido = +R$${fmt(Math.round(metrics.ltv * 0.01 * clientesAtivos))} de LTV na base`)
             if (temObj('escalar')) acoes.push('Escala com LTV/CAC saudável — priorize o canal de menor CPM')
+            if (temObj('captar')) acoes.push(`LTV/CAC ${fmtDec(metrics.ltvCac)}x e margem ${fmtDec(metrics.margem)}% são os números que abrem rodada — documente esses dados para o pitch`)
+            if (temObj('venda-exit')) acoes.push('Para venda/exit: foco em NRR (Net Revenue Retention) >100% — mostra que a base cresce sem novo CAC')
           } else if (semaforo === 'aguardar') {
             acoes.push(`Ajuste o gargalo de unit economics primeiro (LTV/CAC ${fmtDec(metrics.ltvCac)}x → meta 3x)`)
             acoes.push(metrics.ltvCac < 3 && naturezaCobranca !== 'unica' ? 'Retenção é mais barata que aquisição — foque em reduzir churn antes de escalar' : 'Revise precificação ou CAC antes de investir mais em aquisição')
+            if (temObj('organizar')) acoes.push('Organize processos de venda e retenção antes de escalar — escala amplifica ineficiências')
+            if (temObj('reter')) acoes.push(`Churn ${fmtDec(churnEfetivo)}%/mês: implante NPS mensal e onboarding ativo para identificar risco de saída antes do cancelamento`)
           } else {
             acoes.push(`Pare escala: burn real R$${fmt(Math.round(burnReal))}/mês corroído pela SELIC ${selicRate}%`)
             acoes.push('Prioridade: runway mínimo 6 meses antes de qualquer reinvestimento em crescimento')
             if (metrics.margemReal < 0) acoes.push(`Reajuste preços em pelo menos ${Math.abs(metrics.margemReal).toFixed(1)}% para sair de margem real negativa`)
+            if (temObj('sobreviver')) acoes.push('Mapeie todos os custos fixos e identifique os 3 maiores — corte ou renegocie imediatamente')
           }
         }
 
@@ -1618,8 +1643,8 @@ Relatório em 4 seções:
         )
       })()}
 
-      {/* ── 4c. CANAL DE AQUISIÇÃO (verba × plataformas) ── */}
-      {platforms.length > 0 && sanityAlerts.length === 0 && (
+      {/* ── 4c. CANAL DE AQUISIÇÃO — só mostra quando há receita ou conversões reais ── */}
+      {platforms.length > 0 && sanityAlerts.length === 0 && (receita > 0 || novosClientes > 0) && (
         <div>
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp size={16} style={{ color: GREEN }} />
