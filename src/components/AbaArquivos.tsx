@@ -49,7 +49,30 @@ export default function AbaArquivos() {
             .from('workspace_data').select('data')
             .eq('user_id', user.id).eq('module_id', ARQUIVOS_MODULE).maybeSingle()
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          setSnapshots((row?.data as any)?.snapshots ?? [])
+          const remote: CockpitSnapshot[] = (row?.data as any)?.snapshots ?? []
+
+          // Migra dados do localStorage para o Supabase se existirem
+          const localRaw = localStorage.getItem(`ws_${ARQUIVOS_MODULE}`)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const local: CockpitSnapshot[] = localRaw ? (JSON.parse(localRaw) as any)?.snapshots ?? [] : []
+          if (local.length > 0) {
+            const remoteIds = new Set(remote.map(s => s.id))
+            const toMigrate = local.filter(s => !remoteIds.has(s.id))
+            if (toMigrate.length > 0) {
+              const merged = [...toMigrate, ...remote]
+              await supabase.from('workspace_data').upsert(
+                { user_id: user.id, module_id: ARQUIVOS_MODULE, data: { snapshots: merged }, updated_at: new Date().toISOString() },
+                { onConflict: 'user_id,module_id' }
+              )
+              localStorage.removeItem(`ws_${ARQUIVOS_MODULE}`)
+              setSnapshots(merged)
+              setLoading(false)
+              return
+            }
+            localStorage.removeItem(`ws_${ARQUIVOS_MODULE}`)
+          }
+
+          setSnapshots(remote)
         }
       } catch { setSnapshots([]) }
       setLoading(false)
@@ -80,19 +103,36 @@ export default function AbaArquivos() {
       if (!el) return
       const html2canvas = (await import('html2canvas')).default
       const { jsPDF }   = await import('jspdf')
-      const canvas  = await html2canvas(el, { backgroundColor: '#0a0f1e', scale: 2, useCORS: true, logging: false })
+      const canvas  = await html2canvas(el, { backgroundColor: '#0a0f1e', scale: 2, useCORS: true, logging: false, allowTaint: true, foreignObjectRendering: false })
       const imgData = canvas.toDataURL('image/png')
       const pdf     = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
       const pdfW    = pdf.internal.pageSize.getWidth()
-      const pdfH    = (canvas.height * pdfW) / canvas.width
+      const pageH   = pdf.internal.pageSize.getHeight()
+      const imgH    = (canvas.height * pdfW) / canvas.width
       pdf.setFillColor(10, 15, 30)
       pdf.rect(0, 0, pdfW, 14, 'F')
       pdf.setTextColor(255, 255, 255); pdf.setFontSize(10); pdf.setFont('helvetica', 'bold')
       pdf.text(`COCKPIT — ${s.empresa.toUpperCase()}`, 8, 9)
       pdf.setFontSize(8); pdf.setFont('helvetica', 'normal'); pdf.setTextColor(120, 140, 160)
       pdf.text(`Health ${s.metrics.healthScore}/100  |  ${new Date(s.createdAt).toLocaleDateString('pt-BR')}`, pdfW - 8, 9, { align: 'right' })
-      pdf.addImage(imgData, 'PNG', 0, 14, pdfW, pdfH)
-      pdf.save(`cockpit-${s.empresa.toLowerCase().replace(/\s+/g, '-')}-${s.createdAt.slice(0, 10)}.pdf`)
+      const HEADER = 14
+      pdf.addImage(imgData, 'PNG', 0, HEADER, pdfW, imgH)
+      let heightLeft = imgH - (pageH - HEADER)
+      while (heightLeft > 0) {
+        pdf.addPage()
+        pdf.addImage(imgData, 'PNG', 0, -(imgH - heightLeft), pdfW, imgH)
+        heightLeft -= pageH
+      }
+      const blob    = pdf.output('blob')
+      const blobUrl = URL.createObjectURL(blob)
+      const link    = document.createElement('a')
+      link.href = blobUrl
+      link.download = `cockpit-${s.empresa.toLowerCase().replace(/\s+/g, '-')}-${s.createdAt.slice(0, 10)}.pdf`
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60000)
     } catch (e) { console.error('PDF error', e) }
   }
 

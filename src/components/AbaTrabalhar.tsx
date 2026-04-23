@@ -80,7 +80,7 @@ const CONTEXT_SWITCHES: { id: ContextMode; label: string; short: string; icon: R
   { id: 'gestao',      label: 'Meu Negócio',     short: 'Gestão',     icon: TrendingUp,  color: '#10b981', desc: 'Runway · OKRs · TRL',    mood: 'Pragmática — foco em sobrevivência e crescimento' },
   { id: 'consultoria', label: 'Modo Ghost',       short: 'Ghost',      icon: UserCheck,   color: '#f59e0b', desc: 'OBI · Diagnóstico',       mood: 'Analítica — diagnóstico e valor para o cliente' },
   { id: 'estudo',      label: 'Estudo & Teoria',  short: 'Estudo',     icon: BookOpen,    color: '#6366f1', desc: 'Rezende · Peter · OBI',   mood: 'Inspiradora — teoria, conceitos e curadoria' },
-  { id: 'arquivos',    label: 'Arquivos',         short: 'Arquivos',   icon: FolderOpen,  color: '#1a5276', desc: 'Relatórios do Cockpit',    mood: 'Histórico de análises — Cockpit Financeiro' },
+  { id: 'arquivos',    label: 'Arquivos',         short: 'Arquivos',   icon: FolderOpen,  color: '#1a5276', desc: 'Relatórios do Cockpit',    mood: 'Histórico de análises' },
 ]
 
 // Setores/produtos que habilitam cada switch extra
