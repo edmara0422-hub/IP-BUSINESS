@@ -1385,24 +1385,30 @@ Relatório em 4 seções:
         const matProf  = detectProfile(receita, caixa, despesas, faseNegocio || fase, motivoCaixaZero, metrics.margem)
         const bmLbl    = bm?.label ?? ''
 
-        // ── Semáforo — só calcula se dados são confiáveis ─────────────────
+        // ── Semáforo — só calcula se dados são confiáveis e há receita ──────
         const dadosInvalidos = sanityAlerts.length > 0
         const margemPts = receita > 0 ? (metrics.margemReal > 5 ? 1 : metrics.margemReal > 0 ? 0 : -1) : -1
         const roiPts    = metrics.roiSemValidacao ? -1 : (roiVsCdi > 5 ? 1 : roiVsCdi > -5 ? 0 : -1)
+        // LTV/CAC só conta no semáforo quando tem receita real — sem receita é estimado
+        const ltvCacPts = receita > 0 ? (metrics.ltvCac > 3 ? 1 : metrics.ltvCac > 1 ? 0 : -1) : 0
         const pts = dadosInvalidos ? -99 : [
           metrics.runwayCritico ? -2 : metrics.runwayExplicado ? 0 : metrics.runwayProtegido ? 1 : metrics.runway > 6 ? 1 : metrics.runway > 3 ? 0 : -1,
           sectorHeat > 70 ? 1 : sectorHeat > 40 ? 0 : -1,
-          margemPts, roiPts,
-          metrics.ltvCac > 3 ? 1 : metrics.ltvCac > 1 ? 0 : -1,
+          margemPts, roiPts, ltvCacPts,
         ].reduce((a, b) => a + b, 0)
         const semaforo = dadosInvalidos ? 'invalido' : pts >= 3 ? 'crescer' : pts >= 0 ? 'aguardar' : 'nao'
-        const v = semaforo === 'crescer'
-          ? { text: 'CRESCER AGORA',     color: GREEN, icon: '▲' }
+        // Perfil pré-receita/ideia: não usa semáforo de crescimento — fase é validação
+        const v = dadosInvalidos
+          ? { text: 'CORRIJA OS DADOS',        color: AMBER, icon: '⚠' }
+          : matProf === 'ideia'
+          ? { text: 'DEFINIR PROPOSTA',         color: BLUE,  icon: '◎' }
+          : matProf === 'pre-receita'
+          ? { text: 'VALIDAR MERCADO PRIMEIRO', color: BLUE,  icon: '◎' }
+          : semaforo === 'crescer'
+          ? { text: 'CRESCER AGORA',            color: GREEN, icon: '▲' }
           : semaforo === 'aguardar'
-          ? { text: 'AGUARDAR / TESTAR', color: AMBER, icon: '◆' }
-          : semaforo === 'invalido'
-          ? { text: 'CORRIJA OS DADOS',  color: AMBER, icon: '⚠' }
-          : { text: 'NÃO CRESCER AGORA', color: RED,   icon: '▼' }
+          ? { text: 'AGUARDAR / TESTAR',        color: AMBER, icon: '◆' }
+          : { text: 'NÃO CRESCER AGORA',        color: RED,   icon: '▼' }
 
         // ── Achados ────────────────────────────────────────────────────────
         type Finding = { ok: boolean; label: string; detail: string }
@@ -1460,8 +1466,8 @@ Relatório em 4 seções:
             }
           }
 
-          // LTV/CAC
-          if (metrics.ltvCac > 0) {
+          // LTV/CAC — só avalia como achado real quando há receita (sem receita é estimado de benchmark)
+          if (receita > 0 && metrics.ltvCac > 0) {
             if (metrics.ltvCac >= 3) {
               findings.push({ ok: true, label: `LTV/CAC ${fmtDec(metrics.ltvCac)}x`, detail: `Cada R$1 de CAC retorna R$${fmtDec(metrics.ltvCac)} em LTV — unidade econômica sustentável` })
             } else if (metrics.ltvCac >= 1) {
@@ -1471,26 +1477,31 @@ Relatório em 4 seções:
             }
           }
 
+          // Verba mkt sem conversão (quando há receita mas 0 clientes novos)
+          if (receita > 0 && verbaMkt > 100 && novosClientes === 0) {
+            findings.push({ ok: false, label: `Verba mkt R$${fmt(Math.round(verbaMkt))}/mês`, detail: `CAC infinito — gasto em aquisição sem 1 novo cliente. Pause e revise a oferta` })
+          }
+
           // Setor
           if (sectorLabel) {
             findings.push({ ok: sectorHeat >= 50, label: `Setor ${sectorHeat}/100`, detail: sectorHeat > 70 ? `${sectorLabel} aquecido — janela favorável para entrada` : sectorHeat > 40 ? `${sectorLabel} neutro — crescimento possível mas sem vento a favor` : `${sectorLabel} pressionado — crescer em setor fraco exige unit economics muito forte` })
           }
 
-          // CAC cambial (se tem verba)
-          if (verbaMkt > 0 && cac > 0) {
+          // CAC cambial (se tem verba e receita real)
+          if (receita > 0 && verbaMkt > 0 && cac > 0) {
             const cacDelta = cacAjustado - cac
             if (cacDelta > cac * 0.1) {
               findings.push({ ok: false, label: `CAC ajustado R$${fmt(Math.round(cacAjustado))}`, detail: `USD ${usdRate.toFixed(2)} encarece paid media em ${((usdRate / 4.5 - 1) * 100).toFixed(0)}% — CAC real R$${fmt(Math.round(cac))} → R$${fmt(Math.round(cacAjustado))}` })
             }
           }
 
-          // Calibragem de contexto
-          if (bmLbl) {
+          // Benchmark — informativo, não performance (não aparece como ✓ quando sem receita)
+          if (bmLbl && receita > 0) {
             const bmMargemRef = bm!.margemRef
-            findings.push({ ok: metrics.margem >= bmMargemRef * 0.8 || receita === 0, label: `Modelo: ${bmLbl}`, detail: receita === 0 ? `Benchmark de referência: margem ${bm!.margemRef}%, churn ${bm!.churnRef}%/mês, LTV mult ${bm!.ltvMult}x` : `Margem ${fmtDec(metrics.margem)}% vs benchmark ${bmMargemRef}% — ${metrics.margem >= bmMargemRef * 0.8 ? 'dentro do esperado' : 'abaixo do benchmark do modelo'}` })
+            findings.push({ ok: metrics.margem >= bmMargemRef * 0.8, label: `Modelo: ${bmLbl}`, detail: `Margem ${fmtDec(metrics.margem)}% vs benchmark ${bmMargemRef}% — ${metrics.margem >= bmMargemRef * 0.8 ? 'dentro do esperado' : 'abaixo do benchmark do modelo'}` })
           }
           if (objetivos.length > 0) {
-            findings.push({ ok: true, label: `Objetivos: ${objetivos.join(', ')}`, detail: '' })
+            findings.push({ ok: true, label: `Objetivo: ${objetivos.join(' + ')}`, detail: receita > 0 ? '' : 'foco correto para a fase atual' })
           }
         }
 
@@ -1511,10 +1522,24 @@ Relatório em 4 seções:
           acoes.push('Meta única: 1 cliente pagante real, mesmo que informal, para validar o ticket')
           if (sectorHeat > 60) acoes.push(`Setor ${sectorHeat}/100 favorece entrada agora — velocidade de validação importa`)
         } else if (matProf === 'pre-receita') {
-          acoes.push(`Burn atual R$${fmt(despesas)}/mês — liste cada gasto e corte o que não gera tração direta`)
-          acoes.push(naturezaCobranca === 'unica' ? 'Primeira venda: foque no volume mínimo para cobrir o burn' : 'Primeira assinatura recorrente: esse é o único número que importa agora')
-          if (temObj('validar')) acoes.push('Validação ≠ produto perfeito — venda antes de construir')
-          else if (temObj('captar')) acoes.push('Sem receita real, investidor de equity não entra — primeiro revenue, depois captação')
+          // Verba sem conversão: ação mais urgente quando em pré-receita
+          if (verbaMkt > 100 && novosClientes === 0) {
+            acoes.push(`R$${fmt(Math.round(verbaMkt))}/mês em marketing com 0 conversões — pause a verba. Sem oferta validada, mais alcance só aumenta o burn`)
+          }
+          // Portfólio muito amplo para validação
+          if (modelosReceita.length > 2) {
+            acoes.push(`${modelosReceita.length} modelos selecionados — escolha 1 para validar agora. Portfólio amplo dilui foco e torna impossível saber o que funciona`)
+          }
+          acoes.push(`Burn R$${fmt(despesas)}/mês sem 1 real de receita. Meta única: 1 cliente pagante — mesmo informal, mesmo com desconto — para provar que alguém paga pelo valor`)
+          if (naturezaCobranca === 'hibrida') {
+            acoes.push('Modelo híbrido (setup + mensalidade): defina já o valor do setup e o da mensalidade — são tickets diferentes com lógicas de venda diferentes')
+          } else if (naturezaCobranca === 'unica') {
+            acoes.push('Venda única: o que precisa acontecer para 1 pessoa fechar hoje? Defina o caminho mínimo até o "sim"')
+          } else {
+            acoes.push('Assinatura recorrente: o primeiro pagamento mensal real vale mais que 100 usuários gratuitos — valida ticket, churn e compromisso')
+          }
+          if (temObj('validar')) acoes.push('Validação ≠ produto perfeito. Venda antes de construir — o produto real nasce da primeira venda, não do planejamento')
+          else if (temObj('captar')) acoes.push('Investidor de equity não entra sem prova de mercado — 1 cliente pagante vale mais que qualquer pitch deck')
         } else if (matProf === 'solvencia') {
           acoes.push('Fluxo de caixa é emergência — renegocie prazo de recebimento com clientes já ativos')
           acoes.push('Antecipe recebíveis ou abra crédito rotativo antes de perder fornecedores')

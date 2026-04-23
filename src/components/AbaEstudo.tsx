@@ -33,6 +33,7 @@ import type { ContentBlock, TutorMessage } from '@/types/intelligence'
 import { INTELLIGENCE_CONTENT } from '@/data/intelligence-content'
 import { SIM_COMPONENTS as SIM_M3 } from '@/components/intelligence/SimulationsM3'
 import { SIM_M1_CREATIVITY } from '@/components/intelligence/SimulationsM1Creativity'
+import { SIM_M1_OBI } from '@/components/intelligence/SimulationsM1OBI'
 import { SIM_M2 } from '@/components/intelligence/SimulationsM2'
 import { SIM_M6 } from '@/components/intelligence/SimulationsM6'
 import { SIM_INTERACTIVE } from '@/components/intelligence/SimulationsInteractive'
@@ -46,6 +47,7 @@ import ContentBlockRenderer from '@/components/intelligence/ContentBlockRenderer
 const SIM_COMPONENTS: Record<string, React.ComponentType> = {
   ...SIM_M3,
   ...SIM_M1_CREATIVITY,
+  ...SIM_M1_OBI,
   ...SIM_M2,
   ...SIM_M6,
   ...SIM_INTERACTIVE,
