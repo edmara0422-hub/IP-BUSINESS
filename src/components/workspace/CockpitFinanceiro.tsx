@@ -660,7 +660,9 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
         tip: 'Venda consultiva exige vendedor, proposta e reuniões — custo alto que precisa de ticket alto para compensar. Meta: CAC < 20% do ticket',
       })
     }
-    if (verbaMkt > 100 && novosClientes === 0) {
+    // Só alerta se o usuário não declarou que está em fase pré-venda
+    const fasePrevenda = complexidadeVenda.includes('nao-vende') || ['pre-receita', 'lancando'].includes(motivoCaixaZero)
+    if (verbaMkt > 100 && novosClientes === 0 && !fasePrevenda) {
       alerts.push({
         field: 'Marketing',
         msg: `R$${fmt(Math.round(verbaMkt))}/mês em marketing com 0 novos clientes — CAC infinito`,
@@ -1316,34 +1318,36 @@ Relatório em 4 seções:
             </span>
           </div>
         )}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3" style={{ opacity: sanityAlerts.length > 0 ? 0.45 : 1, pointerEvents: sanityAlerts.length > 0 ? 'none' : 'auto', position: 'relative' }}>
-          {sanityAlerts.length > 0 && (
-            <div style={{ position: 'absolute', inset: 0, zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-              <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: AMBER, background: 'rgba(10,15,30,0.85)', padding: '4px 10px', borderRadius: 4, border: `1px solid ${AMBER}40`, letterSpacing: '0.08em' }}>
-                NÚMEROS NÃO CONFIÁVEIS — CORRIJA OS DADOS ACIMA
-              </span>
-            </div>
-          )}
-          {metricCards.map((m) => (
-            <div key={m.label}
-              className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${m.color}` }}>
-              <div className="flex items-center justify-between mb-1">
-                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{m.label}</div>
-                {m.origin && (
-                  <span style={{ fontSize: 8, fontFamily: 'monospace', fontWeight: 700, color: m.origin.color, background: `${m.origin.color}15`, padding: '1px 5px', borderRadius: 3, letterSpacing: '0.05em' }}>
-                    {m.origin.text}
-                  </span>
-                )}
+        {sanityAlerts.length > 0 ? (
+          <div className="rounded-xl p-5 flex flex-col items-center gap-2" style={{ background: 'rgba(154,125,10,0.06)', border: `1px solid ${AMBER}25` }}>
+            <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: AMBER, letterSpacing: '0.08em' }}>INDICADORES OCULTOS</span>
+            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', textAlign: 'center', lineHeight: 1.6 }}>
+              Corrija os problemas acima para liberar os cálculos.<br />Mostrar números com dados inválidos gera decisões erradas.
+            </span>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {metricCards.map((m) => (
+              <div key={m.label}
+                className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${m.color}` }}>
+                <div className="flex items-center justify-between mb-1">
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{m.label}</div>
+                  {m.origin && (
+                    <span style={{ fontSize: 8, fontFamily: 'monospace', fontWeight: 700, color: m.origin.color, background: `${m.origin.color}15`, padding: '1px 5px', borderRadius: 3, letterSpacing: '0.05em' }}>
+                      {m.origin.text}
+                    </span>
+                  )}
+                </div>
+                <div className="truncate" style={{ fontSize: 15, fontWeight: 700, color: m.color, fontFamily: 'monospace', lineHeight: 1.2 }}>{m.value}</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 4, lineHeight: 1.3 }}>{m.desc}</div>
               </div>
-              <div className="truncate" style={{ fontSize: 15, fontWeight: 700, color: m.color, fontFamily: 'monospace', lineHeight: 1.2 }}>{m.value}</div>
-              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)', marginTop: 4, lineHeight: 1.3 }}>{m.desc}</div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ── 4a. ANÁLISE FUNDIDA (operacional × mercado) ── */}
-      <div>
+      <div style={{ display: sanityAlerts.length > 0 ? 'none' : undefined }}>
         <div className="flex items-center gap-2 mb-3">
           <TrendingUp size={16} style={{ color: '#5dade2' }} />
           <span style={{ fontSize: 14, fontWeight: 600 }}>Análise Fundida</span>
@@ -1590,7 +1594,7 @@ Relatório em 4 seções:
       })()}
 
       {/* ── 4c. CANAL DE AQUISIÇÃO (verba × plataformas) ── */}
-      {platforms.length > 0 && (
+      {platforms.length > 0 && sanityAlerts.length === 0 && (
         <div>
           <div className="flex items-center gap-2 mb-3">
             <TrendingUp size={16} style={{ color: GREEN }} />
