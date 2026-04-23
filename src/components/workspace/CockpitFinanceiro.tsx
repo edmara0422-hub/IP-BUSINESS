@@ -648,10 +648,16 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
         tip: 'Venda consultiva exige vendedor, proposta e reuniões — custo alto que precisa de ticket alto para compensar. Meta: CAC < 20% do ticket',
       })
     }
+    if (verbaMkt > 100 && novosClientes === 0) {
+      alerts.push({
+        field: 'Marketing',
+        msg: `R$${fmt(Math.round(verbaMkt))}/mês em marketing com 0 novos clientes — CAC infinito`,
+        tip: 'Gasto em tráfego pago sem conversão queima caixa sem retorno. Pause a verba, revise a oferta e a landing page antes de reativar',
+      })
+    }
     return alerts
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receita, despesas, metrics.margem, complexidadeVenda.join(','), cacEfetivo, ticketEfetivo])
+  }, [receita, despesas, metrics.margem, complexidadeVenda.join(','), cacEfetivo, ticketEfetivo, verbaMkt, novosClientes])
 
   const metricCards = useMemo(() => [
     { label: 'Health Score',   value: `${metrics.healthScore}/100`,  color: colorByRange(metrics.healthScore, 70, 40), desc: sanityAlerts.length > 0 ? `⚠ Dados incompletos — corrija os avisos abaixo para um diagnóstico confiável` : `Nota geral do negócio (0–100): pondera margem, runway, LTV/CAC, setor e burn. >70 = saudável`, origin: O_FUND },
@@ -1298,7 +1304,14 @@ Relatório em 4 seções:
             </span>
           </div>
         )}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3" style={{ opacity: sanityAlerts.length > 0 ? 0.45 : 1, pointerEvents: sanityAlerts.length > 0 ? 'none' : 'auto', position: 'relative' }}>
+          {sanityAlerts.length > 0 && (
+            <div style={{ position: 'absolute', inset: 0, zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+              <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: AMBER, background: 'rgba(10,15,30,0.85)', padding: '4px 10px', borderRadius: 4, border: `1px solid ${AMBER}40`, letterSpacing: '0.08em' }}>
+                NÚMEROS NÃO CONFIÁVEIS — CORRIJA OS DADOS ACIMA
+              </span>
+            </div>
+          )}
           {metricCards.map((m) => (
             <div key={m.label}
               className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', borderTop: `2px solid ${m.color}` }}>
@@ -1351,69 +1364,197 @@ Relatório em 4 seções:
 
       {/* ── 4b. VERDICT — CRESCER AGORA? ── */}
       {(despesas > 0 || receita > 0) && (() => {
-        const cdiAnual  = selicRate - 0.1
-        const roiVsCdi  = metrics.roi - cdiAnual
-        // Sem receita real: penaliza margem e ROI (são estimativas, não dados reais)
+        const cdiAnual = selicRate - 0.1
+        const roiVsCdi = metrics.roi - cdiAnual
+        const matProf  = detectProfile(receita, caixa, despesas, faseNegocio || fase, motivoCaixaZero, metrics.margem)
+        const bmLbl    = bm?.label ?? ''
+
+        // ── Pontuação para semáforo ────────────────────────────────────────
         const margemPts = receita > 0 ? (metrics.margemReal > 5 ? 1 : metrics.margemReal > 0 ? 0 : -1) : -1
         const roiPts    = metrics.roiSemValidacao ? -1 : (roiVsCdi > 5 ? 1 : roiVsCdi > -5 ? 0 : -1)
         const pts = [
-          metrics.runwayCritico ? -2 : metrics.runway > 6 ? 1 : metrics.runway > 3 ? 0 : -1,
+          metrics.runwayCritico ? -2 : metrics.runwayExplicado ? 0 : metrics.runwayProtegido ? 1 : metrics.runway > 6 ? 1 : metrics.runway > 3 ? 0 : -1,
           sectorHeat > 70 ? 1 : sectorHeat > 40 ? 0 : -1,
-          margemPts,
-          roiPts,
+          margemPts, roiPts,
           metrics.ltvCac > 3 ? 1 : metrics.ltvCac > 1 ? 0 : -1,
         ].reduce((a, b) => a + b, 0)
-        const margemDesc = receita > 0 ? `margem real ${metrics.margemReal.toFixed(1)}%` : 'sem receita validada'
-        const matProf = detectProfile(receita, caixa, despesas, faseNegocio || fase, motivoCaixaZero, metrics.margem)
-        const bmRef   = bm
-        const bmLbl   = bmRef?.label ?? ''
         const semaforo = pts >= 3 ? 'crescer' : pts >= 0 ? 'aguardar' : 'nao'
-        const surgMap: Record<MaturityProfile, Record<string, string>> = {
-          ideia:         {
-            crescer:  `Negócio em ideação${bmLbl ? ` (${bmLbl})` : ''}. Setor ${sectorHeat}/100 favorece entrada — valide receita antes de qualquer escala.`,
-            aguardar: `Negócio em ideação. Foco: primeiro cliente pagante antes de investir em crescimento.`,
-            nao:      `Negócio em ideação. Zero dados para escala — valide proposta de valor primeiro.`,
-          },
-          'pre-receita': {
-            crescer:  `Pré-receita${bmLbl ? ` (${bmLbl})` : ''} com setor aquecido (${sectorHeat}/100). Burn R$${fmt(despesas)}/mês — mantenha baixo e foque no primeiro cliente pagante.`,
-            aguardar: `Pré-receita: R$${fmt(despesas)}/mês de burn, runway ${metrics.runway >= 999 ? '∞' : metrics.runway.toFixed(1) + 'm'}. Meta: primeiro R$1 de receita recorrente.`,
-            nao:      `Burn R$${fmt(despesas)}/mês sem receita${metrics.runwayCritico ? ' — CAIXA CRÍTICO' : ''}. Pare gastos não-essenciais. Meta imediata: cobrir R$${fmt(despesas)}/mês.`,
-          },
-          solvencia:     {
-            crescer:  `Receita R$${fmt(receita)} com caixa zerado — risco de insolvência. Resolva fluxo de caixa antes de escalar.`,
-            aguardar: `Receita existe mas caixa R$0. Prioridade: fluxo de caixa, não crescimento. Renegocie prazos de recebimento.`,
-            nao:      `Risco real de insolvência: receita existe mas caixa zerado. 45% das PMEs fecham por fluxo. Renegocie prazos urgente.`,
-          },
-          fluxo:         {
-            crescer:  `Margem ${metrics.margem.toFixed(1)}% reinvestida + setor ${sectorHeat}/100. Perfil saudável — escale${bmLbl ? ` (${bmLbl})` : ''}.`,
-            aguardar: `Margem ${metrics.margem.toFixed(1)}% reinvestida. Verifique se LTV/CAC ${metrics.ltvCac.toFixed(1)}x suporta o ritmo de reinvestimento.`,
-            nao:      `Margem reinvestida mas unit economics fraco (LTV/CAC ${metrics.ltvCac.toFixed(1)}x). Revise CAC antes de acelerar.`,
-          },
-          escala:        {
-            crescer:  `Setor ${sectorHeat}/100 + ${margemDesc} + runway ${metrics.runway >= 999 ? '∞' : metrics.runway.toFixed(1) + 'm'} = janela aberta${bmLbl ? ` (${bmLbl})` : ''}. Escale agora.`,
-            aguardar: `Unit economics precisa de ajuste. CAC ajustado R$${cacAjustado.toFixed(0)} vs LTV R$${metrics.ltv.toFixed(0)} (${metrics.ltvCac.toFixed(1)}x). Melhore antes de escalar.`,
-            nao:      `Taxa real ${taxaRealExata.toFixed(2)}% pressiona margens. Priorize: cortar burn real (R$${burnReal.toFixed(0)}/mês), proteger caixa e reter clientes.`,
-          },
+        const v = semaforo === 'crescer'
+          ? { text: 'CRESCER AGORA',     color: GREEN, icon: '▲' }
+          : semaforo === 'aguardar'
+          ? { text: 'AGUARDAR / TESTAR', color: AMBER, icon: '◆' }
+          : { text: 'NÃO CRESCER AGORA', color: RED,   icon: '▼' }
+
+        // ── Achados: lê todos os dados e calibragem ────────────────────────
+        type Finding = { ok: boolean; label: string; detail: string }
+        const findings: Finding[] = []
+
+        // Qualidade dos dados
+        if (sanityAlerts.length > 0) {
+          findings.push({ ok: false, label: 'Dados incompletos', detail: sanityAlerts.map(a => a.msg).join(' · ') })
         }
-        const surgicalReason = surgMap[matProf]?.[semaforo] ?? ''
-        const v = pts >= 3
-          ? { text: 'CRESCER AGORA', color: GREEN, icon: '▲', reason: surgicalReason }
-          : pts >= 0
-          ? { text: 'AGUARDAR / TESTAR', color: AMBER, icon: '◆', reason: surgicalReason }
-          : { text: 'NÃO CRESCER AGORA', color: RED, icon: '▼', reason: surgicalReason }
+
+        // Runway / sobrevivência
+        if (metrics.runwayProtegido) {
+          findings.push({ ok: true, label: `Runway protegido`, detail: `Aporte R$${fmt(aporteMensal)}/mês cobre o burn — sem prazo de extinção imediato` })
+        } else if (metrics.runwayExplicado) {
+          const ctx = motivoCaixaZero === 'zerado-intencional' ? 'reinvestindo tudo por escolha — sem reserva para imprevistos'
+                    : motivoCaixaZero === 'lancando'           ? 'consumindo caixa para crescer — burn deve ser intencional e controlado'
+                    :                                            'pré-receita, sem caixa operacional ainda'
+          findings.push({ ok: true, label: 'Caixa zerado por contexto', detail: ctx })
+        } else if (metrics.runwayCritico) {
+          findings.push({ ok: false, label: 'Runway ZERO', detail: `R$${fmt(despesas)}/mês de burn com caixa vazio e sem receita — sem aporte, o negócio para` })
+        } else if (metrics.runway < 3) {
+          findings.push({ ok: false, label: `Runway ${fmtDec(metrics.runway)}m`, detail: `Menos de 3 meses de fôlego — prioridade máxima é aumentar caixa` })
+        } else if (metrics.runway < 6) {
+          findings.push({ ok: false, label: `Runway ${fmtDec(metrics.runway)}m`, detail: `Abaixo do mínimo saudável (6 meses) — não é hora de escalar paid` })
+        } else if (metrics.runway < 999) {
+          findings.push({ ok: true, label: `Runway ${fmtDec(metrics.runway)}m`, detail: `Fôlego adequado para testar e iterar` })
+        } else {
+          findings.push({ ok: true, label: 'Runway ∞', detail: 'Receita cobre despesas — sem prazo de extinção' })
+        }
+
+        // Receita / validação de mercado
+        if (receita === 0 && despesas > 0) {
+          findings.push({ ok: false, label: 'Receita R$0', detail: `Burn R$${fmt(despesas)}/mês sem validação de mercado — nenhuma métrica abaixo pode ser confirmada` })
+        } else if (receita > 0) {
+          if (metrics.margemReal < 0) {
+            findings.push({ ok: false, label: `Margem real ${fmtDec(metrics.margemReal)}%`, detail: `Margem bruta ${fmtDec(metrics.margem)}% menos taxa Fisher ${taxaRealExata.toFixed(2)}% = negativa — você perde poder aquisitivo` })
+          } else if (metrics.margem < 15) {
+            findings.push({ ok: false, label: `Margem ${fmtDec(metrics.margem)}%`, detail: `Abaixo de 15% — insuficiente para reinvestir em crescimento` })
+          } else {
+            findings.push({ ok: true, label: `Margem ${fmtDec(metrics.margem)}%`, detail: `Real ${fmtDec(metrics.margemReal)}% após taxa Fisher — ${cargaTributaria > 0 ? `já descontado ${fmtDec(cargaTributaria)}% de impostos` : 'adicione carga tributária na calibragem para margem real pura'}` })
+          }
+        }
+
+        // LTV/CAC
+        if (metrics.ltvCac > 0) {
+          if (metrics.ltvCac >= 3) {
+            findings.push({ ok: true, label: `LTV/CAC ${fmtDec(metrics.ltvCac)}x`, detail: `Cada R$1 de CAC retorna R$${fmtDec(metrics.ltvCac)} em LTV — unidade econômica sustentável` })
+          } else if (metrics.ltvCac >= 1) {
+            findings.push({ ok: false, label: `LTV/CAC ${fmtDec(metrics.ltvCac)}x`, detail: `Abaixo de 3x (mínimo para escala) — ${naturezaCobranca === 'unica' ? 'venda única depende de volume constante para compensar' : 'reduza CAC ou aumente retenção'}` })
+          } else {
+            findings.push({ ok: false, label: `LTV/CAC ${fmtDec(metrics.ltvCac)}x`, detail: `Cada cliente custa mais do que vale — escalar agora queima caixa sem retorno` })
+          }
+        }
+
+        // Setor
+        if (sectorLabel) {
+          findings.push({ ok: sectorHeat >= 50, label: `Setor ${sectorHeat}/100`, detail: sectorHeat > 70 ? `${sectorLabel} aquecido — janela favorável para entrada` : sectorHeat > 40 ? `${sectorLabel} neutro — crescimento possível mas sem vento a favor` : `${sectorLabel} pressionado — crescer em setor fraco exige unit economics muito forte` })
+        }
+
+        // CAC cambial (se tem verba)
+        if (verbaMkt > 0 && cac > 0) {
+          const cacDelta = cacAjustado - cac
+          if (cacDelta > cac * 0.1) {
+            findings.push({ ok: false, label: `CAC ajustado R$${fmt(Math.round(cacAjustado))}`, detail: `USD ${usdRate.toFixed(2)} encarece paid media em ${((usdRate / 4.5 - 1) * 100).toFixed(0)}% — CAC real R$${fmt(Math.round(cac))} → R$${fmt(Math.round(cacAjustado))}` })
+          }
+        }
+
+        // Calibragem de contexto
+        if (bmLbl) {
+          const bmMargemRef = bm!.margemRef
+          findings.push({ ok: metrics.margem >= bmMargemRef * 0.8 || receita === 0, label: `Modelo: ${bmLbl}`, detail: receita === 0 ? `Benchmark de referência: margem ${bm!.margemRef}%, churn ${bm!.churnRef}%/mês, LTV mult ${bm!.ltvMult}x` : `Margem ${fmtDec(metrics.margem)}% vs benchmark ${bmMargemRef}% — ${metrics.margem >= bmMargemRef * 0.8 ? 'dentro do esperado' : 'abaixo do benchmark do modelo'}` })
+        }
+        if (objetivos.length > 0) {
+          findings.push({ ok: true, label: `Objetivos: ${objetivos.join(', ')}`, detail: '' })
+        }
+
+        // ── Gargalo principal: primeiro achado negativo crítico ────────────
+        const blockers = findings.filter(f => !f.ok)
+        const blocker  = blockers[0] ?? null
+
+        // ── Ações concretas baseadas em perfil + calibragem + objetivos ────
+        const acoes: string[] = []
+        const temObj = (o: string) => objetivos.includes(o)
+        const temMod = (m: string) => modelosReceita.includes(m)
+
+        if (sanityAlerts.length > 0) {
+          acoes.push('Preencha os custos reais do negócio — sem dados corretos nenhuma decisão abaixo é confiável')
+          acoes.push('Depois: volte ao Cockpit e reavalie o Health Score com os números reais')
+        } else if (matProf === 'ideia') {
+          acoes.push('Defina quem paga, quanto paga e por quê — antes de qualquer custo')
+          acoes.push('Meta única: 1 cliente pagante real, mesmo que informal, para validar o ticket')
+          if (sectorHeat > 60) acoes.push(`Setor ${sectorHeat}/100 favorece entrada agora — velocidade de validação importa`)
+        } else if (matProf === 'pre-receita') {
+          acoes.push(`Burn atual R$${fmt(despesas)}/mês — liste cada gasto e corte o que não gera tração direta`)
+          acoes.push(naturezaCobranca === 'unica' ? 'Primeira venda: foque no volume mínimo para cobrir o burn' : 'Primeira assinatura recorrente: esse é o único número que importa agora')
+          if (temObj('validar')) acoes.push('Validação ≠ produto perfeito — venda antes de construir')
+          else if (temObj('captar')) acoes.push('Sem receita real, investidor de equity não entra — primeiro revenue, depois captação')
+        } else if (matProf === 'solvencia') {
+          acoes.push('Fluxo de caixa é emergência — renegocie prazo de recebimento com clientes já ativos')
+          acoes.push('Antecipe recebíveis ou abra crédito rotativo antes de perder fornecedores')
+          acoes.push('Zero gastos não-essenciais até caixa ter pelo menos 45 dias de cobertura')
+        } else if (matProf === 'fluxo') {
+          if (metrics.ltvCac < 3) acoes.push(`LTV/CAC ${fmtDec(metrics.ltvCac)}x — melhore retenção antes de reinvestir em aquisição`)
+          acoes.push('Construa reserva de 3 meses antes de acelerar — reinvestimento sem reserva é risco desnecessário')
+          if (temObj('crescer')) acoes.push('Crescimento orgânico primeiro: referências e upsell da base custarão menos que paid agora')
+        } else {
+          // escala
+          if (semaforo === 'crescer') {
+            acoes.push(verbaMkt > 0 ? `Escale paid com cuidado cambial — CAC ajustado R$${fmt(Math.round(cacAjustado))} vs base R$${fmt(Math.round(cac))}` : 'Ative canal pago — unit economics suporta escala agora')
+            if (temMod('saas') || naturezaCobranca === 'recorrente') acoes.push(`Churn ${fmtDec(churnEfetivo)}%/mês: cada 1% reduzido = +R$${fmt(Math.round(metrics.ltv * 0.01 * clientesAtivos))} de LTV na base`)
+            if (temObj('escalar')) acoes.push('Escala com LTV/CAC saudável — priorize o canal de menor CPM')
+          } else if (semaforo === 'aguardar') {
+            acoes.push(`Ajuste o gargalo de unit economics primeiro (LTV/CAC ${fmtDec(metrics.ltvCac)}x → meta 3x)`)
+            acoes.push(metrics.ltvCac < 3 && naturezaCobranca !== 'unica' ? 'Retenção é mais barata que aquisição — foque em reduzir churn antes de escalar' : 'Revise precificação ou CAC antes de investir mais em aquisição')
+          } else {
+            acoes.push(`Pare escala: burn real R$${fmt(Math.round(burnReal))}/mês corroído pela SELIC ${selicRate}%`)
+            acoes.push('Prioridade: runway mínimo 6 meses antes de qualquer reinvestimento em crescimento')
+            if (metrics.margemReal < 0) acoes.push(`Reajuste preços em pelo menos ${Math.abs(metrics.margemReal).toFixed(1)}% para sair de margem real negativa`)
+          }
+        }
+
         return (
-          <div className="rounded-lg px-4 py-3" style={{ background: `${v.color}08`, border: `1px solid ${v.color}30` }}>
-            <div className="flex items-center justify-between mb-2">
+          <div className="rounded-lg overflow-hidden" style={{ border: `1px solid ${v.color}30` }}>
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3" style={{ background: `${v.color}10` }}>
               <div className="flex items-center gap-2">
                 <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em' }}>VERDICT</span>
-                <span style={{ fontSize: 9, fontFamily: 'monospace', color: 'rgba(255,255,255,0.22)', background: 'rgba(255,255,255,0.04)', padding: '1px 5px', borderRadius: 3 }}>{matProf}</span>
+                <span style={{ fontSize: 9, fontFamily: 'monospace', color: 'rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.05)', padding: '1px 6px', borderRadius: 3 }}>{matProf}{bmLbl ? ` · ${bmLbl.split(' /')[0]}` : ''}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: v.color }}>{v.icon}</span>
+              <div className="flex items-center gap-1.5">
+                <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: v.color }}>{v.icon}</span>
                 <span style={{ fontSize: 13, fontFamily: 'monospace', fontWeight: 700, color: v.color }}>{v.text}</span>
               </div>
             </div>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>{v.reason}</p>
+
+            {/* Achados */}
+            <div className="px-4 py-3 flex flex-col gap-1.5" style={{ borderBottom: `1px solid rgba(255,255,255,0.05)` }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em', marginBottom: 4 }}>LEITURA DOS DADOS</p>
+              {findings.filter(f => f.label).map((f, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <span style={{ fontSize: 12, color: f.ok ? GREEN : RED, flexShrink: 0, lineHeight: 1.4 }}>{f.ok ? '✓' : '✕'}</span>
+                  <div>
+                    <span style={{ fontSize: 11, color: f.ok ? 'rgba(255,255,255,0.55)' : AMBER, fontWeight: 600 }}>{f.label}</span>
+                    {f.detail && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginLeft: 6 }}>{f.detail}</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Gargalo */}
+            {blocker && (
+              <div className="px-4 py-2.5" style={{ background: `${RED}08`, borderBottom: `1px solid rgba(255,255,255,0.05)` }}>
+                <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em', marginBottom: 3 }}>GARGALO PRINCIPAL</p>
+                <p style={{ fontSize: 11, color: AMBER, lineHeight: 1.5 }}><span style={{ fontWeight: 700 }}>{blocker.label}</span>{blocker.detail ? ` — ${blocker.detail}` : ''}</p>
+              </div>
+            )}
+
+            {/* Ações */}
+            {acoes.length > 0 && (
+              <div className="px-4 py-3" style={{ background: 'rgba(0,0,0,0.2)' }}>
+                <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em', marginBottom: 6 }}>PRÓXIMAS AÇÕES</p>
+                <div className="flex flex-col gap-1.5">
+                  {acoes.map((a, i) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <span style={{ fontSize: 10, fontFamily: 'monospace', color: v.color, flexShrink: 0, marginTop: 1 }}>→</span>
+                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>{a}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )
       })()}
