@@ -41,7 +41,10 @@ const MODEL_BENCHMARKS: Record<string, {
 type MaturityProfile = 'ideia' | 'pre-receita' | 'solvencia' | 'fluxo' | 'escala'
 function detectProfile(receita: number, caixa: number, despesas: number, fase: string, motivoCaixaZero: string, margem: number): MaturityProfile {
   if (receita === 0 && despesas === 0 && caixa === 0) return 'ideia'
-  if (receita === 0 && despesas > 0 && (fase === 'validacao' || ['pre-receita', 'lancando'].includes(motivoCaixaZero))) return 'pre-receita'
+  if (receita === 0 && despesas > 0 && (
+    ['ideia', 'validacao', 'lancando'].includes(fase) ||
+    ['pre-receita', 'lancando'].includes(motivoCaixaZero)
+  )) return 'pre-receita'
   if (receita > 0 && caixa === 0 && despesas > 0 && motivoCaixaZero === 'zerado-problema') return 'solvencia'
   if (caixa === 0 && margem > 40 && motivoCaixaZero === 'zerado-intencional') return 'fluxo'
   return 'escala'
@@ -407,7 +410,8 @@ function buildBenchmark(fase: string, setores: string[], produtos: string[], rev
     ltda:      { meta: 'eficiência e ROI acima do CDI', runway: '6+ meses', margem: '>35%', ltvcac: '>5x' },
   }
 
-  const b = benchmarks[fase] ?? benchmarks['validacao']
+  const faseMap: Record<string, string> = { ideia: 'validacao', validacao: 'validacao', lancando: 'validacao', crescimento: 'startup', escala: 'ltda', mei: 'mei', slu: 'slu', startup: 'startup', ltda: 'ltda' }
+  const b = benchmarks[faseMap[fase] ?? fase] ?? benchmarks['validacao']
   const tipoNeg = isSaaS ? 'SaaS/App' : isConsult ? 'Consultoria' : isEdu ? 'Infoproduto/Educação' : setor || produto || 'Negócio'
   const cacRef = isSaaS ? 'R$50–150' : isConsult ? 'R$80–300' : isEdu ? 'R$20–80' : 'R$50–200'
   const ticketRef = isSaaS ? 'R$29–199/mês' : isConsult ? 'R$500–5.000/projeto' : isEdu ? 'R$97–497' : 'variável'
@@ -575,8 +579,10 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
         ? (cobertura >= burnParaRunway ? 999 : Math.max(0, caixa / burnEfetivo))
         : (lucro >= 0 ? 999 : 0)
     // Caixa zerado explicado pelo usuário → não é crise, é contexto
-    const runwayExplicado   = runway === 0 && despesas > 0 && !runwayProtegido &&
-      ['zerado-intencional', 'lancando', 'pre-receita'].includes(motivoCaixaZero)
+    const runwayExplicado   = runway === 0 && despesas > 0 && !runwayProtegido && (
+      ['zerado-intencional', 'lancando', 'pre-receita'].includes(motivoCaixaZero) ||
+      (receita === 0 && ['ideia', 'validacao', 'lancando'].includes(faseNegocio))
+    )
     const runwayCritico     = runway === 0 && despesas > 0 && !runwayProtegido && !runwayExplicado
 
     // ── LTV por natureza de cobrança ──────────────────────────────────────
@@ -599,7 +605,9 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     const ltvCacNorm     = Math.min(ltvCac / 5, 1) * 100
     const burnNorm       = Math.max(burnRatio, 0) * 100
     const semDados       = receita === 0 && despesas === 0 && caixa === 0 && aporteMensal === 0
-    const healthBase     = semDados ? 0 : Math.round(margem * 0.22 + runwayNorm * 0.35 + ltvCacNorm * 0.18 + burnNorm * 0.12)
+    // LTV/CAC só entra no health score quando há receita real — estimado de benchmark infla a nota artificialmente
+    const ltvCacContrib  = receita > 0 ? ltvCacNorm * 0.18 : 0
+    const healthBase     = semDados ? 0 : Math.round(margem * 0.22 + runwayNorm * 0.35 + ltvCacContrib + burnNorm * 0.12)
     const sectorBonus    = Math.round((sectorHeat / 100) * 13)
     const healthScore    = semDados ? 0 : Math.min(100, healthBase + sectorBonus)
 
@@ -622,7 +630,7 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
 
     return { margem, margemIsEstimada, lucro, runway, runwayCritico, runwayProtegido, runwayExplicado, burnLiquido, healthScore, ltvCac, ltv, breakeven, roi, roiIneficiente, roiSemValidacao, breakevenAlert, breakevenMeta, semDados, margemReal }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [receita, despesas, caixa, cacEfetivo, ticketMedio, ticketEfetivo, churnEfetivo, churnParaLTV, ltvRefNum, sectorHeat, taxaRealExata, burnReal, usdRate, selicRate, calibragemMargem, bm, aporteMensal, cargaTributaria, naturezaCobranca, motivoCaixaZero])
+  }, [receita, despesas, caixa, cacEfetivo, ticketMedio, ticketEfetivo, churnEfetivo, churnParaLTV, ltvRefNum, sectorHeat, taxaRealExata, burnReal, usdRate, selicRate, calibragemMargem, bm, aporteMensal, cargaTributaria, naturezaCobranca, motivoCaixaZero, faseNegocio])
 
   // origem: verde = seus dados, amarelo = ref.mercado, azul = calculado/fundido
   const O_REAL  = { text: 'seus dados',   color: GREEN }
@@ -679,20 +687,26 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     { label: 'Runway',
       value: metrics.runwayProtegido ? 'Protegido — aporte ativo'
            : metrics.runwayExplicado  ? (motivoCaixaZero === 'zerado-intencional' ? 'Zerado — reinvestindo' : motivoCaixaZero === 'lancando' ? 'Investindo agora' : 'Pré-receita')
-           : metrics.runwayCritico    ? '0,0 meses ⚠'
+           : metrics.runwayCritico    ? (motivoCaixaZero === 'positivo' ? '? — informe o caixa' : '0,0 meses ⚠')
            : metrics.runway >= 999    ? '∞ meses'
            : `${fmtDec(metrics.runway, 2)} meses`,
       color: metrics.runwayProtegido ? GREEN
            : metrics.runwayExplicado  ? BLUE
-           : metrics.runwayCritico    ? RED
+           : metrics.runwayCritico    ? (motivoCaixaZero === 'positivo' ? AMBER : RED)
            : colorByRange(Math.min(metrics.runway, 99), 6, 3),
       desc: metrics.runwayProtegido ? `Aporte R$${fmt(aporteMensal)}/mês cobre o burn de R$${fmt(despesas)}/mês — sem prazo de extinção imediato`
           : metrics.runwayExplicado  ? (
               motivoCaixaZero === 'zerado-intencional' ? `Reinvestindo tudo — queimando R$${fmt(despesas)}/mês por escolha. Risco: sem reserva para imprevistos.`
             : motivoCaixaZero === 'lancando'           ? `Investindo para crescer — burn R$${fmt(despesas)}/mês. Controle o ritmo: cada mês conta.`
-            :                                            `Queimando R$${fmt(despesas)}/mês sem receita. Fase declarada como pré-operação — o burn não para enquanto não há 1ª venda.`
+            :                                            `Queimando R$${fmt(despesas)}/mês sem receita. Fase pré-operação — o burn não para enquanto não há 1ª venda.`
             )
-          : metrics.runwayCritico    ? `CRÍTICO — caixa zerado com R$${fmt(despesas)}/mês de burn ativo. Sem receita ou aporte, o negócio para.`
+          : metrics.runwayCritico    ? (
+              motivoCaixaZero === 'positivo'
+                ? `Você declarou ter reserva — preencha o campo Caixa Disponível acima para calcular o runway real`
+              : aporteMensal > 0
+                ? `Aporte R$${fmt(aporteMensal)}/mês não cobre o burn R$${fmt(despesas)}/mês — faltam R$${fmt(despesas - aporteMensal)}/mês para estabilizar`
+                : `CRÍTICO — caixa zerado com R$${fmt(despesas)}/mês de burn ativo. Sem receita ou aporte, o negócio para.`
+            )
           : `Quantos meses o caixa aguenta no ritmo atual (R$${fmt(despesas)}/mês). Mínimo saudável: 6 meses`,
       origin: caixa > 0 || despesas > 0 || aporteMensal > 0 ? O_REAL : O_CALC },
     { label: 'Lucro Mensal',   value: `R$${fmt(metrics.lucro)}`,     color: metrics.lucro >= 0 ? GREEN : RED,         desc: `O que sobra (ou falta) no mês: receita menos todas as despesas. Negativo = prejuízo operacional`, origin: receita > 0 || despesas > 0 ? O_REAL : O_CALC },
@@ -719,12 +733,18 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
     try {
       const html2canvas = (await import('html2canvas')).default
       const { jsPDF }   = await import('jspdf')
-      const canvas = await html2canvas(pdfRef.current, { backgroundColor: '#0a0f1e', scale: 2, useCORS: true, logging: false })
-      const imgData = canvas.toDataURL('image/png')
-      const pdf  = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-      const pdfW = pdf.internal.pageSize.getWidth()
-      const pdfH = (canvas.height * pdfW) / canvas.width
+      const canvas = await html2canvas(pdfRef.current, {
+        backgroundColor: '#0a0f1e', scale: 2, useCORS: true, logging: false,
+        allowTaint: true, foreignObjectRendering: false,
+      })
+      const imgData  = canvas.toDataURL('image/png')
+      const pdf      = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+      const pdfW     = pdf.internal.pageSize.getWidth()
+      const pageH    = pdf.internal.pageSize.getHeight()
+      const imgH     = (canvas.height * pdfW) / canvas.width
       const dataAtual = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+
+      // Cabeçalho na primeira página
       pdf.setFillColor(10, 15, 30)
       pdf.rect(0, 0, pdfW, 14, 'F')
       pdf.setTextColor(255, 255, 255)
@@ -735,8 +755,35 @@ export default function CockpitFinanceiro({ marketData, userProfile, cockpitAler
       pdf.setFont('helvetica', 'normal')
       pdf.setTextColor(120, 140, 160)
       pdf.text(`Health Score: ${metrics.healthScore}/100  |  ${dataAtual}`, pdfW - 8, 9, { align: 'right' })
-      pdf.addImage(imgData, 'PNG', 0, 14, pdfW, pdfH)
-      pdf.save(`cockpit-${(nomeNegocio || 'ipb').toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().slice(0, 10)}.pdf`)
+
+      // Multi-página: imagem posicionada com offset negativo para cada página adicional
+      const HEADER = 14
+      pdf.addImage(imgData, 'PNG', 0, HEADER, pdfW, imgH)
+      let heightLeft = imgH - (pageH - HEADER)
+      while (heightLeft > 0) {
+        pdf.addPage()
+        pdf.addImage(imgData, 'PNG', 0, -(imgH - heightLeft), pdfW, imgH)
+        heightLeft -= pageH
+      }
+
+      const filename = `cockpit-${(nomeNegocio || 'ipb').toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().slice(0, 10)}.pdf`
+
+      // Blob URL — funciona em desktop e abre no visualizador nativo do iOS
+      const blob    = pdf.output('blob')
+      const blobUrl = URL.createObjectURL(blob)
+      const link    = document.createElement('a')
+      link.href     = blobUrl
+      link.download = filename
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      // Fallback iOS: se o download não disparar, abre em nova aba
+      setTimeout(() => {
+        URL.revokeObjectURL(blobUrl)
+      }, 60000)
+    } catch (e) {
+      console.error('[exportPDF]', e)
     } finally {
       setPdfLoading(false)
     }
@@ -1551,7 +1598,20 @@ Relatório em 4 seções:
           if (modelosReceita.length > 2) {
             acoes.push(`${modelosReceita.length} modelos selecionados — escolha 1 para validar agora. Portfólio amplo dilui foco e torna impossível saber o que funciona`)
           }
-          acoes.push(`Burn R$${fmt(despesas)}/mês sem 1 real de receita. Meta única: 1 cliente pagante — mesmo informal, mesmo com desconto — para provar que alguém paga pelo valor`)
+          const primeiraVendaMsg = temMod('agro')
+            ? `Burn R$${fmt(despesas)}/mês. Meta: 1 lote, contrato de safra ou negociação fechada — prova de que alguém paga o preço projetado antes de escalar produção`
+            : temMod('projetos')
+            ? `Burn R$${fmt(despesas)}/mês. Meta: 1 proposta fechada — preferencialmente por indicação (CAC R$0) — para validar ticket e ciclo de vendas`
+            : temMod('clinica')
+            ? `Burn R$${fmt(despesas)}/mês. Meta: 1 paciente pagante — mesmo consulta avulsa — para validar ticket antes de montar estrutura fixa`
+            : temMod('alimentacao')
+            ? `Burn R$${fmt(despesas)}/mês. Meta: 1 venda real de produto/prato via WhatsApp ou encomenda — para provar aceitação de preço antes de abrir ponto fixo`
+            : temMod('ecommerce') || temMod('fisico')
+            ? `Burn R$${fmt(despesas)}/mês. Meta: 1 venda real do produto — sem loja, sem landing page — para provar que alguém paga o ticket projetado`
+            : temMod('varejo')
+            ? `Burn R$${fmt(despesas)}/mês. Meta: 1 venda real — feira, pop-up ou venda direta — para testar ticket e demanda antes de custo fixo de loja`
+            : `Burn R$${fmt(despesas)}/mês sem 1 real de receita. Meta única: 1 cliente pagante — mesmo informal, mesmo com desconto — para provar que alguém paga pelo valor`
+          acoes.push(primeiraVendaMsg)
           if (naturezaCobranca === 'hibrida') {
             acoes.push('Modelo híbrido (setup + mensalidade): defina já o valor do setup e o da mensalidade — são tickets diferentes com lógicas de venda diferentes')
           } else if (naturezaCobranca === 'unica') {
