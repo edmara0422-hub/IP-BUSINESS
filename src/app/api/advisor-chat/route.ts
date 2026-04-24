@@ -70,7 +70,7 @@ REGRAS:
 ${historyBlock}`
 
     const res = await groqFetch({
-      model: 'llama-3.3-70b-versatile',
+      model: 'groq/compound',
       messages: [
         { role: 'system', content: systemMsg },
         { role: 'user',   content: question },

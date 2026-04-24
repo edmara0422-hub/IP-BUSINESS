@@ -30,22 +30,26 @@ async function safeFetch(url: string, ms = 5000, extraHeaders?: Record<string, s
   } catch { return null }
 }
 
-async function yfChangePercent(ticker: string): Promise<number> {
+async function yfStockInfo(symbol: string): Promise<{ price: number; pct: number }> {
   try {
     const res = await safeFetch(
-      `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}.SA?interval=1d&range=5d`,
+      `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`,
       6000,
       YF_HEADERS,
     )
-    if (!res) return 0
+    if (!res) return { price: 0, pct: 0 }
     const d = await res.json()
     const meta = d?.chart?.result?.[0]?.meta
-    if (!meta) return 0
+    if (!meta) return { price: 0, pct: 0 }
     const price = parseFloat(meta.regularMarketPrice)
     const prev  = parseFloat(meta.chartPreviousClose)
-    if (!Number.isFinite(price) || !Number.isFinite(prev) || prev === 0) return 0
-    return parseFloat(((price / prev - 1) * 100).toFixed(2))
-  } catch { return 0 }
+    if (!Number.isFinite(price) || !Number.isFinite(prev) || prev === 0) return { price: 0, pct: 0 }
+    return { price: parseFloat(price.toFixed(2)), pct: parseFloat(((price / prev - 1) * 100).toFixed(2)) }
+  } catch { return { price: 0, pct: 0 } }
+}
+
+function yfChangePercent(symbol: string): Promise<number> {
+  return yfStockInfo(symbol).then(r => r.pct)
 }
 
 async function yfCommodity(symbol: string): Promise<{ price: number; delta: number } | null> {
@@ -109,13 +113,18 @@ export async function GET() {
   let dEnergy = 0, dFintech = 0, dLogistics = 0
   let dServices = 0, dRetail = 0
 
+  // stocks panel — preços individuais
+  let petrPrice = 36.50, valePrice = 58.20, itubPrice = 27.90, bbdcPrice = 15.80, wegePrice = 50.10
+  let ibovValue = 128000, ibovPct = 0
+
   // ── Fetch em paralelo ───────────────────────────────────────────────────
   try {
     const [
       fxRes, selicRes, ipcaRes, pibRes,
       creditTotalRes, creditIndRes, creditAgroRes, creditComRes, creditSvcRes,
       goldRes, silverRes, oilRes,
-      petr4D, vale3D, itub4D, totvs3D, slce3D, rdor3D, egie3D, mglu3D, rail3D,
+      petr4R, vale3R, itub4R, bbdc4R, wege3R, ibovR,
+      totvs3D, slce3D, rdor3D, egie3D, mglu3D, rail3D,
     ] = await Promise.allSettled([
       // Macro
       safeFetch('https://economia.awesomeapi.com.br/json/last/USD-BRL'),
@@ -123,25 +132,29 @@ export async function GET() {
       safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.13522/dados/ultimos/1?formato=json'),
       safeFetch('https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais?$filter=Indicador%20eq%20%27PIB%20Total%27%20and%20DataReferencia%20eq%20%272026%27&$top=1&$orderby=Data%20desc&$format=json'),
       // BCB crédito PJ por setor (séries SGS — taxa média a.a.)
-      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20714/dados/ultimos/1?formato=json'),  // Total PJ
-      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20754/dados/ultimos/1?formato=json'),  // Indústria
-      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20756/dados/ultimos/1?formato=json'),  // Agropecuária
-      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20758/dados/ultimos/1?formato=json'),  // Comércio
-      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20760/dados/ultimos/1?formato=json'),  // Serviços
-      // Commodities (AwesomeAPI + Yahoo Finance)
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20714/dados/ultimos/1?formato=json'),
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20754/dados/ultimos/1?formato=json'),
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20756/dados/ultimos/1?formato=json'),
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20758/dados/ultimos/1?formato=json'),
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.20760/dados/ultimos/1?formato=json'),
+      // Commodities
       safeFetch('https://economia.awesomeapi.com.br/json/last/XAU-USD'),
       safeFetch('https://economia.awesomeapi.com.br/json/last/XAG-USD'),
       yfCommodity('CL=F'),
-      // Ações BR — Yahoo Finance chart API (sem token)
-      yfChangePercent('PETR4'),
-      yfChangePercent('VALE3'),
-      yfChangePercent('ITUB4'),
-      yfChangePercent('TOTVS3'),
-      yfChangePercent('SLCE3'),
-      yfChangePercent('RDOR3'),
-      yfChangePercent('EGIE3'),
-      yfChangePercent('MGLU3'),
-      yfChangePercent('RAIL3'),
+      // Ações BR com preço + pct (stocks panel)
+      yfStockInfo('PETR4.SA'),
+      yfStockInfo('VALE3.SA'),
+      yfStockInfo('ITUB4.SA'),
+      yfStockInfo('BBDC4.SA'),
+      yfStockInfo('WEGE3.SA'),
+      yfStockInfo('%5EBVSP'),   // IBOVESPA
+      // Setores — apenas pct (representativas)
+      yfChangePercent('TOTS3.SA'),
+      yfChangePercent('SLCE3.SA'),
+      yfChangePercent('RDOR3.SA'),
+      yfChangePercent('EGIE3.SA'),
+      yfChangePercent('MGLU3.SA'),
+      yfChangePercent('RAIL3.SA'),
     ])
 
     // ── Parse macro ──────────────────────────────────────────────────────
@@ -209,12 +222,21 @@ export async function GET() {
       oilD = oilRes.value.delta
     }
 
-    // ── Parse ações BR (Yahoo Finance chart API) ─────────────────────────
-    // Each yfChangePercent returns a number directly via Promise.allSettled
+    // ── Parse ações BR (Yahoo Finance) ───────────────────────────────────
+    const si  = (r: PromiseSettledResult<{ price: number; pct: number }>) =>
+      r.status === 'fulfilled' ? r.value : { price: 0, pct: 0 }
     const pct = (r: PromiseSettledResult<number>) => r.status === 'fulfilled' ? r.value : 0
-    petrD      = pct(petr4D)
-    valeD      = pct(vale3D)
-    dFintech   = pct(itub4D)
+
+    const petr4 = si(petr4R), vale3 = si(vale3R), itub4 = si(itub4R)
+    const bbdc4 = si(bbdc4R), wege3 = si(wege3R), ibov  = si(ibovR)
+
+    petrD      = petr4.pct;  if (petr4.price > 0) petrPrice = petr4.price
+    valeD      = vale3.pct;  if (vale3.price > 0) valePrice = vale3.price
+    dFintech   = itub4.pct;  if (itub4.price > 0) itubPrice = itub4.price
+                             if (bbdc4.price > 0) bbdcPrice = bbdc4.price
+                             if (wege3.price > 0) wegePrice = wege3.price
+    ibovPct    = ibov.pct;   if (ibov.price  > 0) ibovValue = Math.round(ibov.price)
+
     dTech      = pct(totvs3D)
     dAgro      = pct(slce3D)
     dHealth    = pct(rdor3D)
@@ -345,6 +367,22 @@ export async function GET() {
       agro:       { value: r2(creditPjAgro),      label: 'Agropecuária',  unit: '% a.a.' },
       comercio:   { value: r2(creditPjComercio),  label: 'Comércio',      unit: '% a.a.' },
       servicos:   { value: r2(creditPjServicos),  label: 'Serviços',      unit: '% a.a.' },
+    },
+    stocks: {
+      ibov: { value: ibovValue, pct: r2(ibovPct) },
+      br: [
+        { ticker: 'PETR4', label: 'Petrobras',  price: r2(petrPrice), pct: r2(petrD)   },
+        { ticker: 'VALE3', label: 'Vale',        price: r2(valePrice), pct: r2(valeD)   },
+        { ticker: 'ITUB4', label: 'Itaú',        price: r2(itubPrice), pct: r2(dFintech) },
+        { ticker: 'BBDC4', label: 'Bradesco',    price: r2(bbdcPrice), pct: r2(bbdc4.pct) },
+        { ticker: 'WEGE3', label: 'WEG',         price: r2(wegePrice), pct: r2(wege3.pct) },
+      ],
+      global: [
+        { ticker: 'AAPL',  label: 'Apple',   pct: r2(aaplD)  },
+        { ticker: 'GOOGL', label: 'Google',  pct: r2(googlD) },
+        { ticker: 'META',  label: 'Meta',    pct: r2(metaD)  },
+        { ticker: 'AMZN',  label: 'Amazon',  pct: r2(amznD)  },
+      ],
     },
     updatedAt: new Date().toISOString(),
   }

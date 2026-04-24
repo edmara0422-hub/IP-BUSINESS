@@ -91,7 +91,7 @@ function TechStrip() {
   )
 }
 
-/* ── Scroll indicator ───────────────────────────────────────── */
+/* ── Scroll indicator (prata, destaque) ─────────────────────── */
 function ScrollHint() {
   const [vis, setVis] = useState(true)
   useEffect(() => {
@@ -102,14 +102,42 @@ function ScrollHint() {
   return (
     <AnimatePresence>
       {vis && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-2 pointer-events-none z-20">
-          <span className="text-[8px] uppercase tracking-[0.45em] text-white/18">Descobrir</span>
-          <motion.div animate={{ y: [0, 7, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}>
-            <svg width="14" height="22" viewBox="0 0 14 22" fill="none">
-              <rect x="1" y="1" width="12" height="20" rx="6" stroke="rgba(255,255,255,0.12)" strokeWidth="1"/>
-              <motion.rect x="6" y="4" width="2" height="5" rx="1" fill="rgba(255,255,255,0.35)"
-                animate={{ y: [4, 10, 4] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }} />
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
+          transition={{ delay: 1.2, duration: 0.6 }}
+          className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-2.5 pointer-events-none z-20">
+          <motion.span
+            className="text-[9px] uppercase font-mono"
+            style={{
+              letterSpacing: '0.5em',
+              background: 'linear-gradient(180deg, #ffffff 0%, #c0c0c0 50%, #888 100%)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              filter: 'drop-shadow(0 0 8px rgba(192,192,192,0.4))',
+            }}
+            animate={{ opacity: [0.55, 1, 0.55] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}>
+            Descobrir
+          </motion.span>
+          <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}>
+            <svg width="16" height="26" viewBox="0 0 16 26" fill="none">
+              <rect x="1" y="1" width="14" height="24" rx="7"
+                stroke="url(#scrollBorder)" strokeWidth="1.2"/>
+              <motion.rect x="7" y="5" width="2" height="6" rx="1"
+                fill="url(#scrollDot)"
+                animate={{ y: [5, 13, 5] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }} />
+              {/* seta embaixo */}
+              <path d="M5 20 L8 23 L11 20" stroke="rgba(192,192,192,0.45)" strokeWidth="1.2"
+                strokeLinecap="round" strokeLinejoin="round" fill="none" />
+              <defs>
+                <linearGradient id="scrollBorder" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.35)" />
+                  <stop offset="100%" stopColor="rgba(192,192,192,0.1)" />
+                </linearGradient>
+                <linearGradient id="scrollDot" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="100%" stopColor="#c0c0c0" />
+                </linearGradient>
+              </defs>
             </svg>
           </motion.div>
         </motion.div>
@@ -317,7 +345,7 @@ function IaTerminal() {
         <div className="flex gap-1.5">
           {['#ff5f57','#ffbd2e','#28c840'].map((c, i) => <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: c, opacity: 0.45 }} />)}
         </div>
-        <span className="ml-2 text-[10px] font-mono text-white/18 tracking-wider">IPB · Advisor IA · Groq Llama 3.3-70B</span>
+        <span className="ml-2 text-[10px] font-mono text-white/18 tracking-wider">IPB · Advisor IA · Groq Compound</span>
         <motion.div className="ml-auto flex items-center gap-1.5"
           animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.8, repeat: Infinity }}>
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-400/70" />
@@ -432,10 +460,36 @@ export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
             O sistema que transforma dados reais<br />em decisões que fazem sentido.
           </motion.p>
 
-          <motion.p className="text-[9px] text-white/18 font-mono tracking-[0.12em]"
+          <motion.p className="text-[9px] text-white/18 font-mono tracking-[0.12em] mb-8"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.82 }}>
             Sem achismo. Sem promessas. Só resultado.
           </motion.p>
+
+          {/* Botão hero — vidro, sutil, não bloqueia scroll */}
+          <motion.button onClick={onEnter}
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0, duration: 0.6 }}
+            whileHover={{ scale: 1.04, boxShadow: '0 0 32px rgba(255,255,255,0.1)' }}
+            whileTap={{ scale: 0.94, boxShadow: '0 0 16px rgba(255,255,255,0.06)' }}
+            className="relative overflow-hidden px-7 py-2.5 rounded-full text-[11px] font-semibold tracking-[0.12em] text-white/65 transition-colors"
+            style={{
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 100%)',
+              border: '1px solid rgba(255,255,255,0.14)',
+              backdropFilter: 'blur(16px)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
+            }}>
+            <span style={{
+              background: 'linear-gradient(90deg, #e0e0e0, #ffffff, #c0c0c0)',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            }}>
+              Entrar no IPB
+            </span>
+            {/* shimmer */}
+            <motion.div className="absolute inset-0 rounded-full pointer-events-none"
+              style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)', x: '-100%' }}
+              animate={{ x: ['−100%', '200%'] }}
+              transition={{ duration: 2.8, repeat: Infinity, ease: 'linear', repeatDelay: 1 }} />
+          </motion.button>
         </motion.div>
 
         <ScrollHint />
@@ -538,11 +592,17 @@ export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
               </p>
 
               <motion.button onClick={onEnter}
-                className="w-full py-4 text-[13px] font-bold tracking-[0.06em] text-black bg-white rounded-2xl"
+                className="relative w-full py-4 text-[13px] font-bold tracking-[0.08em] text-black bg-white rounded-2xl overflow-hidden"
                 style={{ boxShadow: '0 0 40px rgba(255,255,255,0.08)' }}
-                whileHover={{ scale: 1.025, boxShadow: '0 0 56px rgba(255,255,255,0.14)' }}
-                whileTap={{ scale: 0.97 }}>
-                Entrar no IPB →
+                whileHover={{ scale: 1.025, boxShadow: '0 0 60px rgba(255,255,255,0.18)' }}
+                whileTap={{ scale: 0.96, boxShadow: '0 0 20px rgba(255,255,255,0.06)' }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
+                <span className="relative z-10">Entrar no IPB →</span>
+                {/* ripple shimmer no hover */}
+                <motion.div className="absolute inset-0 rounded-2xl pointer-events-none"
+                  style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)', x: '-100%' }}
+                  whileHover={{ x: '200%' }}
+                  transition={{ duration: 0.55, ease: 'easeInOut' }} />
               </motion.button>
             </div>
           </div>
