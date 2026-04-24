@@ -21,12 +21,7 @@ const LandingPage = dynamic(() => import('@/app/landing/page'), {
   loading: () => null,
 })
 
-function sessionFlag(key: string) {
-  if (typeof window === 'undefined') return false
-  return !!sessionStorage.getItem(key)
-}
-
-// Se o path for /business, /intelligence ou /workspace → entrou direto na aba, pula intro
+// Se a URL já é uma aba específica → entrou direto, pula landing/splash
 function isDirectTabEntry() {
   if (typeof window === 'undefined') return false
   return ['/business', '/intelligence', '/workspace'].includes(window.location.pathname)
@@ -35,8 +30,10 @@ function isDirectTabEntry() {
 export default function Home() {
   const direct = isDirectTabEntry()
 
-  const [showLanding, setShowLanding] = useState(() => !direct && !sessionFlag('ipb_landing_done'))
-  const [showSplash,  setShowSplash]  = useState(() => !direct && !sessionFlag('ipb_splash_done'))
+  // Root URL (/) → sempre mostra landing + splash ao recarregar
+  // URL de aba (/business etc.) → pula intro, abre direto no app
+  const [showLanding, setShowLanding] = useState(() => !direct)
+  const [showSplash,  setShowSplash]  = useState(() => !direct)
   const [justLoggedIn, setJustLoggedIn] = useState(false)
   const { user, loading } = useAuth()
 
@@ -44,12 +41,9 @@ export default function Home() {
 
   const isLoggedIn = !!user || justLoggedIn
 
-  // 1. Landing — pula se entrada direta por URL de aba
+  // 1. Landing — sempre na raiz /
   if (showLanding) {
-    return <LandingPage onEnter={() => {
-      sessionStorage.setItem('ipb_landing_done', '1')
-      setShowLanding(false)
-    }} />
+    return <LandingPage onEnter={() => setShowLanding(false)} />
   }
 
   // 2. Loading auth
@@ -66,21 +60,18 @@ export default function Home() {
     return <LoginForm onLogin={handleLogin} />
   }
 
-  // 4. Logado → Splash — pula se entrada direta por URL de aba
+  // 4. Logado → Splash — sempre na raiz /
   if (showSplash) {
     return (
       <main className="min-h-screen bg-[#050505]">
         <AnimatePresence mode="wait">
-          <SplashScreen key="splash" onComplete={() => {
-            sessionStorage.setItem('ipb_splash_done', '1')
-            setShowSplash(false)
-          }} />
+          <SplashScreen key="splash" onComplete={() => setShowSplash(false)} />
         </AnimatePresence>
       </main>
     )
   }
 
-  // 5. App — initialTab lido do path pelo MainApp
+  // 5. App — aba inicial lida do path pelo MainApp
   return (
     <main className="min-h-screen bg-ocean-900">
       <MainApp />
