@@ -9,7 +9,21 @@ import { useAuth } from '@/hooks/useAuth'
 import { useAccessibility } from '@/hooks/useAccessibility'
 import IpbBackground from '@/components/IpbBackground'
 
-type Tab = 'business' | 'estudo' | 'admin'
+export type Tab = 'business' | 'estudo' | 'admin'
+
+const TAB_PATHS: Record<Tab, string> = {
+  business:  '/business',
+  estudo:    '/intelligence',
+  admin:     '/workspace',
+}
+
+function tabFromPath(): Tab {
+  if (typeof window === 'undefined') return 'business'
+  const p = window.location.pathname
+  if (p === '/intelligence') return 'estudo'
+  if (p === '/workspace')    return 'admin'
+  return 'business'
+}
 
 const AbaBusiness  = dynamic(() => import('@/components/AbaBusiness'),   { ssr: false, loading: () => <div className="min-h-[32rem]" /> })
 const AbaEstudo    = dynamic(() => import('@/components/AbaEstudo'),     { ssr: false, loading: () => <div className="min-h-[32rem]" /> })
@@ -217,13 +231,17 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
 /* ── Main ── */
 export default function MainApp() {
   useAccessibility()
-  const [activeTab, setActiveTab] = useState<Tab>('business')
+  const [activeTab, setActiveTab] = useState<Tab>(tabFromPath)
   // Rastreia abas já visitadas — uma vez montada, a aba nunca desmonta
-  const [visited, setVisited] = useState<Set<Tab>>(new Set<Tab>(['business']))
+  const [visited, setVisited] = useState<Set<Tab>>(() => new Set<Tab>([tabFromPath()]))
 
   const handleSwitch = useCallback((tab: Tab) => {
     setVisited(prev => { const s = new Set(prev); s.add(tab); return s })
     setActiveTab(tab)
+    // Atualiza URL sem navegação/remount
+    if (typeof window !== 'undefined') {
+      window.history.replaceState(null, '', TAB_PATHS[tab])
+    }
   }, [])
 
   return (

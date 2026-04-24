@@ -26,9 +26,17 @@ function sessionFlag(key: string) {
   return !!sessionStorage.getItem(key)
 }
 
+// Se o path for /business, /intelligence ou /workspace → entrou direto na aba, pula intro
+function isDirectTabEntry() {
+  if (typeof window === 'undefined') return false
+  return ['/business', '/intelligence', '/workspace'].includes(window.location.pathname)
+}
+
 export default function Home() {
-  const [showLanding, setShowLanding] = useState(() => !sessionFlag('ipb_landing_done'))
-  const [showSplash,  setShowSplash]  = useState(() => !sessionFlag('ipb_splash_done'))
+  const direct = isDirectTabEntry()
+
+  const [showLanding, setShowLanding] = useState(() => !direct && !sessionFlag('ipb_landing_done'))
+  const [showSplash,  setShowSplash]  = useState(() => !direct && !sessionFlag('ipb_splash_done'))
   const [justLoggedIn, setJustLoggedIn] = useState(false)
   const { user, loading } = useAuth()
 
@@ -36,7 +44,7 @@ export default function Home() {
 
   const isLoggedIn = !!user || justLoggedIn
 
-  // 1. Landing — só na primeira vez por sessão
+  // 1. Landing — pula se entrada direta por URL de aba
   if (showLanding) {
     return <LandingPage onEnter={() => {
       sessionStorage.setItem('ipb_landing_done', '1')
@@ -58,7 +66,7 @@ export default function Home() {
     return <LoginForm onLogin={handleLogin} />
   }
 
-  // 4. Logado → Splash (só na primeira vez por sessão)
+  // 4. Logado → Splash — pula se entrada direta por URL de aba
   if (showSplash) {
     return (
       <main className="min-h-screen bg-[#050505]">
@@ -72,7 +80,7 @@ export default function Home() {
     )
   }
 
-  // 5. App
+  // 5. App — initialTab lido do path pelo MainApp
   return (
     <main className="min-h-screen bg-ocean-900">
       <MainApp />

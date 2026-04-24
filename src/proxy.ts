@@ -1,7 +1,17 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const APP_TAB_PATHS = ['/business', '/intelligence', '/workspace']
+
 export async function proxy(request: NextRequest) {
+  // Rewrite /business, /intelligence, /workspace → serve conteúdo de /
+  // A URL permanece igual no browser; page.tsx lê o pathname para abrir a aba correta
+  if (APP_TAB_PATHS.includes(request.nextUrl.pathname)) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/'
+    return NextResponse.rewrite(url)
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
