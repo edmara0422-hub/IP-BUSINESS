@@ -111,9 +111,10 @@ function SectionLabel({ label, sub }: { label: string; sub?: string }) {
 // ██  1 — GLOBE HERO  (dados em órbita)
 // ════════════════════════════════════════════════════════════════════════════
 
-function OrbitalChip({ label, value, unit, delta, color, index, total, radius, orbitDuration }: {
+function OrbitalChip({ label, value, unit, delta, color, index, total, radius, orbitDuration, context }: {
   label: string; value: string; unit?: string; delta: number; color: string
   index: number; total: number; radius: number; orbitDuration: number
+  context?: string
 }) {
   const startDeg = (index / total) * 360
   const Icon = delta > 0.05 ? TrendingUp : delta < -0.05 ? TrendingDown : Minus
@@ -129,7 +130,7 @@ function OrbitalChip({ label, value, unit, delta, color, index, total, radius, o
     >
       {/* Chip posicionado no raio, contra-rotacionado para ficar legível */}
       <motion.div
-        style={{ position: 'absolute', left: radius, top: 0, x: -38, y: -28 }}
+        style={{ position: 'absolute', left: radius, top: 0, x: -50, y: -40 }}
         initial={{ rotate: -startDeg }}
         animate={{ rotate: -(startDeg + 360) }}
         transition={{ duration: orbitDuration, repeat: Infinity, ease: 'linear' }}
@@ -138,28 +139,45 @@ function OrbitalChip({ label, value, unit, delta, color, index, total, radius, o
           initial={{ opacity: 0, scale: 0.7 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: index * 0.12 + 0.4, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="rounded-xl px-2.5 py-2 flex flex-col items-center gap-0.5"
+          className="rounded-xl px-3 py-2.5 flex flex-col gap-1.5"
           style={{
-            width: 76,
-            background: 'rgba(6,6,10,0.86)',
-            border: `1px solid ${color}28`,
-            backdropFilter: 'blur(16px)',
-            boxShadow: `0 0 16px ${color}14, 0 2px 12px rgba(0,0,0,0.55)`,
+            width: 100,
+            background: 'rgba(6,6,10,0.92)',
+            border: `1px solid ${color}32`,
+            backdropFilter: 'blur(20px)',
+            boxShadow: `0 0 24px ${color}1a, 0 4px 18px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)`,
           }}
         >
+          {/* header: label + ícone */}
           <div className="flex items-center justify-between w-full">
-            <span className="text-[8px] font-mono uppercase tracking-[0.18em] text-white/28 leading-none">{label}</span>
-            <Icon className="w-2.5 h-2.5 shrink-0" style={{ color }} />
+            <span className="text-[7px] font-mono uppercase tracking-[0.22em] text-white/32 leading-none">{label}</span>
+            <div className="flex items-center justify-center rounded-[3px] p-[3px]" style={{ background: `${color}1c` }}>
+              <Icon className="w-2.5 h-2.5 shrink-0" style={{ color }} />
+            </div>
           </div>
-          <span className="text-[13px] font-bold font-mono tabular-nums leading-none text-white/85 mt-0.5">{value}</span>
-          <div className="flex items-center gap-1">
-            {unit && <span className="text-[8px] font-mono text-white/18 leading-none">{unit}</span>}
-            {delta !== 0 && (
-              <span className="text-[8px] font-mono font-semibold leading-none" style={{ color }}>
-                {delta > 0 ? '+' : ''}{Math.abs(delta) < 10 ? delta.toFixed(2) : delta.toFixed(0)}
+          {/* valor principal */}
+          <span className="text-[16px] font-bold font-mono tabular-nums leading-none text-white/92 tracking-tight">{value}</span>
+          {/* unidade */}
+          {unit && <span className="text-[7px] font-mono text-white/24 leading-none -mt-0.5">{unit}</span>}
+          {/* separador */}
+          <div className="w-full h-px" style={{ background: `${color}18` }} />
+          {/* variação hoje + context */}
+          <div className="flex items-center justify-between w-full">
+            <span className="text-[7px] font-mono text-white/20 leading-none">hoje</span>
+            {delta !== 0 ? (
+              <span className="text-[8px] font-mono font-bold leading-none" style={{ color }}>
+                {delta > 0 ? '▲' : '▼'} {Math.abs(delta) < 10 ? Math.abs(delta).toFixed(2) : Math.abs(delta).toFixed(0)}%
               </span>
+            ) : (
+              <span className="text-[7px] font-mono text-white/22 leading-none">estável</span>
             )}
           </div>
+          {/* context / sentiment — 1 linha */}
+          {context && (
+            <span className="text-[7px] leading-[1.3] text-white/36 font-mono" style={{
+              overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'
+            }}>{context}</span>
+          )}
         </motion.div>
       </motion.div>
     </motion.div>
@@ -174,20 +192,20 @@ function GlobeHero({ data }: { data: MarketData }) {
   const oil    = data.commodities.oil
 
   const chips = [
-    { id: 'selic',  label: 'SELIC',    value: `${m.selic.value}`,          unit: '% a.a.',  delta: 0,                 color: '#94a3b8' },
-    { id: 'usdbrl', label: 'USD/BRL',  value: `${m.usdBrl.value}`,         unit: 'R$',      delta: m.usdBrl.delta,    color: pctColor(m.usdBrl.delta) },
-    { id: 'ipca',   label: 'IPCA',     value: `${m.ipca.value}`,           unit: '% 12m',   delta: m.ipca.delta,      color: pctColor(-m.ipca.delta) },
-    { id: 'pib',    label: 'PIB',      value: `${m.pib.value}`,            unit: '% proj',  delta: m.pib.delta,       color: pctColor(m.pib.delta) },
-    { id: 'ibov',   label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000), unit: 'pts',     delta: ibov?.pct  ?? 0,   color: pctColor(ibov?.pct  ?? 0) },
-    { id: 'gold',   label: 'OURO',     value: `${gold?.value   ?? '—'}`,   unit: 'USD/oz',  delta: gold?.delta  ?? 0, color: '#fbbf24' },
-    { id: 'silver', label: 'PRATA',    value: `${silver?.value ?? '—'}`,   unit: 'USD/oz',  delta: silver?.delta ?? 0,color: '#c0c0c0' },
-    { id: 'oil',    label: 'PETRÓLEO', value: `${oil?.value    ?? '—'}`,   unit: 'USD/bbl', delta: oil?.delta   ?? 0, color: pctColor(oil?.delta ?? 0) },
+    { id: 'selic',  label: 'SELIC',    value: `${m.selic.value}`,          unit: '% a.a.',  delta: 0,                  color: '#94a3b8', context: m.selic.sentiment   || 'Taxa básica de juros. Define custo do crédito e atratividade de renda fixa.' },
+    { id: 'usdbrl', label: 'USD/BRL',  value: `R$ ${m.usdBrl.value}`,      unit: 'dólar comercial', delta: m.usdBrl.delta,    color: pctColor(m.usdBrl.delta), context: m.usdBrl.sentiment || 'Câmbio impacta preços, importações e margens de exportadores.' },
+    { id: 'ipca',   label: 'IPCA',     value: `${m.ipca.value}%`,          unit: 'inflação 12m',    delta: m.ipca.delta,      color: pctColor(-m.ipca.delta),  context: m.ipca.sentiment   || 'Inflação oficial. Acima de 4,5% pressiona BC a subir juros.' },
+    { id: 'pib',    label: 'PIB',      value: `${m.pib.value}%`,           unit: 'crescimento proj',delta: m.pib.delta,        color: pctColor(m.pib.delta),    context: m.pib.sentiment    || 'Projeção de crescimento da economia. Acima de 2% indica expansão.' },
+    { id: 'ibov',   label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000), unit: 'pontos',          delta: ibov?.pct  ?? 0,    color: pctColor(ibov?.pct ?? 0), context: 'Principal índice da B3. Reflete humor dos investidores com a bolsa brasileira.' },
+    { id: 'gold',   label: 'OURO',     value: `$${gold?.value   ?? '—'}`,  unit: 'USD por onça troy',delta: gold?.delta  ?? 0,  color: '#fbbf24',                context: 'Ativo-refúgio global. Sobe em crises, queda de juros e dólar fraco.' },
+    { id: 'silver', label: 'PRATA',    value: `$${silver?.value ?? '—'}`,  unit: 'USD por onça troy',delta: silver?.delta ?? 0, color: '#c0c0c0',                context: 'Commodity dual: reserva de valor e uso industrial (chips, energia solar).' },
+    { id: 'oil',    label: 'PETRÓLEO', value: `$${oil?.value    ?? '—'}`,  unit: 'USD por barril',   delta: oil?.delta   ?? 0,  color: pctColor(oil?.delta ?? 0),context: 'Brent impacta combustíveis, frete e inflação. Alta pressiona custos globais.' },
   ]
 
-  const ORBIT_RADIUS  = 172   // px from globe center
-  const ORBIT_SECONDS = 44    // segundos por volta completa
-  const CONTAINER     = 420   // altura total (globo + espaço para chips)
-  const GLOBE_SIZE    = 290   // px
+  const ORBIT_RADIUS  = 210   // px from globe center
+  const ORBIT_SECONDS = 50    // segundos por volta completa
+  const CONTAINER     = 520   // altura total (globo + espaço para chips)
+  const GLOBE_SIZE    = 360   // px
 
   return (
     <div className="relative w-full select-none" style={{ height: CONTAINER, overflow: 'visible' }}>
@@ -242,7 +260,7 @@ function GlobeHero({ data }: { data: MarketData }) {
       {/* Chips orbitando */}
       {chips.map((c, i) => (
         <OrbitalChip key={c.id}
-          label={c.label} value={c.value} unit={c.unit} delta={c.delta} color={c.color}
+          label={c.label} value={c.value} unit={c.unit} delta={c.delta} color={c.color} context={c.context}
           index={i} total={chips.length} radius={ORBIT_RADIUS} orbitDuration={ORBIT_SECONDS}
         />
       ))}
