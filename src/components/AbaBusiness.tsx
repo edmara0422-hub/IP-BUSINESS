@@ -108,78 +108,64 @@ function SectionLabel({ label, sub }: { label: string; sub?: string }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  1 — GLOBE HERO  (dados em órbita)
+// ██  1 — GLOBE HERO
 // ════════════════════════════════════════════════════════════════════════════
 
-function OrbitalChip({ label, value, unit, delta, color, index, total, radius, orbitDuration, context }: {
-  label: string; value: string; unit?: string; delta: number; color: string
-  index: number; total: number; radius: number; orbitDuration: number
-  context?: string
+function DataPill({ label, value, unit, delta, color, context, side, index }: {
+  label: string; value: string; unit?: string; delta: number
+  color: string; context?: string; side: 'left' | 'right'; index: number
 }) {
-  const startDeg = (index / total) * 360
   const Icon = delta > 0.05 ? TrendingUp : delta < -0.05 ? TrendingDown : Minus
 
   return (
-    /* Wrapper que gira ao redor do centro do globo */
     <motion.div
-      className="absolute"
-      style={{ top: '50%', left: '50%', width: 0, height: 0, transformOrigin: '0 0' }}
-      initial={{ rotate: startDeg }}
-      animate={{ rotate: startDeg + 360 }}
-      transition={{ duration: orbitDuration, repeat: Infinity, ease: 'linear' }}
+      className="relative overflow-hidden rounded-[16px] flex-1"
+      initial={{ opacity: 0, x: side === 'left' ? -28 : 28 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.09 + 0.35, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+      style={{
+        background: 'rgba(8,8,14,0.90)',
+        border: '1px solid rgba(255,255,255,0.07)',
+        backdropFilter: 'blur(24px)',
+        boxShadow: `0 0 28px ${color}10, 0 4px 16px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)`,
+      }}
     >
-      {/* Chip posicionado no raio, contra-rotacionado para ficar legível */}
-      <motion.div
-        style={{ position: 'absolute', left: radius, top: 0, x: -50, y: -40 }}
-        initial={{ rotate: -startDeg }}
-        animate={{ rotate: -(startDeg + 360) }}
-        transition={{ duration: orbitDuration, repeat: Infinity, ease: 'linear' }}
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: index * 0.12 + 0.4, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="rounded-xl px-3 py-2.5 flex flex-col gap-1.5"
-          style={{
-            width: 100,
-            background: 'rgba(6,6,10,0.92)',
-            border: `1px solid ${color}32`,
-            backdropFilter: 'blur(20px)',
-            boxShadow: `0 0 24px ${color}1a, 0 4px 18px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)`,
-          }}
-        >
-          {/* header: label + ícone */}
-          <div className="flex items-center justify-between w-full">
-            <span className="text-[7px] font-mono uppercase tracking-[0.22em] text-white/32 leading-none">{label}</span>
-            <div className="flex items-center justify-center rounded-[3px] p-[3px]" style={{ background: `${color}1c` }}>
-              <Icon className="w-2.5 h-2.5 shrink-0" style={{ color }} />
-            </div>
-          </div>
-          {/* valor principal */}
-          <span className="text-[16px] font-bold font-mono tabular-nums leading-none text-white/92 tracking-tight">{value}</span>
-          {/* unidade */}
-          {unit && <span className="text-[7px] font-mono text-white/24 leading-none -mt-0.5">{unit}</span>}
-          {/* separador */}
-          <div className="w-full h-px" style={{ background: `${color}18` }} />
-          {/* variação hoje + context */}
-          <div className="flex items-center justify-between w-full">
-            <span className="text-[7px] font-mono text-white/20 leading-none">hoje</span>
-            {delta !== 0 ? (
-              <span className="text-[8px] font-mono font-bold leading-none" style={{ color }}>
-                {delta > 0 ? '▲' : '▼'} {Math.abs(delta) < 10 ? Math.abs(delta).toFixed(2) : Math.abs(delta).toFixed(0)}%
-              </span>
-            ) : (
-              <span className="text-[7px] font-mono text-white/22 leading-none">estável</span>
-            )}
-          </div>
-          {/* context / sentiment — 1 linha */}
-          {context && (
-            <span className="text-[7px] leading-[1.3] text-white/36 font-mono" style={{
-              overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'
-            }}>{context}</span>
+      {/* Accent bar */}
+      <div className="absolute left-0 inset-y-0 w-[3px] rounded-l-[16px]"
+        style={{ background: `linear-gradient(180deg, transparent 0%, ${color} 35%, ${color} 65%, transparent 100%)` }} />
+      {/* Side glow */}
+      <div className="absolute inset-0 pointer-events-none rounded-[16px]"
+        style={{ background: `radial-gradient(ellipse 90% 60% at ${side === 'left' ? '110%' : '-10%'} 50%, ${color}09 0%, transparent 65%)` }} />
+
+      <div className="relative pl-5 pr-3.5 py-3.5 h-full flex flex-col justify-between gap-2">
+        {/* Label + delta */}
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[8px] font-mono uppercase tracking-[0.26em] text-white/30 leading-none">{label}</span>
+          {delta !== 0 ? (
+            <span className="flex items-center gap-0.5 rounded-full px-2 py-[3px] text-[8px] font-mono font-bold shrink-0"
+              style={{ background: `${color}18`, border: `1px solid ${color}28`, color }}>
+              <Icon className="w-2 h-2" />
+              {Math.abs(delta) < 10 ? Math.abs(delta).toFixed(2) : Math.abs(delta).toFixed(0)}%
+            </span>
+          ) : (
+            <span className="rounded-full px-2 py-[3px] text-[7px] font-mono text-white/24 shrink-0"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              estável
+            </span>
           )}
-        </motion.div>
-      </motion.div>
+        </div>
+
+        {/* Value */}
+        <span className="text-[24px] font-bold font-mono tabular-nums text-white/92 tracking-tight leading-none">
+          {value}
+        </span>
+
+        {/* Unit + context */}
+        <div className="space-y-1">
+          {unit && <div className="text-[8px] font-mono text-white/24 leading-none">{unit}</div>}
+          {context && <p className="text-[8.5px] text-white/30 leading-[1.5] line-clamp-2">{context}</p>}
+        </div>
+      </div>
     </motion.div>
   )
 }
@@ -191,80 +177,103 @@ function GlobeHero({ data }: { data: MarketData }) {
   const silver = data.commodities.silver
   const oil    = data.commodities.oil
 
-  const chips = [
-    { id: 'selic',  label: 'SELIC',    value: `${m.selic.value}`,          unit: '% a.a.',  delta: 0,                  color: '#94a3b8', context: m.selic.sentiment   || 'Taxa básica de juros. Define custo do crédito e atratividade de renda fixa.' },
-    { id: 'usdbrl', label: 'USD/BRL',  value: `R$ ${m.usdBrl.value}`,      unit: 'dólar comercial', delta: m.usdBrl.delta,    color: pctColor(m.usdBrl.delta), context: m.usdBrl.sentiment || 'Câmbio impacta preços, importações e margens de exportadores.' },
-    { id: 'ipca',   label: 'IPCA',     value: `${m.ipca.value}%`,          unit: 'inflação 12m',    delta: m.ipca.delta,      color: pctColor(-m.ipca.delta),  context: m.ipca.sentiment   || 'Inflação oficial. Acima de 4,5% pressiona BC a subir juros.' },
-    { id: 'pib',    label: 'PIB',      value: `${m.pib.value}%`,           unit: 'crescimento proj',delta: m.pib.delta,        color: pctColor(m.pib.delta),    context: m.pib.sentiment    || 'Projeção de crescimento da economia. Acima de 2% indica expansão.' },
-    { id: 'ibov',   label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000), unit: 'pontos',          delta: ibov?.pct  ?? 0,    color: pctColor(ibov?.pct ?? 0), context: 'Principal índice da B3. Reflete humor dos investidores com a bolsa brasileira.' },
-    { id: 'gold',   label: 'OURO',     value: `$${gold?.value   ?? '—'}`,  unit: 'USD por onça troy',delta: gold?.delta  ?? 0,  color: '#fbbf24',                context: 'Ativo-refúgio global. Sobe em crises, queda de juros e dólar fraco.' },
-    { id: 'silver', label: 'PRATA',    value: `$${silver?.value ?? '—'}`,  unit: 'USD por onça troy',delta: silver?.delta ?? 0, color: '#c0c0c0',                context: 'Commodity dual: reserva de valor e uso industrial (chips, energia solar).' },
-    { id: 'oil',    label: 'PETRÓLEO', value: `$${oil?.value    ?? '—'}`,  unit: 'USD por barril',   delta: oil?.delta   ?? 0,  color: pctColor(oil?.delta ?? 0),context: 'Brent impacta combustíveis, frete e inflação. Alta pressiona custos globais.' },
+  const leftChips = [
+    { id: 'selic',  label: 'SELIC',   value: `${m.selic.value}`,      unit: '% ao ano',              delta: 0,              color: '#94a3b8', context: m.selic.sentiment  || 'Taxa básica de juros. Define custo do crédito e atratividade de renda fixa.' },
+    { id: 'usdbrl', label: 'USD/BRL', value: `R$ ${m.usdBrl.value}`,  unit: 'câmbio comercial',       delta: m.usdBrl.delta, color: pctColor(m.usdBrl.delta), context: m.usdBrl.sentiment || 'Câmbio afeta preços, importações e margens de exportadores.' },
+    { id: 'ipca',   label: 'IPCA',    value: `${m.ipca.value}%`,      unit: 'inflação acumulada 12m', delta: m.ipca.delta,   color: pctColor(-m.ipca.delta),  context: m.ipca.sentiment   || 'Inflação oficial. Acima de 4,5% pressiona BC a subir juros.' },
+    { id: 'pib',    label: 'PIB',     value: `${m.pib.value}%`,       unit: 'crescimento projetado',  delta: m.pib.delta,    color: pctColor(m.pib.delta),    context: m.pib.sentiment    || 'Acima de 2% indica expansão. Abaixo de 1% sinaliza estagnação.' },
+  ]
+  const rightChips = [
+    { id: 'ibov',   label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000), unit: 'pontos — B3',           delta: ibov?.pct ?? 0,    color: pctColor(ibov?.pct ?? 0), context: 'Índice principal da bolsa brasileira. Alta = confiança no mercado acionário.' },
+    { id: 'gold',   label: 'OURO',     value: `$ ${gold?.value ?? '—'}`,   unit: 'USD por onça troy',     delta: gold?.delta ?? 0,  color: '#fbbf24',                context: 'Ativo-refúgio global. Sobe em crises, juros em queda e dólar fraco.' },
+    { id: 'silver', label: 'PRATA',    value: `$ ${silver?.value ?? '—'}`, unit: 'USD por onça troy',     delta: silver?.delta ?? 0,color: '#c0c0c0',                context: 'Reserva de valor e insumo industrial: chips, solar, eletrônica.' },
+    { id: 'oil',    label: 'PETRÓLEO', value: `$ ${oil?.value ?? '—'}`,    unit: 'USD por barril (Brent)', delta: oil?.delta ?? 0,   color: pctColor(oil?.delta ?? 0),context: 'Alta encarece combustíveis, logística e inflação em toda cadeia.' },
   ]
 
-  const ORBIT_RADIUS  = 210   // px from globe center
-  const ORBIT_SECONDS = 50    // segundos por volta completa
-  const CONTAINER     = 520   // altura total (globo + espaço para chips)
-  const GLOBE_SIZE    = 360   // px
-
   return (
-    <div className="relative w-full select-none" style={{ height: CONTAINER, overflow: 'visible' }}>
+    <div className="relative w-full select-none">
+      {/* Radial glow bg */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse 55% 75% at 50% 50%, rgba(192,192,192,0.04) 0%, transparent 70%)' }} />
 
-      {/* Glow de fundo */}
-      <div className="absolute pointer-events-none" style={{
-        top: '50%', left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: GLOBE_SIZE * 1.8, height: GLOBE_SIZE * 1.8,
-        borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(192,192,192,0.08) 0%, rgba(192,192,192,0.02) 45%, transparent 70%)',
-      }} />
+      {/* ── Desktop: 3 colunas ── */}
+      <div className="hidden md:flex items-stretch gap-5 w-full">
 
-      {/* Anel de órbita visual (rastro) */}
-      <div className="absolute pointer-events-none" style={{
-        top: '50%', left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: ORBIT_RADIUS * 2 + 76, height: ORBIT_RADIUS * 2 + 76,
-        borderRadius: '50%',
-        border: '1px dashed rgba(192,192,192,0.07)',
-      }} />
+        {/* Coluna esquerda */}
+        <div className="flex flex-col gap-3 shrink-0" style={{ width: 215 }}>
+          {leftChips.map((c, i) => (
+            <DataPill key={c.id} label={c.label} value={c.value} unit={c.unit}
+              delta={c.delta} color={c.color} context={c.context} side="left" index={i} />
+          ))}
+        </div>
 
-      {/* Globo */}
-      <div className="absolute" style={{
-        top: '50%', left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: GLOBE_SIZE, height: GLOBE_SIZE,
-        zIndex: 2,
-      }}>
-        {/* Rings pulsantes */}
-        {[1.15, 1.32].map((s, i) => (
-          <motion.div key={i} className="absolute inset-0 rounded-full pointer-events-none" style={{
-            border: '1px solid rgba(192,192,192,0.07)',
-            transform: `scale(${s})`,
-          }}
-            animate={{ opacity: [0.6, 0.1, 0.6], scale: [s, s * 1.05, s] }}
-            transition={{ duration: 4 + i * 2.2, repeat: Infinity, delay: i * 1.4, ease: 'easeInOut' }}
-          />
-        ))}
-        <Globe3D />
+        {/* Globo central */}
+        <div className="flex-1 flex items-center justify-center min-w-0 py-1">
+          <div className="relative w-full" style={{ maxWidth: 540 }}>
+            {/* Glow */}
+            <div className="absolute inset-0 rounded-full pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(192,192,192,0.07) 35%, transparent 70%)', transform: 'scale(1.45)' }} />
+            {/* Rings pulsantes */}
+            {[1.07, 1.20, 1.38].map((s, i) => (
+              <motion.div key={i} className="absolute inset-0 rounded-full pointer-events-none"
+                style={{ border: '1px solid rgba(192,192,192,0.06)', transform: `scale(${s})` }}
+                animate={{ opacity: [0.55, 0.07, 0.55] }}
+                transition={{ duration: 3.5 + i * 1.8, repeat: Infinity, delay: i * 1.2, ease: 'easeInOut' }} />
+            ))}
+            {/* Globo aspect-ratio 1:1 */}
+            <div className="w-full" style={{ aspectRatio: '1 / 1' }}>
+              <Globe3D />
+            </div>
+            {/* AO VIVO — centro do globo */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 4 }}>
+              <motion.div className="flex items-center gap-2 rounded-full"
+                style={{ background: 'rgba(3,5,8,0.88)', border: '1px solid rgba(52,211,153,0.30)', backdropFilter: 'blur(18px)', padding: '8px 18px' }}
+                initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.9, duration: 0.5 }}>
+                <motion.div className="w-2 h-2 rounded-full bg-emerald-400"
+                  animate={{ opacity: [0.3, 1, 0.3], scale: [0.75, 1.35, 0.75] }}
+                  transition={{ duration: 1.6, repeat: Infinity }} />
+                <span className="text-[10px] font-mono uppercase tracking-[0.35em] text-emerald-400/90">Ao Vivo</span>
+              </motion.div>
+            </div>
+          </div>
+        </div>
 
-        {/* Badge AO VIVO */}
-        <motion.div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full px-2.5 py-1"
-          style={{ background: 'rgba(4,4,6,0.88)', border: '1px solid rgba(52,211,153,0.25)', backdropFilter: 'blur(12px)', zIndex: 3 }}>
-          <motion.div className="w-1.5 h-1.5 rounded-full bg-emerald-400"
-            animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.25, 0.8] }}
-            transition={{ duration: 1.6, repeat: Infinity }} />
-          <span className="text-[8px] font-mono uppercase tracking-[0.3em] text-emerald-400/80">Ao vivo</span>
-        </motion.div>
+        {/* Coluna direita */}
+        <div className="flex flex-col gap-3 shrink-0" style={{ width: 215 }}>
+          {rightChips.map((c, i) => (
+            <DataPill key={c.id} label={c.label} value={c.value} unit={c.unit}
+              delta={c.delta} color={c.color} context={c.context} side="right" index={i} />
+          ))}
+        </div>
       </div>
 
-      {/* Chips orbitando */}
-      {chips.map((c, i) => (
-        <OrbitalChip key={c.id}
-          label={c.label} value={c.value} unit={c.unit} delta={c.delta} color={c.color} context={c.context}
-          index={i} total={chips.length} radius={ORBIT_RADIUS} orbitDuration={ORBIT_SECONDS}
-        />
-      ))}
-
+      {/* ── Mobile: globo + grid ── */}
+      <div className="md:hidden flex flex-col gap-4">
+        <div className="relative mx-auto w-full" style={{ maxWidth: 320 }}>
+          {[1.08, 1.26].map((s, i) => (
+            <motion.div key={i} className="absolute inset-0 rounded-full pointer-events-none"
+              style={{ border: '1px solid rgba(192,192,192,0.06)', transform: `scale(${s})` }}
+              animate={{ opacity: [0.5, 0.07, 0.5] }}
+              transition={{ duration: 3.5 + i * 1.8, repeat: Infinity, delay: i * 1.2 }} />
+          ))}
+          <div className="w-full" style={{ aspectRatio: '1 / 1' }}><Globe3D /></div>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 4 }}>
+            <motion.div className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
+              style={{ background: 'rgba(3,5,8,0.88)', border: '1px solid rgba(52,211,153,0.28)', backdropFilter: 'blur(16px)' }}>
+              <motion.div className="w-1.5 h-1.5 rounded-full bg-emerald-400"
+                animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.6, repeat: Infinity }} />
+              <span className="text-[8px] font-mono uppercase tracking-[0.3em] text-emerald-400/80">Ao Vivo</span>
+            </motion.div>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2.5">
+          {[...leftChips, ...rightChips].map((c, i) => (
+            <DataPill key={c.id} label={c.label} value={c.value} unit={c.unit}
+              delta={c.delta} color={c.color} context={c.context} side={i < 4 ? 'left' : 'right'} index={i} />
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
