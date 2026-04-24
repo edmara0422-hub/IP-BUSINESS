@@ -30,8 +30,6 @@ interface MarketData {
   opportunities?: { id: string; label: string; urgency: number; type: string }[]
   updatedAt: string
 }
-interface SimOffsets { selic: number; cambio: number; ipca: number; pib: number }
-
 // ── Helpers ────────────────────────────────────────────────────────────────
 const fmtBRL = (n: number) =>
   new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
@@ -39,34 +37,6 @@ const fmtK      = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(0)}k` : n.toS
 const pctColor  = (v: number) => v > 0 ? '#34d399' : v < 0 ? '#f87171' : 'rgba(192,192,192,0.45)'
 const pctSign   = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`
 const clamp     = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n))
-
-function applySimulation(data: MarketData, sim: SimOffsets): MarketData {
-  const si = sim.selic, pi = sim.pib, ci = sim.cambio
-  const sectors = data.sectors.map(s => {
-    let a = 0
-    if      (s.id === 'retail')    a = -si * 3 + pi * 2
-    else if (s.id === 'fintech')   a = si * 1.5 + pi
-    else if (s.id === 'tech')      a = pi * 2.5 - si * 0.5
-    else if (s.id === 'agro')      a = pi * 1.5 - ci * 2
-    else if (s.id === 'energy')    a = ci * 2 + pi
-    else if (s.id === 'health')    a = pi * 1.2
-    else if (s.id === 'logistics') a = -ci * 1.5 + pi
-    else if (s.id === 'services')  a = pi * 1.8 - si * 0.8
-    else if (s.id === 'media')     a = pi * 0.5 - si
-    const ch = parseFloat((s.change + a).toFixed(1))
-    return { ...s, change: ch, heat: clamp(Math.round(s.heat + a * 1.2), 0, 100), trend: ch > 3 ? 'up' : ch < -3 ? 'down' : 'neutral' }
-  })
-  return {
-    ...data,
-    macro: {
-      usdBrl: { ...data.macro.usdBrl, value: parseFloat(clamp(data.macro.usdBrl.value + ci, 3, 8).toFixed(2)) },
-      selic:  { ...data.macro.selic,  value: parseFloat(clamp(data.macro.selic.value + si,  2, 20).toFixed(2)) },
-      ipca:   { ...data.macro.ipca,   value: parseFloat(clamp(data.macro.ipca.value + sim.ipca, 0.5, 15).toFixed(2)) },
-      pib:    { ...data.macro.pib,    value: parseFloat(clamp(data.macro.pib.value + pi, -3, 8).toFixed(1)) },
-    },
-    sectors,
-  }
-}
 
 // ── Sparkline ──────────────────────────────────────────────────────────────
 function Sparkline({ id, delta, color, w = 56, h = 20 }: { id: string; delta: number; color: string; w?: number; h?: number }) {
@@ -1032,69 +1002,6 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
 // ██  9 — SIMULAÇÃO DE CENÁRIO
 // ════════════════════════════════════════════════════════════════════════════
 
-function SliderRow({ label, value, min, max, step, onChange }: {
-  label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void
-}) {
-  const col = value > 0 ? '#f87171' : value < 0 ? '#34d399' : 'rgba(192,192,192,0.35)'
-  return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-center justify-between">
-        <span className="text-[9px] font-mono uppercase tracking-[0.25em] text-white/28">{label}</span>
-        <span className="text-[11px] font-mono font-semibold" style={{ color: col }}>
-          {value > 0 ? '+' : ''}{value.toFixed(1)}
-        </span>
-      </div>
-      <input type="range" min={min} max={max} step={step} value={value}
-        onChange={e => onChange(parseFloat(e.target.value))}
-        className="w-full h-1 rounded-full appearance-none cursor-pointer"
-        style={{ accentColor: col }} />
-    </div>
-  )
-}
-
-function ScenarioSim({ data, sim, setSim }: { data: MarketData; sim: SimOffsets; setSim: (s: SimOffsets) => void }) {
-  const hasSim  = sim.selic !== 0 || sim.cambio !== 0 || sim.ipca !== 0 || sim.pib !== 0
-  const simData = useMemo(() => hasSim ? applySimulation(data, sim) : data, [data, sim, hasSim])
-  return (
-    <div className="rounded-2xl overflow-hidden"
-      style={{ background: 'rgba(255,255,255,0.016)', border: '1px solid rgba(192,192,192,0.08)' }}>
-      <div className="px-4 py-3 flex items-center justify-between"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-        <span className="text-[9px] font-mono uppercase tracking-[0.35em] text-white/22">Simulação de Cenário</span>
-        {hasSim && (
-          <button onClick={() => setSim({ selic: 0, cambio: 0, ipca: 0, pib: 0 })}
-            className="text-[9px] font-mono text-white/22 hover:text-white/42 transition-colors">
-            resetar
-          </button>
-        )}
-      </div>
-      <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="flex flex-col gap-4">
-          <SliderRow label="SELIC (pp)"   value={sim.selic}  min={-5} max={5}  step={0.25} onChange={v => setSim({ ...sim, selic: v })}  />
-          <SliderRow label="USD/BRL (R$)" value={sim.cambio} min={-2} max={2}  step={0.05} onChange={v => setSim({ ...sim, cambio: v })} />
-          <SliderRow label="IPCA (pp)"    value={sim.ipca}   min={-3} max={5}  step={0.25} onChange={v => setSim({ ...sim, ipca: v })}   />
-          <SliderRow label="PIB (pp)"     value={sim.pib}    min={-3} max={3}  step={0.1}  onChange={v => setSim({ ...sim, pib: v })}    />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-white/16 mb-2">Impacto setorial</span>
-          {simData.sectors.slice(0, 6).map(s => (
-            <div key={s.id} className="flex items-center justify-between py-1">
-              <span className="text-[10px] text-white/28 truncate max-w-[140px]">{s.label}</span>
-              <div className="flex items-center gap-2">
-                <div className="w-16 h-1 rounded-full bg-white/[0.05]">
-                  <div className="h-full rounded-full" style={{ width: `${s.heat}%`, background: pctColor(s.change), opacity: 0.45 }} />
-                </div>
-                <span className="text-[10px] font-mono w-12 text-right" style={{ color: pctColor(s.change) }}>
-                  {s.change >= 0 ? '+' : ''}{s.change}%
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
 
 // ════════════════════════════════════════════════════════════════════════════
 // ██  MAIN
@@ -1104,7 +1011,6 @@ export default function AbaBusiness() {
   const { marketData: rawData, refetch, lastUpdated } = useMarketData() as {
     marketData: MarketData | null; refetch?: () => void; lastUpdated?: string
   }
-  const [sim, setSim]               = useState<SimOffsets>({ selic: 0, cambio: 0, ipca: 0, pib: 0 })
   const [userSector, setUserSector] = useState<string>()
   const [refreshing, setRefreshing] = useState(false)
   const { user } = useAuth()
@@ -1116,11 +1022,7 @@ export default function AbaBusiness() {
       .then(({ data: d }: { data: { setor?: string } | null }) => { if (d?.setor) setUserSector(d.setor) })
   }, [user?.id])
 
-  const hasSim = sim.selic !== 0 || sim.cambio !== 0 || sim.ipca !== 0 || sim.pib !== 0
-  const data   = useMemo(
-    () => rawData ? (hasSim ? applySimulation(rawData as MarketData, sim) : rawData as MarketData) : null,
-    [rawData, sim, hasSim],
-  )
+  const data = useMemo(() => rawData as MarketData | null, [rawData])
 
   const handleRefresh = async () => {
     if (refreshing || !refetch) return
@@ -1193,12 +1095,6 @@ export default function AbaBusiness() {
       <div>
         <SectionLabel label="Market Intelligence · IA" sub="pergunte sobre mercado, setores, macro" />
         <IaAdvisor data={data} userSector={userSector} />
-      </div>
-
-      {/* 9 — SIMULAÇÃO DE CENÁRIO */}
-      <div>
-        <SectionLabel label="Simulação de Cenário" sub="ajuste macro e veja o impacto setorial" />
-        <ScenarioSim data={data} sim={sim} setSim={setSim} />
       </div>
 
     </motion.div>
