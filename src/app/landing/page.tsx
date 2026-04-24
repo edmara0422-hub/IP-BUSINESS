@@ -91,7 +91,7 @@ function TechStrip() {
   )
 }
 
-/* ── Scroll indicator (prata, destaque) ─────────────────────── */
+/* ── Scroll indicator imersivo ──────────────────────────────── */
 function ScrollHint() {
   const [vis, setVis] = useState(true)
   useEffect(() => {
@@ -99,47 +99,75 @@ function ScrollHint() {
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)
   }, [])
+
   return (
     <AnimatePresence>
       {vis && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
-          transition={{ delay: 1.2, duration: 0.6 }}
-          className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-2.5 pointer-events-none z-20">
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: 6 }}
+          transition={{ delay: 1.4, duration: 0.8 }}
+          className="absolute bottom-7 left-0 right-0 flex flex-col items-center gap-3 pointer-events-none z-20"
+        >
+          {/* texto prata pulsando */}
           <motion.span
-            className="text-[9px] uppercase font-mono"
+            className="text-[8px] uppercase font-mono tracking-[0.55em]"
             style={{
-              letterSpacing: '0.5em',
-              background: 'linear-gradient(180deg, #ffffff 0%, #c0c0c0 50%, #888 100%)',
+              background: 'linear-gradient(180deg, #fff 0%, #d0d0d0 40%, #888 100%)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-              filter: 'drop-shadow(0 0 8px rgba(192,192,192,0.4))',
+              filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.35))',
             }}
-            animate={{ opacity: [0.55, 1, 0.55] }}
-            transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}>
+            animate={{ opacity: [0.4, 1, 0.4] }}
+            transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}>
             Descobrir
           </motion.span>
-          <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}>
-            <svg width="16" height="26" viewBox="0 0 16 26" fill="none">
-              <rect x="1" y="1" width="14" height="24" rx="7"
-                stroke="url(#scrollBorder)" strokeWidth="1.2"/>
-              <motion.rect x="7" y="5" width="2" height="6" rx="1"
-                fill="url(#scrollDot)"
-                animate={{ y: [5, 13, 5] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }} />
-              {/* seta embaixo */}
-              <path d="M5 20 L8 23 L11 20" stroke="rgba(192,192,192,0.45)" strokeWidth="1.2"
-                strokeLinecap="round" strokeLinejoin="round" fill="none" />
-              <defs>
-                <linearGradient id="scrollBorder" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0.35)" />
-                  <stop offset="100%" stopColor="rgba(192,192,192,0.1)" />
-                </linearGradient>
-                <linearGradient id="scrollDot" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ffffff" />
-                  <stop offset="100%" stopColor="#c0c0c0" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </motion.div>
+
+          {/* grupo: raio + chevrons em cascata */}
+          <div className="relative flex flex-col items-center">
+
+            {/* raio de luz descendo */}
+            <motion.div
+              className="absolute top-0 w-px"
+              style={{
+                height: 28,
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 100%)',
+              }}
+              animate={{ scaleY: [0.5, 1, 0.5], opacity: [0.3, 0.7, 0.3] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            />
+
+            {/* 3 chevrons em cascata */}
+            {[0, 1, 2].map(i => (
+              <motion.svg
+                key={i}
+                width="18" height="10" viewBox="0 0 18 10" fill="none"
+                style={{ marginTop: i === 0 ? 28 : -3 }}
+                animate={{ opacity: [0, 1, 0], y: [0, 4, 0] }}
+                transition={{
+                  duration: 1.6,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: i * 0.22,
+                }}
+              >
+                <path
+                  d="M2 2 L9 8 L16 2"
+                  stroke={`rgba(255,255,255,${0.65 - i * 0.2})`}
+                  strokeWidth={1.8 - i * 0.3}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              </motion.svg>
+            ))}
+
+            {/* anel expandindo (pulse) */}
+            <motion.div
+              className="absolute rounded-full border border-white/10"
+              style={{ width: 36, height: 36, top: 18 }}
+              animate={{ scale: [0.6, 1.6], opacity: [0.25, 0] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeOut', delay: 0.4 }}
+            />
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
