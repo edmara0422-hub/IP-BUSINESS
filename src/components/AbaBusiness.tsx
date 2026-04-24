@@ -118,94 +118,99 @@ interface ChipData {
   oque?: string; como?: string
 }
 
-function DataChip({ label, value, unit, delta, color, signal, oque, como, side, index }: ChipData & {
-  side: 'left' | 'right'; index: number
+function DataChip({ label, value, unit, delta, color, signal, oque, como, toward, index }: ChipData & {
+  toward: 'right' | 'left' | 'bottom' | 'top'; index: number
 }) {
   const [open, setOpen] = useState(false)
   const DeltaIcon = delta > 0.05 ? TrendingUp : delta < -0.05 ? TrendingDown : Minus
-  const dur   = 2.8 + (index % 4) * 0.5
-  const delay = index * 0.42
+  const dur   = 2.8 + (index % 4) * 0.55
+  const delay = index * 0.36
 
-  const deltaLabel = delta > 0.05 ? `▲ ${Math.abs(delta) < 10 ? Math.abs(delta).toFixed(2) : Math.abs(delta).toFixed(0)}%`
-    : delta < -0.05 ? `▼ ${Math.abs(delta) < 10 ? Math.abs(delta).toFixed(2) : Math.abs(delta).toFixed(0)}%`
-    : '→ estável'
+  const deltaStr   = Math.abs(delta) < 10 ? Math.abs(delta).toFixed(2) : Math.abs(delta).toFixed(0)
+  const deltaLabel = delta > 0.05 ? `▲ ${deltaStr}%` : delta < -0.05 ? `▼ ${deltaStr}%` : '→ estável'
   const deltaColor = delta > 0.05 ? '#34d399' : delta < -0.05 ? '#f87171' : '#94a3b8'
+
+  const accentStyle: React.CSSProperties =
+    toward === 'right'  ? { right:  0, top: '20%', bottom: '20%', width: 3, borderRadius: '0 3px 3px 0' } :
+    toward === 'left'   ? { left:   0, top: '20%', bottom: '20%', width: 3, borderRadius: '3px 0 0 3px' } :
+    toward === 'bottom' ? { bottom: 0, left: '20%', right: '20%', height: 3, borderRadius: '0 0 3px 3px' } :
+                          { top:    0, left: '20%', right: '20%', height: 3, borderRadius: '3px 3px 0 0' }
+
+  const glowAt = toward === 'right' ? '100% 50%' : toward === 'left' ? '0% 50%' : toward === 'bottom' ? '50% 100%' : '50% 0%'
 
   return (
     <motion.div
-      className="relative flex-1"
-      initial={{ opacity: 0, x: side === 'left' ? -32 : 32 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.1 + 0.3, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0, scale: 0.88 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: index * 0.09 + 0.3, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Float */}
       <motion.div
-        animate={open ? { y: 0 } : { y: [0, -8, 0] }}
+        animate={open ? { y: 0 } : { y: [0, -7, 0] }}
         transition={{ duration: dur, delay, repeat: open ? 0 : Infinity, ease: 'easeInOut' }}
-        className="h-full relative overflow-hidden rounded-[16px] cursor-pointer"
+        className="relative overflow-hidden rounded-[18px] cursor-pointer"
         onClick={() => setOpen(o => !o)}
         style={{
-          background: open ? 'rgba(10,10,18,0.96)' : 'rgba(8,8,15,0.88)',
-          border: `1px solid ${open ? (signal?.color ?? color) + '35' : 'rgba(255,255,255,0.07)'}`,
-          backdropFilter: 'blur(24px)',
+          background: open ? 'rgba(10,10,20,0.97)' : 'rgba(8,8,16,0.90)',
+          border: `1px solid ${open ? (signal?.color ?? color) + '40' : 'rgba(255,255,255,0.08)'}`,
+          backdropFilter: 'blur(28px)',
           boxShadow: open
-            ? `0 0 44px ${signal?.color ?? color}1e, 0 12px 32px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.07)`
-            : `0 0 28px ${color}12, 0 6px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)`,
+            ? `0 0 50px ${signal?.color ?? color}24, 0 16px 40px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.08)`
+            : `0 0 32px ${color}14, 0 8px 24px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)`,
         }}
       >
-        {/* Accent bar esquerda */}
-        <motion.div className="absolute left-0 inset-y-0 w-[3px] rounded-l-[16px]"
-          style={{ background: `linear-gradient(180deg, transparent, ${signal?.color ?? color} 40%, ${signal?.color ?? color} 60%, transparent)` }}
-          animate={{ opacity: [0.4, 1, 0.4] }}
+        {/* Accent bar — aponta para o globo */}
+        <motion.div className="absolute pointer-events-none"
+          style={{ ...accentStyle, background: `linear-gradient(${toward === 'right' || toward === 'left' ? '180deg' : '90deg'}, transparent, ${signal?.color ?? color}, transparent)` }}
+          animate={{ opacity: [0.38, 1, 0.38] }}
           transition={{ duration: dur, delay, repeat: Infinity, ease: 'easeInOut' }} />
         {/* Shimmer */}
         <motion.div className="absolute inset-0 pointer-events-none"
-          style={{ background: `linear-gradient(106deg, transparent 20%, ${color}07 50%, transparent 80%)` }}
-          animate={{ x: ['-120%', '220%'] }}
-          transition={{ duration: 5 + index * 0.6, delay: index * 0.5, repeat: Infinity, ease: 'easeInOut' }} />
-        {/* Radial color bg */}
-        <div className="absolute inset-0 pointer-events-none rounded-[16px]"
-          style={{ background: `radial-gradient(ellipse 80% 55% at ${side === 'left' ? '100%' : '0%'} 50%, ${color}09 0%, transparent 65%)` }} />
+          style={{ background: `linear-gradient(106deg, transparent 20%, ${color}08 50%, transparent 80%)` }}
+          animate={{ x: ['-130%', '230%'] }}
+          transition={{ duration: 5.5 + index * 0.6, delay: index * 0.5, repeat: Infinity, ease: 'easeInOut' }} />
+        {/* Glow radial em direção ao globo */}
+        <div className="absolute inset-0 pointer-events-none rounded-[18px]"
+          style={{ background: `radial-gradient(ellipse 85% 60% at ${glowAt}, ${color}0d 0%, transparent 68%)` }} />
 
-        <div className="relative pl-4 pr-3.5 py-3.5 flex flex-col gap-2">
+        <div className="relative px-4 py-4 flex flex-col gap-2.5">
 
-          {/* Linha 1: label + chevron */}
+          {/* Label + chevron */}
           <div className="flex items-center justify-between">
-            <span className="text-[7.5px] font-mono uppercase tracking-[0.26em] text-white/30">{label}</span>
+            <span className="text-[10px] font-mono uppercase tracking-[0.22em] text-white/35">{label}</span>
             <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.22 }}>
-              <ChevronDown className="w-3 h-3 text-white/20" />
+              <ChevronDown className="w-3.5 h-3.5 text-white/22" />
             </motion.div>
           </div>
 
-          {/* Linha 2: valor grande */}
-          <span className="text-[21px] font-bold font-mono tabular-nums text-white/92 tracking-tight leading-none">{value}</span>
+          {/* Valor */}
+          <span className="text-[24px] font-bold font-mono tabular-nums text-white/94 tracking-tight leading-none">{value}</span>
 
-          {/* Linha 3: unidade + variação vs ontem */}
-          <div className="flex items-center justify-between gap-2">
-            {unit && <span className="text-[7.5px] font-mono text-white/22 leading-none truncate">{unit}</span>}
-            <motion.span
-              className="flex items-center gap-1 rounded-full px-2 py-[3px] text-[8px] font-mono font-bold shrink-0"
-              style={{ background: `${deltaColor}18`, border: `1px solid ${deltaColor}28`, color: deltaColor }}
-              animate={{ opacity: [0.6, 1, 0.6] }}
-              transition={{ duration: 2.4, delay: delay * 0.4, repeat: Infinity }}
-            >
-              <DeltaIcon className="w-2 h-2" />
-              {deltaLabel}
-            </motion.span>
-          </div>
+          {/* Unidade */}
+          {unit && <span className="text-[9.5px] font-mono text-white/28 leading-none -mt-1">{unit}</span>}
+
+          {/* Variação vs ontem */}
+          <motion.span
+            className="self-start flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9.5px] font-mono font-bold"
+            style={{ background: `${deltaColor}1a`, border: `1px solid ${deltaColor}30`, color: deltaColor }}
+            animate={{ opacity: [0.55, 1, 0.55] }}
+            transition={{ duration: 2.2, delay: delay * 0.4, repeat: Infinity }}
+          >
+            <DeltaIcon className="w-2.5 h-2.5" />
+            {deltaLabel} hoje
+          </motion.span>
 
           {/* Sinal de mercado */}
           {signal && (
-            <span className="self-start rounded-[6px] px-2 py-[3px] text-[8px] font-semibold"
-              style={{ background: `${signal.color}18`, border: `1px solid ${signal.color}2e`, color: signal.color }}>
+            <span className="self-start rounded-[8px] px-2.5 py-1 text-[9.5px] font-semibold"
+              style={{ background: `${signal.color}1a`, border: `1px solid ${signal.color}32`, color: signal.color }}>
               {signal.text}
             </span>
           )}
 
-          {/* Separador + O que é (sempre visível) */}
+          {/* O que é — sempre visível */}
           {oque && (
-            <div className="border-t border-white/[0.05] pt-2">
-              <p className="text-[8.5px] text-white/36 leading-[1.55] line-clamp-2">{oque}</p>
+            <div className="border-t border-white/[0.06] pt-2.5">
+              <p className="text-[10.5px] text-white/42 leading-[1.6] line-clamp-3">{oque}</p>
             </div>
           )}
 
@@ -216,12 +221,12 @@ function DataChip({ label, value, unit, delta, color, signal, oque, como, side, 
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                 className="overflow-hidden"
               >
-                <div className="border-t border-white/[0.05] pt-2 mt-0.5">
-                  <p className="text-[7px] font-mono uppercase tracking-[0.2em] text-white/18 mb-1.5">Como afeta seu negócio</p>
-                  <p className="text-[8.5px] text-white/42 leading-[1.6]">{como}</p>
+                <div className="border-t border-white/[0.06] pt-2.5 mt-0.5">
+                  <p className="text-[8.5px] font-mono uppercase tracking-[0.18em] text-white/20 mb-2">Como afeta seu negócio</p>
+                  <p className="text-[10.5px] text-white/48 leading-[1.65]">{como}</p>
                 </div>
               </motion.div>
             )}
@@ -303,26 +308,25 @@ function GlobeHero({ data }: { data: MarketData }) {
   return (
     <div className="relative w-full select-none">
 
-      {/* ── Desktop: globo central + chips ao redor ── */}
-      <div className="hidden md:block relative w-full" style={{ height: 740 }}>
+      {/* ── Desktop: globo central + 8 chips em anel ── */}
+      <div className="hidden md:block relative w-full" style={{ height: 780, overflow: 'visible' }}>
 
         {/* Globo: centro absoluto */}
         <div className="absolute" style={{
           left: '50%', top: '50%',
           transform: 'translate(-50%, -50%)',
-          width: 500, height: 500,
+          width: 460, height: 460,
           zIndex: 2,
         }}>
           <div className="absolute inset-0 rounded-full pointer-events-none"
             style={{ background: 'radial-gradient(circle, rgba(192,192,192,0.07) 30%, transparent 68%)', transform: 'scale(1.55)' }} />
-          {[1.06, 1.17, 1.31, 1.48].map((s, i) => (
+          {[1.06, 1.17, 1.32, 1.50].map((s, i) => (
             <motion.div key={i} className="absolute inset-0 rounded-full pointer-events-none"
               style={{ border: `1px solid rgba(192,192,192,${0.07 - i * 0.015})`, transform: `scale(${s})` }}
               animate={{ opacity: [0.55, 0.05, 0.55] }}
               transition={{ duration: 3.4 + i * 1.7, repeat: Infinity, delay: i * 1.1, ease: 'easeInOut' }} />
           ))}
           <div style={{ width: '100%', height: '100%' }}><Globe3D /></div>
-          {/* AO VIVO — centro */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 4 }}>
             <motion.div className="flex items-center gap-2 rounded-full"
               style={{ background: 'rgba(3,5,8,0.92)', border: '1px solid rgba(52,211,153,0.30)', backdropFilter: 'blur(18px)', padding: '9px 22px' }}
@@ -336,40 +340,42 @@ function GlobeHero({ data }: { data: MarketData }) {
           </div>
         </div>
 
-        {/* Chips: posicionados ao redor do globo usando o espaço da página */}
+        {/* ── 8 chips em anel ao redor do globo ── */}
+        {/* chip width: 230px */}
 
-        {/* SELIC — topo esquerdo */}
-        <div className="absolute" style={{ left: 0, top: 20, width: 268 }}>
-          <DataChip {...leftChips[0]} side="left" index={0} />
+        {/* TOPO-ESQUERDA: SELIC */}
+        <div className="absolute" style={{ left: 0, top: 0, width: 230, zIndex: 10 }}>
+          <DataChip {...leftChips[0]} toward="right" index={0} />
         </div>
-        {/* USD/BRL — meio esquerdo */}
-        <div className="absolute" style={{ left: 0, top: '50%', transform: 'translateY(-50%)', width: 268 }}>
-          <DataChip {...leftChips[1]} side="left" index={1} />
+        {/* TOPO-CENTRO: PIB */}
+        <div className="absolute" style={{ left: 'calc(50% - 115px)', top: 0, width: 230, zIndex: 10 }}>
+          <DataChip {...leftChips[3]} toward="bottom" index={3} />
         </div>
-        {/* IPCA — baixo esquerdo */}
-        <div className="absolute" style={{ left: 0, bottom: 20, width: 268 }}>
-          <DataChip {...leftChips[2]} side="left" index={2} />
-        </div>
-        {/* PIB — centro baixo esquerdo */}
-        <div className="absolute" style={{ left: 'calc(50% - 285px)', bottom: 0, width: 268 }}>
-          <DataChip {...leftChips[3]} side="left" index={3} />
+        {/* TOPO-DIREITA: IBOVESPA */}
+        <div className="absolute" style={{ right: 0, top: 0, width: 230, zIndex: 10 }}>
+          <DataChip {...rightChips[0]} toward="left" index={4} />
         </div>
 
-        {/* IBOVESPA — topo direito */}
-        <div className="absolute" style={{ right: 0, top: 20, width: 268 }}>
-          <DataChip {...rightChips[0]} side="right" index={0} />
+        {/* MEIO-ESQUERDA: USD/BRL */}
+        <div className="absolute" style={{ left: 0, top: '50%', transform: 'translateY(-50%)', width: 230, zIndex: 10 }}>
+          <DataChip {...leftChips[1]} toward="right" index={1} />
         </div>
-        {/* OURO — meio direito */}
-        <div className="absolute" style={{ right: 0, top: '50%', transform: 'translateY(-50%)', width: 268 }}>
-          <DataChip {...rightChips[1]} side="right" index={1} />
+        {/* MEIO-DIREITA: OURO */}
+        <div className="absolute" style={{ right: 0, top: '50%', transform: 'translateY(-50%)', width: 230, zIndex: 10 }}>
+          <DataChip {...rightChips[1]} toward="left" index={5} />
         </div>
-        {/* PRATA — baixo direito */}
-        <div className="absolute" style={{ right: 0, bottom: 20, width: 268 }}>
-          <DataChip {...rightChips[2]} side="right" index={2} />
+
+        {/* BAIXO-ESQUERDA: IPCA */}
+        <div className="absolute" style={{ left: 0, bottom: 0, width: 230, zIndex: 10 }}>
+          <DataChip {...leftChips[2]} toward="right" index={2} />
         </div>
-        {/* PETRÓLEO — centro baixo direito */}
-        <div className="absolute" style={{ left: 'calc(50% + 17px)', bottom: 0, width: 268 }}>
-          <DataChip {...rightChips[3]} side="right" index={3} />
+        {/* BAIXO-CENTRO: PETRÓLEO */}
+        <div className="absolute" style={{ left: 'calc(50% - 115px)', bottom: 0, width: 230, zIndex: 10 }}>
+          <DataChip {...rightChips[3]} toward="top" index={7} />
+        </div>
+        {/* BAIXO-DIREITA: PRATA */}
+        <div className="absolute" style={{ right: 0, bottom: 0, width: 230, zIndex: 10 }}>
+          <DataChip {...rightChips[2]} toward="left" index={6} />
         </div>
       </div>
 
@@ -394,7 +400,7 @@ function GlobeHero({ data }: { data: MarketData }) {
         </div>
         <div className="grid grid-cols-2 gap-2.5">
           {[...leftChips, ...rightChips].map((c, i) => (
-            <DataChip key={c.id} {...c} side={i < 4 ? 'left' : 'right'} index={i} />
+            <DataChip key={c.id} {...c} toward={i < 4 ? 'right' : 'left'} index={i} />
           ))}
         </div>
       </div>
