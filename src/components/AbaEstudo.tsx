@@ -898,9 +898,7 @@ export default function AbaEstudo() {
         <div className="pointer-events-none absolute left-0 top-[15%] h-[60%] w-px bg-[linear-gradient(180deg,transparent,rgba(255,255,255,0.06)_50%,transparent)]" />
         <div className="pointer-events-none absolute right-0 top-[15%] h-[60%] w-px bg-[linear-gradient(180deg,transparent,rgba(255,255,255,0.06)_50%,transparent)]" />
 
-        <div className="mb-7">
-          <BusinessClock variant="hero" showGreeting />
-        </div>
+        <div className="mb-7" />
 
         <div className="mb-8">
           <p className="mb-3 text-[9px] uppercase tracking-[0.52em] text-white/22">Intelligence Operating System</p>
