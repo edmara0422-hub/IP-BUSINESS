@@ -111,44 +111,31 @@ function SectionLabel({ label, sub }: { label: string; sub?: string }) {
 // ██  1 — GLOBE HERO
 // ════════════════════════════════════════════════════════════════════════════
 
-function TrendArrow({ delta, threshold = 0.05 }: { delta: number; threshold?: number }) {
-  if (delta > threshold)  return <TrendingUp  className="w-3 h-3 shrink-0" style={{ color: '#34d399' }} />
-  if (delta < -threshold) return <TrendingDown className="w-3 h-3 shrink-0" style={{ color: '#f87171' }} />
-  return <Minus className="w-3 h-3 shrink-0" style={{ color: 'rgba(192,192,192,0.35)' }} />
-}
-
-function LiveRow({ id, label, value, unit, delta, color, delay, align }: {
-  id: string; label: string; value: string; unit?: string; delta: number
-  color: string; delay: number; align: 'left' | 'right'
+function LiveChip({ id, label, value, unit, delta, color, delay }: {
+  id: string; label: string; value: string; unit?: string
+  delta: number; color: string; delay: number
 }) {
-  const isRight = align === 'right'
+  const Icon = delta > 0.05 ? TrendingUp : delta < -0.05 ? TrendingDown : Minus
   return (
     <motion.div
-      initial={{ opacity: 0, x: isRight ? 10 : -10 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className={`flex items-center gap-2 py-1.5 px-2.5 rounded-xl ${isRight ? 'flex-row-reverse' : ''}`}
-      style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${color}14` }}
+      className="flex flex-col items-center gap-0.5 rounded-xl px-2 py-2"
+      style={{ background: 'rgba(255,255,255,0.025)', border: `1px solid ${color}18` }}
     >
-      {/* Trend */}
-      <TrendArrow delta={delta} />
-
-      {/* Info */}
-      <div className={`flex flex-col flex-1 min-w-0 ${isRight ? 'items-end' : 'items-start'}`}>
-        <span className="text-[8px] font-mono uppercase tracking-[0.22em] text-white/22 leading-none">{label}</span>
-        <div className="flex items-baseline gap-1 mt-0.5">
-          <span className="text-[13px] font-bold font-mono tabular-nums leading-none text-white/80">{value}</span>
-          {unit && <span className="text-[8px] font-mono text-white/18 leading-none">{unit}</span>}
-        </div>
+      <span className="text-[8px] font-mono uppercase tracking-[0.2em] text-white/22 leading-none whitespace-nowrap">{label}</span>
+      <div className="flex items-center gap-1 mt-0.5">
+        <Icon className="w-2.5 h-2.5 shrink-0" style={{ color }} />
+        <span className="text-[13px] font-bold font-mono tabular-nums leading-none text-white/82">{value}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        {unit && <span className="text-[8px] font-mono text-white/18 leading-none">{unit}</span>}
         {delta !== 0 && (
-          <span className="text-[9px] font-mono font-semibold leading-none mt-0.5" style={{ color }}>
+          <span className="text-[8px] font-mono font-semibold leading-none" style={{ color }}>
             {delta > 0 ? '+' : ''}{Math.abs(delta) < 10 ? delta.toFixed(2) : delta.toFixed(0)}
           </span>
         )}
       </div>
-
-      {/* Sparkline */}
-      <Sparkline id={id} delta={delta} color={color} w={36} h={18} />
     </motion.div>
   )
 }
@@ -160,54 +147,60 @@ function GlobeHero({ data }: { data: MarketData }) {
   const silver = data.commodities.silver
   const oil    = data.commodities.oil
 
-  const leftRows = [
-    { id: 'selic',  label: 'SELIC',   value: `${m.selic.value}`,  unit: '% a.a.', delta: 0,              color: '#94a3b8' },
-    { id: 'usdbrl', label: 'USD/BRL', value: `${m.usdBrl.value}`, unit: 'R$',     delta: m.usdBrl.delta, color: pctColor(m.usdBrl.delta) },
-    { id: 'ipca',   label: 'IPCA',    value: `${m.ipca.value}`,   unit: '% 12m',  delta: m.ipca.delta,   color: pctColor(-m.ipca.delta) },
-    { id: 'pib',    label: 'PIB',     value: `${m.pib.value}`,    unit: '% proj', delta: m.pib.delta,    color: pctColor(m.pib.delta) },
-  ]
-
-  const rightRows = [
-    { id: 'ibov',   label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000),  unit: 'pts',     delta: ibov?.pct     ?? 0, color: pctColor(ibov?.pct     ?? 0) },
-    { id: 'gold',   label: 'OURO',     value: `${gold?.value   ?? '—'}`,    unit: 'USD/oz',  delta: gold?.delta   ?? 0, color: '#fbbf24' },
-    { id: 'silver', label: 'PRATA',    value: `${silver?.value ?? '—'}`,    unit: 'USD/oz',  delta: silver?.delta ?? 0, color: '#c0c0c0' },
-    { id: 'oil',    label: 'PETRÓLEO', value: `${oil?.value    ?? '—'}`,    unit: 'USD/bbl', delta: oil?.delta    ?? 0, color: pctColor(oil?.delta    ?? 0) },
+  const chips = [
+    { id: 'selic',  label: 'SELIC',    value: `${m.selic.value}`,          unit: '% a.a.',  delta: 0,                   color: '#94a3b8' },
+    { id: 'usdbrl', label: 'USD/BRL',  value: `${m.usdBrl.value}`,         unit: 'R$',      delta: m.usdBrl.delta,       color: pctColor(m.usdBrl.delta) },
+    { id: 'ipca',   label: 'IPCA',     value: `${m.ipca.value}`,           unit: '% 12m',   delta: m.ipca.delta,         color: pctColor(-m.ipca.delta) },
+    { id: 'pib',    label: 'PIB',      value: `${m.pib.value}`,            unit: '% proj',  delta: m.pib.delta,          color: pctColor(m.pib.delta) },
+    { id: 'ibov',   label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000), unit: 'pts',     delta: ibov?.pct     ?? 0,   color: pctColor(ibov?.pct     ?? 0) },
+    { id: 'gold',   label: 'OURO',     value: `${gold?.value   ?? '—'}`,   unit: 'USD/oz',  delta: gold?.delta   ?? 0,   color: '#fbbf24' },
+    { id: 'silver', label: 'PRATA',    value: `${silver?.value ?? '—'}`,   unit: 'USD/oz',  delta: silver?.delta ?? 0,   color: '#c0c0c0' },
+    { id: 'oil',    label: 'PETRÓLEO', value: `${oil?.value    ?? '—'}`,   unit: 'USD/bbl', delta: oil?.delta    ?? 0,   color: pctColor(oil?.delta    ?? 0) },
   ]
 
   return (
-    <div className="flex items-center gap-2.5 select-none">
+    <div className="flex flex-col items-center gap-5 select-none">
 
-      {/* Left column */}
-      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-        {leftRows.map((r, i) => <LiveRow key={r.id} {...r} delay={i * 0.07} align="left" />)}
-      </div>
+      {/* Globe — centro visual dominante */}
+      <div className="relative flex items-center justify-center" style={{ width: 300, height: 300 }}>
 
-      {/* Globe — centro destacado */}
-      <div className="relative shrink-0 flex flex-col items-center gap-1.5" style={{ width: 210 }}>
-        {/* AO VIVO badge */}
-        <motion.div className="flex items-center gap-1.5 rounded-full px-2.5 py-0.5"
-          style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.18)' }}>
-          <motion.div className="w-1.5 h-1.5 rounded-full bg-emerald-400"
-            animate={{ opacity: [0.4, 1, 0.4], scale: [0.85, 1.15, 0.85] }}
-            transition={{ duration: 1.8, repeat: Infinity }} />
-          <span className="text-[8px] font-mono uppercase tracking-[0.3em] text-emerald-400/70">Ao vivo</span>
-        </motion.div>
+        {/* Deep radial glow */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          background: 'radial-gradient(circle at 50% 50%, rgba(192,192,192,0.10) 0%, rgba(192,192,192,0.04) 38%, transparent 70%)',
+          borderRadius: '50%',
+          transform: 'scale(1.3)',
+        }} />
 
-        {/* Globe */}
-        <div style={{ width: 210, height: 210, position: 'relative' }}>
-          {/* outer glow */}
-          <div className="absolute inset-0 pointer-events-none" style={{
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(192,192,192,0.07) 0%, transparent 68%)',
-            transform: 'scale(1.18)',
-          }} />
+        {/* Pulsing orbital rings */}
+        {[1.18, 1.38, 1.60].map((scale, i) => (
+          <motion.div key={i} className="absolute pointer-events-none" style={{
+            inset: 0, borderRadius: '50%',
+            border: '1px solid rgba(192,192,192,0.07)',
+            transform: `scale(${scale})`,
+          }}
+            animate={{ opacity: [0.5, 0.12, 0.5], scale: [scale, scale * 1.04, scale] }}
+            transition={{ duration: 4 + i * 1.8, repeat: Infinity, delay: i * 1.2, ease: 'easeInOut' }}
+          />
+        ))}
+
+        {/* Globe canvas */}
+        <div style={{ width: 280, height: 280, position: 'relative', zIndex: 1 }}>
           <Globe3D />
         </div>
+
+        {/* AO VIVO badge — dentro da área do globo */}
+        <motion.div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full px-2.5 py-1 z-10"
+          style={{ background: 'rgba(6,6,8,0.82)', border: '1px solid rgba(52,211,153,0.22)', backdropFilter: 'blur(10px)' }}>
+          <motion.div className="w-1.5 h-1.5 rounded-full bg-emerald-400"
+            animate={{ opacity: [0.35, 1, 0.35], scale: [0.8, 1.2, 0.8] }}
+            transition={{ duration: 1.6, repeat: Infinity }} />
+          <span className="text-[8px] font-mono uppercase tracking-[0.3em] text-emerald-400/75">Ao vivo</span>
+        </motion.div>
       </div>
 
-      {/* Right column */}
-      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-        {rightRows.map((r, i) => <LiveRow key={r.id} {...r} delay={i * 0.07 + 0.28} align="right" />)}
+      {/* Data chips — 4 + 4 em duas linhas */}
+      <div className="w-full grid grid-cols-4 gap-2">
+        {chips.map((c, i) => <LiveChip key={c.id} {...c} delay={0.3 + i * 0.06} />)}
       </div>
 
     </div>
@@ -602,7 +595,7 @@ function ActionPlan({ data, userSector }: { data: MarketData; userSector?: strin
   const [loading, setLoading] = useState(false)
   const [typed, setTyped]   = useState('')
   const typingRef           = useRef<ReturnType<typeof setInterval> | null>(null)
-  const bottomRef           = useRef<HTMLDivElement>(null)
+  const scrollRef           = useRef<HTMLDivElement>(null)
 
   const generate = useCallback(async () => {
     if (loading) return
@@ -636,7 +629,7 @@ Seja cirúrgico. Use os dados de mercado reais fornecidos. Zero generalidades.`
       typingRef.current = setInterval(() => {
         i++
         setTyped(text.slice(0, i))
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
         if (i >= text.length && typingRef.current) clearInterval(typingRef.current)
       }, 11)
     } catch {
@@ -694,7 +687,7 @@ Seja cirúrgico. Use os dados de mercado reais fornecidos. Zero generalidades.`
         )}
 
         {typed && (
-          <div className="font-mono text-[11px] leading-[1.9] max-h-[340px] overflow-y-auto">
+          <div ref={scrollRef} className="font-mono text-[11px] leading-[1.9] max-h-[340px] overflow-y-auto">
             {typed.split('\n').map((line, i) => (
               <div key={i} className="mb-0.5"
                 style={{ color: isEmoji(line) ? 'rgba(255,255,255,0.65)' : 'rgba(192,192,192,0.40)' }}>
@@ -705,7 +698,6 @@ Seja cirúrgico. Use os dados de mercado reais fornecidos. Zero generalidades.`
               <motion.span animate={{ opacity: [1, 0] }} transition={{ duration: 0.55, repeat: Infinity }}
                 className="inline-block w-[2px] h-[12px] align-middle ml-px bg-white/45 rounded-sm" />
             )}
-            <div ref={bottomRef} />
           </div>
         )}
 
@@ -742,7 +734,7 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
   const [input, setInput]     = useState('')
   const [fired, setFired]     = useState(false)
   const typingRef             = useRef<ReturnType<typeof setInterval> | null>(null)
-  const bottomRef             = useRef<HTMLDivElement>(null)
+  const iaScrollRef           = useRef<HTMLDivElement>(null)
 
   const runQuery = useCallback(async (q: string) => {
     if (!q.trim() || loading) return
@@ -763,7 +755,7 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
       typingRef.current = setInterval(() => {
         i++
         setTyped(text.slice(0, i))
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        if (iaScrollRef.current) iaScrollRef.current.scrollTop = iaScrollRef.current.scrollHeight
         if (i >= text.length && typingRef.current) clearInterval(typingRef.current)
       }, 11)
     } catch {
@@ -811,7 +803,7 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
         ))}
       </div>
 
-      <div className="px-4 py-4 font-mono text-[11px] leading-[1.9] min-h-[160px] max-h-[300px] overflow-y-auto">
+      <div ref={iaScrollRef} className="px-4 py-4 font-mono text-[11px] leading-[1.9] min-h-[160px] max-h-[300px] overflow-y-auto">
         <AnimatePresence mode="wait">
           {loading && !typed && (
             <motion.div key="thinking" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -841,7 +833,6 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
             )}
           </div>
         )}
-        <div ref={bottomRef} />
       </div>
 
       <div className="px-4 pb-4 flex items-center gap-2"
