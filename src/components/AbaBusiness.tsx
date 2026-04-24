@@ -463,23 +463,22 @@ function StockRow({ ticker, label, price, pct, showPrice = true }: {
   const col  = pctColor(pct)
   const Icon = pct > 0.1 ? TrendingUp : pct < -0.1 ? TrendingDown : Minus
   return (
-    <div className="flex items-center justify-between py-2 border-b border-white/[0.04] last:border-0">
-      <div className="flex items-center gap-2.5">
-        <div className="flex h-6 w-11 items-center justify-center rounded-md text-[9px] font-mono font-bold shrink-0"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.45)' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(200,200,200,0.04)' }}
+      className="last:border-0">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 22, borderRadius: 6, background: 'rgba(200,200,200,0.04)', border: '1px solid rgba(200,200,200,0.08)', fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(200,200,200,0.48)', flexShrink: 0 }}>
           {ticker}
         </div>
-        <span className="text-[10px] text-white/30">{label}</span>
+        <span style={{ fontSize: 10, color: 'rgba(200,200,200,0.32)' }}>{label}</span>
       </div>
-      <div className="flex items-center gap-3">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Sparkline id={ticker} delta={pct} color={col} w={38} h={16} />
         {showPrice && price !== undefined && (
-          <span className="text-[11px] font-mono text-white/45">R${fmtBRL(price)}</span>
+          <span style={{ fontSize: 11, fontFamily: 'monospace', color: 'rgba(200,200,200,0.46)', minWidth: 58, textAlign: 'right' }}>R${fmtBRL(price)}</span>
         )}
-        <div className="flex items-center gap-1">
-          <Icon className="w-3 h-3" style={{ color: col }} />
-          <span className="text-[11px] font-mono font-semibold w-14 text-right" style={{ color: col }}>
-            {pctSign(pct)}
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 3, minWidth: 58, justifyContent: 'flex-end' }}>
+          <Icon style={{ width: 11, height: 11, color: col, flexShrink: 0 }} />
+          <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: col }}>{pctSign(pct)}</span>
         </div>
       </div>
     </div>
@@ -546,60 +545,77 @@ const SECTOR_ANALYSIS: Record<string, { oportunidade: string; risco: string; com
 }
 
 function SectorCard({ sector, delay }: { sector: Sector; delay: number }) {
-  const [open, setOpen] = useState(false)
   const analysis = SECTOR_ANALYSIS[sector.id]
-  const h   = sector.heat
-  const col = h >= 75 ? '#34d399' : h >= 50 ? 'rgba(255,255,255,0.48)' : h >= 30 ? 'rgba(255,255,255,0.28)' : '#f87171'
-  const bg  = h >= 75 ? 'rgba(52,211,153,0.05)'  : h >= 50 ? 'rgba(192,192,192,0.04)' : h >= 30 ? 'rgba(100,100,110,0.04)' : 'rgba(248,113,113,0.05)'
-  const bdr = h >= 75 ? 'rgba(52,211,153,0.14)'  : h >= 50 ? 'rgba(192,192,192,0.07)' : h >= 30 ? 'rgba(100,100,110,0.07)' : 'rgba(248,113,113,0.12)'
+  const h  = sector.heat
+  const signal =
+    h >= 75 ? { label: 'OPORTUNIDADE', color: '#34d399' } :
+    h >= 50 ? { label: 'NEUTRO',       color: '#c0c0c0' } :
+    h >= 30 ? { label: 'CAUTELA',      color: '#fbbf24' } :
+              { label: 'ALTO RISCO',   color: '#f87171' }
+  const chgColor = pctColor(sector.change)
+
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }}
+    <motion.div
+      initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }} transition={{ delay, duration: 0.4 }}
-      className="rounded-xl overflow-hidden" style={{ background: bg, border: `1px solid ${bdr}` }}>
-      <div className="px-3.5 py-3 flex items-center justify-between cursor-pointer" onClick={() => setOpen(o => !o)}>
-        <div className="flex items-center gap-3">
-          <div>
-            <span className="text-[11px] font-semibold text-white/58">{sector.label}</span>
-            <div className="flex items-center gap-2 mt-0.5">
-              <div className="w-20 h-1 rounded-full bg-white/[0.06]">
-                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${h}%`, background: col, opacity: 0.48 }} />
-              </div>
-              <span className="text-[9px] font-mono text-white/28">{h}/100</span>
-            </div>
+      style={{ background: 'rgba(5,5,5,0.94)', border: `1px solid ${signal.color}1a`, borderRadius: 18, overflow: 'hidden', position: 'relative' }}
+    >
+      {/* accent top bar */}
+      <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${signal.color}50, transparent)` }} />
+
+      {/* Header */}
+      <div style={{ padding: '12px 16px 10px', borderBottom: '1px solid rgba(200,200,200,0.05)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: signal.color, background: signal.color + '16', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 8px', fontWeight: 700, flexShrink: 0 }}>
+              {signal.label}
+            </span>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: 'rgba(228,228,228,0.82)' }}>{sector.label}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+            <span style={{ fontSize: 22, fontWeight: 800, fontFamily: 'monospace', color: signal.color, lineHeight: 1 }}>{h}</span>
+            <span style={{ fontSize: 8.5, fontFamily: 'monospace', color: 'rgba(200,200,200,0.22)', alignSelf: 'flex-end', marginBottom: 2 }}>/100</span>
+            <span style={{ fontSize: 9.5, fontFamily: 'monospace', fontWeight: 700, color: chgColor, background: chgColor + '16', border: `1px solid ${chgColor}26`, borderRadius: 99, padding: '2px 7px' }}>
+              {sector.change >= 0 ? '+' : ''}{sector.change}%
+            </span>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-[11px] font-mono font-semibold" style={{ color: pctColor(sector.change) }}>
-            {sector.change >= 0 ? '+' : ''}{sector.change}%
-          </span>
-          <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.22 }}>
-            <ChevronDown className="w-3.5 h-3.5 text-white/20" />
-          </motion.div>
+        {/* Heat bar */}
+        <div style={{ height: 4, background: 'rgba(200,200,200,0.07)', borderRadius: 2, overflow: 'hidden' }}>
+          <motion.div
+            initial={{ width: 0 }} whileInView={{ width: `${h}%` }} viewport={{ once: true }}
+            transition={{ duration: 1.1, delay: delay + 0.2, ease: [0.16, 1, 0.3, 1] }}
+            style={{ height: '100%', borderRadius: 2, background: `linear-gradient(90deg, ${signal.color}40, ${signal.color}cc)` }}
+          />
         </div>
       </div>
 
-      <AnimatePresence>
-        {open && analysis && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden">
-            <div className="px-3.5 pb-3.5 grid grid-cols-2 gap-x-4 gap-y-3"
-              style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '0.75rem' }}>
-              {[
-                { heading: 'Oportunidades', text: analysis.oportunidade, color: '#34d399' },
-                { heading: 'Riscos',        text: analysis.risco,        color: '#f87171' },
-                { heading: 'Como atuar',    text: analysis.como,         color: '#60a5fa' },
-                { heading: 'Quem se beneficia', text: analysis.quem,     color: 'rgba(255,255,255,0.22)' },
-              ].map(({ heading, text, color }) => (
-                <div key={heading}>
-                  <span className="text-[9px] font-mono uppercase tracking-[0.22em]" style={{ color }}>{heading}</span>
-                  <p className="text-[11px] text-white/38 leading-[1.72] mt-1.5">{text}</p>
-                </div>
-              ))}
+      {/* 3-column analysis — sempre visível */}
+      {analysis && (
+        <div style={{ padding: '12px 16px 14px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
+          {([
+            { label: 'Oportunidades', text: analysis.oportunidade, color: '#34d399' },
+            { label: 'Riscos',        text: analysis.risco,        color: '#f87171' },
+            { label: 'Como Atuar',    text: analysis.como,         color: '#c0c0c0' },
+          ] as { label: string; text: string; color: string }[]).map(({ label, text, color }) => (
+            <div key={label}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
+                <div style={{ width: 5, height: 5, borderRadius: '50%', background: color, flexShrink: 0 }} />
+                <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: color + 'aa', fontWeight: 700 }}>{label}</p>
+              </div>
+              <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.46)', lineHeight: 1.64, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>{text}</p>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          ))}
+        </div>
+      )}
+
+      {/* Quem se beneficia — rodapé discreto */}
+      {analysis?.quem && (
+        <div style={{ padding: '8px 16px 10px', borderTop: '1px solid rgba(200,200,200,0.04)' }}>
+          <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.16em', color: 'rgba(200,200,200,0.22)' }}>Quem se beneficia: </span>
+          <span style={{ fontSize: 10, color: 'rgba(200,200,200,0.34)' }}>{analysis.quem}</span>
+        </div>
+      )}
     </motion.div>
   )
 }
@@ -607,8 +623,8 @@ function SectorCard({ sector, delay }: { sector: Sector; delay: number }) {
 function SectorAnalysis({ sectors }: { sectors: Sector[] }) {
   const sorted = [...sectors].sort((a, b) => b.heat - a.heat)
   return (
-    <div className="flex flex-col gap-2">
-      {sorted.map((s, i) => <SectorCard key={s.id} sector={s} delay={i * 0.04} />)}
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
+      {sorted.map((s, i) => <SectorCard key={s.id} sector={s} delay={i * 0.05} />)}
     </div>
   )
 }
@@ -644,20 +660,12 @@ function ImpactChain() {
   const [selected, setSelected] = useState<string>('selic')
   const chain = IMPACT_CHAINS.find(c => c.id === selected)!
   return (
-    <div className="rounded-2xl overflow-hidden"
-      style={{ background: 'rgba(255,255,255,0.016)', border: '1px solid rgba(192,192,192,0.08)' }}>
-      <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-        <span className="text-[9px] font-mono uppercase tracking-[0.35em] text-white/22">Cadeia de Impacto — escolha um indicador</span>
-      </div>
-      <div className="px-4 py-3 flex gap-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+    <div style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.08)', borderRadius: 20, overflow: 'hidden' }}>
+      {/* Selector */}
+      <div style={{ padding: '12px 16px', display: 'flex', gap: 8, borderBottom: '1px solid rgba(200,200,200,0.05)' }}>
         {IMPACT_CHAINS.map(c => (
           <button key={c.id} onClick={() => setSelected(c.id)}
-            className="flex-1 py-2 rounded-xl text-[9px] font-mono uppercase tracking-wider transition-all"
-            style={{
-              background: selected === c.id ? `${c.color}18` : 'rgba(255,255,255,0.03)',
-              border: `1px solid ${selected === c.id ? c.color + '38' : 'rgba(255,255,255,0.06)'}`,
-              color: selected === c.id ? c.color : 'rgba(255,255,255,0.26)',
-            }}>
+            style={{ flex: 1, padding: '8px 4px', borderRadius: 12, fontSize: 9, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.16em', cursor: 'pointer', transition: 'all 0.18s', background: selected === c.id ? `${c.color}18` : 'rgba(200,200,200,0.04)', border: `1px solid ${selected === c.id ? c.color + '40' : 'rgba(200,200,200,0.07)'}`, color: selected === c.id ? c.color : 'rgba(200,200,200,0.28)', fontWeight: selected === c.id ? 700 : 400 }}>
             {c.title}
           </button>
         ))}
@@ -665,26 +673,40 @@ function ImpactChain() {
 
       <AnimatePresence mode="wait">
         <motion.div key={selected}
-          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.22 }}
-          className="p-4 grid grid-cols-2 gap-4">
+          style={{ padding: '16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}
+        >
           {[chain.up, chain.down].map((dir, di) => (
-            <div key={di} className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 mb-0.5">
-                <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: dir.color }} />
-                <span className="text-[9px] font-mono uppercase tracking-wider" style={{ color: dir.color }}>
-                  {chain.title} {dir.label}
-                </span>
+            <div key={di} style={{ background: `${dir.color}06`, border: `1px solid ${dir.color}18`, borderRadius: 14, padding: '14px', overflow: 'hidden', position: 'relative' }}>
+              {/* direction label */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: `${dir.color}20`, border: `1px solid ${dir.color}38`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: dir.color }} />
+                </div>
+                <div>
+                  <p style={{ fontSize: 9, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: dir.color, fontWeight: 700 }}>{chain.title} {dir.label}</p>
+                  <p style={{ fontSize: 8.5, color: 'rgba(200,200,200,0.28)', marginTop: 1 }}>consequências em cascata</p>
+                </div>
               </div>
-              {dir.effects.map((effect, i) => (
-                <motion.div key={i}
-                  initial={{ opacity: 0, x: di === 0 ? -6 : 6 }} animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.055, duration: 0.22 }}
-                  className="flex items-start gap-2">
-                  <div className="mt-1.5 w-1 h-1 rounded-full shrink-0 bg-white/15" />
-                  <span className="text-[11px] text-white/36 leading-[1.65]">{effect}</span>
-                </motion.div>
-              ))}
+              {/* effect chain */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {dir.effects.map((effect, i) => (
+                  <motion.div key={i}
+                    initial={{ opacity: 0, x: di === 0 ? -10 : 10 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.06, duration: 0.22 }}
+                    style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}
+                  >
+                    <div style={{ minWidth: 18, height: 18, borderRadius: 6, background: `${dir.color}18`, border: `1px solid ${dir.color}28`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
+                      <span style={{ fontSize: 8, fontFamily: 'monospace', fontWeight: 700, color: dir.color }}>{i + 1}</span>
+                    </div>
+                    {i < dir.effects.length - 1 && (
+                      <div style={{ position: 'absolute', left: 22, marginTop: 19, width: 1, height: 14, background: `${dir.color}20` }} />
+                    )}
+                    <span style={{ fontSize: 11.5, color: 'rgba(210,210,210,0.48)', lineHeight: 1.62 }}>{effect}</span>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           ))}
         </motion.div>
@@ -701,31 +723,49 @@ function CreditBar({ data }: { data: MarketData }) {
   const rates = data.creditRates
   if (!rates) return null
   const items = [
-    { label: 'PJ Total',  value: rates.total?.value    ?? 0 },
-    { label: 'Comércio',  value: rates.comercio?.value ?? 0 },
-    { label: 'Serviços',  value: rates.servicos?.value ?? 0 },
-    { label: 'Indústria', value: rates.industria?.value ?? 0 },
-    { label: 'Agro',      value: rates.agro?.value     ?? 0 },
+    { label: 'PJ Total',  value: rates.total?.value     ?? 0, id: 'total' },
+    { label: 'Comércio',  value: rates.comercio?.value  ?? 0, id: 'comercio' },
+    { label: 'Serviços',  value: rates.servicos?.value  ?? 0, id: 'servicos' },
+    { label: 'Indústria', value: rates.industria?.value ?? 0, id: 'industria' },
+    { label: 'Agro',      value: rates.agro?.value      ?? 0, id: 'agro' },
   ]
   const max = Math.max(...items.map(i => i.value), 1)
   return (
-    <div className="rounded-2xl p-4"
-      style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(192,192,192,0.07)' }}>
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-white/22">Crédito PJ — % a.a.</span>
-        <span className="text-[9px] font-mono text-white/12">BCB/SGS</span>
+    <div style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.08)', borderRadius: 18, padding: '16px 20px', position: 'relative', overflow: 'hidden' }}>
+      <div className="pointer-events-none absolute inset-0 grid-bg opacity-[0.025]" />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <span style={{ fontSize: 9, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(195,195,195,0.28)' }}>Crédito PJ — % a.a.</span>
+        <span style={{ fontSize: 8, fontFamily: 'monospace', color: 'rgba(195,195,195,0.18)' }}>BCB / SGS</span>
       </div>
-      <div className="flex flex-col gap-2.5">
-        {items.map(item => (
-          <div key={item.label} className="flex items-center gap-3">
-            <span className="text-[9px] font-mono text-white/28 w-16 shrink-0">{item.label}</span>
-            <div className="flex-1 h-1.5 rounded-full bg-white/[0.05]">
-              <motion.div className="h-full rounded-full"
-                initial={{ width: 0 }} whileInView={{ width: `${(item.value / max) * 100}%` }}
-                viewport={{ once: true }} transition={{ duration: 0.8 }}
-                style={{ background: item.value > 25 ? 'rgba(248,113,113,0.5)' : 'rgba(192,192,192,0.3)' }} />
-            </div>
-            <span className="text-[10px] font-mono font-semibold text-white/40 w-10 text-right">{item.value}%</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
+        {items.map((item, idx) => {
+          const risk = item.value > 28 ? { label: 'ALTO', color: '#f87171' } : item.value > 16 ? { label: 'MÉDIO', color: '#fbbf24' } : { label: 'BAIXO', color: '#34d399' }
+          return (
+            <motion.div key={item.id}
+              initial={{ opacity: 0, x: -10 }} whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }} transition={{ delay: idx * 0.07, duration: 0.35 }}
+              style={{ display: 'flex', alignItems: 'center', gap: 10 }}
+            >
+              <span style={{ fontSize: 9.5, fontFamily: 'monospace', color: 'rgba(195,195,195,0.34)', width: 66, flexShrink: 0 }}>{item.label}</span>
+              <div style={{ flex: 1, height: 7, background: 'rgba(200,200,200,0.07)', borderRadius: 4, overflow: 'hidden' }}>
+                <motion.div
+                  initial={{ width: 0 }} whileInView={{ width: `${(item.value / max) * 100}%` }}
+                  viewport={{ once: true }} transition={{ duration: 1, delay: idx * 0.07 + 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  style={{ height: '100%', borderRadius: 4, background: `linear-gradient(90deg, ${risk.color}35, ${risk.color}88)` }}
+                />
+              </div>
+              <span style={{ fontSize: 12, fontFamily: 'monospace', fontWeight: 700, color: risk.color, minWidth: 44, textAlign: 'right' }}>{item.value}%</span>
+              <span style={{ fontSize: 7.5, fontFamily: 'monospace', fontWeight: 700, color: risk.color, background: risk.color + '14', border: `1px solid ${risk.color}22`, borderRadius: 99, padding: '2px 6px', flexShrink: 0, minWidth: 36, textAlign: 'center' }}>{risk.label}</span>
+            </motion.div>
+          )
+        })}
+      </div>
+      {/* Nota de interpretação */}
+      <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(200,200,200,0.05)', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+        {[{ label: 'BAIXO — até 16% a.a.', color: '#34d399' }, { label: 'MÉDIO — 16–28% a.a.', color: '#fbbf24' }, { label: 'ALTO — acima de 28% a.a.', color: '#f87171' }].map(l => (
+          <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: l.color, flexShrink: 0 }} />
+            <span style={{ fontSize: 8.5, color: 'rgba(195,195,195,0.28)' }}>{l.label}</span>
           </div>
         ))}
       </div>
