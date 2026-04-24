@@ -1,8 +1,43 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion'
 import IpbBackground from '@/components/IpbBackground'
+
+/* ── Botão Magnético ────────────────────────────────────────── */
+function BotaoMagnetico({ children, className, style, onClick }: {
+  children: React.ReactNode
+  className?: string
+  style?: React.CSSProperties
+  onClick?: () => void
+}) {
+  const ref = useRef<HTMLButtonElement>(null)
+  const x   = useMotionValue(0)
+  const y   = useMotionValue(0)
+  const sx  = useSpring(x, { stiffness: 200, damping: 20 })
+  const sy  = useSpring(y, { stiffness: 200, damping: 20 })
+
+  const onMove = (e: React.MouseEvent) => {
+    const r = ref.current?.getBoundingClientRect()
+    if (!r) return
+    x.set((e.clientX - (r.left + r.width  / 2)) * 0.3)
+    y.set((e.clientY - (r.top  + r.height / 2)) * 0.3)
+  }
+
+  return (
+    <motion.button
+      ref={ref}
+      style={{ x: sx, y: sy, ...style }}
+      onMouseMove={onMove}
+      onMouseLeave={() => { x.set(0); y.set(0) }}
+      whileTap={{ scale: 0.96 }}
+      className={className}
+      onClick={onClick}
+    >
+      {children}
+    </motion.button>
+  )
+}
 
 /* ── Ticker de mercado ao vivo ──────────────────────────────── */
 type Tick = { label: string; value: string; delta: string; up: boolean }
@@ -94,11 +129,22 @@ function TechStrip() {
 /* ── Scroll indicator imersivo ──────────────────────────────── */
 function ScrollHint() {
   const [vis, setVis] = useState(true)
+  const mx = useMotionValue(0)
+  const my = useMotionValue(0)
+  const sx = useSpring(mx, { stiffness: 160, damping: 18 })
+  const sy = useSpring(my, { stiffness: 160, damping: 18 })
+
   useEffect(() => {
     const fn = () => setVis(window.scrollY < 60)
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)
   }, [])
+
+  const onMove = (e: React.MouseEvent) => {
+    const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    mx.set((e.clientX - (r.left + r.width  / 2)) * 0.25)
+    my.set((e.clientY - (r.top  + r.height / 2)) * 0.25)
+  }
 
   return (
     <AnimatePresence>
@@ -106,7 +152,10 @@ function ScrollHint() {
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: 6 }}
           transition={{ delay: 1.4, duration: 0.8 }}
-          className="absolute bottom-7 left-0 right-0 flex flex-col items-center gap-3 pointer-events-none z-20"
+          onMouseMove={onMove}
+          onMouseLeave={() => { mx.set(0); my.set(0) }}
+          className="absolute bottom-7 left-0 right-0 flex flex-col items-center gap-3 z-20 cursor-default"
+          style={{ x: sx, y: sy } as React.CSSProperties}
         >
           {/* texto prata pulsando */}
           <motion.span
@@ -493,31 +542,29 @@ export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
             Sem achismo. Sem promessas. Só resultado.
           </motion.p>
 
-          {/* Botão hero — vidro, sutil, não bloqueia scroll */}
-          <motion.button onClick={onEnter}
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.0, duration: 0.6 }}
-            whileHover={{ scale: 1.04, boxShadow: '0 0 32px rgba(255,255,255,0.1)' }}
-            whileTap={{ scale: 0.94, boxShadow: '0 0 16px rgba(255,255,255,0.06)' }}
-            className="relative overflow-hidden px-7 py-2.5 rounded-full text-[11px] font-semibold tracking-[0.12em] text-white/65 transition-colors"
-            style={{
-              background: 'linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 100%)',
-              border: '1px solid rgba(255,255,255,0.14)',
-              backdropFilter: 'blur(16px)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
-            }}>
-            <span style={{
-              background: 'linear-gradient(90deg, #e0e0e0, #ffffff, #c0c0c0)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            }}>
-              Entrar no IPB
-            </span>
-            {/* shimmer */}
-            <motion.div className="absolute inset-0 rounded-full pointer-events-none"
-              style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)', x: '-100%' }}
-              animate={{ x: ['−100%', '200%'] }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: 'linear', repeatDelay: 1 }} />
-          </motion.button>
+          {/* Botão hero magnético */}
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0, duration: 0.6 }}>
+            <BotaoMagnetico onClick={onEnter}
+              className="relative overflow-hidden px-7 py-2.5 rounded-full text-[11px] font-semibold tracking-[0.12em]"
+              style={{
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.09) 0%, rgba(255,255,255,0.03) 100%)',
+                border: '1px solid rgba(255,255,255,0.14)',
+                backdropFilter: 'blur(16px)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
+              }}>
+              <span style={{
+                background: 'linear-gradient(90deg, #e0e0e0, #ffffff, #c0c0c0)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              }}>
+                Entrar no IPB
+              </span>
+              <motion.div className="absolute inset-0 rounded-full pointer-events-none"
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)', x: '-100%' }}
+                animate={{ x: ['-100%', '200%'] }}
+                transition={{ duration: 2.8, repeat: Infinity, ease: 'linear', repeatDelay: 1 }} />
+            </BotaoMagnetico>
+          </motion.div>
         </motion.div>
 
         <ScrollHint />
@@ -619,19 +666,15 @@ export default function LandingPage({ onEnter }: { onEnter?: () => void }) {
                 Mercado real, IA real, diagnóstico real.<br />Entre e veja a diferença ao usar.
               </p>
 
-              <motion.button onClick={onEnter}
+              <BotaoMagnetico onClick={onEnter}
                 className="relative w-full py-4 text-[13px] font-bold tracking-[0.08em] text-black bg-white rounded-2xl overflow-hidden"
-                style={{ boxShadow: '0 0 40px rgba(255,255,255,0.08)' }}
-                whileHover={{ scale: 1.025, boxShadow: '0 0 60px rgba(255,255,255,0.18)' }}
-                whileTap={{ scale: 0.96, boxShadow: '0 0 20px rgba(255,255,255,0.06)' }}
-                transition={{ type: 'spring', stiffness: 400, damping: 25 }}>
+                style={{ boxShadow: '0 0 40px rgba(255,255,255,0.08)' }}>
                 <span className="relative z-10">Entrar no IPB →</span>
-                {/* ripple shimmer no hover */}
                 <motion.div className="absolute inset-0 rounded-2xl pointer-events-none"
-                  style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)', x: '-100%' }}
-                  whileHover={{ x: '200%' }}
-                  transition={{ duration: 0.55, ease: 'easeInOut' }} />
-              </motion.button>
+                  style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.28) 50%, transparent 100%)', x: '-100%' }}
+                  animate={{ x: ['-100%', '200%'] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: 'linear', repeatDelay: 1.5 }} />
+              </BotaoMagnetico>
             </div>
           </div>
         </motion.div>
