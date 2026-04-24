@@ -113,15 +113,18 @@ function SectionLabel({ label, sub }: { label: string; sub?: string }) {
 
 interface ChipData {
   id: string; label: string; value: string; unit?: string
-  delta: number; color: string; context?: string
+  delta: number; color: string
+  signal?: { text: string; color: string }
+  oque?: string; como?: string
 }
 
-function DataChip({ label, value, unit, delta, color, context, position, index }: ChipData & {
+function DataChip({ label, value, unit, delta, color, signal, oque, como, position, index }: ChipData & {
   position: 'top' | 'bottom'; index: number
 }) {
-  const Icon   = delta > 0.05 ? TrendingUp : delta < -0.05 ? TrendingDown : Minus
-  const dur    = 2.6 + (index % 4) * 0.55
-  const delay  = index * 0.38
+  const [open, setOpen] = useState(false)
+  const Icon  = delta > 0.05 ? TrendingUp : delta < -0.05 ? TrendingDown : Minus
+  const dur   = 2.6 + (index % 4) * 0.55
+  const delay = index * 0.38
 
   return (
     <motion.div
@@ -130,64 +133,106 @@ function DataChip({ label, value, unit, delta, color, context, position, index }
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08 + 0.3, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Float wrapper */}
+      {/* Float wrapper — pausa ao abrir */}
       <motion.div
-        animate={{ y: [0, -10, 0] }}
-        transition={{ duration: dur, delay, repeat: Infinity, ease: 'easeInOut' }}
-        className="relative overflow-hidden rounded-[18px] cursor-default"
+        animate={open ? { y: 0 } : { y: [0, -10, 0] }}
+        transition={{ duration: dur, delay, repeat: open ? 0 : Infinity, ease: 'easeInOut' }}
+        className="relative overflow-hidden rounded-[18px] cursor-pointer"
+        onClick={() => setOpen(o => !o)}
         style={{
           background: 'rgba(8,8,15,0.88)',
-          border: `1px solid rgba(255,255,255,0.07)`,
+          border: `1px solid ${open ? (signal?.color ?? color) + '38' : 'rgba(255,255,255,0.07)'}`,
           backdropFilter: 'blur(26px)',
-          boxShadow: `0 0 36px ${color}14, 0 8px 28px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)`,
+          boxShadow: open
+            ? `0 0 48px ${signal?.color ?? color}22, 0 12px 36px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.07)`
+            : `0 0 36px ${color}14, 0 8px 28px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)`,
         }}
       >
-        {/* Accent edge: bottom para chips de cima, top para chips de baixo */}
+        {/* Accent edge */}
         <motion.div
           className={`absolute ${position === 'top' ? 'bottom' : 'top'}-0 left-[12%] right-[12%] h-[2px] rounded-full`}
-          style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}
+          style={{ background: `linear-gradient(90deg, transparent, ${signal?.color ?? color}, transparent)` }}
           animate={{ opacity: [0.35, 1, 0.35] }}
           transition={{ duration: dur, delay, repeat: Infinity, ease: 'easeInOut' }}
         />
-        {/* Shimmer sweep */}
-        <motion.div
-          className="absolute inset-0 pointer-events-none"
+        {/* Shimmer */}
+        <motion.div className="absolute inset-0 pointer-events-none"
           style={{ background: `linear-gradient(108deg, transparent 25%, ${color}07 50%, transparent 75%)` }}
           animate={{ x: ['-110%', '210%'] }}
           transition={{ duration: 4 + index * 0.5, delay: index * 0.6, repeat: Infinity, ease: 'easeInOut' }}
         />
-        {/* Color glow de fundo */}
+        {/* Glow bg */}
         <div className="absolute inset-0 pointer-events-none rounded-[18px]"
           style={{ background: `radial-gradient(ellipse 70% 50% at 50% ${position === 'top' ? '100%' : '0%'}, ${color}0c 0%, transparent 70%)` }} />
 
         <div className="relative px-4 py-3.5 flex flex-col gap-1.5">
-          {/* Label + badge */}
+          {/* Label + variação */}
           <div className="flex items-center justify-between gap-2">
             <span className="text-[7.5px] font-mono uppercase tracking-[0.25em] text-white/28 leading-none">{label}</span>
-            {delta !== 0 ? (
-              <motion.span
-                className="flex items-center gap-0.5 rounded-full px-2 py-[3px] text-[7.5px] font-mono font-bold shrink-0"
-                style={{ background: `${color}18`, border: `1px solid ${color}30`, color }}
-                animate={{ opacity: [0.65, 1, 0.65] }}
-                transition={{ duration: 2.2, delay: delay * 0.5, repeat: Infinity }}
+            <div className="flex items-center gap-1.5">
+              {delta !== 0 ? (
+                <motion.span
+                  className="flex items-center gap-0.5 rounded-full px-2 py-[3px] text-[7.5px] font-mono font-bold shrink-0"
+                  style={{ background: `${color}18`, border: `1px solid ${color}30`, color }}
+                  animate={{ opacity: [0.65, 1, 0.65] }}
+                  transition={{ duration: 2.2, delay: delay * 0.5, repeat: Infinity }}
+                >
+                  <Icon className="w-2 h-2" />
+                  {Math.abs(delta) < 10 ? Math.abs(delta).toFixed(2) : Math.abs(delta).toFixed(0)}%
+                </motion.span>
+              ) : (
+                <span className="rounded-full px-2 py-[3px] text-[7px] font-mono text-white/22"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  estável
+                </span>
+              )}
+              <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                <ChevronDown className="w-3 h-3 text-white/24" />
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Valor + unidade */}
+          <div className="flex items-baseline gap-2">
+            <span className="text-[22px] font-bold font-mono tabular-nums text-white/92 tracking-tight leading-none">{value}</span>
+            {unit && <span className="text-[7.5px] font-mono text-white/22 leading-none">{unit}</span>}
+          </div>
+
+          {/* Signal badge */}
+          {signal && (
+            <span className="self-start rounded-full px-2.5 py-[3px] text-[8px] font-semibold"
+              style={{ background: `${signal.color}18`, border: `1px solid ${signal.color}30`, color: signal.color }}>
+              {signal.text}
+            </span>
+          )}
+
+          {/* Expandido: O que é + Como afeta */}
+          <AnimatePresence>
+            {open && (oque || como) && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                className="overflow-hidden"
               >
-                <Icon className="w-2 h-2" />
-                {Math.abs(delta) < 10 ? Math.abs(delta).toFixed(2) : Math.abs(delta).toFixed(0)}%
-              </motion.span>
-            ) : (
-              <span className="rounded-full px-2 py-[3px] text-[7px] font-mono text-white/22"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                estável
-              </span>
+                <div className="pt-2.5 flex flex-col gap-2.5 border-t border-white/[0.06] mt-1">
+                  {oque && (
+                    <div>
+                      <p className="text-[7px] font-mono uppercase tracking-[0.2em] text-white/22 mb-1">O que é</p>
+                      <p className="text-[9px] text-white/50 leading-[1.6]">{oque}</p>
+                    </div>
+                  )}
+                  {como && (
+                    <div>
+                      <p className="text-[7px] font-mono uppercase tracking-[0.2em] text-white/22 mb-1">Como afeta seu negócio</p>
+                      <p className="text-[9px] text-white/44 leading-[1.6]">{como}</p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
             )}
-          </div>
-          {/* Valor */}
-          <span className="text-[22px] font-bold font-mono tabular-nums text-white/92 tracking-tight leading-none">{value}</span>
-          {/* Unidade + contexto */}
-          <div>
-            {unit && <div className="text-[7.5px] font-mono text-white/22 leading-none">{unit}</div>}
-            {context && <p className="text-[8px] text-white/28 leading-[1.5] mt-0.5 line-clamp-1">{context}</p>}
-          </div>
+          </AnimatePresence>
         </div>
       </motion.div>
     </motion.div>
@@ -201,17 +246,65 @@ function GlobeHero({ data }: { data: MarketData }) {
   const silver = data.commodities.silver
   const oil    = data.commodities.oil
 
+  const sv = m.selic.value
+  const uv = m.usdBrl.value
+  const iv = m.ipca.value
+  const pv = m.pib.value
+
   const topChips: ChipData[] = [
-    { id: 'selic',  label: 'SELIC',   value: `${m.selic.value}`,     unit: '% ao ano',              delta: 0,              color: '#94a3b8', context: m.selic.sentiment  || 'Taxa básica de juros. Define custo do crédito no Brasil.' },
-    { id: 'usdbrl', label: 'USD/BRL', value: `R$ ${m.usdBrl.value}`, unit: 'câmbio comercial',       delta: m.usdBrl.delta, color: pctColor(m.usdBrl.delta), context: m.usdBrl.sentiment || 'Câmbio afeta preços, importações e exportadores.' },
-    { id: 'ipca',   label: 'IPCA',    value: `${m.ipca.value}%`,     unit: 'inflação acum. 12 meses', delta: m.ipca.delta,  color: pctColor(-m.ipca.delta),  context: m.ipca.sentiment   || 'Inflação oficial. Acima de 4,5% pressiona o BC.' },
-    { id: 'pib',    label: 'PIB',     value: `${m.pib.value}%`,      unit: 'crescimento projetado',  delta: m.pib.delta,    color: pctColor(m.pib.delta),    context: m.pib.sentiment    || 'Acima de 2% = expansão. Abaixo de 1% = estagnação.' },
+    {
+      id: 'selic', label: 'SELIC', value: `${sv}`, unit: '% ao ano', delta: 0, color: '#94a3b8',
+      signal: sv > 13 ? { text: 'Crédito restritivo', color: '#f87171' } : sv > 10 ? { text: 'Neutro', color: '#fbbf24' } : { text: 'Expansivo', color: '#34d399' },
+      oque: 'Taxa básica de juros definida pelo COPOM/BCB. Referência para todo crédito e custo de capital no Brasil.',
+      como: 'Sobe → crédito PJ mais caro (20–45% a.a.) → capital de giro encarece → consumo cai → PME sente pressão de caixa. Cai → expansão fica mais barata → momento de investir e crescer.',
+    },
+    {
+      id: 'usdbrl', label: 'USD/BRL', value: `R$ ${uv}`, unit: 'câmbio comercial', delta: m.usdBrl.delta, color: pctColor(m.usdBrl.delta),
+      signal: uv > 5.8 ? { text: 'Dólar pressionado', color: '#f87171' } : uv > 5.0 ? { text: 'Câmbio elevado', color: '#fbbf24' } : { text: 'Câmbio favorável', color: '#34d399' },
+      oque: 'Câmbio real/dólar. Reflete confiança externa no Brasil, fluxo de capital e saldo da balança comercial.',
+      como: 'Dólar alto → insumos importados e tech encarecem → agro e exportação ganham. Dólar baixo → importação barata, mas margens de exportação comprimem. PME importadora sofre mais.',
+    },
+    {
+      id: 'ipca', label: 'IPCA', value: `${iv}%`, unit: 'inflação acum. 12m', delta: m.ipca.delta, color: pctColor(-m.ipca.delta),
+      signal: iv > 5 ? { text: 'Inflação elevada', color: '#f87171' } : iv > 3.5 ? { text: 'Acima da meta', color: '#fbbf24' } : { text: 'Controlado', color: '#34d399' },
+      oque: 'Inflação oficial (IBGE). Mede variação de preços ao consumidor. Meta BCB 2025: 3% ±1.5 pp.',
+      como: 'Alto → poder de compra cai + margens reais reduzem + reajuste salarial necessário. PME tem menor poder de repasse que grandes empresas — sente antes e mais forte.',
+    },
+    {
+      id: 'pib', label: 'PIB', value: `${pv}%`, unit: 'crescimento projetado', delta: m.pib.delta, color: pctColor(m.pib.delta),
+      signal: pv < 0.5 ? { text: 'Contração', color: '#f87171' } : pv < 1.5 ? { text: 'Crescimento fraco', color: '#fbbf24' } : { text: 'Expansão', color: '#34d399' },
+      oque: 'Produto Interno Bruto — soma de tudo produzido. Projeção Focus (BCB) é o consenso do mercado financeiro.',
+      como: '>2% → demanda aquece, expanda agora. 0–2% → priorize eficiência e caixa. <0% → recessão técnica, preserve runway de 6 meses e corte variáveis.',
+    },
   ]
+
+  const gp = ibov?.pct ?? 0
+  const op = oil?.delta ?? 0
   const bottomChips: ChipData[] = [
-    { id: 'ibov',   label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000), unit: 'pontos — B3',          delta: ibov?.pct ?? 0,    color: pctColor(ibov?.pct ?? 0), context: 'Principal índice da bolsa. Alta reflete confiança dos investidores.' },
-    { id: 'gold',   label: 'OURO',     value: `$ ${gold?.value ?? '—'}`,   unit: 'USD / onça troy',      delta: gold?.delta ?? 0,  color: '#fbbf24',                context: 'Ativo-refúgio global. Sobe em crises e queda de juros.' },
-    { id: 'silver', label: 'PRATA',    value: `$ ${silver?.value ?? '—'}`, unit: 'USD / onça troy',      delta: silver?.delta ?? 0,color: '#c0c0c0',                context: 'Reserva de valor e insumo industrial: chips, energia solar.' },
-    { id: 'oil',    label: 'PETRÓLEO', value: `$ ${oil?.value ?? '—'}`,    unit: 'USD / barril (Brent)', delta: oil?.delta ?? 0,   color: pctColor(oil?.delta ?? 0),context: 'Alta encarece combustíveis, frete e inflação global.' },
+    {
+      id: 'ibov', label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000), unit: 'pontos — B3', delta: gp, color: pctColor(gp),
+      signal: gp > 1 ? { text: 'Bolsa em alta', color: '#34d399' } : gp < -1 ? { text: 'Bolsa em queda', color: '#f87171' } : { text: 'Bolsa lateral', color: '#fbbf24' },
+      oque: 'Principal índice da B3. Agrega as maiores empresas do Brasil ponderadas por valor de mercado.',
+      como: 'Alta → confiança, acesso a crédito e IPOs facilitados. Queda → risco de credit crunch, valuation de PMEs comprimido, saída de capital estrangeiro.',
+    },
+    {
+      id: 'gold', label: 'OURO', value: `$ ${gold?.value ?? '—'}`, unit: 'USD / onça troy', delta: gold?.delta ?? 0, color: '#fbbf24',
+      signal: (gold?.delta ?? 0) > 1 ? { text: 'Refúgio ativo', color: '#fbbf24' } : (gold?.delta ?? 0) < -1 ? { text: 'Pressão de venda', color: '#f87171' } : { text: 'Estável', color: '#94a3b8' },
+      oque: 'Ativo-refúgio global. Sobe em crises, queda de juros americanos e enfraquecimento do dólar.',
+      como: 'Alta do ouro sinaliza aversão a risco global. Empresas com dívida em dólar ou insumos importados sofrem mais neste cenário.',
+    },
+    {
+      id: 'silver', label: 'PRATA', value: `$ ${silver?.value ?? '—'}`, unit: 'USD / onça troy', delta: silver?.delta ?? 0, color: '#c0c0c0',
+      signal: (silver?.delta ?? 0) > 1 ? { text: 'Commodity em alta', color: '#34d399' } : (silver?.delta ?? 0) < -1 ? { text: 'Recuo industrial', color: '#f87171' } : { text: 'Estável', color: '#94a3b8' },
+      oque: 'Commodity dual: reserva de valor + insumo industrial (chips, painéis solares, eletrônica).',
+      como: 'Alta = demanda industrial crescente ou aversão a risco. Relevante para tech, energia renovável e manufatura.',
+    },
+    {
+      id: 'oil', label: 'PETRÓLEO', value: `$ ${oil?.value ?? '—'}`, unit: 'USD / barril (Brent)', delta: op, color: pctColor(op),
+      signal: op > 2 ? { text: 'Pressão inflacionária', color: '#f87171' } : op < -2 ? { text: 'Alívio nos custos', color: '#34d399' } : { text: 'Estável', color: '#fbbf24' },
+      oque: 'Brent: referência global de petróleo. Afeta diretamente combustíveis, plásticos, frete e logística.',
+      como: 'Alta → combustível mais caro → frete sobe → preços ao consumidor pressionados. PME logística e transportes sentem primeiro.',
+    },
   ]
 
   return (
