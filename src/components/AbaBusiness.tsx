@@ -111,94 +111,87 @@ function SectionLabel({ label, sub }: { label: string; sub?: string }) {
 // ██  1 — GLOBE HERO
 // ════════════════════════════════════════════════════════════════════════════
 
-function DataOrb({ label, value, sub, color, delay = 0, style }: {
-  label: string; value: string; sub?: string; color: string; delay?: number; style: React.CSSProperties
+function DataCard({ id, label, value, unit, delta, color, delay, dir }: {
+  id: string; label: string; value: string; unit?: string; delta: number
+  color: string; delay: number; dir: 'left' | 'right'
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.75 }}
-      animate={{ opacity: 1, scale: 1, y: [0, -5, 0] }}
-      transition={{
-        opacity: { delay, duration: 0.45 },
-        scale:   { delay, duration: 0.45, ease: [0.16, 1, 0.3, 1] },
-        y:       { delay: delay + 0.5, duration: 3.6 + delay * 0.4, repeat: Infinity, ease: 'easeInOut' },
+      initial={{ opacity: 0, x: dir === 'left' ? -12 : 12 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      className="rounded-xl p-2.5 flex flex-col gap-1"
+      style={{
+        background: 'rgba(255,255,255,0.022)',
+        border: `1px solid ${color}18`,
+        backdropFilter: 'blur(12px)',
       }}
-      className="absolute pointer-events-none"
-      style={style}
     >
-      <div className="rounded-xl px-2.5 py-1.5 flex flex-col items-center gap-0.5"
-        style={{
-          background: 'rgba(8,8,10,0.82)',
-          border: `1px solid ${color}28`,
-          backdropFilter: 'blur(14px)',
-          boxShadow: `0 0 18px ${color}12, 0 2px 8px rgba(0,0,0,0.4)`,
-        }}>
-        <span className="text-[8px] font-mono uppercase tracking-[0.28em] text-white/28 whitespace-nowrap">{label}</span>
-        <span className="text-[13px] font-bold font-mono tabular-nums leading-none text-white/82">{value}</span>
-        {sub && <span className="text-[9px] font-mono font-semibold" style={{ color }}>{sub}</span>}
+      <div className="flex items-center justify-between">
+        <span className="text-[8px] font-mono uppercase tracking-[0.25em] text-white/25 leading-none">{label}</span>
+        <motion.div className="w-1 h-1 rounded-full" style={{ background: color, boxShadow: `0 0 4px ${color}` }}
+          animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 2 + delay, repeat: Infinity }} />
       </div>
+      <div className="flex items-end justify-between gap-1">
+        <div>
+          <span className="text-[14px] font-bold font-mono tabular-nums leading-none text-white/82">{value}</span>
+          {unit && <span className="text-[8px] font-mono text-white/18 ml-0.5">{unit}</span>}
+        </div>
+        <Sparkline id={id} delta={delta} color={color} w={40} h={16} />
+      </div>
+      {delta !== 0 && (
+        <span className="text-[9px] font-mono font-semibold leading-none" style={{ color }}>
+          {delta > 0 ? '+' : ''}{delta.toFixed(2)}
+        </span>
+      )}
     </motion.div>
   )
 }
 
 function GlobeHero({ data }: { data: MarketData }) {
-  const m    = data.macro
-  const ibov = data.stocks?.ibov
-  const gold = data.commodities.gold
+  const m      = data.macro
+  const ibov   = data.stocks?.ibov
+  const gold   = data.commodities.gold
+  const silver = data.commodities.silver
+  const oil    = data.commodities.oil
 
-  const orbs = [
-    {
-      label: 'IPCA', value: `${m.ipca.value}%`, sub: m.ipca.delta !== 0 ? pctSign(m.ipca.delta) : undefined,
-      color: pctColor(-m.ipca.delta), delay: 0.0,
-      style: { top: '2%', left: '50%', transform: 'translateX(-50%)' },
-    },
-    {
-      label: 'SELIC', value: `${m.selic.value}%`, sub: 'a.a.',
-      color: '#94a3b8', delay: 0.1,
-      style: { top: '20%', left: '2%' },
-    },
-    {
-      label: 'USD', value: `R$${m.usdBrl.value}`, sub: m.usdBrl.delta !== 0 ? pctSign(m.usdBrl.delta) : undefined,
-      color: pctColor(m.usdBrl.delta), delay: 0.2,
-      style: { top: '20%', right: '2%' },
-    },
-    {
-      label: 'PIB', value: `${m.pib.value}%`, sub: 'proj.',
-      color: pctColor(m.pib.delta), delay: 0.3,
-      style: { bottom: '20%', left: '2%' },
-    },
-    {
-      label: 'OURO', value: `$${gold?.value ?? '—'}`, sub: gold?.delta !== undefined ? pctSign(gold.delta) : undefined,
-      color: pctColor(gold?.delta ?? 0), delay: 0.4,
-      style: { bottom: '20%', right: '2%' },
-    },
-    {
-      label: 'IBOV', value: fmtK(ibov?.value ?? 128000) + 'k', sub: ibov?.pct !== undefined ? pctSign(ibov.pct) : undefined,
-      color: pctColor(ibov?.pct ?? 0), delay: 0.5,
-      style: { bottom: '2%', left: '50%', transform: 'translateX(-50%)' },
-    },
+  const leftCards = [
+    { id: 'selic',  label: 'SELIC',   value: `${m.selic.value}`,    unit: '% a.a.', delta: 0,                   color: '#94a3b8' },
+    { id: 'usdbrl', label: 'USD/BRL', value: `${m.usdBrl.value}`,   unit: 'R$',     delta: m.usdBrl.delta,      color: pctColor(m.usdBrl.delta) },
+    { id: 'ipca',   label: 'IPCA',    value: `${m.ipca.value}`,     unit: '% 12m',  delta: m.ipca.delta,        color: pctColor(-m.ipca.delta) },
+    { id: 'pib',    label: 'PIB',     value: `${m.pib.value}`,      unit: '% proj', delta: m.pib.delta,         color: pctColor(m.pib.delta) },
+  ]
+
+  const rightCards = [
+    { id: 'ibov',   label: 'IBOVESPA',  value: fmtK(ibov?.value ?? 128000), unit: 'pts',    delta: ibov?.pct  ?? 0,     color: pctColor(ibov?.pct  ?? 0) },
+    { id: 'gold',   label: 'OURO',      value: `${gold?.value   ?? '—'}`,   unit: 'USD/oz', delta: gold?.delta   ?? 0,  color: '#fbbf24' },
+    { id: 'silver', label: 'PRATA',     value: `${silver?.value ?? '—'}`,   unit: 'USD/oz', delta: silver?.delta ?? 0,  color: '#94a3b8' },
+    { id: 'oil',    label: 'PETRÓLEO',  value: `${oil?.value    ?? '—'}`,   unit: 'USD/bbl',delta: oil?.delta    ?? 0,  color: pctColor(oil?.delta ?? 0) },
   ]
 
   return (
-    <div className="relative w-full select-none" style={{ height: 370 }}>
-      {/* Halo glow */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 0 }}>
-        <div style={{
-          width: 240, height: 240, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(192,192,192,0.055) 0%, transparent 72%)',
-        }} />
+    <div className="flex items-center gap-3 select-none">
+      {/* Left column */}
+      <div className="flex flex-col gap-2 flex-1 min-w-0">
+        {leftCards.map((c, i) => <DataCard key={c.id} {...c} delay={i * 0.08} dir="left" />)}
       </div>
-      {/* Globe */}
-      <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 1 }}>
-        <div style={{ width: 240, height: 240 }}>
+
+      {/* Globe — center, fixed size */}
+      <div className="relative shrink-0" style={{ width: 180, height: 180 }}>
+        <div style={{ width: '100%', height: '100%' }}>
           <Globe3D />
         </div>
+        {/* glow ring */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(192,192,192,0.06) 0%, transparent 70%)',
+        }} />
       </div>
-      {/* Orbs */}
-      {orbs.map(orb => (
-        <DataOrb key={orb.label} label={orb.label} value={orb.value} sub={orb.sub}
-          color={orb.color} delay={orb.delay} style={{ ...orb.style, zIndex: 2 }} />
-      ))}
+
+      {/* Right column */}
+      <div className="flex flex-col gap-2 flex-1 min-w-0">
+        {rightCards.map((c, i) => <DataCard key={c.id} {...c} delay={i * 0.08 + 0.32} dir="right" />)}
+      </div>
     </div>
   )
 }
