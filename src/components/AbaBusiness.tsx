@@ -2,11 +2,16 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { RefreshCw, Send, ChevronRight, TrendingUp, TrendingDown, Minus, Zap } from 'lucide-react'
-import IpbBackground from '@/components/IpbBackground'
+import {
+  RefreshCw, Send, ChevronRight, TrendingUp, TrendingDown, Minus,
+  Zap, ChevronDown, Play,
+} from 'lucide-react'
 import { useMarketData } from '@/hooks/useMarketData'
 import { useAuth } from '@/hooks/useAuth'
 import { createClient } from '@/lib/supabase/client'
+import dynamic from 'next/dynamic'
+
+const Globe3D = dynamic(() => import('@/components/business/Globe3D'), { ssr: false })
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface MacroPoint   { value: number; delta: number; sentiment: string }
@@ -64,7 +69,7 @@ function applySimulation(data: MarketData, sim: SimOffsets): MarketData {
 }
 
 // ── Sparkline ──────────────────────────────────────────────────────────────
-function Sparkline({ id, delta, color, w = 64, h = 22 }: { id: string; delta: number; color: string; w?: number; h?: number }) {
+function Sparkline({ id, delta, color, w = 56, h = 20 }: { id: string; delta: number; color: string; w?: number; h?: number }) {
   const pts = useMemo(() => {
     const dateStr = new Date().toDateString()
     let seed = 0
@@ -82,66 +87,225 @@ function Sparkline({ id, delta, color, w = 64, h = 22 }: { id: string; delta: nu
   }, [id, delta, w, h])
   return (
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="shrink-0">
-      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.3"
-        strokeLinecap="round" strokeLinejoin="round" opacity="0.65" />
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.2"
+        strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
     </svg>
   )
 }
 
-// ── Macro Card ─────────────────────────────────────────────────────────────
-function MacroCard({ id, label, value, unit, delta, color, sub, delay }: {
-  id: string; label: string; value: string; unit?: string; delta: number
-  color: string; sub?: string; delay: number
+// ── Section Label ──────────────────────────────────────────────────────────
+function SectionLabel({ label, sub }: { label: string; sub?: string }) {
+  return (
+    <motion.div initial={{ opacity: 0, x: -8 }} whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }} transition={{ duration: 0.5 }}
+      className="flex items-center gap-3 mb-4">
+      <div className="w-0.5 h-4 rounded-full" style={{ background: 'rgba(192,192,192,0.22)' }} />
+      <span className="text-[9px] font-mono uppercase tracking-[0.4em] text-white/25">{label}</span>
+      {sub && <span className="text-[9px] font-mono text-white/12">{sub}</span>}
+      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(192,192,192,0.07), transparent)' }} />
+    </motion.div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  1 — GLOBE HERO
+// ════════════════════════════════════════════════════════════════════════════
+
+function DataOrb({ label, value, sub, color, delay = 0, style }: {
+  label: string; value: string; sub?: string; color: string; delay?: number; style: React.CSSProperties
 }) {
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, ease: [0.16, 1, 0.3, 1], duration: 0.6 }}
-      className="relative rounded-2xl p-4 flex flex-col gap-1 overflow-hidden"
-      style={{ background: 'rgba(255,255,255,0.022)', border: '1px solid rgba(192,192,192,0.09)', backdropFilter: 'blur(20px)' }}>
-      <div className="absolute top-0 left-4 right-4 h-px"
-        style={{ background: 'linear-gradient(90deg,transparent,rgba(192,192,192,0.18),transparent)' }} />
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-white/28">{label}</span>
-        <motion.div className="w-1.5 h-1.5 rounded-full"
-          style={{ background: color, boxShadow: `0 0 6px ${color}80` }}
-          animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 2.2, repeat: Infinity }} />
-      </div>
-      <div className="flex items-end justify-between gap-2">
-        <div>
-          <span className="text-[1.4rem] font-bold tabular-nums leading-none text-white/88 font-mono">{value}</span>
-          {unit && <span className="text-[9px] text-white/22 ml-1 font-mono">{unit}</span>}
-          {sub && <div className="text-[8px] text-white/16 mt-0.5 font-mono">{sub}</div>}
-        </div>
-        <div className="flex flex-col items-end gap-1">
-          <span className="text-[10px] font-mono font-semibold" style={{ color }}>
-            {delta > 0 ? '+' : ''}{delta.toFixed(2)}
-          </span>
-          <Sparkline id={id} delta={delta} color={color} />
-        </div>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.75 }}
+      animate={{ opacity: 1, scale: 1, y: [0, -5, 0] }}
+      transition={{
+        opacity: { delay, duration: 0.45 },
+        scale:   { delay, duration: 0.45, ease: [0.16, 1, 0.3, 1] },
+        y:       { delay: delay + 0.5, duration: 3.6 + delay * 0.4, repeat: Infinity, ease: 'easeInOut' },
+      }}
+      className="absolute pointer-events-none"
+      style={style}
+    >
+      <div className="rounded-xl px-2.5 py-1.5 flex flex-col items-center gap-0.5"
+        style={{
+          background: 'rgba(8,8,10,0.82)',
+          border: `1px solid ${color}28`,
+          backdropFilter: 'blur(14px)',
+          boxShadow: `0 0 18px ${color}12, 0 2px 8px rgba(0,0,0,0.4)`,
+        }}>
+        <span className="text-[8px] font-mono uppercase tracking-[0.28em] text-white/28 whitespace-nowrap">{label}</span>
+        <span className="text-[13px] font-bold font-mono tabular-nums leading-none text-white/82">{value}</span>
+        {sub && <span className="text-[9px] font-mono font-semibold" style={{ color }}>{sub}</span>}
       </div>
     </motion.div>
   )
 }
 
-function CommandCenter({ data }: { data: MarketData }) {
+function GlobeHero({ data }: { data: MarketData }) {
   const m    = data.macro
   const ibov = data.stocks?.ibov
-  const cards = [
-    { id: 'selic',  label: 'SELIC',     value: `${m.selic.value}`,           unit: '% a.a.',  delta: 0,                       color: '#94a3b8', sub: 'taxa básica' },
-    { id: 'usdbrl', label: 'USD/BRL',   value: `${m.usdBrl.value}`,          unit: 'R$',      delta: m.usdBrl.delta,           color: pctColor(m.usdBrl.delta),     sub: 'câmbio' },
-    { id: 'ipca',   label: 'IPCA',      value: `${m.ipca.value}`,            unit: '% 12m',   delta: m.ipca.delta,             color: pctColor(-m.ipca.delta),      sub: 'inflação' },
-    { id: 'pib',    label: 'PIB',       value: `${m.pib.value}`,             unit: '% proj',  delta: m.pib.delta,              color: pctColor(m.pib.delta),        sub: 'Focus' },
-    { id: 'gold',   label: 'OURO',      value: `${data.commodities.gold?.value ?? '—'}`, unit: 'USD/oz', delta: data.commodities.gold?.delta ?? 0, color: pctColor(data.commodities.gold?.delta ?? 0), sub: 'commodity' },
-    { id: 'ibov',   label: 'IBOVESPA',  value: fmtK(ibov?.value ?? 128000),  unit: 'pts',     delta: ibov?.pct ?? 0,           color: pctColor(ibov?.pct ?? 0),     sub: 'B3' },
+  const gold = data.commodities.gold
+
+  const orbs = [
+    {
+      label: 'IPCA', value: `${m.ipca.value}%`, sub: m.ipca.delta !== 0 ? pctSign(m.ipca.delta) : undefined,
+      color: pctColor(-m.ipca.delta), delay: 0.0,
+      style: { top: '2%', left: '50%', transform: 'translateX(-50%)' },
+    },
+    {
+      label: 'SELIC', value: `${m.selic.value}%`, sub: 'a.a.',
+      color: '#94a3b8', delay: 0.1,
+      style: { top: '20%', left: '2%' },
+    },
+    {
+      label: 'USD', value: `R$${m.usdBrl.value}`, sub: m.usdBrl.delta !== 0 ? pctSign(m.usdBrl.delta) : undefined,
+      color: pctColor(m.usdBrl.delta), delay: 0.2,
+      style: { top: '20%', right: '2%' },
+    },
+    {
+      label: 'PIB', value: `${m.pib.value}%`, sub: 'proj.',
+      color: pctColor(m.pib.delta), delay: 0.3,
+      style: { bottom: '20%', left: '2%' },
+    },
+    {
+      label: 'OURO', value: `$${gold?.value ?? '—'}`, sub: gold?.delta !== undefined ? pctSign(gold.delta) : undefined,
+      color: pctColor(gold?.delta ?? 0), delay: 0.4,
+      style: { bottom: '20%', right: '2%' },
+    },
+    {
+      label: 'IBOV', value: fmtK(ibov?.value ?? 128000) + 'k', sub: ibov?.pct !== undefined ? pctSign(ibov.pct) : undefined,
+      color: pctColor(ibov?.pct ?? 0), delay: 0.5,
+      style: { bottom: '2%', left: '50%', transform: 'translateX(-50%)' },
+    },
   ]
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
-      {cards.map((c, i) => <MacroCard key={c.id} {...c} delay={i * 0.07} />)}
+    <div className="relative w-full select-none" style={{ height: 370 }}>
+      {/* Halo glow */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 0 }}>
+        <div style={{
+          width: 240, height: 240, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(192,192,192,0.055) 0%, transparent 72%)',
+        }} />
+      </div>
+      {/* Globe */}
+      <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 1 }}>
+        <div style={{ width: 240, height: 240 }}>
+          <Globe3D />
+        </div>
+      </div>
+      {/* Orbs */}
+      {orbs.map(orb => (
+        <DataOrb key={orb.label} label={orb.label} value={orb.value} sub={orb.sub}
+          color={orb.color} delay={orb.delay} style={{ ...orb.style, zIndex: 2 }} />
+      ))}
     </div>
   )
 }
 
-// ── Stocks Panel ───────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// ██  2 — MACRO MEANING
+// ════════════════════════════════════════════════════════════════════════════
+
+const MACRO_CARDS = [
+  {
+    id: 'selic', label: 'SELIC',
+    oque: 'Taxa básica de juros definida pelo COPOM/BCB. Referência para todo crédito e custo de capital no Brasil.',
+    como: 'Sobe → crédito PJ mais caro (20-45% a.a.) → capital de giro encarece → consumo cai → PME sente pressão de caixa. Cai → expansão fica mais barata → momento de investir e crescer.',
+    sinalFn: (v: number) => v > 13 ? { text: 'Crédito restritivo', color: '#f87171' } : v > 10 ? { text: 'Neutro', color: '#fbbf24' } : { text: 'Expansivo', color: '#34d399' },
+  },
+  {
+    id: 'usdbrl', label: 'USD / BRL',
+    oque: 'Câmbio real/dólar. Reflete confiança externa no Brasil, fluxo de capital e saldo da balança comercial.',
+    como: 'Dólar alto → insumos importados e tech encarecem → agro e exportação ganham. Dólar baixo → importação fica barata → margens de exportação comprimem. PME importadora sofre com câmbio alto.',
+    sinalFn: (v: number) => v > 5.8 ? { text: 'Dólar pressionado', color: '#f87171' } : v > 5.0 ? { text: 'Câmbio elevado', color: '#fbbf24' } : { text: 'Câmbio favorável', color: '#34d399' },
+  },
+  {
+    id: 'ipca', label: 'IPCA',
+    oque: 'Inflação oficial (IBGE). Mede variação de preços ao consumidor. Meta BCB 2024: 3% ±1.5 pp.',
+    como: 'Alto → poder de compra cai + margens reais reduzem + reajuste salarial necessário. PME tem menor poder de repasse que grandes empresas — sente antes e mais forte.',
+    sinalFn: (v: number) => v > 5 ? { text: 'Inflação elevada', color: '#f87171' } : v > 3.5 ? { text: 'Acima da meta', color: '#fbbf24' } : { text: 'Controlado', color: '#34d399' },
+  },
+  {
+    id: 'pib', label: 'PIB',
+    oque: 'Produto Interno Bruto — soma de tudo produzido. Projeção Focus (BCB) é o consenso do mercado financeiro.',
+    como: '>2% → demanda aquece, expanda agora. 0–2% → crescimento fraco, priorize eficiência e caixa. <0% → recessão técnica, preserve runway mínimo de 6 meses e corte variáveis.',
+    sinalFn: (v: number) => v < 0.5 ? { text: 'Contração', color: '#f87171' } : v < 1.5 ? { text: 'Crescimento fraco', color: '#fbbf24' } : { text: 'Expansão', color: '#34d399' },
+  },
+]
+
+function MacroMeaningCard({ card, value, expanded, onToggle }: {
+  card: typeof MACRO_CARDS[0]; value: number; expanded: boolean; onToggle: () => void
+}) {
+  const sinal = card.sinalFn(value)
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }} transition={{ duration: 0.4 }}
+      className="rounded-2xl overflow-hidden cursor-pointer"
+      style={{ background: 'rgba(255,255,255,0.022)', border: '1px solid rgba(192,192,192,0.08)' }}
+      onClick={onToggle}
+    >
+      <div className="px-3.5 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <span className="text-[10px] font-mono font-semibold text-white/55">{card.label}</span>
+          <div className="w-1.5 h-1.5 rounded-full" style={{ background: sinal.color, boxShadow: `0 0 5px ${sinal.color}80` }} />
+          <span className="text-[9px] font-mono" style={{ color: sinal.color }}>{sinal.text}</span>
+        </div>
+        <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.22 }}>
+          <ChevronDown className="w-3.5 h-3.5 text-white/20" />
+        </motion.div>
+      </div>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="px-3.5 pb-3.5 flex flex-col gap-3"
+              style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
+              onClick={e => e.stopPropagation()}>
+              <div className="pt-3">
+                <span className="text-[9px] font-mono uppercase tracking-[0.25em] text-white/18">O que é</span>
+                <p className="text-[12px] text-white/48 leading-[1.75] mt-1.5">{card.oque}</p>
+              </div>
+              <div>
+                <span className="text-[9px] font-mono uppercase tracking-[0.25em] text-white/18">Como afeta seu negócio</span>
+                <p className="text-[12px] text-white/48 leading-[1.75] mt-1.5">{card.como}</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+function MacroMeaning({ data }: { data: MarketData }) {
+  const [expanded, setExpanded] = useState<string | null>('selic')
+  const vals: Record<string, number> = {
+    selic: data.macro.selic.value,
+    usdbrl: data.macro.usdBrl.value,
+    ipca: data.macro.ipca.value,
+    pib: data.macro.pib.value,
+  }
+  return (
+    <div className="grid grid-cols-2 gap-2.5">
+      {MACRO_CARDS.map(card => (
+        <MacroMeaningCard key={card.id} card={card} value={vals[card.id] ?? 0}
+          expanded={expanded === card.id}
+          onToggle={() => setExpanded(expanded === card.id ? null : card.id)} />
+      ))}
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  3 — MARKET PANEL (B3 + Global)
+// ════════════════════════════════════════════════════════════════════════════
+
 function StockRow({ ticker, label, price, pct, showPrice = true }: {
   ticker: string; label: string; price?: number; pct: number; showPrice?: boolean
 }) {
@@ -150,15 +314,15 @@ function StockRow({ ticker, label, price, pct, showPrice = true }: {
   return (
     <div className="flex items-center justify-between py-2 border-b border-white/[0.04] last:border-0">
       <div className="flex items-center gap-2.5">
-        <div className="flex h-6 w-10 items-center justify-center rounded-md text-[9px] font-mono font-bold shrink-0"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.5)' }}>
+        <div className="flex h-6 w-11 items-center justify-center rounded-md text-[9px] font-mono font-bold shrink-0"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.45)' }}>
           {ticker}
         </div>
         <span className="text-[10px] text-white/30">{label}</span>
       </div>
       <div className="flex items-center gap-3">
         {showPrice && price !== undefined && (
-          <span className="text-[11px] font-mono text-white/50">R${fmtBRL(price)}</span>
+          <span className="text-[11px] font-mono text-white/45">R${fmtBRL(price)}</span>
         )}
         <div className="flex items-center gap-1">
           <Icon className="w-3 h-3" style={{ color: col }} />
@@ -173,8 +337,7 @@ function StockRow({ ticker, label, price, pct, showPrice = true }: {
 
 function MarketPanel({ data }: { data: MarketData }) {
   const brStocks = data.stocks?.br ?? []
-  const glStocks = (data.stocks?.global ?? data.globalAgents?.slice(0, 4).map(a => ({ ticker: a.id.toUpperCase(), label: a.label, pct: a.delta })) ?? [])
-
+  const glStocks = data.stocks?.global ?? data.globalAgents?.slice(0, 4).map(a => ({ ticker: a.id.toUpperCase(), label: a.label, pct: a.delta })) ?? []
   const fallbackBR = [
     { ticker: 'PETR4', label: 'Petrobras', price: 36.50, pct: 0 },
     { ticker: 'VALE3', label: 'Vale',       price: 58.20, pct: 0 },
@@ -182,11 +345,10 @@ function MarketPanel({ data }: { data: MarketData }) {
     { ticker: 'BBDC4', label: 'Bradesco',   price: 15.80, pct: 0 },
     { ticker: 'WEGE3', label: 'WEG',        price: 50.10, pct: 0 },
   ]
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       <div className="rounded-2xl overflow-hidden"
-        style={{ background: 'rgba(255,255,255,0.018)', border: '1px solid rgba(192,192,192,0.08)', backdropFilter: 'blur(20px)' }}>
+        style={{ background: 'rgba(255,255,255,0.018)', border: '1px solid rgba(192,192,192,0.08)' }}>
         <div className="px-4 pt-4 pb-2 flex items-center justify-between"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
           <span className="text-[9px] font-mono uppercase tracking-[0.35em] text-white/22">Bolsa BR · B3</span>
@@ -195,12 +357,11 @@ function MarketPanel({ data }: { data: MarketData }) {
         </div>
         <div className="px-4 py-1">
           {(brStocks.length > 0 ? brStocks : fallbackBR).map(s =>
-            <StockRow key={s.ticker} ticker={s.ticker} label={s.label} price={s.price} pct={s.pct} />)}
+            <StockRow key={s.ticker} ticker={s.ticker} label={s.label} price={(s as StockBR).price} pct={s.pct} />)}
         </div>
       </div>
-
       <div className="rounded-2xl overflow-hidden"
-        style={{ background: 'rgba(255,255,255,0.018)', border: '1px solid rgba(192,192,192,0.08)', backdropFilter: 'blur(20px)' }}>
+        style={{ background: 'rgba(255,255,255,0.018)', border: '1px solid rgba(192,192,192,0.08)' }}>
         <div className="px-4 pt-4 pb-2 flex items-center justify-between"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
           <span className="text-[9px] font-mono uppercase tracking-[0.35em] text-white/22">Empresas Globais</span>
@@ -217,45 +378,346 @@ function MarketPanel({ data }: { data: MarketData }) {
   )
 }
 
-// ── Sector Heatmap ─────────────────────────────────────────────────────────
-function SectorCell({ sector, delay }: { sector: Sector; delay: number }) {
+// ════════════════════════════════════════════════════════════════════════════
+// ██  4 — SECTOR ANALYSIS (expandable)
+// ════════════════════════════════════════════════════════════════════════════
+
+const SECTOR_ANALYSIS: Record<string, { oportunidade: string; risco: string; como: string; quem: string }> = {
+  retail:    { oportunidade: 'SELIC em queda estimula consumo. Fintechs de BNPL crescem. Social commerce e omnichannel expandem.', risco: 'Inflação corrói poder de compra. Inadimplência PJ 5.8%. Margens típicas de 3-8%.', como: 'Parcelamento sem juros + cashback. Integrar canais físico/digital. Estoque enxuto (just-in-time).', quem: 'Varejo popular, e-commerce, marketplace, franquias' },
+  fintech:   { oportunidade: 'Open Finance abre novas receitas. Crédito digital cresce 30% a.a. Embedded finance em expansão.', risco: 'BACEN mais rigoroso. NIM comprimido com SELIC alta. Fraude e chargeback elevados no Brasil.', como: 'Produtos de renda fixa com cashback. BaaS para nichos. Crédito consignado digital.', quem: 'Fintechs de crédito, pagamentos, banking-as-a-service, seguradoras digitais' },
+  tech:      { oportunidade: 'IA generativa reduz custo operacional 30-60%. SaaS vertical cresce 22% a.a. no Brasil.', risco: 'Câmbio encarece custos em USD. Churn SaaS BR 5-8%/mês vs 1-3% nos EUA. CAC elevado.', como: 'Precificação em USD para exportação. PLG para reduzir CAC. Verticais com alto switching cost.', quem: 'SaaS vertical, AI-native, devtools, marketplaces B2B' },
+  agro:      { oportunidade: 'Commodities em alta histórica. Câmbio favorece exportação. Agrotech cresce 45% a.a.', risco: 'Risco climático (La Niña/El Niño). Custo de insumos em dólar. Logística cara para escoamento.', como: 'Hedge cambial. Contrato futuro de commodities. Tecnologia de precisão para reduzir custo.', quem: 'Produtores de soja, milho, pecuária, café; agtechs, tradings' },
+  energy:    { oportunidade: 'Mercado livre de energia cresce 18% a.a. Solar distribuído em boom. ESG como diferencial competitivo.', risco: 'Regulação ANEEL/CMSE. Risco hidrológico em ano seco. Capital intensivo.', como: 'Solar com financiamento no cliente. PCLD com grandes consumidores. RECs para ESG corporativo.', quem: 'Geradoras, distribuidoras, integradores solar, energytechs' },
+  health:    { oportunidade: 'Envelhecimento da população. Telemedicina cresce 28% a.a. Healthtech com SaaS recorrente.', risco: 'ANS com regulação crescente. Inadimplência nos planos >15%. Custo de sinistro alto.', como: 'B2B via planos corporativos. Preventivo e wellness. IA para diagnóstico e redução de custo.', quem: 'Healthtechs, clínicas, operadoras de plano, farmácias' },
+  logistics: { oportunidade: 'E-commerce gera demanda last-mile. Fulfillment centers ganham escala. Cross-docking urbano.', risco: 'Câmbio encarece frota importada. Diesel e pedágio pressionam margem. Concorrência de marketplace.', como: 'Roteirização com IA. Micro-fulfillment urban. Frota elétrica para urban delivery.', quem: 'Transportadoras, 3PLs, marketplaces de entrega, fintechs de frete' },
+  services:  { oportunidade: 'Terceirização de TI e BPO acelera. Consultoria ESG em alta demanda. Serviços recorrentes crescem.', risco: 'SELIC alta limita expansão dos clientes PME. Comoditização. Alta rotatividade de talentos.', como: 'Contratos recorrentes com SLA. Precificação por resultado/outcome. Especialização vertical.', quem: 'Consultorias, bureaus, prestadores B2B, agências especializadas' },
+  media:     { oportunidade: 'Criadores independentes escalam com plataformas. Adtech BR cresce. Comunidades pagas em alta.', risco: 'CPM volátil com macro. Atenção fragmentada. LGPD limita targeting. Algoritmos mudam constantemente.', como: 'Owned media (newsletter, podcast). Comunidade paga. Branded content B2B.', quem: 'Agências, creators, adtechs, OTTs, publishers' },
+}
+
+function SectorCard({ sector, delay }: { sector: Sector; delay: number }) {
+  const [open, setOpen] = useState(false)
+  const analysis = SECTOR_ANALYSIS[sector.id]
   const h   = sector.heat
-  const bg  = h >= 75 ? 'rgba(52,211,153,0.12)' : h >= 50 ? 'rgba(192,192,192,0.06)' : h >= 30 ? 'rgba(100,100,110,0.06)' : 'rgba(248,113,113,0.1)'
-  const bdr = h >= 75 ? 'rgba(52,211,153,0.2)'  : h >= 50 ? 'rgba(192,192,192,0.09)' : h >= 30 ? 'rgba(100,100,110,0.09)' : 'rgba(248,113,113,0.18)'
-  const col = h >= 75 ? '#34d399' : h >= 50 ? 'rgba(255,255,255,0.5)' : h >= 30 ? 'rgba(255,255,255,0.3)' : '#f87171'
+  const col = h >= 75 ? '#34d399' : h >= 50 ? 'rgba(255,255,255,0.48)' : h >= 30 ? 'rgba(255,255,255,0.28)' : '#f87171'
+  const bg  = h >= 75 ? 'rgba(52,211,153,0.05)'  : h >= 50 ? 'rgba(192,192,192,0.04)' : h >= 30 ? 'rgba(100,100,110,0.04)' : 'rgba(248,113,113,0.05)'
+  const bdr = h >= 75 ? 'rgba(52,211,153,0.14)'  : h >= 50 ? 'rgba(192,192,192,0.07)' : h >= 30 ? 'rgba(100,100,110,0.07)' : 'rgba(248,113,113,0.12)'
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.94 }} whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }} transition={{ delay, duration: 0.5 }}
-      className="relative rounded-xl p-3 flex flex-col gap-1"
-      style={{ background: bg, border: `1px solid ${bdr}` }}>
-      <span className="text-[8px] font-semibold text-white/42 leading-tight">{sector.label}</span>
-      <div className="flex items-end justify-between mt-1">
-        <div>
-          <span className="text-[1.1rem] font-bold font-mono tabular-nums leading-none" style={{ color: col }}>{h}</span>
-          <span className="text-[8px] font-mono text-white/15 ml-0.5">/100</span>
+    <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }} transition={{ delay, duration: 0.4 }}
+      className="rounded-xl overflow-hidden" style={{ background: bg, border: `1px solid ${bdr}` }}>
+      <div className="px-3.5 py-3 flex items-center justify-between cursor-pointer" onClick={() => setOpen(o => !o)}>
+        <div className="flex items-center gap-3">
+          <div>
+            <span className="text-[11px] font-semibold text-white/58">{sector.label}</span>
+            <div className="flex items-center gap-2 mt-0.5">
+              <div className="w-20 h-1 rounded-full bg-white/[0.06]">
+                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${h}%`, background: col, opacity: 0.48 }} />
+              </div>
+              <span className="text-[9px] font-mono text-white/28">{h}/100</span>
+            </div>
+          </div>
         </div>
-        <span className="text-[10px] font-mono font-semibold" style={{ color: pctColor(sector.change) }}>
-          {sector.change >= 0 ? '+' : ''}{sector.change}%
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-[11px] font-mono font-semibold" style={{ color: pctColor(sector.change) }}>
+            {sector.change >= 0 ? '+' : ''}{sector.change}%
+          </span>
+          <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.22 }}>
+            <ChevronDown className="w-3.5 h-3.5 text-white/20" />
+          </motion.div>
+        </div>
       </div>
-      <div className="h-0.5 rounded-full mt-1 bg-white/[0.05]">
-        <div className="h-full rounded-full" style={{ width: `${h}%`, background: col, opacity: 0.45 }} />
-      </div>
+
+      <AnimatePresence>
+        {open && analysis && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden">
+            <div className="px-3.5 pb-3.5 grid grid-cols-2 gap-x-4 gap-y-3"
+              style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '0.75rem' }}>
+              {[
+                { heading: 'Oportunidades', text: analysis.oportunidade, color: '#34d399' },
+                { heading: 'Riscos',        text: analysis.risco,        color: '#f87171' },
+                { heading: 'Como atuar',    text: analysis.como,         color: '#60a5fa' },
+                { heading: 'Quem se beneficia', text: analysis.quem,     color: 'rgba(255,255,255,0.22)' },
+              ].map(({ heading, text, color }) => (
+                <div key={heading}>
+                  <span className="text-[9px] font-mono uppercase tracking-[0.22em]" style={{ color }}>{heading}</span>
+                  <p className="text-[11px] text-white/38 leading-[1.72] mt-1.5">{text}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }
 
-function SectorHeatmap({ sectors }: { sectors: Sector[] }) {
+function SectorAnalysis({ sectors }: { sectors: Sector[] }) {
   const sorted = [...sectors].sort((a, b) => b.heat - a.heat)
   return (
-    <div className="grid grid-cols-3 gap-2">
-      {sorted.map((s, i) => <SectorCell key={s.id} sector={s} delay={i * 0.05} />)}
+    <div className="flex flex-col gap-2">
+      {sorted.map((s, i) => <SectorCard key={s.id} sector={s} delay={i * 0.04} />)}
     </div>
   )
 }
 
-// ── IA Advisor ─────────────────────────────────────────────────────────────
-const PRESETS = [
+// ════════════════════════════════════════════════════════════════════════════
+// ██  5 — CADEIA DE IMPACTO
+// ════════════════════════════════════════════════════════════════════════════
+
+const IMPACT_CHAINS = [
+  {
+    id: 'selic', title: 'SELIC', color: '#94a3b8',
+    up:   { label: 'Sobe',   color: '#f87171', effects: ['Crédito PJ mais caro (20-45% a.a.)', 'Capital de giro encarece', 'Consumo das famílias contrai', 'Pressão em varejo e serviços', 'CDB vira concorrente direto do negócio'] },
+    down: { label: 'Cai',    color: '#34d399', effects: ['Crédito mais barato e acessível', 'Custo de capital reduz', 'Consumo aquece', 'Expansão e M&A ficam viáveis', 'Ativos de risco sobem de valor'] },
+  },
+  {
+    id: 'usdbrl', title: 'USD/BRL', color: '#60a5fa',
+    up:   { label: 'Sobe',   color: '#f87171', effects: ['Insumos importados encarecem', 'Tech e SaaS em USD ficam caros', 'Agro e exportação ganham competitividade', 'Inflação de custo pressiona PME', 'Margens reais caem'] },
+    down: { label: 'Cai',    color: '#34d399', effects: ['Importações ficam mais baratas', 'Insumos e tecnologia acessíveis', 'Margem de exportação comprime', 'Alívio inflacionário', 'Consumo de bens importados cresce'] },
+  },
+  {
+    id: 'ipca', title: 'IPCA', color: '#f87171',
+    up:   { label: 'Sobe',   color: '#f87171', effects: ['Poder de compra cai', 'Margens reais reduzem', 'Pressão salarial (dissídio)', 'PME tem menor poder de repasse', 'BCB reage subindo a SELIC'] },
+    down: { label: 'Cai',    color: '#34d399', effects: ['Poder de compra sobe', 'Margens reais expandem', 'Pressão salarial menor', 'BCB pode cortar a SELIC', 'Competitividade de exportação melhora'] },
+  },
+  {
+    id: 'pib', title: 'PIB', color: '#34d399',
+    up:   { label: 'Cresce', color: '#34d399', effects: ['Demanda agregada sobe', 'Receitas das empresas crescem', 'Emprego e renda expandem', 'Investimento privado acelera', 'Momento de expandir e contratar'] },
+    down: { label: 'Cai',    color: '#f87171', effects: ['Demanda contrai', 'Receitas sob pressão', 'Desemprego pode subir', 'Crédito fica mais restritivo', 'Preservar caixa e cortar variáveis'] },
+  },
+]
+
+function ImpactChain() {
+  const [selected, setSelected] = useState<string>('selic')
+  const chain = IMPACT_CHAINS.find(c => c.id === selected)!
+  return (
+    <div className="rounded-2xl overflow-hidden"
+      style={{ background: 'rgba(255,255,255,0.016)', border: '1px solid rgba(192,192,192,0.08)' }}>
+      <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+        <span className="text-[9px] font-mono uppercase tracking-[0.35em] text-white/22">Cadeia de Impacto — escolha um indicador</span>
+      </div>
+      <div className="px-4 py-3 flex gap-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+        {IMPACT_CHAINS.map(c => (
+          <button key={c.id} onClick={() => setSelected(c.id)}
+            className="flex-1 py-2 rounded-xl text-[9px] font-mono uppercase tracking-wider transition-all"
+            style={{
+              background: selected === c.id ? `${c.color}18` : 'rgba(255,255,255,0.03)',
+              border: `1px solid ${selected === c.id ? c.color + '38' : 'rgba(255,255,255,0.06)'}`,
+              color: selected === c.id ? c.color : 'rgba(255,255,255,0.26)',
+            }}>
+            {c.title}
+          </button>
+        ))}
+      </div>
+
+      <AnimatePresence mode="wait">
+        <motion.div key={selected}
+          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.22 }}
+          className="p-4 grid grid-cols-2 gap-4">
+          {[chain.up, chain.down].map((dir, di) => (
+            <div key={di} className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 mb-0.5">
+                <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: dir.color }} />
+                <span className="text-[9px] font-mono uppercase tracking-wider" style={{ color: dir.color }}>
+                  {chain.title} {dir.label}
+                </span>
+              </div>
+              {dir.effects.map((effect, i) => (
+                <motion.div key={i}
+                  initial={{ opacity: 0, x: di === 0 ? -6 : 6 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.055, duration: 0.22 }}
+                  className="flex items-start gap-2">
+                  <div className="mt-1.5 w-1 h-1 rounded-full shrink-0 bg-white/15" />
+                  <span className="text-[11px] text-white/36 leading-[1.65]">{effect}</span>
+                </motion.div>
+              ))}
+            </div>
+          ))}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  6 — CRÉDITO PJ
+// ════════════════════════════════════════════════════════════════════════════
+
+function CreditBar({ data }: { data: MarketData }) {
+  const rates = data.creditRates
+  if (!rates) return null
+  const items = [
+    { label: 'PJ Total',  value: rates.total?.value    ?? 0 },
+    { label: 'Comércio',  value: rates.comercio?.value ?? 0 },
+    { label: 'Serviços',  value: rates.servicos?.value ?? 0 },
+    { label: 'Indústria', value: rates.industria?.value ?? 0 },
+    { label: 'Agro',      value: rates.agro?.value     ?? 0 },
+  ]
+  const max = Math.max(...items.map(i => i.value), 1)
+  return (
+    <div className="rounded-2xl p-4"
+      style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(192,192,192,0.07)' }}>
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-white/22">Crédito PJ — % a.a.</span>
+        <span className="text-[9px] font-mono text-white/12">BCB/SGS</span>
+      </div>
+      <div className="flex flex-col gap-2.5">
+        {items.map(item => (
+          <div key={item.label} className="flex items-center gap-3">
+            <span className="text-[9px] font-mono text-white/28 w-16 shrink-0">{item.label}</span>
+            <div className="flex-1 h-1.5 rounded-full bg-white/[0.05]">
+              <motion.div className="h-full rounded-full"
+                initial={{ width: 0 }} whileInView={{ width: `${(item.value / max) * 100}%` }}
+                viewport={{ once: true }} transition={{ duration: 0.8 }}
+                style={{ background: item.value > 25 ? 'rgba(248,113,113,0.5)' : 'rgba(192,192,192,0.3)' }} />
+            </div>
+            <span className="text-[10px] font-mono font-semibold text-white/40 w-10 text-right">{item.value}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  7 — PLANO DE AÇÃO IA
+// ════════════════════════════════════════════════════════════════════════════
+
+function ActionPlan({ data, userSector }: { data: MarketData; userSector?: string }) {
+  const [plan, setPlan]     = useState('')
+  const [loading, setLoading] = useState(false)
+  const [typed, setTyped]   = useState('')
+  const typingRef           = useRef<ReturnType<typeof setInterval> | null>(null)
+  const bottomRef           = useRef<HTMLDivElement>(null)
+
+  const generate = useCallback(async () => {
+    if (loading) return
+    setLoading(true)
+    setPlan('')
+    setTyped('')
+    if (typingRef.current) clearInterval(typingRef.current)
+
+    const q = `Gere um PLANO DE AÇÃO EXECUTÁVEL para uma PME brasileira${userSector ? ` do setor de ${userSector}` : ''} com base nos dados de mercado atuais.
+
+Formato obrigatório:
+🎯 DIAGNÓSTICO (2 linhas máximo)
+⚡ AÇÃO IMEDIATA 1 (esta semana): [ação específica com número]
+⚡ AÇÃO IMEDIATA 2 (esta semana): [ação específica com número]
+📅 AÇÃO CURTO PRAZO (este mês): [ação específica]
+⚠️ ALERTA CRÍTICO: [principal risco imediato]
+💡 OPORTUNIDADE IGNORADA: [o que muitas PMEs não estão vendo agora]
+
+Seja cirúrgico. Use os dados de mercado reais fornecidos. Zero generalidades.`
+
+    try {
+      const res = await fetch('/api/market-intelligence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q, marketData: data, userSector }),
+      })
+      const d = await res.json()
+      const text: string = d.answer ?? ''
+      setPlan(text)
+      let i = 0
+      typingRef.current = setInterval(() => {
+        i++
+        setTyped(text.slice(0, i))
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        if (i >= text.length && typingRef.current) clearInterval(typingRef.current)
+      }, 11)
+    } catch {
+      setTyped('Erro ao gerar plano de ação.')
+    } finally {
+      setLoading(false)
+    }
+  }, [data, loading, userSector])
+
+  useEffect(() => () => { if (typingRef.current) clearInterval(typingRef.current) }, [])
+
+  const isEmoji = (line: string) => /^[🎯⚡📅⚠️💡]/.test(line)
+
+  return (
+    <div className="rounded-2xl overflow-hidden"
+      style={{ background: 'rgba(3,3,3,0.95)', border: '1px solid rgba(52,211,153,0.14)', backdropFilter: 'blur(32px)' }}>
+      <div className="flex items-center gap-3 px-4 py-3"
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: 'rgba(0,0,0,0.4)' }}>
+        <div className="flex gap-1.5">
+          {['#ff5f57', '#ffbd2e', '#28c840'].map((c, i) =>
+            <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: c, opacity: 0.45 }} />)}
+        </div>
+        <Play className="w-3 h-3 text-white/22 ml-1" />
+        <span className="text-[10px] font-mono text-white/20 tracking-wider">IPB · Plano de Ação · Groq Compound</span>
+        {loading && (
+          <motion.div className="ml-auto" animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}>
+            <RefreshCw className="w-3 h-3 text-white/18" />
+          </motion.div>
+        )}
+      </div>
+
+      <div className="px-4 py-4">
+        {!plan && !loading && (
+          <div className="flex flex-col items-center gap-4 py-6">
+            <p className="text-[12px] text-white/28 text-center leading-[1.8] max-w-xs">
+              Plano executável com base nas condições atuais — SELIC, câmbio, setores e oportunidades reais de mercado.
+            </p>
+            <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}
+              onClick={generate}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full text-[11px] font-mono font-semibold"
+              style={{ background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.28)', color: '#34d399' }}>
+              <Zap className="w-3.5 h-3.5" />
+              Gerar Plano de Ação
+            </motion.button>
+          </div>
+        )}
+
+        {loading && !typed && (
+          <div className="flex items-center gap-2.5 py-6 text-white/20">
+            <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}>
+              <RefreshCw className="w-3.5 h-3.5" />
+            </motion.div>
+            <span className="text-[11px] font-mono">Analisando mercado e gerando plano...</span>
+          </div>
+        )}
+
+        {typed && (
+          <div className="font-mono text-[11px] leading-[1.9] max-h-[340px] overflow-y-auto">
+            {typed.split('\n').map((line, i) => (
+              <div key={i} className="mb-0.5"
+                style={{ color: isEmoji(line) ? 'rgba(255,255,255,0.65)' : 'rgba(192,192,192,0.40)' }}>
+                {line || <br />}
+              </div>
+            ))}
+            {(loading || typed.length < plan.length) && (
+              <motion.span animate={{ opacity: [1, 0] }} transition={{ duration: 0.55, repeat: Infinity }}
+                className="inline-block w-[2px] h-[12px] align-middle ml-px bg-white/45 rounded-sm" />
+            )}
+            <div ref={bottomRef} />
+          </div>
+        )}
+
+        {typed && !loading && (
+          <div className="flex justify-end mt-3">
+            <motion.button whileTap={{ scale: 0.96 }} onClick={generate}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-mono"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.25)' }}>
+              <RefreshCw className="w-2.5 h-2.5" />
+              atualizar plano
+            </motion.button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  8 — IA MARKET INTELLIGENCE
+// ════════════════════════════════════════════════════════════════════════════
+
+const IA_PRESETS = [
   'Análise geral do mercado agora',
   'Qual setor tem mais oportunidade?',
   'Impacto da SELIC no meu negócio',
@@ -301,7 +763,7 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
   }, [data, loading, userSector])
 
   useEffect(() => {
-    if (!fired && data) { setFired(true); setTimeout(() => runQuery(PRESETS[0]), 900) }
+    if (!fired && data) { setFired(true); setTimeout(() => runQuery(IA_PRESETS[0]), 900) }
   }, [data, fired, runQuery])
 
   useEffect(() => () => { if (typingRef.current) clearInterval(typingRef.current) }, [])
@@ -315,7 +777,7 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
       <div className="flex items-center gap-3 px-4 py-3"
         style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: 'rgba(0,0,0,0.4)' }}>
         <div className="flex gap-1.5">
-          {['#ff5f57','#ffbd2e','#28c840'].map((c, i) =>
+          {['#ff5f57', '#ffbd2e', '#28c840'].map((c, i) =>
             <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: c, opacity: 0.45 }} />)}
         </div>
         <Zap className="w-3 h-3 text-white/22 ml-1" />
@@ -327,9 +789,8 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
         </motion.div>
       </div>
 
-      <div className="px-4 py-3 flex flex-wrap gap-2"
-        style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-        {PRESETS.map(p => (
+      <div className="px-4 py-3 flex flex-wrap gap-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+        {IA_PRESETS.map(p => (
           <button key={p} onClick={() => runQuery(p)} disabled={loading}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-mono text-white/32 transition-all hover:text-white/55 disabled:opacity-40"
             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
@@ -357,7 +818,7 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
               const isSignal = line.startsWith('SINAL:')
               return (
                 <div key={i} style={{ borderTop: isSignal ? '1px solid rgba(255,255,255,0.05)' : 'none', paddingTop: isSignal ? '0.75rem' : 0, marginTop: isSignal ? '0.75rem' : 0 }}>
-                  <span style={{ color: isSignal ? signalColor : line.startsWith('>') ? 'rgba(255,255,255,0.18)' : 'rgba(192,192,192,0.62)' }}>
+                  <span style={{ color: isSignal ? signalColor : line.startsWith('>') ? 'rgba(255,255,255,0.18)' : 'rgba(192,192,192,0.60)' }}>
                     {line}
                   </span>
                 </div>
@@ -388,44 +849,10 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
   )
 }
 
-// ── Credit Bar ─────────────────────────────────────────────────────────────
-function CreditBar({ data }: { data: MarketData }) {
-  const rates = data.creditRates
-  if (!rates) return null
-  const items = [
-    { label: 'PJ Total',  value: rates.total?.value    ?? 0 },
-    { label: 'Comércio',  value: rates.comercio?.value ?? 0 },
-    { label: 'Serviços',  value: rates.servicos?.value ?? 0 },
-    { label: 'Indústria', value: rates.industria?.value ?? 0 },
-    { label: 'Agro',      value: rates.agro?.value     ?? 0 },
-  ]
-  const max = Math.max(...items.map(i => i.value), 1)
-  return (
-    <div className="rounded-2xl p-4"
-      style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(192,192,192,0.07)' }}>
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-white/22">Crédito PJ — % a.a.</span>
-        <span className="text-[8px] font-mono text-white/12">BCB/SGS</span>
-      </div>
-      <div className="flex flex-col gap-2.5">
-        {items.map(item => (
-          <div key={item.label} className="flex items-center gap-3">
-            <span className="text-[9px] font-mono text-white/28 w-16 shrink-0">{item.label}</span>
-            <div className="flex-1 h-1.5 rounded-full bg-white/[0.05]">
-              <motion.div className="h-full rounded-full"
-                initial={{ width: 0 }} whileInView={{ width: `${(item.value / max) * 100}%` }}
-                viewport={{ once: true }} transition={{ duration: 0.8 }}
-                style={{ background: item.value > 25 ? 'rgba(248,113,113,0.5)' : 'rgba(192,192,192,0.3)' }} />
-            </div>
-            <span className="text-[10px] font-mono font-semibold text-white/42 w-10 text-right">{item.value}%</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
+// ════════════════════════════════════════════════════════════════════════════
+// ██  9 — SIMULAÇÃO DE CENÁRIO
+// ════════════════════════════════════════════════════════════════════════════
 
-// ── Scenario Simulation ────────────────────────────────────────────────────
 function SliderRow({ label, value, min, max, step, onChange }: {
   label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void
 }) {
@@ -470,10 +897,10 @@ function ScenarioSim({ data, sim, setSim }: { data: MarketData; sim: SimOffsets;
           <SliderRow label="PIB (pp)"     value={sim.pib}    min={-3} max={3}  step={0.1}  onChange={v => setSim({ ...sim, pib: v })}    />
         </div>
         <div className="flex flex-col gap-1.5">
-          <span className="text-[8px] font-mono uppercase tracking-[0.3em] text-white/16 mb-2">Impacto setorial</span>
+          <span className="text-[9px] font-mono uppercase tracking-[0.3em] text-white/16 mb-2">Impacto setorial</span>
           {simData.sectors.slice(0, 6).map(s => (
             <div key={s.id} className="flex items-center justify-between py-1">
-              <span className="text-[9px] text-white/28 truncate max-w-[140px]">{s.label}</span>
+              <span className="text-[10px] text-white/28 truncate max-w-[140px]">{s.label}</span>
               <div className="flex items-center gap-2">
                 <div className="w-16 h-1 rounded-full bg-white/[0.05]">
                   <div className="h-full rounded-full" style={{ width: `${s.heat}%`, background: pctColor(s.change), opacity: 0.45 }} />
@@ -490,28 +917,15 @@ function ScenarioSim({ data, sim, setSim }: { data: MarketData; sim: SimOffsets;
   )
 }
 
-// ── Section Label ──────────────────────────────────────────────────────────
-function SectionLabel({ label, sub }: { label: string; sub?: string }) {
-  return (
-    <motion.div initial={{ opacity: 0, x: -8 }} whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }} transition={{ duration: 0.5 }}
-      className="flex items-center gap-3 mb-4">
-      <div className="w-0.5 h-4 rounded-full" style={{ background: 'rgba(192,192,192,0.22)' }} />
-      <span className="text-[9px] font-mono uppercase tracking-[0.4em] text-white/25">{label}</span>
-      {sub && <span className="text-[8px] font-mono text-white/12">{sub}</span>}
-      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(192,192,192,0.07), transparent)' }} />
-    </motion.div>
-  )
-}
-
 // ════════════════════════════════════════════════════════════════════════════
 // ██  MAIN
 // ════════════════════════════════════════════════════════════════════════════
+
 export default function AbaBusiness() {
   const { marketData: rawData, refetch, lastUpdated } = useMarketData() as {
     marketData: MarketData | null; refetch?: () => void; lastUpdated?: string
   }
-  const [sim, setSim]           = useState<SimOffsets>({ selic: 0, cambio: 0, ipca: 0, pib: 0 })
+  const [sim, setSim]               = useState<SimOffsets>({ selic: 0, cambio: 0, ipca: 0, pib: 0 })
   const [userSector, setUserSector] = useState<string>()
   const [refreshing, setRefreshing] = useState(false)
   const { user } = useAuth()
@@ -520,7 +934,7 @@ export default function AbaBusiness() {
     if (!user) return
     const sb = createClient()
     sb.from('workspace_profiles').select('setor').eq('user_id', user.id).maybeSingle()
-      .then(({ data: d }) => { if (d?.setor) setUserSector(d.setor) })
+      .then(({ data: d }: { data: { setor?: string } | null }) => { if (d?.setor) setUserSector(d.setor) })
   }, [user?.id])
 
   const hasSim = sim.selic !== 0 || sim.cambio !== 0 || sim.ipca !== 0 || sim.pib !== 0
@@ -548,12 +962,12 @@ export default function AbaBusiness() {
     : null
 
   return (
-    <motion.div className="relative flex flex-col gap-7 pb-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <motion.div className="relative flex flex-col gap-8 pb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
 
-      {/* COMMAND CENTER */}
+      {/* 1 — GLOBE HERO */}
       <div>
-        <div className="flex items-center justify-between">
-          <SectionLabel label="Command Center" sub="dados em tempo real" />
+        <div className="flex items-center justify-between mb-1">
+          <SectionLabel label="Mercado Global ao Vivo" sub="indicadores em tempo real" />
           <button onClick={handleRefresh} disabled={refreshing}
             className="flex items-center gap-1.5 text-[9px] font-mono text-white/20 hover:text-white/38 transition-colors disabled:opacity-40 mb-4">
             <motion.div animate={refreshing ? { rotate: 360 } : {}}
@@ -563,34 +977,52 @@ export default function AbaBusiness() {
             {updatedStr ? `atualizado ${updatedStr}` : 'atualizar'}
           </button>
         </div>
-        <CommandCenter data={data} />
+        <GlobeHero data={data} />
       </div>
 
-      {/* MERCADOS */}
+      {/* 2 — MACRO MEANING */}
       <div>
-        <SectionLabel label="Mercados" sub="B3 + globais" />
+        <SectionLabel label="Macro: O que Significa" sub="para o seu negócio" />
+        <MacroMeaning data={data} />
+      </div>
+
+      {/* 3 — BOLSA & EMPRESAS */}
+      <div>
+        <SectionLabel label="Bolsa & Empresas" sub="B3 + globais" />
         <MarketPanel data={data} />
       </div>
 
-      {/* HEATMAP */}
+      {/* 4 — SETORES: ANÁLISE COMPLETA */}
       <div>
-        <SectionLabel label="Heatmap Setorial" sub="9 setores · calor de oportunidade" />
-        <SectorHeatmap sectors={data.sectors} />
+        <SectionLabel label="Setores: Análise Completa" sub="oportunidades · riscos · como atuar" />
+        <SectorAnalysis sectors={data.sectors} />
       </div>
 
-      {/* CRÉDITO */}
+      {/* 5 — CADEIA DE IMPACTO */}
+      <div>
+        <SectionLabel label="Cadeia de Impacto" sub="como cada indicador afeta o ecossistema" />
+        <ImpactChain />
+      </div>
+
+      {/* 6 — CRÉDITO PJ */}
       <div>
         <SectionLabel label="Crédito PJ" sub="taxas médias BCB/SGS" />
         <CreditBar data={data} />
       </div>
 
-      {/* IA ADVISOR */}
+      {/* 7 — PLANO DE AÇÃO IA */}
       <div>
-        <SectionLabel label="Market Intelligence · IA" sub="Groq Compound · análise ao vivo" />
+        <SectionLabel label="Plano de Ação: Hoje" sub="gerado por Groq Compound com dados reais" />
+        <ActionPlan data={data} userSector={userSector} />
+      </div>
+
+      {/* 8 — IA MARKET INTELLIGENCE */}
+      <div>
+        <SectionLabel label="Market Intelligence · IA" sub="pergunte sobre mercado, setores, macro" />
         <IaAdvisor data={data} userSector={userSector} />
       </div>
 
-      {/* SIMULAÇÃO */}
+      {/* 9 — SIMULAÇÃO DE CENÁRIO */}
       <div>
         <SectionLabel label="Simulação de Cenário" sub="ajuste macro e veja o impacto setorial" />
         <ScenarioSim data={data} sim={sim} setSim={setSim} />
