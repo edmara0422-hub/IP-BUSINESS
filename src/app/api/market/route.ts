@@ -113,8 +113,9 @@ export async function GET() {
   let dEnergy = 0, dFintech = 0, dLogistics = 0
   let dServices = 0, dRetail = 0
 
-  // stocks panel — preços individuais
+  // stocks panel — preços e pcts individuais
   let petrPrice = 36.50, valePrice = 58.20, itubPrice = 27.90, bbdcPrice = 15.80, wegePrice = 50.10
+  let bbdcPct = 0, wegePct = 0
   let ibovValue = 128000, ibovPct = 0
 
   // ── Fetch em paralelo ───────────────────────────────────────────────────
@@ -233,8 +234,8 @@ export async function GET() {
     petrD      = petr4.pct;  if (petr4.price > 0) petrPrice = petr4.price
     valeD      = vale3.pct;  if (vale3.price > 0) valePrice = vale3.price
     dFintech   = itub4.pct;  if (itub4.price > 0) itubPrice = itub4.price
-                             if (bbdc4.price > 0) bbdcPrice = bbdc4.price
-                             if (wege3.price > 0) wegePrice = wege3.price
+    bbdcPct    = bbdc4.pct;  if (bbdc4.price > 0) bbdcPrice = bbdc4.price
+    wegePct    = wege3.pct;  if (wege3.price > 0) wegePrice = wege3.price
     ibovPct    = ibov.pct;   if (ibov.price  > 0) ibovValue = Math.round(ibov.price)
 
     dTech      = pct(totvs3D)
@@ -374,8 +375,8 @@ export async function GET() {
         { ticker: 'PETR4', label: 'Petrobras',  price: r2(petrPrice), pct: r2(petrD)   },
         { ticker: 'VALE3', label: 'Vale',        price: r2(valePrice), pct: r2(valeD)   },
         { ticker: 'ITUB4', label: 'Itaú',        price: r2(itubPrice), pct: r2(dFintech) },
-        { ticker: 'BBDC4', label: 'Bradesco',    price: r2(bbdcPrice), pct: r2(bbdc4.pct) },
-        { ticker: 'WEGE3', label: 'WEG',         price: r2(wegePrice), pct: r2(wege3.pct) },
+        { ticker: 'BBDC4', label: 'Bradesco',    price: r2(bbdcPrice), pct: r2(bbdcPct) },
+        { ticker: 'WEGE3', label: 'WEG',         price: r2(wegePrice), pct: r2(wegePct) },
       ],
       global: [
         { ticker: 'AAPL',  label: 'Apple',   pct: r2(aaplD)  },
