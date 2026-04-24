@@ -147,7 +147,7 @@ function OrbitalChip({ chip, index, isSelected, onClick }: {
 
   return (
     <motion.div
-      style={{ position: 'absolute', left: '50%', top: '50%', width: 132, marginLeft: -66, marginTop: -40, zIndex: isSelected ? 20 : 10, cursor: 'pointer' }}
+      style={{ position: 'absolute', left: '50%', top: '50%', width: 136, marginLeft: -68, marginTop: -44, zIndex: isSelected ? 20 : 10, cursor: 'pointer' }}
       animate={{ x: xKF, y: yKF }}
       transition={{ duration: ORB_DUR, repeat: Infinity, ease: 'linear', times }}
       onClick={(e) => { e.stopPropagation(); onClick() }}
@@ -157,36 +157,40 @@ function OrbitalChip({ chip, index, isSelected, onClick }: {
         animate={{ opacity: 1, scale: isSelected ? 1.07 : 1 }}
         transition={{ delay: index * 0.12 + 0.3, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          background: isSelected ? 'rgba(12,14,22,0.98)' : 'rgba(7,9,16,0.90)',
-          border: `1px solid ${isSelected ? accent + '50' : 'rgba(255,255,255,0.10)'}`,
+          background: isSelected ? 'rgba(10,10,10,0.98)' : 'rgba(5,5,5,0.92)',
+          border: `1px solid ${isSelected ? accent + '50' : 'rgba(195,195,195,0.10)'}`,
           backdropFilter: 'blur(26px)',
           borderRadius: 15,
           padding: '9px 11px 10px',
           boxShadow: isSelected
-            ? `0 0 32px ${accent}28, 0 10px 30px rgba(0,0,0,0.78), inset 0 1px 0 rgba(255,255,255,0.08)`
-            : `0 4px 18px rgba(0,0,0,0.58), inset 0 1px 0 rgba(255,255,255,0.055)`,
+            ? `0 0 32px ${accent}28, 0 10px 30px rgba(0,0,0,0.85), inset 0 1px 0 rgba(210,210,210,0.08)`
+            : `0 4px 18px rgba(0,0,0,0.65), inset 0 1px 0 rgba(200,200,200,0.05)`,
           overflow: 'hidden',
         }}
       >
         {/* Shimmer sweep */}
         <motion.div
-          style={{ position: 'absolute', inset: 0, background: `linear-gradient(105deg, transparent 25%, ${accent}0a 50%, transparent 75%)`, pointerEvents: 'none' }}
+          style={{ position: 'absolute', inset: 0, background: `linear-gradient(105deg, transparent 25%, ${accent}08 50%, transparent 75%)`, pointerEvents: 'none' }}
           animate={{ x: ['-140%', '240%'] }}
           transition={{ duration: 6 + index * 0.7, delay: index * 0.6, repeat: Infinity, ease: 'easeInOut' }}
         />
-        <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.22em', color: 'rgba(255,255,255,0.30)', marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.22em', color: 'rgba(195,195,195,0.30)', marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {chip.label}
         </p>
-        <p style={{ fontSize: 19, fontWeight: 700, fontFamily: 'monospace', color: 'rgba(255,255,255,0.95)', lineHeight: 1, marginBottom: 7 }}>
+        <p style={{ fontSize: 19, fontWeight: 700, fontFamily: 'monospace', color: 'rgba(235,235,235,0.96)', lineHeight: 1, marginBottom: 5 }}>
           {chip.value}
         </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <span style={{ fontSize: 8.5, fontFamily: 'monospace', fontWeight: 700, color: deltaColor, background: deltaColor + '18', border: `1px solid ${deltaColor}28`, borderRadius: 99, padding: '2px 7px', display: 'inline-flex', alignItems: 'center', gap: 3, alignSelf: 'flex-start' }}>
+        {/* Mini sparkline */}
+        <div style={{ marginBottom: 5, opacity: 0.65 }}>
+          <Sparkline id={chip.id} delta={chip.delta} color={deltaColor} w={46} h={13} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <span style={{ fontSize: 8.5, fontFamily: 'monospace', fontWeight: 700, color: deltaColor, background: deltaColor + '16', border: `1px solid ${deltaColor}26`, borderRadius: 99, padding: '2px 7px', display: 'inline-flex', alignItems: 'center', gap: 3, alignSelf: 'flex-start' }}>
             <DeltaIcon style={{ width: 8, height: 8, flexShrink: 0 }} />
             {deltaSign}{deltaStr}% hoje
           </span>
           {chip.signal && (
-            <span style={{ fontSize: 7.5, fontWeight: 600, color: chip.signal.color, background: chip.signal.color + '14', border: `1px solid ${chip.signal.color}22`, borderRadius: 99, padding: '2px 7px', alignSelf: 'flex-start', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
+            <span style={{ fontSize: 7.5, fontWeight: 600, color: chip.signal.color, background: chip.signal.color + '12', border: `1px solid ${chip.signal.color}20`, borderRadius: 99, padding: '2px 7px', alignSelf: 'flex-start', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
               {chip.signal.text}
             </span>
           )}
@@ -196,7 +200,7 @@ function OrbitalChip({ chip, index, isSelected, onClick }: {
   )
 }
 
-// ── Detail panel — appears below orbit when a chip is selected ────────────────
+// ── Detail panel — overlay centered on the orbit stage ───────────────────────
 function DetailPanel({ chip, onClose }: { chip: ChipData; onClose: () => void }) {
   const DeltaIcon  = chip.delta > 0.05 ? TrendingUp : chip.delta < -0.05 ? TrendingDown : Minus
   const deltaColor = chip.delta > 0.05 ? '#34d399' : chip.delta < -0.05 ? '#f87171' : '#94a3b8'
@@ -206,58 +210,56 @@ function DetailPanel({ chip, onClose }: { chip: ChipData; onClose: () => void })
   const accent     = chip.signal?.color ?? chip.color
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 14 }}
-      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-      style={{ background: 'rgba(7,9,16,0.97)', border: `1px solid ${accent}28`, backdropFilter: 'blur(32px)', borderRadius: 22, padding: '24px 28px 26px', boxShadow: `0 0 56px ${accent}14, 0 22px 52px rgba(0,0,0,0.78)`, position: 'relative', overflow: 'hidden' }}
-    >
+    <div style={{ background: 'rgba(4,4,4,0.97)', border: `1px solid ${accent}30`, backdropFilter: 'blur(40px)', borderRadius: 24, padding: '22px 24px 26px', boxShadow: `0 0 70px ${accent}12, 0 28px 60px rgba(0,0,0,0.92), inset 0 1px 0 rgba(200,200,200,0.06)`, position: 'relative', overflow: 'hidden', width: 540, maxWidth: '88vw' }}>
       {/* top accent line */}
-      <div style={{ position: 'absolute', top: 0, left: '8%', right: '8%', height: 2, background: `linear-gradient(90deg, transparent, ${accent}55, transparent)`, borderRadius: 2 }} />
+      <div style={{ position: 'absolute', top: 0, left: '5%', right: '5%', height: 1.5, background: `linear-gradient(90deg, transparent, ${accent}60, transparent)`, borderRadius: 2 }} />
+      <div className="pointer-events-none absolute inset-0 grid-bg opacity-[0.03]" />
 
       <button onClick={onClose}
-        style={{ position: 'absolute', right: 14, top: 14, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, cursor: 'pointer', color: 'rgba(255,255,255,0.38)', fontSize: 17, lineHeight: 1 }}
+        style={{ position: 'absolute', right: 13, top: 13, width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(200,200,200,0.05)', border: '1px solid rgba(200,200,200,0.10)', borderRadius: 7, cursor: 'pointer', color: 'rgba(200,200,200,0.40)', fontSize: 16, lineHeight: 1 }}
       >×</button>
 
-      <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
-        {/* Left: metrics */}
-        <div style={{ minWidth: 130 }}>
-          <p style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.22em', color: 'rgba(255,255,255,0.26)', marginBottom: 6 }}>{chip.label}</p>
-          <p style={{ fontSize: 36, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(255,255,255,0.96)', lineHeight: 1 }}>{chip.value}</p>
-          {chip.unit && <p style={{ fontSize: 10, fontFamily: 'monospace', color: 'rgba(255,255,255,0.26)', marginTop: 5 }}>{chip.unit}</p>}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 12 }}>
-            <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: deltaColor, background: deltaColor + '1a', border: `1px solid ${deltaColor}2c`, borderRadius: 99, padding: '3px 9px', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-              <DeltaIcon style={{ width: 10, height: 10 }} />{deltaLabel}
-            </span>
-            {chip.signal && (
-              <span style={{ fontSize: 10, fontWeight: 600, color: chip.signal.color, background: chip.signal.color + '18', border: `1px solid ${chip.signal.color}26`, borderRadius: 99, padding: '3px 9px' }}>
-                {chip.signal.text}
-              </span>
-            )}
-          </div>
+      {/* Header: label + value + badges */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14, paddingRight: 30 }}>
+        <div>
+          <p style={{ fontSize: 8, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.26em', color: 'rgba(195,195,195,0.28)', marginBottom: 5 }}>{chip.label}</p>
+          <p style={{ fontSize: 40, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.97)', lineHeight: 1 }}>{chip.value}</p>
+          {chip.unit && <p style={{ fontSize: 10, fontFamily: 'monospace', color: 'rgba(195,195,195,0.28)', marginTop: 4 }}>{chip.unit}</p>}
         </div>
-
-        {/* Vertical divider */}
-        <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(255,255,255,0.06)', minHeight: 80, flexShrink: 0 }} />
-
-        {/* Right: explanations */}
-        <div style={{ flex: 1, minWidth: 200 }}>
-          {chip.oque && (
-            <div style={{ marginBottom: 14 }}>
-              <p style={{ fontSize: 8, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.20)', marginBottom: 5 }}>O que é</p>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.52)', lineHeight: 1.64 }}>{chip.oque}</p>
-            </div>
-          )}
-          {chip.como && (
-            <div>
-              <p style={{ fontSize: 8, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.20)', marginBottom: 5 }}>Como afeta seu negócio</p>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.57)', lineHeight: 1.64 }}>{chip.como}</p>
-            </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5, paddingTop: 2 }}>
+          <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: deltaColor, background: deltaColor + '18', border: `1px solid ${deltaColor}2e`, borderRadius: 99, padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <DeltaIcon style={{ width: 11, height: 11 }} />{deltaLabel}
+          </span>
+          {chip.signal && (
+            <span style={{ fontSize: 10, fontWeight: 600, color: chip.signal.color, background: chip.signal.color + '18', border: `1px solid ${chip.signal.color}28`, borderRadius: 99, padding: '3px 10px' }}>
+              {chip.signal.text}
+            </span>
           )}
         </div>
       </div>
-    </motion.div>
+
+      {/* Sparkline chart */}
+      <div style={{ marginBottom: 16, padding: '10px 12px 8px', background: 'rgba(200,200,200,0.025)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 12, overflow: 'hidden' }}>
+        <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(195,195,195,0.22)', marginBottom: 7 }}>Variação 14 dias</p>
+        <Sparkline id={chip.id} delta={chip.delta} color={accent} w={480} h={50} />
+      </div>
+
+      {/* Two-column explanations */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        {chip.oque && (
+          <div style={{ padding: '11px 13px', background: 'rgba(200,200,200,0.025)', border: '1px solid rgba(200,200,200,0.065)', borderRadius: 12 }}>
+            <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(195,195,195,0.24)', marginBottom: 6 }}>O que é</p>
+            <p style={{ fontSize: 12.5, color: 'rgba(215,215,215,0.52)', lineHeight: 1.66 }}>{chip.oque}</p>
+          </div>
+        )}
+        {chip.como && (
+          <div style={{ padding: '11px 13px', background: `${accent}07`, border: `1px solid ${accent}18`, borderRadius: 12 }}>
+            <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: `${accent}80`, marginBottom: 6 }}>Impacto no negócio</p>
+            <p style={{ fontSize: 12.5, color: 'rgba(215,215,215,0.57)', lineHeight: 1.66 }}>{chip.como}</p>
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -334,7 +336,7 @@ function GlobeHero({ data }: { data: MarketData }) {
     <div className="relative w-full select-none" onClick={() => setSelectedId(null)}>
 
       {/* ── Desktop: órbita elíptica ── */}
-      <div className="hidden md:flex flex-col gap-6">
+      <div className="hidden md:block">
 
         {/* Orbit stage */}
         <div className="relative w-full" style={{ height: 660 }}>
@@ -342,7 +344,7 @@ function GlobeHero({ data }: { data: MarketData }) {
           {/* SVG: trilha da órbita */}
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} overflow="visible">
             <ellipse cx="50%" cy="50%" rx={ORB_AX} ry={ORB_AY}
-              fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1" strokeDasharray="4 10" />
+              fill="none" stroke="rgba(195,195,195,0.05)" strokeWidth="1" strokeDasharray="4 10" />
           </svg>
 
           {/* Globo 380px centralizado */}
@@ -358,14 +360,14 @@ function GlobeHero({ data }: { data: MarketData }) {
             {/* AO VIVO badge */}
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 4 }}>
               <motion.div
-                style={{ background: 'rgba(3,5,8,0.92)', border: '1px solid rgba(52,211,153,0.30)', backdropFilter: 'blur(18px)', padding: '9px 22px', borderRadius: 99, display: 'flex', alignItems: 'center', gap: 8 }}
+                style={{ background: 'rgba(2,2,2,0.92)', border: '1px solid rgba(52,211,153,0.28)', backdropFilter: 'blur(18px)', padding: '9px 22px', borderRadius: 99, display: 'flex', alignItems: 'center', gap: 8 }}
                 initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.9, duration: 0.5 }}
               >
                 <motion.div style={{ width: 8, height: 8, borderRadius: '50%', background: '#34d399' }}
                   animate={{ opacity: [0.3, 1, 0.3], scale: [0.75, 1.4, 0.75] }}
                   transition={{ duration: 1.6, repeat: Infinity }} />
-                <span style={{ fontSize: 11, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.38em', color: 'rgba(52,211,153,0.9)' }}>Ao Vivo</span>
+                <span style={{ fontSize: 11, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.38em', color: 'rgba(52,211,153,0.88)' }}>Ao Vivo</span>
               </motion.div>
             </div>
           </div>
@@ -380,16 +382,33 @@ function GlobeHero({ data }: { data: MarketData }) {
               onClick={() => setSelectedId(prev => prev === chip.id ? null : chip.id)}
             />
           ))}
-        </div>
 
-        {/* Detail panel — aparece abaixo da órbita, sem sobrepor chips */}
-        <AnimatePresence>
-          {selectedChip && (
-            <div onClick={e => e.stopPropagation()}>
-              <DetailPanel chip={selectedChip} onClose={() => setSelectedId(null)} />
-            </div>
-          )}
-        </AnimatePresence>
+          {/* Detail panel — overlay centralizado DENTRO do stage, acima dos chips */}
+          <AnimatePresence>
+            {selectedChip && (
+              <>
+                {/* Backdrop escurece órbita, chip clicado fica visível */}
+                <motion.div
+                  style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.68)', backdropFilter: 'blur(8px)', zIndex: 25 }}
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  transition={{ duration: 0.22 }}
+                  onClick={() => setSelectedId(null)}
+                />
+                {/* Panel centralizado */}
+                <motion.div
+                  style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', zIndex: 30 }}
+                  initial={{ opacity: 0, scale: 0.88, y: 18 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.92, y: 10 }}
+                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  <DetailPanel chip={selectedChip} onClose={() => setSelectedId(null)} />
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* ── Mobile: globo + grid 2 col ── */}
