@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from 'react'
 import { motion, useSpring, useTransform, AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { apiFetch } from '@/lib/api'
-import BusinessClock from '@/components/business/BusinessClock'
 import UserContextBanner from '@/components/business/UserContextBanner'
 
 const Globe3D = dynamic(() => import('./Globe3D'), { ssr: false, loading: () => <div className="flex h-full items-center justify-center"><span className="text-[10px] text-white/20">Carregando globo...</span></div> })
@@ -442,11 +441,6 @@ export default function PanoramaSection({ data, ai, userProfile }: { data: any; 
     <div className="flex flex-col gap-3 px-4 pb-8">
 
       <UserContextBanner userProfile={userProfile} sectionInsight={ai?.panorama || undefined} />
-
-      {/* ── Relógio estático acima do globo ── */}
-      <div className="px-0">
-        <BusinessClock variant="hero" showGreeting />
-      </div>
 
       {/* ══ BLOCO 1: GLOBO 3D CENTRAL + DADOS FLUTUANTES ══ */}
       <div>
