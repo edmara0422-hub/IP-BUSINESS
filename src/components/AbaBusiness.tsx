@@ -111,39 +111,44 @@ function SectionLabel({ label, sub }: { label: string; sub?: string }) {
 // ██  1 — GLOBE HERO
 // ════════════════════════════════════════════════════════════════════════════
 
-function DataCard({ id, label, value, unit, delta, color, delay, dir }: {
+function TrendArrow({ delta, threshold = 0.05 }: { delta: number; threshold?: number }) {
+  if (delta > threshold)  return <TrendingUp  className="w-3 h-3 shrink-0" style={{ color: '#34d399' }} />
+  if (delta < -threshold) return <TrendingDown className="w-3 h-3 shrink-0" style={{ color: '#f87171' }} />
+  return <Minus className="w-3 h-3 shrink-0" style={{ color: 'rgba(192,192,192,0.35)' }} />
+}
+
+function LiveRow({ id, label, value, unit, delta, color, delay, align }: {
   id: string; label: string; value: string; unit?: string; delta: number
-  color: string; delay: number; dir: 'left' | 'right'
+  color: string; delay: number; align: 'left' | 'right'
 }) {
+  const isRight = align === 'right'
   return (
     <motion.div
-      initial={{ opacity: 0, x: dir === 'left' ? -12 : 12 }}
+      initial={{ opacity: 0, x: isRight ? 10 : -10 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-      className="rounded-xl p-2.5 flex flex-col gap-1"
-      style={{
-        background: 'rgba(255,255,255,0.022)',
-        border: `1px solid ${color}18`,
-        backdropFilter: 'blur(12px)',
-      }}
+      transition={{ delay, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      className={`flex items-center gap-2 py-1.5 px-2.5 rounded-xl ${isRight ? 'flex-row-reverse' : ''}`}
+      style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${color}14` }}
     >
-      <div className="flex items-center justify-between">
-        <span className="text-[8px] font-mono uppercase tracking-[0.25em] text-white/25 leading-none">{label}</span>
-        <motion.div className="w-1 h-1 rounded-full" style={{ background: color, boxShadow: `0 0 4px ${color}` }}
-          animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 2 + delay, repeat: Infinity }} />
-      </div>
-      <div className="flex items-end justify-between gap-1">
-        <div>
-          <span className="text-[14px] font-bold font-mono tabular-nums leading-none text-white/82">{value}</span>
-          {unit && <span className="text-[8px] font-mono text-white/18 ml-0.5">{unit}</span>}
+      {/* Trend */}
+      <TrendArrow delta={delta} />
+
+      {/* Info */}
+      <div className={`flex flex-col flex-1 min-w-0 ${isRight ? 'items-end' : 'items-start'}`}>
+        <span className="text-[8px] font-mono uppercase tracking-[0.22em] text-white/22 leading-none">{label}</span>
+        <div className="flex items-baseline gap-1 mt-0.5">
+          <span className="text-[13px] font-bold font-mono tabular-nums leading-none text-white/80">{value}</span>
+          {unit && <span className="text-[8px] font-mono text-white/18 leading-none">{unit}</span>}
         </div>
-        <Sparkline id={id} delta={delta} color={color} w={40} h={16} />
+        {delta !== 0 && (
+          <span className="text-[9px] font-mono font-semibold leading-none mt-0.5" style={{ color }}>
+            {delta > 0 ? '+' : ''}{Math.abs(delta) < 10 ? delta.toFixed(2) : delta.toFixed(0)}
+          </span>
+        )}
       </div>
-      {delta !== 0 && (
-        <span className="text-[9px] font-mono font-semibold leading-none" style={{ color }}>
-          {delta > 0 ? '+' : ''}{delta.toFixed(2)}
-        </span>
-      )}
+
+      {/* Sparkline */}
+      <Sparkline id={id} delta={delta} color={color} w={36} h={18} />
     </motion.div>
   )
 }
@@ -155,43 +160,56 @@ function GlobeHero({ data }: { data: MarketData }) {
   const silver = data.commodities.silver
   const oil    = data.commodities.oil
 
-  const leftCards = [
-    { id: 'selic',  label: 'SELIC',   value: `${m.selic.value}`,    unit: '% a.a.', delta: 0,                   color: '#94a3b8' },
-    { id: 'usdbrl', label: 'USD/BRL', value: `${m.usdBrl.value}`,   unit: 'R$',     delta: m.usdBrl.delta,      color: pctColor(m.usdBrl.delta) },
-    { id: 'ipca',   label: 'IPCA',    value: `${m.ipca.value}`,     unit: '% 12m',  delta: m.ipca.delta,        color: pctColor(-m.ipca.delta) },
-    { id: 'pib',    label: 'PIB',     value: `${m.pib.value}`,      unit: '% proj', delta: m.pib.delta,         color: pctColor(m.pib.delta) },
+  const leftRows = [
+    { id: 'selic',  label: 'SELIC',   value: `${m.selic.value}`,  unit: '% a.a.', delta: 0,              color: '#94a3b8' },
+    { id: 'usdbrl', label: 'USD/BRL', value: `${m.usdBrl.value}`, unit: 'R$',     delta: m.usdBrl.delta, color: pctColor(m.usdBrl.delta) },
+    { id: 'ipca',   label: 'IPCA',    value: `${m.ipca.value}`,   unit: '% 12m',  delta: m.ipca.delta,   color: pctColor(-m.ipca.delta) },
+    { id: 'pib',    label: 'PIB',     value: `${m.pib.value}`,    unit: '% proj', delta: m.pib.delta,    color: pctColor(m.pib.delta) },
   ]
 
-  const rightCards = [
-    { id: 'ibov',   label: 'IBOVESPA',  value: fmtK(ibov?.value ?? 128000), unit: 'pts',    delta: ibov?.pct  ?? 0,     color: pctColor(ibov?.pct  ?? 0) },
-    { id: 'gold',   label: 'OURO',      value: `${gold?.value   ?? '—'}`,   unit: 'USD/oz', delta: gold?.delta   ?? 0,  color: '#fbbf24' },
-    { id: 'silver', label: 'PRATA',     value: `${silver?.value ?? '—'}`,   unit: 'USD/oz', delta: silver?.delta ?? 0,  color: '#94a3b8' },
-    { id: 'oil',    label: 'PETRÓLEO',  value: `${oil?.value    ?? '—'}`,   unit: 'USD/bbl',delta: oil?.delta    ?? 0,  color: pctColor(oil?.delta ?? 0) },
+  const rightRows = [
+    { id: 'ibov',   label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000),  unit: 'pts',     delta: ibov?.pct     ?? 0, color: pctColor(ibov?.pct     ?? 0) },
+    { id: 'gold',   label: 'OURO',     value: `${gold?.value   ?? '—'}`,    unit: 'USD/oz',  delta: gold?.delta   ?? 0, color: '#fbbf24' },
+    { id: 'silver', label: 'PRATA',    value: `${silver?.value ?? '—'}`,    unit: 'USD/oz',  delta: silver?.delta ?? 0, color: '#c0c0c0' },
+    { id: 'oil',    label: 'PETRÓLEO', value: `${oil?.value    ?? '—'}`,    unit: 'USD/bbl', delta: oil?.delta    ?? 0, color: pctColor(oil?.delta    ?? 0) },
   ]
 
   return (
-    <div className="flex items-center gap-3 select-none">
+    <div className="flex items-center gap-2.5 select-none">
+
       {/* Left column */}
-      <div className="flex flex-col gap-2 flex-1 min-w-0">
-        {leftCards.map((c, i) => <DataCard key={c.id} {...c} delay={i * 0.08} dir="left" />)}
+      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+        {leftRows.map((r, i) => <LiveRow key={r.id} {...r} delay={i * 0.07} align="left" />)}
       </div>
 
-      {/* Globe — center, fixed size */}
-      <div className="relative shrink-0" style={{ width: 180, height: 180 }}>
-        <div style={{ width: '100%', height: '100%' }}>
+      {/* Globe — centro destacado */}
+      <div className="relative shrink-0 flex flex-col items-center gap-1.5" style={{ width: 210 }}>
+        {/* AO VIVO badge */}
+        <motion.div className="flex items-center gap-1.5 rounded-full px-2.5 py-0.5"
+          style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.18)' }}>
+          <motion.div className="w-1.5 h-1.5 rounded-full bg-emerald-400"
+            animate={{ opacity: [0.4, 1, 0.4], scale: [0.85, 1.15, 0.85] }}
+            transition={{ duration: 1.8, repeat: Infinity }} />
+          <span className="text-[8px] font-mono uppercase tracking-[0.3em] text-emerald-400/70">Ao vivo</span>
+        </motion.div>
+
+        {/* Globe */}
+        <div style={{ width: 210, height: 210, position: 'relative' }}>
+          {/* outer glow */}
+          <div className="absolute inset-0 pointer-events-none" style={{
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(192,192,192,0.07) 0%, transparent 68%)',
+            transform: 'scale(1.18)',
+          }} />
           <Globe3D />
         </div>
-        {/* glow ring */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(192,192,192,0.06) 0%, transparent 70%)',
-        }} />
       </div>
 
       {/* Right column */}
-      <div className="flex flex-col gap-2 flex-1 min-w-0">
-        {rightCards.map((c, i) => <DataCard key={c.id} {...c} delay={i * 0.08 + 0.32} dir="right" />)}
+      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+        {rightRows.map((r, i) => <LiveRow key={r.id} {...r} delay={i * 0.07 + 0.28} align="right" />)}
       </div>
+
     </div>
   )
 }
