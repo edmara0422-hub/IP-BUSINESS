@@ -108,7 +108,7 @@ function SectionLabel({ label, sub }: { label: string; sub?: string }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  1 — GLOBE HERO
+// ██  1 — GLOBE HERO  (chips em órbita elíptica + painel de detalhe)
 // ════════════════════════════════════════════════════════════════════════════
 
 interface ChipData {
@@ -118,126 +118,152 @@ interface ChipData {
   oque?: string; como?: string
 }
 
-function DataChip({ label, value, unit, delta, color, signal, oque, como, toward, index }: ChipData & {
-  toward: 'right' | 'left' | 'bottom' | 'top'; index: number
+// ── Orbit math ────────────────────────────────────────────────────────────────
+const ORB_AX   = 338   // horizontal semi-axis (px)
+const ORB_AY   = 195   // vertical semi-axis (px)
+const ORB_DUR  = 80    // seconds per full revolution
+const ORB_N    = 40    // keyframe segments (41 points, first === last → seamless)
+
+function makeOrbitKF(startAngle: number) {
+  const times = Array.from({ length: ORB_N + 1 }, (_, i) => i / ORB_N)
+  const x = times.map(t => Math.round(ORB_AX * Math.cos(startAngle + t * 2 * Math.PI)))
+  const y = times.map(t => Math.round(ORB_AY * Math.sin(startAngle + t * 2 * Math.PI)))
+  return { x, y, times }
+}
+
+// ── Small chip that orbits the globe ─────────────────────────────────────────
+function OrbitalChip({ chip, index, isSelected, onClick }: {
+  chip: ChipData; index: number; isSelected: boolean; onClick: () => void
 }) {
-  const [open, setOpen] = useState(false)
-  const DeltaIcon = delta > 0.05 ? TrendingUp : delta < -0.05 ? TrendingDown : Minus
-  const dur   = 2.8 + (index % 4) * 0.55
-  const delay = index * 0.36
+  const startAngle = (index / 8) * 2 * Math.PI - Math.PI / 2
+  const { x: xKF, y: yKF, times } = makeOrbitKF(startAngle)
 
-  const deltaStr   = Math.abs(delta) < 10 ? Math.abs(delta).toFixed(2) : Math.abs(delta).toFixed(0)
-  const deltaLabel = delta > 0.05 ? `▲ ${deltaStr}%` : delta < -0.05 ? `▼ ${deltaStr}%` : '→ estável'
-  const deltaColor = delta > 0.05 ? '#34d399' : delta < -0.05 ? '#f87171' : '#94a3b8'
-
-  const accentStyle: React.CSSProperties =
-    toward === 'right'  ? { right:  0, top: '20%', bottom: '20%', width: 3, borderRadius: '0 3px 3px 0' } :
-    toward === 'left'   ? { left:   0, top: '20%', bottom: '20%', width: 3, borderRadius: '3px 0 0 3px' } :
-    toward === 'bottom' ? { bottom: 0, left: '20%', right: '20%', height: 3, borderRadius: '0 0 3px 3px' } :
-                          { top:    0, left: '20%', right: '20%', height: 3, borderRadius: '3px 3px 0 0' }
-
-  const glowAt = toward === 'right' ? '100% 50%' : toward === 'left' ? '0% 50%' : toward === 'bottom' ? '50% 100%' : '50% 0%'
+  const DeltaIcon  = chip.delta > 0.05 ? TrendingUp : chip.delta < -0.05 ? TrendingDown : Minus
+  const deltaColor = chip.delta > 0.05 ? '#34d399' : chip.delta < -0.05 ? '#f87171' : '#94a3b8'
+  const absDelta   = Math.abs(chip.delta)
+  const deltaStr   = absDelta < 10 ? absDelta.toFixed(1) : absDelta.toFixed(0)
+  const deltaSign  = chip.delta > 0.05 ? '▲' : chip.delta < -0.05 ? '▼' : '→'
+  const accent     = chip.signal?.color ?? chip.color
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.88 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: index * 0.09 + 0.3, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+      style={{ position: 'absolute', left: '50%', top: '50%', width: 132, marginLeft: -66, marginTop: -40, zIndex: isSelected ? 20 : 10, cursor: 'pointer' }}
+      animate={{ x: xKF, y: yKF }}
+      transition={{ duration: ORB_DUR, repeat: Infinity, ease: 'linear', times }}
+      onClick={(e) => { e.stopPropagation(); onClick() }}
     >
       <motion.div
-        animate={open ? { y: 0 } : { y: [0, -7, 0] }}
-        transition={{ duration: dur, delay, repeat: open ? 0 : Infinity, ease: 'easeInOut' }}
-        className="relative overflow-hidden rounded-[18px] cursor-pointer"
-        onClick={() => setOpen(o => !o)}
+        initial={{ opacity: 0, scale: 0.75 }}
+        animate={{ opacity: 1, scale: isSelected ? 1.07 : 1 }}
+        transition={{ delay: index * 0.12 + 0.3, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          background: open ? 'rgba(10,10,20,0.97)' : 'rgba(8,8,16,0.90)',
-          border: `1px solid ${open ? (signal?.color ?? color) + '40' : 'rgba(255,255,255,0.08)'}`,
-          backdropFilter: 'blur(28px)',
-          boxShadow: open
-            ? `0 0 50px ${signal?.color ?? color}24, 0 16px 40px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.08)`
-            : `0 0 32px ${color}14, 0 8px 24px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)`,
+          background: isSelected ? 'rgba(12,14,22,0.98)' : 'rgba(7,9,16,0.90)',
+          border: `1px solid ${isSelected ? accent + '50' : 'rgba(255,255,255,0.10)'}`,
+          backdropFilter: 'blur(26px)',
+          borderRadius: 15,
+          padding: '9px 11px 10px',
+          boxShadow: isSelected
+            ? `0 0 32px ${accent}28, 0 10px 30px rgba(0,0,0,0.78), inset 0 1px 0 rgba(255,255,255,0.08)`
+            : `0 4px 18px rgba(0,0,0,0.58), inset 0 1px 0 rgba(255,255,255,0.055)`,
+          overflow: 'hidden',
         }}
       >
-        {/* Accent bar — aponta para o globo */}
-        <motion.div className="absolute pointer-events-none"
-          style={{ ...accentStyle, background: `linear-gradient(${toward === 'right' || toward === 'left' ? '180deg' : '90deg'}, transparent, ${signal?.color ?? color}, transparent)` }}
-          animate={{ opacity: [0.38, 1, 0.38] }}
-          transition={{ duration: dur, delay, repeat: Infinity, ease: 'easeInOut' }} />
-        {/* Shimmer */}
-        <motion.div className="absolute inset-0 pointer-events-none"
-          style={{ background: `linear-gradient(106deg, transparent 20%, ${color}08 50%, transparent 80%)` }}
-          animate={{ x: ['-130%', '230%'] }}
-          transition={{ duration: 5.5 + index * 0.6, delay: index * 0.5, repeat: Infinity, ease: 'easeInOut' }} />
-        {/* Glow radial em direção ao globo */}
-        <div className="absolute inset-0 pointer-events-none rounded-[18px]"
-          style={{ background: `radial-gradient(ellipse 85% 60% at ${glowAt}, ${color}0d 0%, transparent 68%)` }} />
-
-        <div className="relative px-4 py-4 flex flex-col gap-2.5">
-
-          {/* Label + chevron */}
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono uppercase tracking-[0.22em] text-white/35">{label}</span>
-            <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.22 }}>
-              <ChevronDown className="w-3.5 h-3.5 text-white/22" />
-            </motion.div>
-          </div>
-
-          {/* Valor */}
-          <span className="text-[24px] font-bold font-mono tabular-nums text-white/94 tracking-tight leading-none">{value}</span>
-
-          {/* Unidade */}
-          {unit && <span className="text-[9.5px] font-mono text-white/28 leading-none -mt-1">{unit}</span>}
-
-          {/* Variação vs ontem */}
-          <motion.span
-            className="self-start flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9.5px] font-mono font-bold"
-            style={{ background: `${deltaColor}1a`, border: `1px solid ${deltaColor}30`, color: deltaColor }}
-            animate={{ opacity: [0.55, 1, 0.55] }}
-            transition={{ duration: 2.2, delay: delay * 0.4, repeat: Infinity }}
-          >
-            <DeltaIcon className="w-2.5 h-2.5" />
-            {deltaLabel} hoje
-          </motion.span>
-
-          {/* Sinal de mercado */}
-          {signal && (
-            <span className="self-start rounded-[8px] px-2.5 py-1 text-[9.5px] font-semibold"
-              style={{ background: `${signal.color}1a`, border: `1px solid ${signal.color}32`, color: signal.color }}>
-              {signal.text}
+        {/* Shimmer sweep */}
+        <motion.div
+          style={{ position: 'absolute', inset: 0, background: `linear-gradient(105deg, transparent 25%, ${accent}0a 50%, transparent 75%)`, pointerEvents: 'none' }}
+          animate={{ x: ['-140%', '240%'] }}
+          transition={{ duration: 6 + index * 0.7, delay: index * 0.6, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.22em', color: 'rgba(255,255,255,0.30)', marginBottom: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {chip.label}
+        </p>
+        <p style={{ fontSize: 19, fontWeight: 700, fontFamily: 'monospace', color: 'rgba(255,255,255,0.95)', lineHeight: 1, marginBottom: 7 }}>
+          {chip.value}
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <span style={{ fontSize: 8.5, fontFamily: 'monospace', fontWeight: 700, color: deltaColor, background: deltaColor + '18', border: `1px solid ${deltaColor}28`, borderRadius: 99, padding: '2px 7px', display: 'inline-flex', alignItems: 'center', gap: 3, alignSelf: 'flex-start' }}>
+            <DeltaIcon style={{ width: 8, height: 8, flexShrink: 0 }} />
+            {deltaSign}{deltaStr}% hoje
+          </span>
+          {chip.signal && (
+            <span style={{ fontSize: 7.5, fontWeight: 600, color: chip.signal.color, background: chip.signal.color + '14', border: `1px solid ${chip.signal.color}22`, borderRadius: 99, padding: '2px 7px', alignSelf: 'flex-start', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
+              {chip.signal.text}
             </span>
           )}
-
-          {/* O que é — sempre visível */}
-          {oque && (
-            <div className="border-t border-white/[0.06] pt-2.5">
-              <p className="text-[10.5px] text-white/42 leading-[1.6] line-clamp-3">{oque}</p>
-            </div>
-          )}
-
-          {/* Expandido: Como afeta */}
-          <AnimatePresence>
-            {open && como && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                className="overflow-hidden"
-              >
-                <div className="border-t border-white/[0.06] pt-2.5 mt-0.5">
-                  <p className="text-[8.5px] font-mono uppercase tracking-[0.18em] text-white/20 mb-2">Como afeta seu negócio</p>
-                  <p className="text-[10.5px] text-white/48 leading-[1.65]">{como}</p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </motion.div>
     </motion.div>
   )
 }
 
+// ── Detail panel — appears below orbit when a chip is selected ────────────────
+function DetailPanel({ chip, onClose }: { chip: ChipData; onClose: () => void }) {
+  const DeltaIcon  = chip.delta > 0.05 ? TrendingUp : chip.delta < -0.05 ? TrendingDown : Minus
+  const deltaColor = chip.delta > 0.05 ? '#34d399' : chip.delta < -0.05 ? '#f87171' : '#94a3b8'
+  const absDelta   = Math.abs(chip.delta)
+  const deltaStr   = absDelta < 10 ? absDelta.toFixed(2) : absDelta.toFixed(0)
+  const deltaLabel = chip.delta > 0.05 ? `▲ ${deltaStr}%` : chip.delta < -0.05 ? `▼ ${deltaStr}%` : '→ estável'
+  const accent     = chip.signal?.color ?? chip.color
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 14 }}
+      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+      style={{ background: 'rgba(7,9,16,0.97)', border: `1px solid ${accent}28`, backdropFilter: 'blur(32px)', borderRadius: 22, padding: '24px 28px 26px', boxShadow: `0 0 56px ${accent}14, 0 22px 52px rgba(0,0,0,0.78)`, position: 'relative', overflow: 'hidden' }}
+    >
+      {/* top accent line */}
+      <div style={{ position: 'absolute', top: 0, left: '8%', right: '8%', height: 2, background: `linear-gradient(90deg, transparent, ${accent}55, transparent)`, borderRadius: 2 }} />
+
+      <button onClick={onClose}
+        style={{ position: 'absolute', right: 14, top: 14, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, cursor: 'pointer', color: 'rgba(255,255,255,0.38)', fontSize: 17, lineHeight: 1 }}
+      >×</button>
+
+      <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+        {/* Left: metrics */}
+        <div style={{ minWidth: 130 }}>
+          <p style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.22em', color: 'rgba(255,255,255,0.26)', marginBottom: 6 }}>{chip.label}</p>
+          <p style={{ fontSize: 36, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(255,255,255,0.96)', lineHeight: 1 }}>{chip.value}</p>
+          {chip.unit && <p style={{ fontSize: 10, fontFamily: 'monospace', color: 'rgba(255,255,255,0.26)', marginTop: 5 }}>{chip.unit}</p>}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 12 }}>
+            <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: deltaColor, background: deltaColor + '1a', border: `1px solid ${deltaColor}2c`, borderRadius: 99, padding: '3px 9px', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <DeltaIcon style={{ width: 10, height: 10 }} />{deltaLabel}
+            </span>
+            {chip.signal && (
+              <span style={{ fontSize: 10, fontWeight: 600, color: chip.signal.color, background: chip.signal.color + '18', border: `1px solid ${chip.signal.color}26`, borderRadius: 99, padding: '3px 9px' }}>
+                {chip.signal.text}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Vertical divider */}
+        <div style={{ width: 1, alignSelf: 'stretch', background: 'rgba(255,255,255,0.06)', minHeight: 80, flexShrink: 0 }} />
+
+        {/* Right: explanations */}
+        <div style={{ flex: 1, minWidth: 200 }}>
+          {chip.oque && (
+            <div style={{ marginBottom: 14 }}>
+              <p style={{ fontSize: 8, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.20)', marginBottom: 5 }}>O que é</p>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.52)', lineHeight: 1.64 }}>{chip.oque}</p>
+            </div>
+          )}
+          {chip.como && (
+            <div>
+              <p style={{ fontSize: 8, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.20)', marginBottom: 5 }}>Como afeta seu negócio</p>
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.57)', lineHeight: 1.64 }}>{chip.como}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
 function GlobeHero({ data }: { data: MarketData }) {
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+
   const m      = data.macro
   const ibov   = data.stocks?.ibov
   const gold   = data.commodities.gold
@@ -248,8 +274,10 @@ function GlobeHero({ data }: { data: MarketData }) {
   const uv = m.usdBrl.value
   const iv = m.ipca.value
   const pv = m.pib.value
+  const gp = ibov?.pct ?? 0
+  const op = oil?.delta ?? 0
 
-  const leftChips: ChipData[] = [
+  const chips: ChipData[] = [
     {
       id: 'selic', label: 'SELIC', value: `${sv}`, unit: '% ao ano', delta: 0, color: '#94a3b8',
       signal: sv > 13 ? { text: 'Crédito restritivo', color: '#f87171' } : sv > 10 ? { text: 'Neutro', color: '#fbbf24' } : { text: 'Expansivo', color: '#34d399' },
@@ -274,11 +302,6 @@ function GlobeHero({ data }: { data: MarketData }) {
       oque: 'Produto Interno Bruto — soma de tudo produzido. Projeção Focus (BCB) é o consenso do mercado financeiro.',
       como: '>2% → demanda aquece, expanda agora. 0–2% → priorize eficiência e caixa. <0% → recessão técnica, preserve runway de 6 meses e corte variáveis.',
     },
-  ]
-
-  const gp = ibov?.pct ?? 0
-  const op = oil?.delta ?? 0
-  const rightChips: ChipData[] = [
     {
       id: 'ibov', label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000), unit: 'pontos — B3', delta: gp, color: pctColor(gp),
       signal: gp > 1 ? { text: 'Bolsa em alta', color: '#34d399' } : gp < -1 ? { text: 'Bolsa em queda', color: '#f87171' } : { text: 'Bolsa lateral', color: '#fbbf24' },
@@ -305,104 +328,133 @@ function GlobeHero({ data }: { data: MarketData }) {
     },
   ]
 
+  const selectedChip = chips.find(c => c.id === selectedId) ?? null
+
   return (
-    <div className="relative w-full select-none">
+    <div className="relative w-full select-none" onClick={() => setSelectedId(null)}>
 
-      {/* ── Desktop: globo central + 8 chips em anel ── */}
-      <div className="hidden md:block relative w-full" style={{ height: 780, overflow: 'visible' }}>
+      {/* ── Desktop: órbita elíptica ── */}
+      <div className="hidden md:flex flex-col gap-6">
 
-        {/* Globo: centro absoluto */}
-        <div className="absolute" style={{
-          left: '50%', top: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 460, height: 460,
-          zIndex: 2,
-        }}>
-          <div className="absolute inset-0 rounded-full pointer-events-none"
-            style={{ background: 'radial-gradient(circle, rgba(192,192,192,0.07) 30%, transparent 68%)', transform: 'scale(1.55)' }} />
-          {[1.06, 1.17, 1.32, 1.50].map((s, i) => (
-            <motion.div key={i} className="absolute inset-0 rounded-full pointer-events-none"
-              style={{ border: `1px solid rgba(192,192,192,${0.07 - i * 0.015})`, transform: `scale(${s})` }}
-              animate={{ opacity: [0.55, 0.05, 0.55] }}
-              transition={{ duration: 3.4 + i * 1.7, repeat: Infinity, delay: i * 1.1, ease: 'easeInOut' }} />
-          ))}
-          <div style={{ width: '100%', height: '100%' }}><Globe3D /></div>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 4 }}>
-            <motion.div className="flex items-center gap-2 rounded-full"
-              style={{ background: 'rgba(3,5,8,0.92)', border: '1px solid rgba(52,211,153,0.30)', backdropFilter: 'blur(18px)', padding: '9px 22px' }}
-              initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.9, duration: 0.5 }}>
-              <motion.div className="w-2 h-2 rounded-full bg-emerald-400"
-                animate={{ opacity: [0.3, 1, 0.3], scale: [0.75, 1.4, 0.75] }}
-                transition={{ duration: 1.6, repeat: Infinity }} />
-              <span className="text-[11px] font-mono uppercase tracking-[0.38em] text-emerald-400/90">Ao Vivo</span>
-            </motion.div>
+        {/* Orbit stage */}
+        <div className="relative w-full" style={{ height: 660 }}>
+
+          {/* SVG: trilha da órbita */}
+          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} overflow="visible">
+            <ellipse cx="50%" cy="50%" rx={ORB_AX} ry={ORB_AY}
+              fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1" strokeDasharray="4 10" />
+          </svg>
+
+          {/* Globo 380px centralizado */}
+          <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', width: 380, height: 380, zIndex: 2 }}>
+            {[1.06, 1.18, 1.34, 1.52].map((s, i) => (
+              <motion.div key={i}
+                style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `1px solid rgba(192,192,192,${0.07 - i * 0.014})`, transform: `scale(${s})`, pointerEvents: 'none' }}
+                animate={{ opacity: [0.55, 0.06, 0.55] }}
+                transition={{ duration: 3.4 + i * 1.7, repeat: Infinity, delay: i * 1.1, ease: 'easeInOut' }}
+              />
+            ))}
+            <div style={{ width: '100%', height: '100%' }}><Globe3D /></div>
+            {/* AO VIVO badge */}
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 4 }}>
+              <motion.div
+                style={{ background: 'rgba(3,5,8,0.92)', border: '1px solid rgba(52,211,153,0.30)', backdropFilter: 'blur(18px)', padding: '9px 22px', borderRadius: 99, display: 'flex', alignItems: 'center', gap: 8 }}
+                initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.9, duration: 0.5 }}
+              >
+                <motion.div style={{ width: 8, height: 8, borderRadius: '50%', background: '#34d399' }}
+                  animate={{ opacity: [0.3, 1, 0.3], scale: [0.75, 1.4, 0.75] }}
+                  transition={{ duration: 1.6, repeat: Infinity }} />
+                <span style={{ fontSize: 11, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.38em', color: 'rgba(52,211,153,0.9)' }}>Ao Vivo</span>
+              </motion.div>
+            </div>
           </div>
+
+          {/* 8 chips em órbita elíptica */}
+          {chips.map((chip, i) => (
+            <OrbitalChip
+              key={chip.id}
+              chip={chip}
+              index={i}
+              isSelected={selectedId === chip.id}
+              onClick={() => setSelectedId(prev => prev === chip.id ? null : chip.id)}
+            />
+          ))}
         </div>
 
-        {/* ── 8 chips em anel ao redor do globo ── */}
-        {/* chip width: 230px */}
-
-        {/* TOPO-ESQUERDA: SELIC */}
-        <div className="absolute" style={{ left: 0, top: 0, width: 230, zIndex: 10 }}>
-          <DataChip {...leftChips[0]} toward="right" index={0} />
-        </div>
-        {/* TOPO-CENTRO: PIB */}
-        <div className="absolute" style={{ left: 'calc(50% - 115px)', top: 0, width: 230, zIndex: 10 }}>
-          <DataChip {...leftChips[3]} toward="bottom" index={3} />
-        </div>
-        {/* TOPO-DIREITA: IBOVESPA */}
-        <div className="absolute" style={{ right: 0, top: 0, width: 230, zIndex: 10 }}>
-          <DataChip {...rightChips[0]} toward="left" index={4} />
-        </div>
-
-        {/* MEIO-ESQUERDA: USD/BRL */}
-        <div className="absolute" style={{ left: 0, top: '50%', transform: 'translateY(-50%)', width: 230, zIndex: 10 }}>
-          <DataChip {...leftChips[1]} toward="right" index={1} />
-        </div>
-        {/* MEIO-DIREITA: OURO */}
-        <div className="absolute" style={{ right: 0, top: '50%', transform: 'translateY(-50%)', width: 230, zIndex: 10 }}>
-          <DataChip {...rightChips[1]} toward="left" index={5} />
-        </div>
-
-        {/* BAIXO-ESQUERDA: IPCA */}
-        <div className="absolute" style={{ left: 0, bottom: 0, width: 230, zIndex: 10 }}>
-          <DataChip {...leftChips[2]} toward="right" index={2} />
-        </div>
-        {/* BAIXO-CENTRO: PETRÓLEO */}
-        <div className="absolute" style={{ left: 'calc(50% - 115px)', bottom: 0, width: 230, zIndex: 10 }}>
-          <DataChip {...rightChips[3]} toward="top" index={7} />
-        </div>
-        {/* BAIXO-DIREITA: PRATA */}
-        <div className="absolute" style={{ right: 0, bottom: 0, width: 230, zIndex: 10 }}>
-          <DataChip {...rightChips[2]} toward="left" index={6} />
-        </div>
+        {/* Detail panel — aparece abaixo da órbita, sem sobrepor chips */}
+        <AnimatePresence>
+          {selectedChip && (
+            <div onClick={e => e.stopPropagation()}>
+              <DetailPanel chip={selectedChip} onClose={() => setSelectedId(null)} />
+            </div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* ── Mobile: globo + grid 2 col ── */}
       <div className="md:hidden flex flex-col gap-4">
         <div className="relative mx-auto w-full" style={{ maxWidth: 300 }}>
           {[1.08, 1.28].map((s, i) => (
-            <motion.div key={i} className="absolute inset-0 rounded-full pointer-events-none"
-              style={{ border: '1px solid rgba(192,192,192,0.06)', transform: `scale(${s})` }}
+            <motion.div key={i}
+              style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '1px solid rgba(192,192,192,0.06)', transform: `scale(${s})`, pointerEvents: 'none' }}
               animate={{ opacity: [0.5, 0.07, 0.5] }}
-              transition={{ duration: 3.5 + i * 1.8, repeat: Infinity, delay: i * 1.2 }} />
+              transition={{ duration: 3.5 + i * 1.8, repeat: Infinity, delay: i * 1.2 }}
+            />
           ))}
           <div className="w-full" style={{ aspectRatio: '1 / 1' }}><Globe3D /></div>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 4 }}>
-            <motion.div className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
-              style={{ background: 'rgba(3,5,8,0.88)', border: '1px solid rgba(52,211,153,0.28)', backdropFilter: 'blur(16px)' }}>
-              <motion.div className="w-1.5 h-1.5 rounded-full bg-emerald-400"
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 4 }}>
+            <motion.div style={{ background: 'rgba(3,5,8,0.88)', border: '1px solid rgba(52,211,153,0.28)', backdropFilter: 'blur(16px)', borderRadius: 99, padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <motion.div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }}
                 animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.6, repeat: Infinity }} />
-              <span className="text-[8px] font-mono uppercase tracking-[0.3em] text-emerald-400/80">Ao Vivo</span>
+              <span style={{ fontSize: 8, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(52,211,153,0.8)' }}>Ao Vivo</span>
             </motion.div>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2.5">
-          {[...leftChips, ...rightChips].map((c, i) => (
-            <DataChip key={c.id} {...c} toward={i < 4 ? 'right' : 'left'} index={i} />
-          ))}
+
+        <div className="grid grid-cols-2 gap-3">
+          {chips.map((chip, i) => {
+            const DeltaIcon  = chip.delta > 0.05 ? TrendingUp : chip.delta < -0.05 ? TrendingDown : Minus
+            const deltaColor = chip.delta > 0.05 ? '#34d399' : chip.delta < -0.05 ? '#f87171' : '#94a3b8'
+            const deltaStr   = Math.abs(chip.delta) < 10 ? Math.abs(chip.delta).toFixed(1) : Math.abs(chip.delta).toFixed(0)
+            const deltaSign  = chip.delta > 0.05 ? '▲' : chip.delta < -0.05 ? '▼' : '→'
+            const isOpen     = selectedId === chip.id
+            return (
+              <motion.div key={chip.id}
+                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.07, duration: 0.4 }}
+                onClick={e => { e.stopPropagation(); setSelectedId(prev => prev === chip.id ? null : chip.id) }}
+                style={{ background: isOpen ? 'rgba(12,14,22,0.98)' : 'rgba(7,9,16,0.88)', border: `1px solid ${isOpen ? (chip.signal?.color ?? chip.color) + '44' : 'rgba(255,255,255,0.08)'}`, backdropFilter: 'blur(20px)', borderRadius: 16, padding: '12px 13px', cursor: 'pointer' }}
+              >
+                <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.28)', marginBottom: 3 }}>{chip.label}</p>
+                <p style={{ fontSize: 20, fontWeight: 700, fontFamily: 'monospace', color: 'rgba(255,255,255,0.94)', lineHeight: 1, marginBottom: 6 }}>{chip.value}</p>
+                <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: deltaColor, display: 'inline-flex', alignItems: 'center', gap: 3, background: deltaColor + '18', border: `1px solid ${deltaColor}28`, borderRadius: 99, padding: '2px 7px' }}>
+                  <DeltaIcon style={{ width: 8, height: 8 }} />{deltaSign}{deltaStr}%
+                </span>
+                {chip.signal && <p style={{ fontSize: 8, fontWeight: 600, color: chip.signal.color, marginTop: 4 }}>{chip.signal.text}</p>}
+                <AnimatePresence>
+                  {isOpen && (chip.oque || chip.como) && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                      style={{ overflow: 'hidden', marginTop: 8, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 8 }}
+                    >
+                      {chip.oque && <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.48)', lineHeight: 1.6, marginBottom: chip.como ? 7 : 0 }}>{chip.oque}</p>}
+                      {chip.como && <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.52)', lineHeight: 1.6 }}>{chip.como}</p>}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )
+          })}
         </div>
+
+        <AnimatePresence>
+          {selectedChip && (
+            <div onClick={e => e.stopPropagation()}>
+              <DetailPanel chip={selectedChip} onClose={() => setSelectedId(null)} />
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   )
