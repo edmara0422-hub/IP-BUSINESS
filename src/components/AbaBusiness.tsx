@@ -11,8 +11,9 @@ import { useAuth } from '@/hooks/useAuth'
 import { createClient } from '@/lib/supabase/client'
 import dynamic from 'next/dynamic'
 
-const Globe3D       = dynamic(() => import('@/components/business/Globe3D'),       { ssr: false })
-const SectorScene3D = dynamic(() => import('@/components/business/SectorScene3D'), { ssr: false, loading: () => <div style={{ height: 520, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(200,200,200,0.22)', fontSize: 11, fontFamily: 'monospace', letterSpacing: '0.2em' }}>CARREGANDO 3D…</div> })
+const Globe3D            = dynamic(() => import('@/components/business/Globe3D'),            { ssr: false })
+const SectorScene3D      = dynamic(() => import('@/components/business/SectorScene3D'),      { ssr: false, loading: () => <div style={{ height: 540, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(180,160,255,0.3)', fontSize: 10, fontFamily: 'monospace', letterSpacing: '0.3em' }}>INICIALIZANDO 3D…</div> })
+const SkyscraperMarket3D = dynamic(() => import('@/components/business/SkyscraperMarket3D'), { ssr: false, loading: () => <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(180,160,255,0.3)', fontSize: 10, fontFamily: 'monospace', letterSpacing: '0.3em' }}>INICIALIZANDO 3D…</div> })
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface MacroPoint   { value: number; delta: number; sentiment: string }
@@ -70,10 +71,10 @@ function SectionLabel({ label, sub }: { label: string; sub?: string }) {
     <motion.div initial={{ opacity: 0, x: -8 }} whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }} transition={{ duration: 0.5 }}
       className="flex items-center gap-3 mb-4">
-      <div className="w-0.5 h-4 rounded-full" style={{ background: 'rgba(192,192,192,0.22)' }} />
-      <span className="text-[9px] font-mono uppercase tracking-[0.4em] text-white/25">{label}</span>
-      {sub && <span className="text-[9px] font-mono text-white/12">{sub}</span>}
-      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(192,192,192,0.07), transparent)' }} />
+      <div className="w-0.5 h-4 rounded-full" style={{ background: 'linear-gradient(180deg, rgba(139,92,246,0.8), rgba(100,60,220,0.3))' }} />
+      <span className="text-[9px] font-mono uppercase tracking-[0.4em]" style={{ color: 'rgba(180,160,255,0.55)' }}>{label}</span>
+      {sub && <span className="text-[9px] font-mono" style={{ color: 'rgba(180,160,255,0.22)' }}>{sub}</span>}
+      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(139,92,246,0.15), transparent)' }} />
     </motion.div>
   )
 }
@@ -462,7 +463,7 @@ function GlobeHero({ data }: { data: MarketData }) {
 function StockCard({ ticker, label, price, pct, showPrice = true }: {
   ticker: string; label: string; price?: number; pct: number; showPrice?: boolean
 }) {
-  const col   = pctColor(pct)
+  const col    = pctColor(pct)
   const isBull = pct > 0.05
   const isBear = pct < -0.05
   return (
@@ -470,21 +471,23 @@ function StockCard({ ticker, label, price, pct, showPrice = true }: {
       initial={{ opacity: 0, scale: 0.94 }} whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true }} transition={{ duration: 0.3 }}
       style={{
-        background: isBull ? 'rgba(52,211,153,0.055)' : isBear ? 'rgba(248,113,113,0.055)' : 'rgba(5,5,5,0.88)',
-        border: `1px solid ${col}22`,
+        background: isBull ? 'rgba(0,255,247,0.06)' : isBear ? 'rgba(239,68,68,0.06)' : 'rgba(7,6,26,0.88)',
+        border: `1px solid ${col}28`,
         borderRadius: 14,
         padding: '11px 13px',
         overflow: 'hidden',
         position: 'relative',
+        boxShadow: isBull ? '0 0 12px rgba(0,255,247,0.06)' : isBear ? '0 0 12px rgba(239,68,68,0.06)' : 'none',
       }}
     >
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1.5, background: `linear-gradient(90deg, transparent, ${col}50, transparent)` }} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-        <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(200,200,200,0.44)', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{ticker}</span>
-        <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: col, background: col + '18', border: `1px solid ${col}28`, borderRadius: 99, padding: '1px 7px' }}>{pctSign(pct)}</span>
+        <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(180,160,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{ticker}</span>
+        <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: col, background: col + '18', border: `1px solid ${col}30`, borderRadius: 99, padding: '1px 7px', boxShadow: `0 0 8px ${col}22` }}>{pctSign(pct)}</span>
       </div>
-      <p style={{ fontSize: 11, color: 'rgba(210,210,210,0.58)', marginBottom: showPrice ? 5 : 7, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</p>
+      <p style={{ fontSize: 11, color: 'rgba(210,210,210,0.52)', marginBottom: showPrice ? 5 : 7, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</p>
       {showPrice && price !== undefined && (
-        <p style={{ fontSize: 18, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.92)', marginBottom: 7, lineHeight: 1 }}>R${fmtBRL(price)}</p>
+        <p style={{ fontSize: 18, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.94)', marginBottom: 7, lineHeight: 1, textShadow: `0 0 12px ${col}40` }}>R${fmtBRL(price)}</p>
       )}
       <Sparkline id={ticker} delta={pct} color={col} w={114} h={28} />
     </motion.div>
@@ -492,6 +495,7 @@ function StockCard({ ticker, label, price, pct, showPrice = true }: {
 }
 
 function MarketPanel({ data }: { data: MarketData }) {
+  const [mode, setMode] = useState<'3d' | 'cards'>('3d')
   const brStocks = data.stocks?.br ?? []
   const glStocks = data.stocks?.global ?? data.globalAgents?.slice(0, 4).map(a => ({ ticker: a.id.toUpperCase(), label: a.label, pct: a.delta })) ?? []
   const fallbackBR: StockBR[] = [
@@ -512,20 +516,42 @@ function MarketPanel({ data }: { data: MarketData }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
       {/* B3 */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(195,195,195,0.28)' }}>Bolsa BR · B3</span>
-          <motion.div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }}
-            animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(180,160,255,0.4)' }}>Bolsa BR · B3</span>
+            <motion.div style={{ width: 6, height: 6, borderRadius: '50%', background: '#00fff7', boxShadow: '0 0 6px #00fff7' }}
+              animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} />
+          </div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {([{ id: '3d', label: '3D' }, { id: 'cards', label: 'CARDS' }] as { id: '3d' | 'cards'; label: string }[]).map(({ id, label }) => (
+              <button key={id} onClick={() => setMode(id)}
+                style={{ padding: '4px 12px', borderRadius: 99, fontSize: 8, fontFamily: 'monospace', letterSpacing: '0.18em', cursor: 'pointer', transition: 'all 0.15s', fontWeight: mode === id ? 700 : 400, background: mode === id ? 'rgba(139,92,246,0.2)' : 'rgba(200,200,200,0.04)', border: `1px solid ${mode === id ? 'rgba(139,92,246,0.45)' : 'rgba(200,200,200,0.07)'}`, color: mode === id ? 'rgba(180,160,255,0.9)' : 'rgba(200,200,200,0.28)', boxShadow: mode === id ? '0 0 10px rgba(139,92,246,0.15)' : 'none' }}>
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(138px, 1fr))', gap: 8 }}>
-          {brList.map(s => <StockCard key={s.ticker} ticker={s.ticker} label={s.label} price={(s as StockBR).price} pct={s.pct} />)}
-        </div>
+
+        <AnimatePresence mode="wait">
+          {mode === '3d' ? (
+            <motion.div key="3d" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
+              <SkyscraperMarket3D stocks={brList} />
+            </motion.div>
+          ) : (
+            <motion.div key="cards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(138px, 1fr))', gap: 8 }}>
+                {brList.map(s => <StockCard key={s.ticker} ticker={s.ticker} label={s.label} price={(s as StockBR).price} pct={s.pct} />)}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
+
       {/* Global */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(195,195,195,0.28)' }}>Mercados Globais</span>
-          <motion.div style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa' }}
+          <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(180,160,255,0.4)' }}>Mercados Globais</span>
+          <motion.div style={{ width: 6, height: 6, borderRadius: '50%', background: '#7c3aed', boxShadow: '0 0 6px #7c3aed' }}
             animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2.4, repeat: Infinity }} />
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 8 }}>
@@ -571,72 +597,72 @@ function SectorCard({ sector, delay }: { sector: Sector; delay: number }) {
   const analysis = SECTOR_ANALYSIS[sector.id]
   const h  = sector.heat
   const signal =
-    h >= 75 ? { label: 'OPORTUNIDADE', color: '#34d399' } :
-    h >= 50 ? { label: 'NEUTRO',       color: '#c0c0c0' } :
-    h >= 30 ? { label: 'CAUTELA',      color: '#fbbf24' } :
-              { label: 'ALTO RISCO',   color: '#f87171' }
+    h >= 75 ? { label: 'OPORTUNIDADE', color: '#00fff7' } :
+    h >= 50 ? { label: 'NEUTRO',       color: '#8b5cf6' } :
+    h >= 30 ? { label: 'CAUTELA',      color: '#f59e0b' } :
+              { label: 'ALTO RISCO',   color: '#ef4444' }
   const chgColor = pctColor(sector.change)
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }} transition={{ delay, duration: 0.4 }}
-      style={{ background: 'rgba(5,5,5,0.94)', border: `1px solid ${signal.color}1a`, borderRadius: 18, overflow: 'hidden', position: 'relative' }}
+      style={{ background: 'rgba(7,6,26,0.94)', border: `1px solid ${signal.color}22`, borderRadius: 18, overflow: 'hidden', position: 'relative', boxShadow: `0 0 20px ${signal.color}06` }}
     >
       {/* accent top bar */}
-      <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${signal.color}50, transparent)` }} />
+      <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${signal.color}70, transparent)` }} />
 
       {/* Header */}
-      <div style={{ padding: '12px 16px 10px', borderBottom: '1px solid rgba(200,200,200,0.05)' }}>
+      <div style={{ padding: '12px 16px 10px', borderBottom: '1px solid rgba(100,80,200,0.08)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: signal.color, background: signal.color + '16', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 8px', fontWeight: 700, flexShrink: 0 }}>
+            <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}35`, borderRadius: 99, padding: '2px 8px', fontWeight: 700, flexShrink: 0, boxShadow: `0 0 10px ${signal.color}18` }}>
               {signal.label}
             </span>
-            <span style={{ fontSize: 12.5, fontWeight: 600, color: 'rgba(228,228,228,0.82)' }}>{sector.label}</span>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: 'rgba(228,228,228,0.85)' }}>{sector.label}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-            <span style={{ fontSize: 22, fontWeight: 800, fontFamily: 'monospace', color: signal.color, lineHeight: 1 }}>{h}</span>
-            <span style={{ fontSize: 8.5, fontFamily: 'monospace', color: 'rgba(200,200,200,0.22)', alignSelf: 'flex-end', marginBottom: 2 }}>/100</span>
-            <span style={{ fontSize: 9.5, fontFamily: 'monospace', fontWeight: 700, color: chgColor, background: chgColor + '16', border: `1px solid ${chgColor}26`, borderRadius: 99, padding: '2px 7px' }}>
+            <span style={{ fontSize: 22, fontWeight: 800, fontFamily: 'monospace', color: signal.color, lineHeight: 1, textShadow: `0 0 16px ${signal.color}60` }}>{h}</span>
+            <span style={{ fontSize: 8.5, fontFamily: 'monospace', color: 'rgba(180,160,255,0.25)', alignSelf: 'flex-end', marginBottom: 2 }}>/100</span>
+            <span style={{ fontSize: 9.5, fontFamily: 'monospace', fontWeight: 700, color: chgColor, background: chgColor + '16', border: `1px solid ${chgColor}28`, borderRadius: 99, padding: '2px 7px' }}>
               {sector.change >= 0 ? '+' : ''}{sector.change}%
             </span>
           </div>
         </div>
         {/* Heat bar */}
-        <div style={{ height: 4, background: 'rgba(200,200,200,0.07)', borderRadius: 2, overflow: 'hidden' }}>
+        <div style={{ height: 4, background: 'rgba(100,80,200,0.08)', borderRadius: 2, overflow: 'hidden' }}>
           <motion.div
             initial={{ width: 0 }} whileInView={{ width: `${h}%` }} viewport={{ once: true }}
             transition={{ duration: 1.1, delay: delay + 0.2, ease: [0.16, 1, 0.3, 1] }}
-            style={{ height: '100%', borderRadius: 2, background: `linear-gradient(90deg, ${signal.color}40, ${signal.color}cc)` }}
+            style={{ height: '100%', borderRadius: 2, background: `linear-gradient(90deg, ${signal.color}40, ${signal.color})`, boxShadow: `0 0 6px ${signal.color}50` }}
           />
         </div>
       </div>
 
-      {/* 3-column analysis — sempre visível */}
+      {/* 3-column analysis */}
       {analysis && (
-        <div style={{ padding: '12px 16px 14px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
+        <div style={{ padding: '12px 16px 14px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
           {([
-            { label: 'Oportunidades', text: analysis.oportunidade, color: '#34d399' },
-            { label: 'Riscos',        text: analysis.risco,        color: '#f87171' },
-            { label: 'Como Atuar',    text: analysis.como,         color: '#c0c0c0' },
-          ] as { label: string; text: string; color: string }[]).map(({ label, text, color }) => (
-            <div key={label}>
+            { label: 'Oportunidades', text: analysis.oportunidade, color: '#00fff7', bg: 'rgba(0,255,247,0.05)', border: 'rgba(0,255,247,0.12)' },
+            { label: 'Riscos',        text: analysis.risco,        color: '#ef4444', bg: 'rgba(239,68,68,0.05)',  border: 'rgba(239,68,68,0.12)' },
+            { label: 'Como Atuar',    text: analysis.como,         color: '#8b5cf6', bg: 'rgba(139,92,246,0.05)', border: 'rgba(139,92,246,0.12)' },
+          ] as { label: string; text: string; color: string; bg: string; border: string }[]).map(({ label, text, color, bg, border }) => (
+            <div key={label} style={{ padding: '9px 11px', background: bg, border: `1px solid ${border}`, borderRadius: 12, borderTop: `2px solid ${color}40` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
-                <div style={{ width: 5, height: 5, borderRadius: '50%', background: color, flexShrink: 0 }} />
-                <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: color + 'aa', fontWeight: 700 }}>{label}</p>
+                <div style={{ width: 5, height: 5, borderRadius: '50%', background: color, flexShrink: 0, boxShadow: `0 0 5px ${color}` }} />
+                <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: color + 'cc', fontWeight: 700 }}>{label}</p>
               </div>
-              <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.46)', lineHeight: 1.64, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>{text}</p>
+              <p style={{ fontSize: 11, color: 'rgba(210,210,210,0.48)', lineHeight: 1.64, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>{text}</p>
             </div>
           ))}
         </div>
       )}
 
-      {/* Quem se beneficia — rodapé discreto */}
+      {/* Quem se beneficia */}
       {analysis?.quem && (
-        <div style={{ padding: '8px 16px 10px', borderTop: '1px solid rgba(200,200,200,0.04)' }}>
-          <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.16em', color: 'rgba(200,200,200,0.22)' }}>Quem se beneficia: </span>
-          <span style={{ fontSize: 10, color: 'rgba(200,200,200,0.34)' }}>{analysis.quem}</span>
+        <div style={{ padding: '8px 16px 10px', borderTop: '1px solid rgba(100,80,200,0.06)' }}>
+          <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.16em', color: 'rgba(180,160,255,0.28)' }}>Quem se beneficia: </span>
+          <span style={{ fontSize: 10, color: 'rgba(200,200,200,0.36)' }}>{analysis.quem}</span>
         </div>
       )}
     </motion.div>
@@ -656,7 +682,7 @@ function SectorAnalysis({ sectors }: { sectors: Sector[] }) {
           { id: 'cards', label: 'CARDS' },
         ] as { id: 'cards' | '3d'; label: string }[]).map(({ id, label }) => (
           <button key={id} onClick={() => setMode(id)}
-            style={{ padding: '5px 14px', borderRadius: 99, fontSize: 8.5, fontFamily: 'monospace', letterSpacing: '0.18em', cursor: 'pointer', transition: 'all 0.18s', fontWeight: mode === id ? 700 : 400, background: mode === id ? 'rgba(192,192,192,0.14)' : 'rgba(200,200,200,0.04)', border: `1px solid ${mode === id ? 'rgba(192,192,192,0.28)' : 'rgba(200,200,200,0.07)'}`, color: mode === id ? 'rgba(228,228,228,0.85)' : 'rgba(200,200,200,0.32)' }}>
+            style={{ padding: '5px 16px', borderRadius: 99, fontSize: 8.5, fontFamily: 'monospace', letterSpacing: '0.18em', cursor: 'pointer', transition: 'all 0.18s', fontWeight: mode === id ? 700 : 400, background: mode === id ? 'rgba(139,92,246,0.2)' : 'rgba(200,200,200,0.03)', border: `1px solid ${mode === id ? 'rgba(139,92,246,0.45)' : 'rgba(200,200,200,0.07)'}`, color: mode === id ? 'rgba(180,160,255,0.92)' : 'rgba(200,200,200,0.28)', boxShadow: mode === id ? '0 0 14px rgba(139,92,246,0.18)' : 'none' }}>
             {label}
           </button>
         ))}
@@ -709,13 +735,14 @@ const IMPACT_CHAINS = [
 function ImpactChain() {
   const [selected, setSelected] = useState<string>('selic')
   const chain = IMPACT_CHAINS.find(c => c.id === selected)!
+
   return (
-    <div style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.08)', borderRadius: 20, overflow: 'hidden' }}>
+    <div style={{ background: 'rgba(5,4,25,0.96)', border: '1px solid rgba(100,80,200,0.14)', borderRadius: 20, overflow: 'hidden' }}>
       {/* Selector */}
-      <div style={{ padding: '12px 16px', display: 'flex', gap: 8, borderBottom: '1px solid rgba(200,200,200,0.05)' }}>
+      <div style={{ padding: '14px 16px', display: 'flex', gap: 8, borderBottom: '1px solid rgba(100,80,200,0.08)', background: 'rgba(0,0,0,0.25)' }}>
         {IMPACT_CHAINS.map(c => (
           <button key={c.id} onClick={() => setSelected(c.id)}
-            style={{ flex: 1, padding: '8px 4px', borderRadius: 12, fontSize: 9, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.16em', cursor: 'pointer', transition: 'all 0.18s', background: selected === c.id ? `${c.color}18` : 'rgba(200,200,200,0.04)', border: `1px solid ${selected === c.id ? c.color + '40' : 'rgba(200,200,200,0.07)'}`, color: selected === c.id ? c.color : 'rgba(200,200,200,0.28)', fontWeight: selected === c.id ? 700 : 400 }}>
+            style={{ flex: 1, padding: '9px 4px', borderRadius: 12, fontSize: 9, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.16em', cursor: 'pointer', transition: 'all 0.18s', background: selected === c.id ? `${c.color}20` : 'rgba(200,200,200,0.03)', border: `1px solid ${selected === c.id ? c.color + '50' : 'rgba(200,200,200,0.07)'}`, color: selected === c.id ? c.color : 'rgba(200,200,200,0.28)', fontWeight: selected === c.id ? 700 : 400, boxShadow: selected === c.id ? `0 0 14px ${c.color}18` : 'none' }}>
             {c.title}
           </button>
         ))}
@@ -725,40 +752,62 @@ function ImpactChain() {
         <motion.div key={selected}
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.22 }}
-          style={{ padding: '16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}
+          style={{ padding: '20px 18px' }}
         >
-          {[chain.up, chain.down].map((dir, di) => (
-            <div key={di} style={{ background: `${dir.color}06`, border: `1px solid ${dir.color}18`, borderRadius: 14, padding: '14px', overflow: 'hidden', position: 'relative' }}>
-              {/* direction label */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: `${dir.color}20`, border: `1px solid ${dir.color}38`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: dir.color }} />
-                </div>
-                <div>
-                  <p style={{ fontSize: 9, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: dir.color, fontWeight: 700 }}>{chain.title} {dir.label}</p>
-                  <p style={{ fontSize: 8.5, color: 'rgba(200,200,200,0.28)', marginTop: 1 }}>consequências em cascata</p>
-                </div>
-              </div>
-              {/* effect chain */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {dir.effects.map((effect, i) => (
-                  <motion.div key={i}
-                    initial={{ opacity: 0, x: di === 0 ? -10 : 10 }} animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.06, duration: 0.22 }}
-                    style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}
-                  >
-                    <div style={{ minWidth: 18, height: 18, borderRadius: 6, background: `${dir.color}18`, border: `1px solid ${dir.color}28`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>
-                      <span style={{ fontSize: 8, fontFamily: 'monospace', fontWeight: 700, color: dir.color }}>{i + 1}</span>
-                    </div>
-                    {i < dir.effects.length - 1 && (
-                      <div style={{ position: 'absolute', left: 22, marginTop: 19, width: 1, height: 14, background: `${dir.color}20` }} />
-                    )}
-                    <span style={{ fontSize: 11.5, color: 'rgba(210,210,210,0.48)', lineHeight: 1.62 }}>{effect}</span>
-                  </motion.div>
-                ))}
-              </div>
+          {/* Central indicator badge */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 22 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 22px', background: `${chain.color}16`, border: `1px solid ${chain.color}45`, borderRadius: 99, boxShadow: `0 0 28px ${chain.color}20` }}>
+              <motion.div
+                style={{ width: 8, height: 8, borderRadius: '50%', background: chain.color, boxShadow: `0 0 8px ${chain.color}` }}
+                animate={{ opacity: [0.4, 1, 0.4], scale: [0.8, 1.3, 0.8] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <span style={{ fontSize: 11, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: chain.color, fontWeight: 700 }}>{chain.title}</span>
+              <span style={{ fontSize: 8.5, fontFamily: 'monospace', color: 'rgba(180,160,255,0.35)', letterSpacing: '0.1em' }}>INDICADOR MACRO</span>
             </div>
-          ))}
+          </div>
+
+          {/* Two flow columns */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            {[chain.up, chain.down].map((dir, di) => (
+              <div key={di}>
+                {/* Column header */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${dir.color}22` }}>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: `${dir.color}18`, border: `1px solid ${dir.color}45`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 0 12px ${dir.color}20` }}>
+                    <span style={{ fontSize: 13, color: dir.color, fontWeight: 700, lineHeight: 1 }}>{di === 0 ? '↑' : '↓'}</span>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 9, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.16em', color: dir.color, fontWeight: 700 }}>{chain.title} {dir.label}</p>
+                    <p style={{ fontSize: 8, color: 'rgba(180,160,255,0.28)', marginTop: 1 }}>cascata de efeitos</p>
+                  </div>
+                </div>
+
+                {/* Flow items with vertical neon line */}
+                <div style={{ position: 'relative', paddingLeft: 22 }}>
+                  <motion.div
+                    initial={{ height: 0 }} animate={{ height: '100%' }}
+                    transition={{ duration: 0.9, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ position: 'absolute', left: 8, top: 0, width: 1.5, background: `linear-gradient(180deg, ${dir.color}80, ${dir.color}10)`, borderRadius: 2 }}
+                  />
+                  {dir.effects.map((effect, i) => (
+                    <motion.div key={i}
+                      initial={{ opacity: 0, x: di === 0 ? -14 : 14 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.07 + 0.15, duration: 0.28 }}
+                      style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 10 }}
+                    >
+                      {/* Dot on the flow line */}
+                      <div style={{ position: 'absolute', left: -18, top: 5, width: 7, height: 7, borderRadius: '50%', background: dir.color, boxShadow: `0 0 8px ${dir.color}`, flexShrink: 0 }} />
+                      <span style={{ fontSize: 11.5, color: 'rgba(212,212,212,0.52)', lineHeight: 1.62 }}>
+                        <span style={{ fontSize: 8, fontFamily: 'monospace', fontWeight: 700, color: dir.color, marginRight: 5, background: dir.color + '16', borderRadius: 4, padding: '1px 5px' }}>{i + 1}</span>
+                        {effect}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </motion.div>
       </AnimatePresence>
     </div>
@@ -781,41 +830,50 @@ function CreditBar({ data }: { data: MarketData }) {
   ]
   const max = Math.max(...items.map(i => i.value), 1)
   return (
-    <div style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.08)', borderRadius: 18, padding: '16px 20px', position: 'relative', overflow: 'hidden' }}>
-      <div className="pointer-events-none absolute inset-0 grid-bg opacity-[0.025]" />
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-        <span style={{ fontSize: 9, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(195,195,195,0.28)' }}>Crédito PJ — % a.a.</span>
-        <span style={{ fontSize: 8, fontFamily: 'monospace', color: 'rgba(195,195,195,0.18)' }}>BCB / SGS</span>
+    <div style={{ background: 'rgba(5,4,25,0.96)', border: '1px solid rgba(100,80,200,0.14)', borderRadius: 18, padding: '18px 22px', position: 'relative', overflow: 'hidden' }}>
+      {/* Corner accent */}
+      <div style={{ position: 'absolute', top: 0, right: 0, width: 70, height: 70, background: 'linear-gradient(225deg, rgba(124,58,237,0.12), transparent)', borderRadius: '0 18px 0 70px' }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, width: 50, height: 50, background: 'linear-gradient(45deg, rgba(0,255,247,0.06), transparent)', borderRadius: '0 50px 0 18px' }} />
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <span style={{ fontSize: 9, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(180,160,255,0.4)' }}>Crédito PJ — % a.a.</span>
+        <span style={{ fontSize: 7.5, fontFamily: 'monospace', color: 'rgba(139,92,246,0.5)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: 99, padding: '2px 10px' }}>BCB / SGS</span>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         {items.map((item, idx) => {
-          const risk = item.value > 28 ? { label: 'ALTO', color: '#f87171' } : item.value > 16 ? { label: 'MÉDIO', color: '#fbbf24' } : { label: 'BAIXO', color: '#34d399' }
+          const risk = item.value > 28 ? { label: 'ALTO', color: '#ef4444' } : item.value > 16 ? { label: 'MÉDIO', color: '#f59e0b' } : { label: 'BAIXO', color: '#00fff7' }
           return (
             <motion.div key={item.id}
-              initial={{ opacity: 0, x: -10 }} whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }} transition={{ delay: idx * 0.07, duration: 0.35 }}
-              style={{ display: 'flex', alignItems: 'center', gap: 10 }}
+              initial={{ opacity: 0, x: -14 }} whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }} transition={{ delay: idx * 0.08, duration: 0.38 }}
             >
-              <span style={{ fontSize: 9.5, fontFamily: 'monospace', color: 'rgba(195,195,195,0.34)', width: 66, flexShrink: 0 }}>{item.label}</span>
-              <div style={{ flex: 1, height: 7, background: 'rgba(200,200,200,0.07)', borderRadius: 4, overflow: 'hidden' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <span style={{ fontSize: 9.5, fontFamily: 'monospace', color: 'rgba(200,200,200,0.45)' }}>{item.label}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 17, fontFamily: 'monospace', fontWeight: 800, color: risk.color, textShadow: `0 0 14px ${risk.color}60` }}>{item.value}%</span>
+                  <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: risk.color, background: risk.color + '16', border: `1px solid ${risk.color}28`, borderRadius: 99, padding: '2px 8px', boxShadow: `0 0 8px ${risk.color}18` }}>{risk.label}</span>
+                </div>
+              </div>
+              <div style={{ height: 8, background: 'rgba(100,80,200,0.08)', borderRadius: 4, overflow: 'hidden', position: 'relative' }}>
                 <motion.div
                   initial={{ width: 0 }} whileInView={{ width: `${(item.value / max) * 100}%` }}
-                  viewport={{ once: true }} transition={{ duration: 1, delay: idx * 0.07 + 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  style={{ height: '100%', borderRadius: 4, background: `linear-gradient(90deg, ${risk.color}35, ${risk.color}88)` }}
-                />
+                  viewport={{ once: true }} transition={{ duration: 1.2, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                  style={{ height: '100%', borderRadius: 4, background: `linear-gradient(90deg, ${risk.color}50, ${risk.color})`, boxShadow: `0 0 10px ${risk.color}40`, position: 'relative', overflow: 'hidden' }}
+                >
+                  <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(255,255,255,0.06) 3px, rgba(255,255,255,0.06) 5px)' }} />
+                </motion.div>
               </div>
-              <span style={{ fontSize: 12, fontFamily: 'monospace', fontWeight: 700, color: risk.color, minWidth: 44, textAlign: 'right' }}>{item.value}%</span>
-              <span style={{ fontSize: 7.5, fontFamily: 'monospace', fontWeight: 700, color: risk.color, background: risk.color + '14', border: `1px solid ${risk.color}22`, borderRadius: 99, padding: '2px 6px', flexShrink: 0, minWidth: 36, textAlign: 'center' }}>{risk.label}</span>
             </motion.div>
           )
         })}
       </div>
-      {/* Nota de interpretação */}
-      <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid rgba(200,200,200,0.05)', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-        {[{ label: 'BAIXO — até 16% a.a.', color: '#34d399' }, { label: 'MÉDIO — 16–28% a.a.', color: '#fbbf24' }, { label: 'ALTO — acima de 28% a.a.', color: '#f87171' }].map(l => (
-          <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: l.color, flexShrink: 0 }} />
-            <span style={{ fontSize: 8.5, color: 'rgba(195,195,195,0.28)' }}>{l.label}</span>
+
+      <div style={{ marginTop: 18, paddingTop: 14, borderTop: '1px solid rgba(100,80,200,0.08)', display: 'flex', gap: 18, flexWrap: 'wrap' }}>
+        {[{ label: 'BAIXO — até 16% a.a.', color: '#00fff7' }, { label: 'MÉDIO — 16–28% a.a.', color: '#f59e0b' }, { label: 'ALTO — acima de 28% a.a.', color: '#ef4444' }].map(l => (
+          <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: l.color, boxShadow: `0 0 6px ${l.color}`, flexShrink: 0 }} />
+            <span style={{ fontSize: 8.5, color: 'rgba(180,160,255,0.30)' }}>{l.label}</span>
           </div>
         ))}
       </div>
