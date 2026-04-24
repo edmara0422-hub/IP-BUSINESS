@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bell, BookOpen, Briefcase, Globe, LogOut, Shield, Settings, SunMedium, MoonStar } from 'lucide-react'
@@ -218,35 +218,33 @@ function TabSwitcher({ active, onSwitch }: { active: Tab; onSwitch: (tab: Tab) =
 export default function MainApp() {
   useAccessibility()
   const [activeTab, setActiveTab] = useState<Tab>('business')
+  // Rastreia abas já visitadas — uma vez montada, a aba nunca desmonta
+  const [visited, setVisited] = useState<Set<Tab>>(new Set<Tab>(['business']))
+
+  const handleSwitch = useCallback((tab: Tab) => {
+    setVisited(prev => { const s = new Set(prev); s.add(tab); return s })
+    setActiveTab(tab)
+  }, [])
 
   return (
     <div className="relative min-h-screen bg-[#050505] mobile-scale">
-      {/* Fundo brilhante global */}
       <IpbBackground />
-
       <TopBar />
 
       <div className="relative z-10 mx-auto max-w-7xl px-2 mt-[5rem] mb-[12rem] md:px-8 md:mt-[5rem] md:mb-[8rem]">
-        <AnimatePresence mode="wait">
-          {activeTab === 'business' && (
-            <motion.div key="business" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <AbaBusiness />
-            </motion.div>
-          )}
-          {activeTab === 'estudo' && (
-            <motion.div key="estudo" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <AbaEstudo />
-            </motion.div>
-          )}
-          {activeTab === 'admin' && (
-            <motion.div key="workspace" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <AbaWorkspace />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Abas ficam montadas após a primeira visita — só mostra/esconde com display */}
+        <div style={{ display: activeTab === 'business' ? 'block' : 'none' }}>
+          {visited.has('business') && <AbaBusiness />}
+        </div>
+        <div style={{ display: activeTab === 'estudo' ? 'block' : 'none' }}>
+          {visited.has('estudo') && <AbaEstudo />}
+        </div>
+        <div style={{ display: activeTab === 'admin' ? 'block' : 'none' }}>
+          {visited.has('admin') && <AbaWorkspace />}
+        </div>
       </div>
 
-      <TabSwitcher active={activeTab} onSwitch={setActiveTab} />
+      <TabSwitcher active={activeTab} onSwitch={handleSwitch} />
     </div>
   )
 }

@@ -21,21 +21,27 @@ const LandingPage = dynamic(() => import('@/app/landing/page'), {
   loading: () => null,
 })
 
+function sessionFlag(key: string) {
+  if (typeof window === 'undefined') return false
+  return !!sessionStorage.getItem(key)
+}
+
 export default function Home() {
-  const [showSplash, setShowSplash] = useState(true)
-  const [showLanding, setShowLanding] = useState(true)
+  const [showLanding, setShowLanding] = useState(() => !sessionFlag('ipb_landing_done'))
+  const [showSplash,  setShowSplash]  = useState(() => !sessionFlag('ipb_splash_done'))
   const [justLoggedIn, setJustLoggedIn] = useState(false)
   const { user, loading } = useAuth()
 
-  const handleLogin = useCallback(() => {
-    setJustLoggedIn(true)
-  }, [])
+  const handleLogin = useCallback(() => { setJustLoggedIn(true) }, [])
 
   const isLoggedIn = !!user || justLoggedIn
 
-  // 1. Landing — sempre primeira tela
+  // 1. Landing — só na primeira vez por sessão
   if (showLanding) {
-    return <LandingPage onEnter={() => setShowLanding(false)} />
+    return <LandingPage onEnter={() => {
+      sessionStorage.setItem('ipb_landing_done', '1')
+      setShowLanding(false)
+    }} />
   }
 
   // 2. Loading auth
@@ -52,12 +58,15 @@ export default function Home() {
     return <LoginForm onLogin={handleLogin} />
   }
 
-  // 4. Logado → Splash
+  // 4. Logado → Splash (só na primeira vez por sessão)
   if (showSplash) {
     return (
       <main className="min-h-screen bg-[#050505]">
         <AnimatePresence mode="wait">
-          <SplashScreen key="splash" onComplete={() => setShowSplash(false)} />
+          <SplashScreen key="splash" onComplete={() => {
+            sessionStorage.setItem('ipb_splash_done', '1')
+            setShowSplash(false)
+          }} />
         </AnimatePresence>
       </main>
     )
