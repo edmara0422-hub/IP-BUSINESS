@@ -118,117 +118,110 @@ interface ChipData {
   oque?: string; como?: string
 }
 
-function DataChip({ label, value, unit, delta, color, signal, oque, como, position, index }: ChipData & {
-  position: 'top' | 'bottom'; index: number
+function DataChip({ label, value, unit, delta, color, signal, oque, como, side, index }: ChipData & {
+  side: 'left' | 'right'; index: number
 }) {
   const [open, setOpen] = useState(false)
-  const Icon  = delta > 0.05 ? TrendingUp : delta < -0.05 ? TrendingDown : Minus
-  const dur   = 2.6 + (index % 4) * 0.55
-  const delay = index * 0.38
+  const DeltaIcon = delta > 0.05 ? TrendingUp : delta < -0.05 ? TrendingDown : Minus
+  const dur   = 2.8 + (index % 4) * 0.5
+  const delay = index * 0.42
+
+  const deltaLabel = delta > 0.05 ? `▲ ${Math.abs(delta) < 10 ? Math.abs(delta).toFixed(2) : Math.abs(delta).toFixed(0)}%`
+    : delta < -0.05 ? `▼ ${Math.abs(delta) < 10 ? Math.abs(delta).toFixed(2) : Math.abs(delta).toFixed(0)}%`
+    : '→ estável'
+  const deltaColor = delta > 0.05 ? '#34d399' : delta < -0.05 ? '#f87171' : '#94a3b8'
 
   return (
     <motion.div
-      className="flex-1 min-w-0"
-      initial={{ opacity: 0, y: position === 'top' ? -28 : 28 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.08 + 0.3, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="relative flex-1"
+      initial={{ opacity: 0, x: side === 'left' ? -32 : 32 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.1 + 0.3, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Float wrapper — pausa ao abrir */}
+      {/* Float */}
       <motion.div
-        animate={open ? { y: 0 } : { y: [0, -10, 0] }}
+        animate={open ? { y: 0 } : { y: [0, -8, 0] }}
         transition={{ duration: dur, delay, repeat: open ? 0 : Infinity, ease: 'easeInOut' }}
-        className="relative overflow-hidden rounded-[18px] cursor-pointer"
+        className="h-full relative overflow-hidden rounded-[16px] cursor-pointer"
         onClick={() => setOpen(o => !o)}
         style={{
-          background: 'rgba(8,8,15,0.88)',
-          border: `1px solid ${open ? (signal?.color ?? color) + '38' : 'rgba(255,255,255,0.07)'}`,
-          backdropFilter: 'blur(26px)',
+          background: open ? 'rgba(10,10,18,0.96)' : 'rgba(8,8,15,0.88)',
+          border: `1px solid ${open ? (signal?.color ?? color) + '35' : 'rgba(255,255,255,0.07)'}`,
+          backdropFilter: 'blur(24px)',
           boxShadow: open
-            ? `0 0 48px ${signal?.color ?? color}22, 0 12px 36px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.07)`
-            : `0 0 36px ${color}14, 0 8px 28px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06)`,
+            ? `0 0 44px ${signal?.color ?? color}1e, 0 12px 32px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.07)`
+            : `0 0 28px ${color}12, 0 6px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)`,
         }}
       >
-        {/* Accent edge */}
-        <motion.div
-          className={`absolute ${position === 'top' ? 'bottom' : 'top'}-0 left-[12%] right-[12%] h-[2px] rounded-full`}
-          style={{ background: `linear-gradient(90deg, transparent, ${signal?.color ?? color}, transparent)` }}
-          animate={{ opacity: [0.35, 1, 0.35] }}
-          transition={{ duration: dur, delay, repeat: Infinity, ease: 'easeInOut' }}
-        />
+        {/* Accent bar esquerda */}
+        <motion.div className="absolute left-0 inset-y-0 w-[3px] rounded-l-[16px]"
+          style={{ background: `linear-gradient(180deg, transparent, ${signal?.color ?? color} 40%, ${signal?.color ?? color} 60%, transparent)` }}
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ duration: dur, delay, repeat: Infinity, ease: 'easeInOut' }} />
         {/* Shimmer */}
         <motion.div className="absolute inset-0 pointer-events-none"
-          style={{ background: `linear-gradient(108deg, transparent 25%, ${color}07 50%, transparent 75%)` }}
-          animate={{ x: ['-110%', '210%'] }}
-          transition={{ duration: 4 + index * 0.5, delay: index * 0.6, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        {/* Glow bg */}
-        <div className="absolute inset-0 pointer-events-none rounded-[18px]"
-          style={{ background: `radial-gradient(ellipse 70% 50% at 50% ${position === 'top' ? '100%' : '0%'}, ${color}0c 0%, transparent 70%)` }} />
+          style={{ background: `linear-gradient(106deg, transparent 20%, ${color}07 50%, transparent 80%)` }}
+          animate={{ x: ['-120%', '220%'] }}
+          transition={{ duration: 5 + index * 0.6, delay: index * 0.5, repeat: Infinity, ease: 'easeInOut' }} />
+        {/* Radial color bg */}
+        <div className="absolute inset-0 pointer-events-none rounded-[16px]"
+          style={{ background: `radial-gradient(ellipse 80% 55% at ${side === 'left' ? '100%' : '0%'} 50%, ${color}09 0%, transparent 65%)` }} />
 
-        <div className="relative px-4 py-3.5 flex flex-col gap-1.5">
-          {/* Label + variação */}
+        <div className="relative pl-4 pr-3.5 py-3.5 flex flex-col gap-2">
+
+          {/* Linha 1: label + chevron */}
+          <div className="flex items-center justify-between">
+            <span className="text-[7.5px] font-mono uppercase tracking-[0.26em] text-white/30">{label}</span>
+            <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.22 }}>
+              <ChevronDown className="w-3 h-3 text-white/20" />
+            </motion.div>
+          </div>
+
+          {/* Linha 2: valor grande */}
+          <span className="text-[21px] font-bold font-mono tabular-nums text-white/92 tracking-tight leading-none">{value}</span>
+
+          {/* Linha 3: unidade + variação vs ontem */}
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[7.5px] font-mono uppercase tracking-[0.25em] text-white/28 leading-none">{label}</span>
-            <div className="flex items-center gap-1.5">
-              {delta !== 0 ? (
-                <motion.span
-                  className="flex items-center gap-0.5 rounded-full px-2 py-[3px] text-[7.5px] font-mono font-bold shrink-0"
-                  style={{ background: `${color}18`, border: `1px solid ${color}30`, color }}
-                  animate={{ opacity: [0.65, 1, 0.65] }}
-                  transition={{ duration: 2.2, delay: delay * 0.5, repeat: Infinity }}
-                >
-                  <Icon className="w-2 h-2" />
-                  {Math.abs(delta) < 10 ? Math.abs(delta).toFixed(2) : Math.abs(delta).toFixed(0)}%
-                </motion.span>
-              ) : (
-                <span className="rounded-full px-2 py-[3px] text-[7px] font-mono text-white/22"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  estável
-                </span>
-              )}
-              <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                <ChevronDown className="w-3 h-3 text-white/24" />
-              </motion.div>
-            </div>
+            {unit && <span className="text-[7.5px] font-mono text-white/22 leading-none truncate">{unit}</span>}
+            <motion.span
+              className="flex items-center gap-1 rounded-full px-2 py-[3px] text-[8px] font-mono font-bold shrink-0"
+              style={{ background: `${deltaColor}18`, border: `1px solid ${deltaColor}28`, color: deltaColor }}
+              animate={{ opacity: [0.6, 1, 0.6] }}
+              transition={{ duration: 2.4, delay: delay * 0.4, repeat: Infinity }}
+            >
+              <DeltaIcon className="w-2 h-2" />
+              {deltaLabel}
+            </motion.span>
           </div>
 
-          {/* Valor + unidade */}
-          <div className="flex items-baseline gap-2">
-            <span className="text-[22px] font-bold font-mono tabular-nums text-white/92 tracking-tight leading-none">{value}</span>
-            {unit && <span className="text-[7.5px] font-mono text-white/22 leading-none">{unit}</span>}
-          </div>
-
-          {/* Signal badge */}
+          {/* Sinal de mercado */}
           {signal && (
-            <span className="self-start rounded-full px-2.5 py-[3px] text-[8px] font-semibold"
-              style={{ background: `${signal.color}18`, border: `1px solid ${signal.color}30`, color: signal.color }}>
+            <span className="self-start rounded-[6px] px-2 py-[3px] text-[8px] font-semibold"
+              style={{ background: `${signal.color}18`, border: `1px solid ${signal.color}2e`, color: signal.color }}>
               {signal.text}
             </span>
           )}
 
-          {/* Expandido: O que é + Como afeta */}
+          {/* Separador + O que é (sempre visível) */}
+          {oque && (
+            <div className="border-t border-white/[0.05] pt-2">
+              <p className="text-[8.5px] text-white/36 leading-[1.55] line-clamp-2">{oque}</p>
+            </div>
+          )}
+
+          {/* Expandido: Como afeta */}
           <AnimatePresence>
-            {open && (oque || como) && (
+            {open && como && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}
                 className="overflow-hidden"
               >
-                <div className="pt-2.5 flex flex-col gap-2.5 border-t border-white/[0.06] mt-1">
-                  {oque && (
-                    <div>
-                      <p className="text-[7px] font-mono uppercase tracking-[0.2em] text-white/22 mb-1">O que é</p>
-                      <p className="text-[9px] text-white/50 leading-[1.6]">{oque}</p>
-                    </div>
-                  )}
-                  {como && (
-                    <div>
-                      <p className="text-[7px] font-mono uppercase tracking-[0.2em] text-white/22 mb-1">Como afeta seu negócio</p>
-                      <p className="text-[9px] text-white/44 leading-[1.6]">{como}</p>
-                    </div>
-                  )}
+                <div className="border-t border-white/[0.05] pt-2 mt-0.5">
+                  <p className="text-[7px] font-mono uppercase tracking-[0.2em] text-white/18 mb-1.5">Como afeta seu negócio</p>
+                  <p className="text-[8.5px] text-white/42 leading-[1.6]">{como}</p>
                 </div>
               </motion.div>
             )}
@@ -251,7 +244,7 @@ function GlobeHero({ data }: { data: MarketData }) {
   const iv = m.ipca.value
   const pv = m.pib.value
 
-  const topChips: ChipData[] = [
+  const leftChips: ChipData[] = [
     {
       id: 'selic', label: 'SELIC', value: `${sv}`, unit: '% ao ano', delta: 0, color: '#94a3b8',
       signal: sv > 13 ? { text: 'Crédito restritivo', color: '#f87171' } : sv > 10 ? { text: 'Neutro', color: '#fbbf24' } : { text: 'Expansivo', color: '#34d399' },
@@ -280,7 +273,7 @@ function GlobeHero({ data }: { data: MarketData }) {
 
   const gp = ibov?.pct ?? 0
   const op = oil?.delta ?? 0
-  const bottomChips: ChipData[] = [
+  const rightChips: ChipData[] = [
     {
       id: 'ibov', label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000), unit: 'pontos — B3', delta: gp, color: pctColor(gp),
       signal: gp > 1 ? { text: 'Bolsa em alta', color: '#34d399' } : gp < -1 ? { text: 'Bolsa em queda', color: '#f87171' } : { text: 'Bolsa lateral', color: '#fbbf24' },
@@ -310,38 +303,33 @@ function GlobeHero({ data }: { data: MarketData }) {
   return (
     <div className="relative w-full select-none">
 
-      {/* ── Desktop ── */}
-      <div className="hidden md:flex flex-col gap-5">
+      {/* ── Desktop: 3 colunas ── */}
+      <div className="hidden md:flex items-stretch gap-5 w-full">
 
-        {/* TOP: 4 chips flutuando */}
-        <div className="flex gap-3.5">
-          {topChips.map((c, i) => <DataChip key={c.id} {...c} position="top" index={i} />)}
+        {/* Coluna esquerda: SELIC · USD/BRL · IPCA · PIB */}
+        <div className="flex flex-col gap-3 shrink-0" style={{ width: 228 }}>
+          {leftChips.map((c, i) => (
+            <DataChip key={c.id} {...c} side="left" index={i} />
+          ))}
         </div>
 
-        {/* GLOBO */}
-        <div className="relative flex justify-center py-2">
-          {/* Glow externo */}
-          <div className="absolute inset-0 pointer-events-none flex justify-center items-center">
-            <div style={{
-              width: 700, height: 700, borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(192,192,192,0.06) 30%, transparent 68%)',
-            }} />
-          </div>
-          <div className="relative w-full" style={{ maxWidth: 600 }}>
-            {/* Rings */}
-            {[1.06, 1.17, 1.32, 1.50].map((s, i) => (
+        {/* Globo central */}
+        <div className="flex-1 flex items-center justify-center min-w-0 py-1">
+          <div className="relative w-full" style={{ maxWidth: 460 }}>
+            <div className="absolute inset-0 rounded-full pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(192,192,192,0.06) 35%, transparent 70%)', transform: 'scale(1.5)' }} />
+            {[1.07, 1.18, 1.34].map((s, i) => (
               <motion.div key={i} className="absolute inset-0 rounded-full pointer-events-none"
-                style={{ border: `1px solid rgba(192,192,192,${0.07 - i * 0.015})`, transform: `scale(${s})` }}
-                animate={{ opacity: [0.6, 0.05, 0.6] }}
-                transition={{ duration: 3.2 + i * 1.6, repeat: Infinity, delay: i * 1.1, ease: 'easeInOut' }} />
+                style={{ border: `1px solid rgba(192,192,192,${0.07 - i * 0.02})`, transform: `scale(${s})` }}
+                animate={{ opacity: [0.6, 0.06, 0.6] }}
+                transition={{ duration: 3.4 + i * 1.7, repeat: Infinity, delay: i * 1.1, ease: 'easeInOut' }} />
             ))}
             <div className="w-full" style={{ aspectRatio: '1 / 1' }}><Globe3D /></div>
-            {/* AO VIVO — centro */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 4 }}>
               <motion.div className="flex items-center gap-2 rounded-full"
-                style={{ background: 'rgba(3,5,8,0.90)', border: '1px solid rgba(52,211,153,0.32)', backdropFilter: 'blur(18px)', padding: '9px 22px' }}
+                style={{ background: 'rgba(3,5,8,0.90)', border: '1px solid rgba(52,211,153,0.30)', backdropFilter: 'blur(18px)', padding: '8px 20px' }}
                 initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1, duration: 0.5 }}>
+                transition={{ delay: 0.9, duration: 0.5 }}>
                 <motion.div className="w-2 h-2 rounded-full bg-emerald-400"
                   animate={{ opacity: [0.3, 1, 0.3], scale: [0.75, 1.4, 0.75] }}
                   transition={{ duration: 1.6, repeat: Infinity }} />
@@ -351,15 +339,17 @@ function GlobeHero({ data }: { data: MarketData }) {
           </div>
         </div>
 
-        {/* BOTTOM: 4 chips flutuando */}
-        <div className="flex gap-3.5">
-          {bottomChips.map((c, i) => <DataChip key={c.id} {...c} position="bottom" index={i} />)}
+        {/* Coluna direita: IBOV · OURO · PRATA · PETRÓLEO */}
+        <div className="flex flex-col gap-3 shrink-0" style={{ width: 228 }}>
+          {rightChips.map((c, i) => (
+            <DataChip key={c.id} {...c} side="right" index={i} />
+          ))}
         </div>
       </div>
 
-      {/* ── Mobile: globo + grid ── */}
+      {/* ── Mobile: globo + grid 2 col ── */}
       <div className="md:hidden flex flex-col gap-4">
-        <div className="relative mx-auto w-full" style={{ maxWidth: 320 }}>
+        <div className="relative mx-auto w-full" style={{ maxWidth: 300 }}>
           {[1.08, 1.28].map((s, i) => (
             <motion.div key={i} className="absolute inset-0 rounded-full pointer-events-none"
               style={{ border: '1px solid rgba(192,192,192,0.06)', transform: `scale(${s})` }}
@@ -377,8 +367,8 @@ function GlobeHero({ data }: { data: MarketData }) {
           </div>
         </div>
         <div className="grid grid-cols-2 gap-2.5">
-          {[...topChips, ...bottomChips].map((c, i) => (
-            <DataChip key={c.id} {...c} position={i < 4 ? 'top' : 'bottom'} index={i} />
+          {[...leftChips, ...rightChips].map((c, i) => (
+            <DataChip key={c.id} {...c} side={i < 4 ? 'left' : 'right'} index={i} />
           ))}
         </div>
       </div>
@@ -387,106 +377,7 @@ function GlobeHero({ data }: { data: MarketData }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  2 — MACRO MEANING
-// ════════════════════════════════════════════════════════════════════════════
-
-const MACRO_CARDS = [
-  {
-    id: 'selic', label: 'SELIC',
-    oque: 'Taxa básica de juros definida pelo COPOM/BCB. Referência para todo crédito e custo de capital no Brasil.',
-    como: 'Sobe → crédito PJ mais caro (20-45% a.a.) → capital de giro encarece → consumo cai → PME sente pressão de caixa. Cai → expansão fica mais barata → momento de investir e crescer.',
-    sinalFn: (v: number) => v > 13 ? { text: 'Crédito restritivo', color: '#f87171' } : v > 10 ? { text: 'Neutro', color: '#fbbf24' } : { text: 'Expansivo', color: '#34d399' },
-  },
-  {
-    id: 'usdbrl', label: 'USD / BRL',
-    oque: 'Câmbio real/dólar. Reflete confiança externa no Brasil, fluxo de capital e saldo da balança comercial.',
-    como: 'Dólar alto → insumos importados e tech encarecem → agro e exportação ganham. Dólar baixo → importação fica barata → margens de exportação comprimem. PME importadora sofre com câmbio alto.',
-    sinalFn: (v: number) => v > 5.8 ? { text: 'Dólar pressionado', color: '#f87171' } : v > 5.0 ? { text: 'Câmbio elevado', color: '#fbbf24' } : { text: 'Câmbio favorável', color: '#34d399' },
-  },
-  {
-    id: 'ipca', label: 'IPCA',
-    oque: 'Inflação oficial (IBGE). Mede variação de preços ao consumidor. Meta BCB 2024: 3% ±1.5 pp.',
-    como: 'Alto → poder de compra cai + margens reais reduzem + reajuste salarial necessário. PME tem menor poder de repasse que grandes empresas — sente antes e mais forte.',
-    sinalFn: (v: number) => v > 5 ? { text: 'Inflação elevada', color: '#f87171' } : v > 3.5 ? { text: 'Acima da meta', color: '#fbbf24' } : { text: 'Controlado', color: '#34d399' },
-  },
-  {
-    id: 'pib', label: 'PIB',
-    oque: 'Produto Interno Bruto — soma de tudo produzido. Projeção Focus (BCB) é o consenso do mercado financeiro.',
-    como: '>2% → demanda aquece, expanda agora. 0–2% → crescimento fraco, priorize eficiência e caixa. <0% → recessão técnica, preserve runway mínimo de 6 meses e corte variáveis.',
-    sinalFn: (v: number) => v < 0.5 ? { text: 'Contração', color: '#f87171' } : v < 1.5 ? { text: 'Crescimento fraco', color: '#fbbf24' } : { text: 'Expansão', color: '#34d399' },
-  },
-]
-
-function MacroMeaningCard({ card, value, expanded, onToggle }: {
-  card: typeof MACRO_CARDS[0]; value: number; expanded: boolean; onToggle: () => void
-}) {
-  const sinal = card.sinalFn(value)
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }} transition={{ duration: 0.4 }}
-      className="rounded-2xl overflow-hidden cursor-pointer"
-      style={{ background: 'rgba(255,255,255,0.022)', border: '1px solid rgba(192,192,192,0.08)' }}
-      onClick={onToggle}
-    >
-      <div className="px-3.5 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <span className="text-[10px] font-mono font-semibold text-white/55">{card.label}</span>
-          <div className="w-1.5 h-1.5 rounded-full" style={{ background: sinal.color, boxShadow: `0 0 5px ${sinal.color}80` }} />
-          <span className="text-[9px] font-mono" style={{ color: sinal.color }}>{sinal.text}</span>
-        </div>
-        <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.22 }}>
-          <ChevronDown className="w-3.5 h-3.5 text-white/20" />
-        </motion.div>
-      </div>
-
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden"
-          >
-            <div className="px-3.5 pb-3.5 flex flex-col gap-3"
-              style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
-              onClick={e => e.stopPropagation()}>
-              <div className="pt-3">
-                <span className="text-[9px] font-mono uppercase tracking-[0.25em] text-white/18">O que é</span>
-                <p className="text-[12px] text-white/48 leading-[1.75] mt-1.5">{card.oque}</p>
-              </div>
-              <div>
-                <span className="text-[9px] font-mono uppercase tracking-[0.25em] text-white/18">Como afeta seu negócio</span>
-                <p className="text-[12px] text-white/48 leading-[1.75] mt-1.5">{card.como}</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  )
-}
-
-function MacroMeaning({ data }: { data: MarketData }) {
-  const [expanded, setExpanded] = useState<string | null>('selic')
-  const vals: Record<string, number> = {
-    selic: data.macro.selic.value,
-    usdbrl: data.macro.usdBrl.value,
-    ipca: data.macro.ipca.value,
-    pib: data.macro.pib.value,
-  }
-  return (
-    <div className="grid grid-cols-2 gap-2.5">
-      {MACRO_CARDS.map(card => (
-        <MacroMeaningCard key={card.id} card={card} value={vals[card.id] ?? 0}
-          expanded={expanded === card.id}
-          onToggle={() => setExpanded(expanded === card.id ? null : card.id)} />
-      ))}
-    </div>
-  )
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-// ██  3 — MARKET PANEL (B3 + Global)
+// ██  2 — MARKET PANEL (B3 + Global)
 // ════════════════════════════════════════════════════════════════════════════
 
 function StockRow({ ticker, label, price, pct, showPrice = true }: {
@@ -1161,13 +1052,7 @@ export default function AbaBusiness() {
         <GlobeHero data={data} />
       </div>
 
-      {/* 2 — MACRO MEANING */}
-      <div>
-        <SectionLabel label="Macro: O que Significa" sub="para o seu negócio" />
-        <MacroMeaning data={data} />
-      </div>
-
-      {/* 3 — BOLSA & EMPRESAS */}
+      {/* 2 — BOLSA & EMPRESAS */}
       <div>
         <SectionLabel label="Bolsa & Empresas" sub="B3 + globais" />
         <MarketPanel data={data} />
