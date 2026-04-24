@@ -303,47 +303,73 @@ function GlobeHero({ data }: { data: MarketData }) {
   return (
     <div className="relative w-full select-none">
 
-      {/* ── Desktop: 3 colunas ── */}
-      <div className="hidden md:flex items-stretch gap-5 w-full">
+      {/* ── Desktop: globo central + chips ao redor ── */}
+      <div className="hidden md:block relative w-full" style={{ height: 740 }}>
 
-        {/* Coluna esquerda: SELIC · USD/BRL · IPCA · PIB */}
-        <div className="flex flex-col gap-3 shrink-0" style={{ width: 228 }}>
-          {leftChips.map((c, i) => (
-            <DataChip key={c.id} {...c} side="left" index={i} />
+        {/* Globo: centro absoluto */}
+        <div className="absolute" style={{
+          left: '50%', top: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 500, height: 500,
+          zIndex: 2,
+        }}>
+          <div className="absolute inset-0 rounded-full pointer-events-none"
+            style={{ background: 'radial-gradient(circle, rgba(192,192,192,0.07) 30%, transparent 68%)', transform: 'scale(1.55)' }} />
+          {[1.06, 1.17, 1.31, 1.48].map((s, i) => (
+            <motion.div key={i} className="absolute inset-0 rounded-full pointer-events-none"
+              style={{ border: `1px solid rgba(192,192,192,${0.07 - i * 0.015})`, transform: `scale(${s})` }}
+              animate={{ opacity: [0.55, 0.05, 0.55] }}
+              transition={{ duration: 3.4 + i * 1.7, repeat: Infinity, delay: i * 1.1, ease: 'easeInOut' }} />
           ))}
-        </div>
-
-        {/* Globo central */}
-        <div className="flex-1 flex items-center justify-center min-w-0 py-1">
-          <div className="relative w-full" style={{ maxWidth: 460 }}>
-            <div className="absolute inset-0 rounded-full pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(192,192,192,0.06) 35%, transparent 70%)', transform: 'scale(1.5)' }} />
-            {[1.07, 1.18, 1.34].map((s, i) => (
-              <motion.div key={i} className="absolute inset-0 rounded-full pointer-events-none"
-                style={{ border: `1px solid rgba(192,192,192,${0.07 - i * 0.02})`, transform: `scale(${s})` }}
-                animate={{ opacity: [0.6, 0.06, 0.6] }}
-                transition={{ duration: 3.4 + i * 1.7, repeat: Infinity, delay: i * 1.1, ease: 'easeInOut' }} />
-            ))}
-            <div className="w-full" style={{ aspectRatio: '1 / 1' }}><Globe3D /></div>
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 4 }}>
-              <motion.div className="flex items-center gap-2 rounded-full"
-                style={{ background: 'rgba(3,5,8,0.90)', border: '1px solid rgba(52,211,153,0.30)', backdropFilter: 'blur(18px)', padding: '8px 20px' }}
-                initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.9, duration: 0.5 }}>
-                <motion.div className="w-2 h-2 rounded-full bg-emerald-400"
-                  animate={{ opacity: [0.3, 1, 0.3], scale: [0.75, 1.4, 0.75] }}
-                  transition={{ duration: 1.6, repeat: Infinity }} />
-                <span className="text-[11px] font-mono uppercase tracking-[0.38em] text-emerald-400/90">Ao Vivo</span>
-              </motion.div>
-            </div>
+          <div style={{ width: '100%', height: '100%' }}><Globe3D /></div>
+          {/* AO VIVO — centro */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 4 }}>
+            <motion.div className="flex items-center gap-2 rounded-full"
+              style={{ background: 'rgba(3,5,8,0.92)', border: '1px solid rgba(52,211,153,0.30)', backdropFilter: 'blur(18px)', padding: '9px 22px' }}
+              initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.9, duration: 0.5 }}>
+              <motion.div className="w-2 h-2 rounded-full bg-emerald-400"
+                animate={{ opacity: [0.3, 1, 0.3], scale: [0.75, 1.4, 0.75] }}
+                transition={{ duration: 1.6, repeat: Infinity }} />
+              <span className="text-[11px] font-mono uppercase tracking-[0.38em] text-emerald-400/90">Ao Vivo</span>
+            </motion.div>
           </div>
         </div>
 
-        {/* Coluna direita: IBOV · OURO · PRATA · PETRÓLEO */}
-        <div className="flex flex-col gap-3 shrink-0" style={{ width: 228 }}>
-          {rightChips.map((c, i) => (
-            <DataChip key={c.id} {...c} side="right" index={i} />
-          ))}
+        {/* Chips: posicionados ao redor do globo usando o espaço da página */}
+
+        {/* SELIC — topo esquerdo */}
+        <div className="absolute" style={{ left: 0, top: 20, width: 268 }}>
+          <DataChip {...leftChips[0]} side="left" index={0} />
+        </div>
+        {/* USD/BRL — meio esquerdo */}
+        <div className="absolute" style={{ left: 0, top: '50%', transform: 'translateY(-50%)', width: 268 }}>
+          <DataChip {...leftChips[1]} side="left" index={1} />
+        </div>
+        {/* IPCA — baixo esquerdo */}
+        <div className="absolute" style={{ left: 0, bottom: 20, width: 268 }}>
+          <DataChip {...leftChips[2]} side="left" index={2} />
+        </div>
+        {/* PIB — centro baixo esquerdo */}
+        <div className="absolute" style={{ left: 'calc(50% - 285px)', bottom: 0, width: 268 }}>
+          <DataChip {...leftChips[3]} side="left" index={3} />
+        </div>
+
+        {/* IBOVESPA — topo direito */}
+        <div className="absolute" style={{ right: 0, top: 20, width: 268 }}>
+          <DataChip {...rightChips[0]} side="right" index={0} />
+        </div>
+        {/* OURO — meio direito */}
+        <div className="absolute" style={{ right: 0, top: '50%', transform: 'translateY(-50%)', width: 268 }}>
+          <DataChip {...rightChips[1]} side="right" index={1} />
+        </div>
+        {/* PRATA — baixo direito */}
+        <div className="absolute" style={{ right: 0, bottom: 20, width: 268 }}>
+          <DataChip {...rightChips[2]} side="right" index={2} />
+        </div>
+        {/* PETRÓLEO — centro baixo direito */}
+        <div className="absolute" style={{ left: 'calc(50% + 17px)', bottom: 0, width: 268 }}>
+          <DataChip {...rightChips[3]} side="right" index={3} />
         </div>
       </div>
 
