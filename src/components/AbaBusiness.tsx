@@ -394,17 +394,21 @@ function GlobeHero({ data }: { data: MarketData }) {
                   transition={{ duration: 0.22 }}
                   onClick={() => setSelectedId(null)}
                 />
-                {/* Panel centralizado */}
-                <motion.div
-                  style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', zIndex: 30 }}
-                  initial={{ opacity: 0, scale: 0.88, y: 18 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.92, y: 10 }}
-                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                  onClick={e => e.stopPropagation()}
+                {/* Wrapper de centramento (CSS puro, sem conflito com Framer transforms) */}
+                <div
+                  style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', zIndex: 30, pointerEvents: 'none' }}
                 >
-                  <DetailPanel chip={selectedChip} onClose={() => setSelectedId(null)} />
-                </motion.div>
+                  <motion.div
+                    style={{ pointerEvents: 'auto' }}
+                    initial={{ opacity: 0, scale: 0.88, y: 18 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.92, y: 10 }}
+                    transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <DetailPanel chip={selectedChip} onClose={() => setSelectedId(null)} />
+                  </motion.div>
+                </div>
               </>
             )}
           </AnimatePresence>
