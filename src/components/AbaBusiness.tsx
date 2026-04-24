@@ -11,7 +11,8 @@ import { useAuth } from '@/hooks/useAuth'
 import { createClient } from '@/lib/supabase/client'
 import dynamic from 'next/dynamic'
 
-const Globe3D = dynamic(() => import('@/components/business/Globe3D'), { ssr: false })
+const Globe3D       = dynamic(() => import('@/components/business/Globe3D'),       { ssr: false })
+const SectorScene3D = dynamic(() => import('@/components/business/SectorScene3D'), { ssr: false, loading: () => <div style={{ height: 520, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(200,200,200,0.22)', fontSize: 11, fontFamily: 'monospace', letterSpacing: '0.2em' }}>CARREGANDO 3D…</div> })
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface MacroPoint   { value: number; delta: number; sentiment: string }
@@ -457,71 +458,78 @@ function GlobeHero({ data }: { data: MarketData }) {
 // ██  2 — MARKET PANEL (B3 + Global)
 // ════════════════════════════════════════════════════════════════════════════
 
-function StockRow({ ticker, label, price, pct, showPrice = true }: {
+// ── Stock Card (trading card visual) ──────────────────────────────────────────
+function StockCard({ ticker, label, price, pct, showPrice = true }: {
   ticker: string; label: string; price?: number; pct: number; showPrice?: boolean
 }) {
-  const col  = pctColor(pct)
-  const Icon = pct > 0.1 ? TrendingUp : pct < -0.1 ? TrendingDown : Minus
+  const col   = pctColor(pct)
+  const isBull = pct > 0.05
+  const isBear = pct < -0.05
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(200,200,200,0.04)' }}
-      className="last:border-0">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 44, height: 22, borderRadius: 6, background: 'rgba(200,200,200,0.04)', border: '1px solid rgba(200,200,200,0.08)', fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(200,200,200,0.48)', flexShrink: 0 }}>
-          {ticker}
-        </div>
-        <span style={{ fontSize: 10, color: 'rgba(200,200,200,0.32)' }}>{label}</span>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.94 }} whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }} transition={{ duration: 0.3 }}
+      style={{
+        background: isBull ? 'rgba(52,211,153,0.055)' : isBear ? 'rgba(248,113,113,0.055)' : 'rgba(5,5,5,0.88)',
+        border: `1px solid ${col}22`,
+        borderRadius: 14,
+        padding: '11px 13px',
+        overflow: 'hidden',
+        position: 'relative',
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+        <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(200,200,200,0.44)', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{ticker}</span>
+        <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: col, background: col + '18', border: `1px solid ${col}28`, borderRadius: 99, padding: '1px 7px' }}>{pctSign(pct)}</span>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Sparkline id={ticker} delta={pct} color={col} w={38} h={16} />
-        {showPrice && price !== undefined && (
-          <span style={{ fontSize: 11, fontFamily: 'monospace', color: 'rgba(200,200,200,0.46)', minWidth: 58, textAlign: 'right' }}>R${fmtBRL(price)}</span>
-        )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 3, minWidth: 58, justifyContent: 'flex-end' }}>
-          <Icon style={{ width: 11, height: 11, color: col, flexShrink: 0 }} />
-          <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: col }}>{pctSign(pct)}</span>
-        </div>
-      </div>
-    </div>
+      <p style={{ fontSize: 11, color: 'rgba(210,210,210,0.58)', marginBottom: showPrice ? 5 : 7, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</p>
+      {showPrice && price !== undefined && (
+        <p style={{ fontSize: 18, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.92)', marginBottom: 7, lineHeight: 1 }}>R${fmtBRL(price)}</p>
+      )}
+      <Sparkline id={ticker} delta={pct} color={col} w={114} h={28} />
+    </motion.div>
   )
 }
 
 function MarketPanel({ data }: { data: MarketData }) {
   const brStocks = data.stocks?.br ?? []
   const glStocks = data.stocks?.global ?? data.globalAgents?.slice(0, 4).map(a => ({ ticker: a.id.toUpperCase(), label: a.label, pct: a.delta })) ?? []
-  const fallbackBR = [
+  const fallbackBR: StockBR[] = [
     { ticker: 'PETR4', label: 'Petrobras', price: 36.50, pct: 0 },
     { ticker: 'VALE3', label: 'Vale',       price: 58.20, pct: 0 },
     { ticker: 'ITUB4', label: 'Itaú',       price: 27.90, pct: 0 },
     { ticker: 'BBDC4', label: 'Bradesco',   price: 15.80, pct: 0 },
     { ticker: 'WEGE3', label: 'WEG',        price: 50.10, pct: 0 },
   ]
+  const allGlobal = [
+    ...glStocks.slice(0, 4),
+    { ticker: 'XAU',  label: 'Ouro',      pct: data.commodities.gold?.delta ?? 0 },
+    { ticker: 'CL=F', label: 'Petróleo',  pct: data.commodities.oil?.delta  ?? 0 },
+  ]
+  const brList = brStocks.length > 0 ? brStocks : fallbackBR
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-      <div className="rounded-2xl overflow-hidden"
-        style={{ background: 'rgba(255,255,255,0.018)', border: '1px solid rgba(192,192,192,0.08)' }}>
-        <div className="px-4 pt-4 pb-2 flex items-center justify-between"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-          <span className="text-[9px] font-mono uppercase tracking-[0.35em] text-white/22">Bolsa BR · B3</span>
-          <motion.div className="w-1.5 h-1.5 rounded-full bg-emerald-400/55"
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      {/* B3 */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(195,195,195,0.28)' }}>Bolsa BR · B3</span>
+          <motion.div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }}
             animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} />
         </div>
-        <div className="px-4 py-1">
-          {(brStocks.length > 0 ? brStocks : fallbackBR).map(s =>
-            <StockRow key={s.ticker} ticker={s.ticker} label={s.label} price={(s as StockBR).price} pct={s.pct} />)}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(138px, 1fr))', gap: 8 }}>
+          {brList.map(s => <StockCard key={s.ticker} ticker={s.ticker} label={s.label} price={(s as StockBR).price} pct={s.pct} />)}
         </div>
       </div>
-      <div className="rounded-2xl overflow-hidden"
-        style={{ background: 'rgba(255,255,255,0.018)', border: '1px solid rgba(192,192,192,0.08)' }}>
-        <div className="px-4 pt-4 pb-2 flex items-center justify-between"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-          <span className="text-[9px] font-mono uppercase tracking-[0.35em] text-white/22">Empresas Globais</span>
-          <motion.div className="w-1.5 h-1.5 rounded-full bg-blue-400/45"
+      {/* Global */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(195,195,195,0.28)' }}>Mercados Globais</span>
+          <motion.div style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa' }}
             animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2.4, repeat: Infinity }} />
         </div>
-        <div className="px-4 py-1">
-          {glStocks.slice(0, 4).map(s => <StockRow key={s.ticker} ticker={s.ticker} label={s.label} pct={s.pct} showPrice={false} />)}
-          <StockRow ticker="XAU"  label="Ouro"     pct={data.commodities.gold?.delta ?? 0} showPrice={false} />
-          <StockRow ticker="CL=F" label="Petróleo" pct={data.commodities.oil?.delta  ?? 0} showPrice={false} />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 8 }}>
+          {allGlobal.map(s => <StockCard key={s.ticker} ticker={s.ticker} label={s.label} pct={s.pct} showPrice={false} />)}
         </div>
       </div>
     </div>
@@ -542,6 +550,21 @@ const SECTOR_ANALYSIS: Record<string, { oportunidade: string; risco: string; com
   logistics: { oportunidade: 'E-commerce gera demanda last-mile. Fulfillment centers ganham escala. Cross-docking urbano.', risco: 'Câmbio encarece frota importada. Diesel e pedágio pressionam margem. Concorrência de marketplace.', como: 'Roteirização com IA. Micro-fulfillment urban. Frota elétrica para urban delivery.', quem: 'Transportadoras, 3PLs, marketplaces de entrega, fintechs de frete' },
   services:  { oportunidade: 'Terceirização de TI e BPO acelera. Consultoria ESG em alta demanda. Serviços recorrentes crescem.', risco: 'SELIC alta limita expansão dos clientes PME. Comoditização. Alta rotatividade de talentos.', como: 'Contratos recorrentes com SLA. Precificação por resultado/outcome. Especialização vertical.', quem: 'Consultorias, bureaus, prestadores B2B, agências especializadas' },
   media:     { oportunidade: 'Criadores independentes escalam com plataformas. Adtech BR cresce. Comunidades pagas em alta.', risco: 'CPM volátil com macro. Atenção fragmentada. LGPD limita targeting. Algoritmos mudam constantemente.', como: 'Owned media (newsletter, podcast). Comunidade paga. Branded content B2B.', quem: 'Agências, creators, adtechs, OTTs, publishers' },
+}
+
+// ── Circular heat gauge ────────────────────────────────────────────────────────
+function HeatGauge({ value, color }: { value: number; color: string }) {
+  const r = 24, circ = 2 * Math.PI * r
+  const dash = (value / 100) * circ
+  return (
+    <svg width={58} height={58} viewBox="0 0 58 58" style={{ flexShrink: 0 }}>
+      <circle cx={29} cy={29} r={r} fill="none" stroke="rgba(200,200,200,0.07)" strokeWidth={5} />
+      <circle cx={29} cy={29} r={r} fill="none" stroke={color} strokeWidth={5}
+        strokeDasharray={`${dash} ${circ}`} strokeDashoffset={circ * 0.25}
+        strokeLinecap="round" style={{ transition: 'stroke-dasharray 1.1s ease' }} />
+      <text x={29} y={34} textAnchor="middle" fontSize={13} fontWeight="800" fill={color} fontFamily="monospace">{value}</text>
+    </svg>
+  )
 }
 
 function SectorCard({ sector, delay }: { sector: Sector; delay: number }) {
@@ -621,10 +644,37 @@ function SectorCard({ sector, delay }: { sector: Sector; delay: number }) {
 }
 
 function SectorAnalysis({ sectors }: { sectors: Sector[] }) {
+  const [mode, setMode] = useState<'3d' | 'cards'>('3d')
   const sorted = [...sectors].sort((a, b) => b.heat - a.heat)
+
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
-      {sorted.map((s, i) => <SectorCard key={s.id} sector={s} delay={i * 0.05} />)}
+    <div>
+      {/* Toggle */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, marginBottom: 14 }}>
+        {([
+          { id: '3d',    label: '3D INTERATIVO' },
+          { id: 'cards', label: 'CARDS' },
+        ] as { id: 'cards' | '3d'; label: string }[]).map(({ id, label }) => (
+          <button key={id} onClick={() => setMode(id)}
+            style={{ padding: '5px 14px', borderRadius: 99, fontSize: 8.5, fontFamily: 'monospace', letterSpacing: '0.18em', cursor: 'pointer', transition: 'all 0.18s', fontWeight: mode === id ? 700 : 400, background: mode === id ? 'rgba(192,192,192,0.14)' : 'rgba(200,200,200,0.04)', border: `1px solid ${mode === id ? 'rgba(192,192,192,0.28)' : 'rgba(200,200,200,0.07)'}`, color: mode === id ? 'rgba(228,228,228,0.85)' : 'rgba(200,200,200,0.32)' }}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <AnimatePresence mode="wait">
+        {mode === '3d' ? (
+          <motion.div key="3d" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
+            <SectorScene3D sectors={sorted} />
+          </motion.div>
+        ) : (
+          <motion.div key="cards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
+              {sorted.map((s, i) => <SectorCard key={s.id} sector={s} delay={i * 0.05} />)}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
