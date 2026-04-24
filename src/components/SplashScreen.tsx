@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import SplashCanvas from '@/components/SplashCanvas'
+import IpbBackground from '@/components/IpbBackground'
 
 interface SplashScreenProps {
   onComplete: () => void
@@ -91,6 +92,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease: 'easeInOut' }}
     >
+      <IpbBackground />
       <div className="absolute inset-0">
         <SplashCanvas />
       </div>
