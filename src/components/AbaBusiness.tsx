@@ -108,34 +108,60 @@ function SectionLabel({ label, sub }: { label: string; sub?: string }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  1 — GLOBE HERO
+// ██  1 — GLOBE HERO  (dados em órbita)
 // ════════════════════════════════════════════════════════════════════════════
 
-function LiveChip({ id, label, value, unit, delta, color, delay }: {
-  id: string; label: string; value: string; unit?: string
-  delta: number; color: string; delay: number
+function OrbitalChip({ label, value, unit, delta, color, index, total, radius, orbitDuration }: {
+  label: string; value: string; unit?: string; delta: number; color: string
+  index: number; total: number; radius: number; orbitDuration: number
 }) {
+  const startDeg = (index / total) * 360
   const Icon = delta > 0.05 ? TrendingUp : delta < -0.05 ? TrendingDown : Minus
+
   return (
+    /* Wrapper que gira ao redor do centro do globo */
     <motion.div
-      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className="flex flex-col items-center gap-0.5 rounded-xl px-2 py-2"
-      style={{ background: 'rgba(255,255,255,0.025)', border: `1px solid ${color}18` }}
+      className="absolute"
+      style={{ top: '50%', left: '50%', width: 0, height: 0, transformOrigin: '0 0' }}
+      initial={{ rotate: startDeg }}
+      animate={{ rotate: startDeg + 360 }}
+      transition={{ duration: orbitDuration, repeat: Infinity, ease: 'linear' }}
     >
-      <span className="text-[8px] font-mono uppercase tracking-[0.2em] text-white/22 leading-none whitespace-nowrap">{label}</span>
-      <div className="flex items-center gap-1 mt-0.5">
-        <Icon className="w-2.5 h-2.5 shrink-0" style={{ color }} />
-        <span className="text-[13px] font-bold font-mono tabular-nums leading-none text-white/82">{value}</span>
-      </div>
-      <div className="flex items-center gap-1">
-        {unit && <span className="text-[8px] font-mono text-white/18 leading-none">{unit}</span>}
-        {delta !== 0 && (
-          <span className="text-[8px] font-mono font-semibold leading-none" style={{ color }}>
-            {delta > 0 ? '+' : ''}{Math.abs(delta) < 10 ? delta.toFixed(2) : delta.toFixed(0)}
-          </span>
-        )}
-      </div>
+      {/* Chip posicionado no raio, contra-rotacionado para ficar legível */}
+      <motion.div
+        style={{ position: 'absolute', left: radius, top: 0, x: -38, y: -28 }}
+        initial={{ rotate: -startDeg }}
+        animate={{ rotate: -(startDeg + 360) }}
+        transition={{ duration: orbitDuration, repeat: Infinity, ease: 'linear' }}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: index * 0.12 + 0.4, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="rounded-xl px-2.5 py-2 flex flex-col items-center gap-0.5"
+          style={{
+            width: 76,
+            background: 'rgba(6,6,10,0.86)',
+            border: `1px solid ${color}28`,
+            backdropFilter: 'blur(16px)',
+            boxShadow: `0 0 16px ${color}14, 0 2px 12px rgba(0,0,0,0.55)`,
+          }}
+        >
+          <div className="flex items-center justify-between w-full">
+            <span className="text-[8px] font-mono uppercase tracking-[0.18em] text-white/28 leading-none">{label}</span>
+            <Icon className="w-2.5 h-2.5 shrink-0" style={{ color }} />
+          </div>
+          <span className="text-[13px] font-bold font-mono tabular-nums leading-none text-white/85 mt-0.5">{value}</span>
+          <div className="flex items-center gap-1">
+            {unit && <span className="text-[8px] font-mono text-white/18 leading-none">{unit}</span>}
+            {delta !== 0 && (
+              <span className="text-[8px] font-mono font-semibold leading-none" style={{ color }}>
+                {delta > 0 ? '+' : ''}{Math.abs(delta) < 10 ? delta.toFixed(2) : delta.toFixed(0)}
+              </span>
+            )}
+          </div>
+        </motion.div>
+      </motion.div>
     </motion.div>
   )
 }
@@ -148,60 +174,78 @@ function GlobeHero({ data }: { data: MarketData }) {
   const oil    = data.commodities.oil
 
   const chips = [
-    { id: 'selic',  label: 'SELIC',    value: `${m.selic.value}`,          unit: '% a.a.',  delta: 0,                   color: '#94a3b8' },
-    { id: 'usdbrl', label: 'USD/BRL',  value: `${m.usdBrl.value}`,         unit: 'R$',      delta: m.usdBrl.delta,       color: pctColor(m.usdBrl.delta) },
-    { id: 'ipca',   label: 'IPCA',     value: `${m.ipca.value}`,           unit: '% 12m',   delta: m.ipca.delta,         color: pctColor(-m.ipca.delta) },
-    { id: 'pib',    label: 'PIB',      value: `${m.pib.value}`,            unit: '% proj',  delta: m.pib.delta,          color: pctColor(m.pib.delta) },
-    { id: 'ibov',   label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000), unit: 'pts',     delta: ibov?.pct     ?? 0,   color: pctColor(ibov?.pct     ?? 0) },
-    { id: 'gold',   label: 'OURO',     value: `${gold?.value   ?? '—'}`,   unit: 'USD/oz',  delta: gold?.delta   ?? 0,   color: '#fbbf24' },
-    { id: 'silver', label: 'PRATA',    value: `${silver?.value ?? '—'}`,   unit: 'USD/oz',  delta: silver?.delta ?? 0,   color: '#c0c0c0' },
-    { id: 'oil',    label: 'PETRÓLEO', value: `${oil?.value    ?? '—'}`,   unit: 'USD/bbl', delta: oil?.delta    ?? 0,   color: pctColor(oil?.delta    ?? 0) },
+    { id: 'selic',  label: 'SELIC',    value: `${m.selic.value}`,          unit: '% a.a.',  delta: 0,                 color: '#94a3b8' },
+    { id: 'usdbrl', label: 'USD/BRL',  value: `${m.usdBrl.value}`,         unit: 'R$',      delta: m.usdBrl.delta,    color: pctColor(m.usdBrl.delta) },
+    { id: 'ipca',   label: 'IPCA',     value: `${m.ipca.value}`,           unit: '% 12m',   delta: m.ipca.delta,      color: pctColor(-m.ipca.delta) },
+    { id: 'pib',    label: 'PIB',      value: `${m.pib.value}`,            unit: '% proj',  delta: m.pib.delta,       color: pctColor(m.pib.delta) },
+    { id: 'ibov',   label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000), unit: 'pts',     delta: ibov?.pct  ?? 0,   color: pctColor(ibov?.pct  ?? 0) },
+    { id: 'gold',   label: 'OURO',     value: `${gold?.value   ?? '—'}`,   unit: 'USD/oz',  delta: gold?.delta  ?? 0, color: '#fbbf24' },
+    { id: 'silver', label: 'PRATA',    value: `${silver?.value ?? '—'}`,   unit: 'USD/oz',  delta: silver?.delta ?? 0,color: '#c0c0c0' },
+    { id: 'oil',    label: 'PETRÓLEO', value: `${oil?.value    ?? '—'}`,   unit: 'USD/bbl', delta: oil?.delta   ?? 0, color: pctColor(oil?.delta ?? 0) },
   ]
 
+  const ORBIT_RADIUS  = 172   // px from globe center
+  const ORBIT_SECONDS = 44    // segundos por volta completa
+  const CONTAINER     = 420   // altura total (globo + espaço para chips)
+  const GLOBE_SIZE    = 290   // px
+
   return (
-    <div className="flex flex-col items-center gap-5 select-none">
+    <div className="relative w-full select-none" style={{ height: CONTAINER, overflow: 'visible' }}>
 
-      {/* Globe — centro visual dominante */}
-      <div className="relative flex items-center justify-center" style={{ width: 300, height: 300 }}>
+      {/* Glow de fundo */}
+      <div className="absolute pointer-events-none" style={{
+        top: '50%', left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: GLOBE_SIZE * 1.8, height: GLOBE_SIZE * 1.8,
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(192,192,192,0.08) 0%, rgba(192,192,192,0.02) 45%, transparent 70%)',
+      }} />
 
-        {/* Deep radial glow */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: 'radial-gradient(circle at 50% 50%, rgba(192,192,192,0.10) 0%, rgba(192,192,192,0.04) 38%, transparent 70%)',
-          borderRadius: '50%',
-          transform: 'scale(1.3)',
-        }} />
+      {/* Anel de órbita visual (rastro) */}
+      <div className="absolute pointer-events-none" style={{
+        top: '50%', left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: ORBIT_RADIUS * 2 + 76, height: ORBIT_RADIUS * 2 + 76,
+        borderRadius: '50%',
+        border: '1px dashed rgba(192,192,192,0.07)',
+      }} />
 
-        {/* Pulsing orbital rings */}
-        {[1.18, 1.38, 1.60].map((scale, i) => (
-          <motion.div key={i} className="absolute pointer-events-none" style={{
-            inset: 0, borderRadius: '50%',
+      {/* Globo */}
+      <div className="absolute" style={{
+        top: '50%', left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: GLOBE_SIZE, height: GLOBE_SIZE,
+        zIndex: 2,
+      }}>
+        {/* Rings pulsantes */}
+        {[1.15, 1.32].map((s, i) => (
+          <motion.div key={i} className="absolute inset-0 rounded-full pointer-events-none" style={{
             border: '1px solid rgba(192,192,192,0.07)',
-            transform: `scale(${scale})`,
+            transform: `scale(${s})`,
           }}
-            animate={{ opacity: [0.5, 0.12, 0.5], scale: [scale, scale * 1.04, scale] }}
-            transition={{ duration: 4 + i * 1.8, repeat: Infinity, delay: i * 1.2, ease: 'easeInOut' }}
+            animate={{ opacity: [0.6, 0.1, 0.6], scale: [s, s * 1.05, s] }}
+            transition={{ duration: 4 + i * 2.2, repeat: Infinity, delay: i * 1.4, ease: 'easeInOut' }}
           />
         ))}
+        <Globe3D />
 
-        {/* Globe canvas */}
-        <div style={{ width: 280, height: 280, position: 'relative', zIndex: 1 }}>
-          <Globe3D />
-        </div>
-
-        {/* AO VIVO badge — dentro da área do globo */}
-        <motion.div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full px-2.5 py-1 z-10"
-          style={{ background: 'rgba(6,6,8,0.82)', border: '1px solid rgba(52,211,153,0.22)', backdropFilter: 'blur(10px)' }}>
+        {/* Badge AO VIVO */}
+        <motion.div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full px-2.5 py-1"
+          style={{ background: 'rgba(4,4,6,0.88)', border: '1px solid rgba(52,211,153,0.25)', backdropFilter: 'blur(12px)', zIndex: 3 }}>
           <motion.div className="w-1.5 h-1.5 rounded-full bg-emerald-400"
-            animate={{ opacity: [0.35, 1, 0.35], scale: [0.8, 1.2, 0.8] }}
+            animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.25, 0.8] }}
             transition={{ duration: 1.6, repeat: Infinity }} />
-          <span className="text-[8px] font-mono uppercase tracking-[0.3em] text-emerald-400/75">Ao vivo</span>
+          <span className="text-[8px] font-mono uppercase tracking-[0.3em] text-emerald-400/80">Ao vivo</span>
         </motion.div>
       </div>
 
-      {/* Data chips — 4 + 4 em duas linhas */}
-      <div className="w-full grid grid-cols-4 gap-2">
-        {chips.map((c, i) => <LiveChip key={c.id} {...c} delay={0.3 + i * 0.06} />)}
-      </div>
+      {/* Chips orbitando */}
+      {chips.map((c, i) => (
+        <OrbitalChip key={c.id}
+          label={c.label} value={c.value} unit={c.unit} delta={c.delta} color={c.color}
+          index={i} total={chips.length} radius={ORBIT_RADIUS} orbitDuration={ORBIT_SECONDS}
+        />
+      ))}
 
     </div>
   )
