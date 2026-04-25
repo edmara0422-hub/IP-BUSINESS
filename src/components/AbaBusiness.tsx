@@ -262,6 +262,137 @@ function DetailPanel({ chip, onClose }: { chip: ChipData; onClose: () => void })
   )
 }
 
+// ── Globe Audio Bar — waveform heights determinísticos (seed por índice) ───
+const WAVE_H = Array.from({ length: 28 }, (_, i) => {
+  let s = (i * 1664525 + 1013904223) | 0
+  s = (Math.imul(s, 1664525) + 1013904223) | 0
+  return (Math.abs(s) % 14) + 4
+})
+const WAVE_DUR = Array.from({ length: 28 }, (_, i) => {
+  let s = (i * 22695477 + 1) | 0
+  s = (Math.imul(s, 1664525) + 1013904223) | 0
+  return 0.35 + (Math.abs(s) % 30) / 100
+})
+
+const GlobeAudioBar = memo(function GlobeAudioBar({
+  chips, audioText, chipOffsets,
+}: { chips: ChipData[]; audioText: string; chipOffsets: number[] }) {
+  const [playing, setPlaying] = useState(false)
+  const [currentIdx, setCurrentIdx] = useState<number | null>(null)
+
+  const toggle = useCallback(() => {
+    if (!('speechSynthesis' in window)) return
+    if (playing) {
+      window.speechSynthesis.cancel()
+      setPlaying(false)
+      setCurrentIdx(null)
+      return
+    }
+    const utt = new SpeechSynthesisUtterance(audioText)
+    utt.lang = 'pt-BR'; utt.rate = 1.0; utt.pitch = 1
+    const voices = window.speechSynthesis.getVoices()
+    const ptBr = voices.find(v => v.lang === 'pt-BR') ?? voices.find(v => v.lang.startsWith('pt'))
+    if (ptBr) utt.voice = ptBr
+    utt.onboundary = (e) => {
+      if (e.name !== 'word') return
+      // charIndex indica posição atual no texto — usamos para saber qual chip está sendo lido
+      let idx = chipOffsets.length - 1
+      for (let i = 0; i < chipOffsets.length; i++) {
+        if (e.charIndex < chipOffsets[i]) { idx = Math.max(0, i - 1); break }
+      }
+      setCurrentIdx(idx)
+    }
+    utt.onend = () => { setPlaying(false); setCurrentIdx(null) }
+    utt.onerror = () => { setPlaying(false); setCurrentIdx(null) }
+    window.speechSynthesis.speak(utt)
+    setPlaying(true)
+    setCurrentIdx(0)
+  }, [audioText, chipOffsets, playing])
+
+  useEffect(() => () => { if (playing) window.speechSynthesis.cancel() }, [playing])
+
+  const activeChip = currentIdx !== null ? chips[currentIdx] : null
+  const accentColor = activeChip?.signal?.color ?? '#34d399'
+
+  return (
+    <div style={{ margin: '12px 0 2px', padding: '14px 18px', background: playing ? 'rgba(52,211,153,0.04)' : 'rgba(255,255,255,0.02)', border: `1px solid ${playing ? 'rgba(52,211,153,0.20)' : 'rgba(255,255,255,0.07)'}`, borderRadius: 16, transition: 'all 0.3s' }}>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        {/* Botão play/pause */}
+        <button onClick={toggle} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 40, height: 40, borderRadius: '50%', background: playing ? `${accentColor}18` : 'rgba(255,255,255,0.06)', border: `1.5px solid ${playing ? accentColor + '55' : 'rgba(255,255,255,0.12)'}`, cursor: 'pointer', flexShrink: 0, transition: 'all 0.22s' }}>
+          {playing ? (
+            <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
+              <rect x="2" y="1" width="3" height="10" rx="1" fill={accentColor} />
+              <rect x="7" y="1" width="3" height="10" rx="1" fill={accentColor} />
+            </svg>
+          ) : (
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+              <path d="M4 2L12 7L4 12V2Z" fill="rgba(192,192,192,0.65)" />
+            </svg>
+          )}
+        </button>
+
+        {/* Label + subtítulo */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: playing ? accentColor : 'rgba(192,192,192,0.5)', letterSpacing: '0.05em', marginBottom: 3, transition: 'color 0.3s' }}>
+            {playing && activeChip
+              ? `Narrando: ${activeChip.label} — ${activeChip.value}`
+              : 'Ouvir análise completa do mercado'}
+          </p>
+          <p style={{ fontSize: 8.5, color: 'rgba(192,192,192,0.25)', fontFamily: 'monospace', letterSpacing: '0.04em' }}>
+            {playing && activeChip
+              ? activeChip.signal?.text ?? 'estável'
+              : `${chips.length} indicadores com análise completa · O que é · Como afeta seu negócio`}
+          </p>
+        </div>
+
+        {/* Dots de progresso */}
+        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', flexShrink: 0 }}>
+          {chips.map((c, i) => {
+            const isActive = playing && currentIdx === i
+            const isDone   = playing && currentIdx !== null && i < currentIdx
+            const col      = c.signal?.color ?? '#34d399'
+            return (
+              <div key={c.id} title={c.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                <motion.div
+                  animate={isActive ? { scale: [1, 1.6, 1], opacity: [0.8, 1, 0.8] } : {}}
+                  transition={{ duration: 0.75, repeat: isActive ? Infinity : 0 }}
+                  style={{ width: isActive ? 9 : 6, height: isActive ? 9 : 6, borderRadius: '50%', background: isActive ? col : isDone ? col + '55' : 'rgba(255,255,255,0.10)', boxShadow: isActive ? `0 0 8px ${col}80` : 'none', transition: 'all 0.3s' }}
+                />
+                <span style={{ fontSize: 5.5, fontFamily: 'monospace', color: isActive ? col : isDone ? col + '77' : 'rgba(255,255,255,0.14)', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{c.label}</span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Waveform animada — alturas determinísticas */}
+      <AnimatePresence>
+        {playing && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25 }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 12, paddingTop: 12, borderTop: `1px solid ${accentColor}12` }}>
+              {WAVE_H.map((h, i) => (
+                <motion.div key={i}
+                  animate={{ scaleY: [0.2, 1, 0.2] }}
+                  transition={{ duration: WAVE_DUR[i], repeat: Infinity, delay: i * 0.055, ease: 'easeInOut' }}
+                  style={{ width: 3, height: h, background: i % 4 === 0 ? accentColor + 'bb' : accentColor + '44', borderRadius: 2, flexShrink: 0, transformOrigin: 'center' }}
+                />
+              ))}
+              <span style={{ marginLeft: 10, fontSize: 8, fontFamily: 'monospace', color: accentColor + '66', letterSpacing: '0.12em', whiteSpace: 'nowrap' }}>
+                NARRANDO · PT-BR
+              </span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+})
+
 const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
@@ -331,6 +462,23 @@ const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
   ], [sv, uv, iv, pv, gp, op, gold?.value, gold?.delta, silver?.value, silver?.delta, oil?.value])
 
   const selectedChip = chips.find(c => c.id === selectedId) ?? null
+
+  const { globeAudioText, chipOffsets } = useMemo(() => {
+    const offsets: number[] = []
+    let text = `Análise completa do Mercado Global ao Vivo. Acompanhe agora os ${chips.length} principais indicadores econômicos que afetam diretamente o resultado do seu negócio. `
+    chips.forEach((c, i) => {
+      offsets.push(text.length)
+      const deltaDir = c.delta > 0.05 ? `subindo ${c.delta.toFixed(2) ?? ''}%` : c.delta < -0.05 ? `caindo ${Math.abs(c.delta).toFixed(2)}%` : 'estável hoje'
+      const sinal = c.signal?.text ?? 'estável'
+      const oque = c.oque ?? ''
+      const como = c.como ?? ''
+      text += `Indicador ${i + 1}: ${c.label}. Valor atual: ${c.value}${c.unit ? `, ${c.unit}` : ''}. Variação: ${deltaDir}. Situação: ${sinal}. `
+      if (oque) text += `O que é: ${oque} `
+      if (como) text += `Como isso impacta o seu negócio: ${como} `
+    })
+    text += `Fim da análise completa do Mercado Global ao Vivo.`
+    return { globeAudioText: text, chipOffsets: offsets }
+  }, [chips])
 
   return (
     <div className="relative w-full select-none" onClick={() => setSelectedId(null)}>
@@ -456,10 +604,8 @@ const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
           )}
         </AnimatePresence>
 
-        {/* Audio resumo do globo */}
-        <div className="flex justify-center mt-1">
-          <AudioButton color="#34d399" text={chips.map(c => `${c.label}: ${c.value}. ${c.signal?.text ?? ''}. ${c.oque ?? ''}`).join(' ')} />
-        </div>
+        {/* Audio — análise completa do globo */}
+        <GlobeAudioBar chips={chips} audioText={globeAudioText} chipOffsets={chipOffsets} />
       </div>
     </div>
   )
@@ -1156,9 +1302,17 @@ const SectorCard = memo(function SectorCard({ sectors }: { sectors: Sector[] }) 
       </div>
 
       {/* Decisão */}
-      <div style={{ padding: '10px 16px 13px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+      <div style={{ padding: '10px 16px 10px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
         <div style={{ width: 5, height: 5, borderRadius: '50%', background: topColor, marginTop: 4, flexShrink: 0 }} />
         <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.44)', lineHeight: 1.65 }}>{decisao}</p>
+      </div>
+
+      {/* Metodologia */}
+      <div style={{ padding: '6px 16px 11px', borderTop: '1px solid rgba(200,200,200,0.03)' }}>
+        <p style={{ fontSize: 7.5, fontFamily: 'monospace', color: 'rgba(192,192,192,0.18)', lineHeight: 1.65 }}>
+          <span style={{ textTransform: 'uppercase', letterSpacing: '0.18em', marginRight: 6 }}>~cálculo</span>
+          Heat score = base editorial por setor (Tech 95, Agro 88, Saúde 82, Energia 76, Fintech 71, Logística 65, Serviços 42, Varejo 18, Mídia 5) ajustada pela variação diária real da B3 (×5). Dado ao vivo.
+        </p>
       </div>
     </motion.div>
   )
@@ -1269,14 +1423,15 @@ const SectorHeatmap = memo(function SectorHeatmap({ sectors }: { sectors: Sector
 // ██  INTELLIGENCE CARDS  (Marketing · Sustentabilidade · Liderança)
 // ════════════════════════════════════════════════════════════════════════════
 
-interface IntelStat { label: string; value: string; color: string }
+interface IntelStat { label: string; value: string; color: string; source?: string }
 
-const IntelCard = memo(function IntelCard({ num, label, badge, badgeColor, stats, insight, decisao, decisaoColor }: {
+const IntelCard = memo(function IntelCard({ num, label, badge, badgeColor, stats, insight, decisao, decisaoColor, footnote }: {
   num: string; label: string
   badge: string; badgeColor: string
   stats: IntelStat[]
   insight: string
   decisao: string; decisaoColor: string
+  footnote?: string
 }) {
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }}
@@ -1294,6 +1449,9 @@ const IntelCard = memo(function IntelCard({ num, label, badge, badgeColor, stats
           <div key={s.label}>
             <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.24)', marginBottom: 4 }}>{s.label}</p>
             <p style={{ fontSize: 20, fontWeight: 800, fontFamily: 'monospace', color: s.color, lineHeight: 1 }}>{s.value}</p>
+            {s.source && (
+              <p style={{ fontSize: 7, fontFamily: 'monospace', color: 'rgba(192,192,192,0.22)', marginTop: 4, lineHeight: 1.5 }}>{s.source}</p>
+            )}
           </div>
         ))}
       </div>
@@ -1307,6 +1465,13 @@ const IntelCard = memo(function IntelCard({ num, label, badge, badgeColor, stats
           {decisao}
         </p>
       </div>
+      {footnote && (
+        <div style={{ padding: '7px 16px 10px', borderTop: '1px solid rgba(200,200,200,0.03)' }}>
+          <p style={{ fontSize: 7.5, fontFamily: 'monospace', color: 'rgba(192,192,192,0.18)', lineHeight: 1.65 }}>
+            <span style={{ textTransform: 'uppercase', letterSpacing: '0.18em', marginRight: 6 }}>~cálculo</span>{footnote}
+          </p>
+        </div>
+      )}
     </motion.div>
   )
 })
@@ -1327,12 +1492,13 @@ const MarketingIntel = memo(function MarketingIntel({ data }: { data: MarketData
     <IntelCard num="06" label="Marketing"
       badge={signal.label} badgeColor={signal.color}
       stats={[
-        { label: 'Confiança', value: String(icc),                color: iccCol },
-        { label: 'Demanda',   value: String(retail?.heat ?? 55), color: pctColor(retail?.change ?? 0) },
-        { label: 'Mídia',     value: String(media?.heat ?? 58),  color: pctColor(media?.change ?? 0) },
+        { label: 'Confiança', value: String(icc),                color: iccCol,                          source: `~Proxy: 60 + PIB×4 − IPCA×3 − (SELIC−10)×1.5` },
+        { label: 'Demanda',   value: String(retail?.heat ?? 55), color: pctColor(retail?.change ?? 0),   source: `~Heat varejo: base edit. + Δ B3 ×5` },
+        { label: 'Mídia',     value: String(media?.heat ?? 58),  color: pctColor(media?.change ?? 0),    source: `~Heat mídia: base edit. + Δ B3 ×5` },
       ]}
       insight={`Índice de Confiança (proxy) ${icc}/100. Demanda online ${retail?.heat ?? 55}/100, variação ${pctSign(retail?.change ?? 0)}. Mídia digital ${media?.heat ?? 58}/100.`}
       decisao={decisao} decisaoColor={signal.color}
+      footnote={`ICC não usa API oficial — é calculado via fórmula proxy com dados reais do BCB (SELIC, IPCA, PIB Focus). Demanda e Mídia = scores setoriais: base editorial calibrada + variação diária real da B3.`}
     />
   )
 })
@@ -1352,12 +1518,13 @@ const SustentabilidadeIntel = memo(function SustentabilidadeIntel({ data }: { da
     <IntelCard num="07" label="Sustentabilidade"
       badge={`RISCO ${risk}`} badgeColor={rc}
       stats={[
-        { label: 'Green Score', value: String(green),               color: rc },
-        { label: 'Energia',     value: String(energy?.heat ?? '—'), color: pctColor(energy?.change ?? 0) },
-        { label: 'Agro',        value: String(agro?.heat ?? '—'),   color: pctColor(agro?.change ?? 0) },
+        { label: 'Green Score', value: String(green),               color: rc,                            source: `~(Energia + Agro) ÷ 2 + 5` },
+        { label: 'Energia',     value: String(energy?.heat ?? '—'), color: pctColor(energy?.change ?? 0), source: `~Heat setor: base edit. + Δ B3 ×5` },
+        { label: 'Agro',        value: String(agro?.heat ?? '—'),   color: pctColor(agro?.change ?? 0),   source: `~Heat setor: base edit. + Δ B3 ×5` },
       ]}
       insight={`Score ESG proxy ${green}/100. Energia renovável: ${energy?.heat ?? '—'}/100. Agro sustentável: ${agro?.heat ?? '—'}/100. Crédito verde (LCA/CRA) disponível.`}
       decisao={decisao} decisaoColor={rc}
+      footnote={`Green Score não usa API oficial — é calculado como média dos heats de Energia e Agro + 5 pontos. Cada heat setorial combina base editorial (calibrada para BR) com variação diária real da B3.`}
     />
   )
 })
@@ -1379,12 +1546,13 @@ const LiderancaIntel = memo(function LiderancaIntel({ data }: { data: MarketData
     <IntelCard num="08" label="Liderança"
       badge={signal.label} badgeColor={signal.color}
       stats={[
-        { label: 'Desemprego',  value: `${desemp}%`,                    color: Number(desemp) > 8 ? '#f87171' : '#34d399' },
-        { label: 'Pressão Sal.', value: salPress,                        color: salCol },
-        { label: 'Demanda Tech', value: String(tech?.heat ?? '—'),       color: pctColor(tech?.change ?? 0) },
+        { label: 'Desemprego',   value: `${desemp}%`,              color: Number(desemp) > 8 ? '#f87171' : '#34d399', source: `~Proxy PNAD: 6,5 − PIB×0,4` },
+        { label: 'Pressão Sal.', value: salPress,                   color: salCol,                                     source: `~Derivado do IPCA real (BCB)` },
+        { label: 'Demanda Tech', value: String(tech?.heat ?? '—'),  color: pctColor(tech?.change ?? 0),                source: `~Heat setor: base edit. + Δ B3 ×5` },
       ]}
       insight={`Desemprego estimado ${desemp}% (proxy PNAD). Pressão salarial ${salPress} com IPCA ${ipca.value}%. Demanda por tech ${tech?.heat ?? '—'}/100 · Serviços ${services?.heat ?? '—'}/100.`}
       decisao={decisao} decisaoColor={signal.color}
+      footnote={`Desemprego usa proxy: 6,5 − PIB×0,4 (clamp 4,5–12%) — IBGE/PNAD divulgado mensalmente, sem API em tempo real. Pressão Salarial derivada do IPCA real do BCB. Demanda Tech = heat setorial (base editorial + Δ B3).`}
     />
   )
 })
