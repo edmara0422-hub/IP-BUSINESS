@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   RefreshCw, Send, ChevronRight, TrendingUp, TrendingDown, Minus,
-  Zap, ChevronDown, Play,
+  Zap, Play,
 } from 'lucide-react'
 import { useMarketData } from '@/hooks/useMarketData'
 import { useAuth } from '@/hooks/useAuth'
@@ -80,7 +80,7 @@ function SectionLabel({ label, sub }: { label: string; sub?: string }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  1 — GLOBE HERO  (chips em órbita elíptica + painel de detalhe)
+// ██  GLOBE HERO  (chips em órbita elíptica + painel de detalhe)
 // ════════════════════════════════════════════════════════════════════════════
 
 interface ChipData {
@@ -90,11 +90,10 @@ interface ChipData {
   oque?: string; como?: string
 }
 
-// ── Orbit math ────────────────────────────────────────────────────────────────
-const ORB_AX   = 338   // horizontal semi-axis (px)
-const ORB_AY   = 195   // vertical semi-axis (px)
-const ORB_DUR  = 80    // seconds per full revolution
-const ORB_N    = 40    // keyframe segments (41 points, first === last → seamless)
+const ORB_AX   = 338
+const ORB_AY   = 195
+const ORB_DUR  = 80
+const ORB_N    = 40
 
 function makeOrbitKF(startAngle: number) {
   const times = Array.from({ length: ORB_N + 1 }, (_, i) => i / ORB_N)
@@ -103,7 +102,6 @@ function makeOrbitKF(startAngle: number) {
   return { x, y, times }
 }
 
-// ── Small chip that orbits the globe ─────────────────────────────────────────
 function OrbitalChip({ chip, index, isSelected, onClick }: {
   chip: ChipData; index: number; isSelected: boolean; onClick: () => void
 }) {
@@ -140,7 +138,6 @@ function OrbitalChip({ chip, index, isSelected, onClick }: {
           overflow: 'hidden',
         }}
       >
-        {/* Shimmer sweep */}
         <motion.div
           style={{ position: 'absolute', inset: 0, background: `linear-gradient(105deg, transparent 25%, ${accent}08 50%, transparent 75%)`, pointerEvents: 'none' }}
           animate={{ x: ['-140%', '240%'] }}
@@ -152,7 +149,6 @@ function OrbitalChip({ chip, index, isSelected, onClick }: {
         <p style={{ fontSize: 19, fontWeight: 700, fontFamily: 'monospace', color: 'rgba(235,235,235,0.96)', lineHeight: 1, marginBottom: 5 }}>
           {chip.value}
         </p>
-        {/* Mini sparkline */}
         <div style={{ marginBottom: 5, opacity: 0.65 }}>
           <Sparkline id={chip.id} delta={chip.delta} color={deltaColor} w={46} h={13} />
         </div>
@@ -172,7 +168,6 @@ function OrbitalChip({ chip, index, isSelected, onClick }: {
   )
 }
 
-// ── Detail panel — overlay centered on the orbit stage ───────────────────────
 function DetailPanel({ chip, onClose }: { chip: ChipData; onClose: () => void }) {
   const DeltaIcon  = chip.delta > 0.05 ? TrendingUp : chip.delta < -0.05 ? TrendingDown : Minus
   const deltaColor = chip.delta > 0.05 ? '#34d399' : chip.delta < -0.05 ? '#f87171' : '#94a3b8'
@@ -183,15 +178,11 @@ function DetailPanel({ chip, onClose }: { chip: ChipData; onClose: () => void })
 
   return (
     <div style={{ background: 'rgba(4,4,4,0.97)', border: `1px solid ${accent}30`, backdropFilter: 'blur(40px)', borderRadius: 24, padding: '22px 24px 26px', boxShadow: `0 0 70px ${accent}12, 0 28px 60px rgba(0,0,0,0.92), inset 0 1px 0 rgba(200,200,200,0.06)`, position: 'relative', overflow: 'hidden', width: 540, maxWidth: '88vw' }}>
-      {/* top accent line */}
       <div style={{ position: 'absolute', top: 0, left: '5%', right: '5%', height: 1.5, background: `linear-gradient(90deg, transparent, ${accent}60, transparent)`, borderRadius: 2 }} />
       <div className="pointer-events-none absolute inset-0 grid-bg opacity-[0.03]" />
-
       <button onClick={onClose}
         style={{ position: 'absolute', right: 13, top: 13, width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(200,200,200,0.05)', border: '1px solid rgba(200,200,200,0.10)', borderRadius: 7, cursor: 'pointer', color: 'rgba(200,200,200,0.40)', fontSize: 16, lineHeight: 1 }}
       >×</button>
-
-      {/* Header: label + value + badges */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14, paddingRight: 30 }}>
         <div>
           <p style={{ fontSize: 8, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.26em', color: 'rgba(195,195,195,0.28)', marginBottom: 5 }}>{chip.label}</p>
@@ -209,14 +200,10 @@ function DetailPanel({ chip, onClose }: { chip: ChipData; onClose: () => void })
           )}
         </div>
       </div>
-
-      {/* Sparkline chart */}
       <div style={{ marginBottom: 16, padding: '10px 12px 8px', background: 'rgba(200,200,200,0.025)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 12, overflow: 'hidden' }}>
         <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(195,195,195,0.22)', marginBottom: 7 }}>Variação 14 dias</p>
         <Sparkline id={chip.id} delta={chip.delta} color={accent} w={480} h={50} />
       </div>
-
-      {/* Two-column explanations */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         {chip.oque && (
           <div style={{ padding: '11px 13px', background: 'rgba(200,200,200,0.025)', border: '1px solid rgba(200,200,200,0.065)', borderRadius: 12 }}>
@@ -306,20 +293,12 @@ function GlobeHero({ data }: { data: MarketData }) {
 
   return (
     <div className="relative w-full select-none" onClick={() => setSelectedId(null)}>
-
-      {/* ── Desktop: órbita elíptica ── */}
       <div className="hidden md:block">
-
-        {/* Orbit stage */}
         <div className="relative w-full" style={{ height: 660 }}>
-
-          {/* SVG: trilha da órbita */}
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} overflow="visible">
             <ellipse cx="50%" cy="50%" rx={ORB_AX} ry={ORB_AY}
               fill="none" stroke="rgba(195,195,195,0.05)" strokeWidth="1" strokeDasharray="4 10" />
           </svg>
-
-          {/* Globo 380px centralizado */}
           <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', width: 380, height: 380, zIndex: 2 }}>
             {[1.06, 1.18, 1.34, 1.52].map((s, i) => (
               <motion.div key={i}
@@ -329,7 +308,6 @@ function GlobeHero({ data }: { data: MarketData }) {
               />
             ))}
             <div style={{ width: '100%', height: '100%' }}><Globe3D /></div>
-            {/* AO VIVO badge */}
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 4 }}>
               <motion.div
                 style={{ background: 'rgba(2,2,2,0.92)', border: '1px solid rgba(52,211,153,0.28)', backdropFilter: 'blur(18px)', padding: '9px 22px', borderRadius: 99, display: 'flex', alignItems: 'center', gap: 8 }}
@@ -343,33 +321,20 @@ function GlobeHero({ data }: { data: MarketData }) {
               </motion.div>
             </div>
           </div>
-
-          {/* 8 chips em órbita elíptica */}
           {chips.map((chip, i) => (
-            <OrbitalChip
-              key={chip.id}
-              chip={chip}
-              index={i}
-              isSelected={selectedId === chip.id}
-              onClick={() => setSelectedId(prev => prev === chip.id ? null : chip.id)}
-            />
+            <OrbitalChip key={chip.id} chip={chip} index={i} isSelected={selectedId === chip.id}
+              onClick={() => setSelectedId(prev => prev === chip.id ? null : chip.id)} />
           ))}
-
-          {/* Detail panel — overlay centralizado DENTRO do stage, acima dos chips */}
           <AnimatePresence>
             {selectedChip && (
               <>
-                {/* Backdrop escurece órbita, chip clicado fica visível */}
                 <motion.div
                   style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.68)', backdropFilter: 'blur(8px)', zIndex: 25 }}
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   transition={{ duration: 0.22 }}
                   onClick={() => setSelectedId(null)}
                 />
-                {/* Wrapper de centramento (CSS puro, sem conflito com Framer transforms) */}
-                <div
-                  style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', zIndex: 30, pointerEvents: 'none' }}
-                >
+                <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', zIndex: 30, pointerEvents: 'none' }}>
                   <motion.div
                     style={{ pointerEvents: 'auto' }}
                     initial={{ opacity: 0, scale: 0.88, y: 18 }}
@@ -387,7 +352,6 @@ function GlobeHero({ data }: { data: MarketData }) {
         </div>
       </div>
 
-      {/* ── Mobile: globo + grid 2 col ── */}
       <div className="md:hidden flex flex-col gap-4">
         <div className="relative mx-auto w-full" style={{ maxWidth: 300 }}>
           {[1.08, 1.28].map((s, i) => (
@@ -456,10 +420,9 @@ function GlobeHero({ data }: { data: MarketData }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  2 — MARKET PANEL (B3 + Global)
+// ██  MARKET PANEL (B3 + Global)
 // ════════════════════════════════════════════════════════════════════════════
 
-// ── Stock Card (trading card visual) ──────────────────────────────────────────
 function StockCard({ ticker, label, price, pct, showPrice = true }: {
   ticker: string; label: string; price?: number; pct: number; showPrice?: boolean
 }) {
@@ -512,7 +475,6 @@ function MarketPanel({ data }: { data: MarketData }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-      {/* B3 */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -529,7 +491,6 @@ function MarketPanel({ data }: { data: MarketData }) {
             ))}
           </div>
         </div>
-
         <AnimatePresence mode="wait">
           {mode === '3d' ? (
             <motion.div key="3d" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
@@ -544,8 +505,6 @@ function MarketPanel({ data }: { data: MarketData }) {
           )}
         </AnimatePresence>
       </div>
-
-      {/* Global */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(195,195,195,0.28)' }}>Mercados Globais</span>
@@ -561,7 +520,367 @@ function MarketPanel({ data }: { data: MarketData }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  4 — SECTOR ANALYSIS (expandable)
+// ██  DOMAIN NAV — barra de navegação dos 9 temas
+// ════════════════════════════════════════════════════════════════════════════
+
+const DOMAIN_NAV = [
+  { num: '01', label: 'Economia',        id: 'domain-01' },
+  { num: '02', label: 'Mercado & Bolsa', id: 'domain-02' },
+  { num: '03', label: 'Empresas',        id: 'domain-03' },
+  { num: '04', label: 'Commodities',     id: 'domain-04' },
+  { num: '05', label: 'Finanças',        id: 'domain-05' },
+  { num: '06', label: 'Marketing',       id: 'domain-06' },
+  { num: '07', label: 'Sust.',           id: 'domain-07' },
+  { num: '08', label: 'Liderança',       id: 'domain-08' },
+  { num: '09', label: 'Business',        id: 'domain-09' },
+]
+
+function DomainNav() {
+  const [active, setActive] = useState<string | null>(null)
+
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id)
+    if (el) {
+      const y = el.getBoundingClientRect().top + window.scrollY - 72
+      window.scrollTo({ top: y, behavior: 'smooth' })
+    }
+    setActive(id)
+  }
+
+  return (
+    <div style={{
+      display: 'flex', gap: 6, overflowX: 'auto', padding: '2px 0 8px',
+      scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' as React.CSSProperties['WebkitOverflowScrolling'],
+    }}>
+      {DOMAIN_NAV.map(d => (
+        <button key={d.id} onClick={() => scrollTo(d.id)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            padding: '6px 13px', borderRadius: 99, flexShrink: 0, cursor: 'pointer',
+            background: active === d.id ? 'rgba(200,200,200,0.11)' : 'rgba(200,200,200,0.03)',
+            border: `1px solid ${active === d.id ? 'rgba(200,200,200,0.22)' : 'rgba(200,200,200,0.07)'}`,
+            transition: 'all 0.15s',
+          }}
+        >
+          <span style={{ fontSize: 7, fontFamily: 'monospace', color: 'rgba(195,195,195,0.25)', letterSpacing: '0.12em' }}>{d.num}</span>
+          <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: active === d.id ? 700 : 400, color: active === d.id ? 'rgba(220,220,220,0.88)' : 'rgba(195,195,195,0.42)', whiteSpace: 'nowrap' }}>{d.label}</span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  DOMAIN CARD — base wrapper
+// ════════════════════════════════════════════════════════════════════════════
+
+interface KPIItem { label: string; value: string; delta?: number; sub?: string; color?: string }
+
+function DomainCard({
+  num, label, badge, badgeColor, kpis, decisao, decisaoColor, children,
+}: {
+  num: string; label: string
+  badge?: string; badgeColor?: string
+  kpis?: KPIItem[]
+  decisao: string; decisaoColor: string
+  children?: React.ReactNode
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }} transition={{ duration: 0.38 }}
+      style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}
+    >
+      {/* Header */}
+      <div style={{ padding: '13px 18px 11px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{ fontSize: 7.5, fontFamily: 'monospace', color: 'rgba(195,195,195,0.18)', letterSpacing: '0.2em' }}>{num}</span>
+        <div style={{ width: 1, height: 10, background: 'rgba(200,200,200,0.10)', flexShrink: 0 }} />
+        <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(195,195,195,0.42)', fontWeight: 700 }}>{label}</span>
+        {badge && badgeColor && (
+          <span style={{ marginLeft: 'auto', fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: badgeColor, background: badgeColor + '18', border: `1px solid ${badgeColor}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{badge}</span>
+        )}
+      </div>
+      {/* KPIs */}
+      {kpis && kpis.length > 0 && (
+        <div style={{ padding: '16px 18px 14px', display: 'grid', gridTemplateColumns: `repeat(${Math.min(kpis.length, 4)}, 1fr)`, gap: 16, borderBottom: children ? '1px solid rgba(200,200,200,0.05)' : 'none' }}>
+          {kpis.map(k => {
+            const col = k.color ?? (k.delta !== undefined ? pctColor(k.delta) : 'rgba(235,235,235,0.88)')
+            return (
+              <div key={k.label}>
+                <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(195,195,195,0.24)', marginBottom: 5 }}>{k.label}</p>
+                <p style={{ fontSize: 22, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.90)', lineHeight: 1, marginBottom: 4 }}>{k.value}</p>
+                {k.sub && <p style={{ fontSize: 9, fontFamily: 'monospace', color: col, fontWeight: k.delta !== undefined ? 700 : 400 }}>{k.sub}</p>}
+              </div>
+            )
+          })}
+        </div>
+      )}
+      {children && <div style={{ borderBottom: '1px solid rgba(200,200,200,0.05)' }}>{children}</div>}
+      {/* DECISÃO */}
+      <div style={{ padding: '11px 18px 13px', display: 'flex', alignItems: 'flex-start', gap: 9 }}>
+        <div style={{ width: 6, height: 6, borderRadius: '50%', background: decisaoColor, marginTop: 4, flexShrink: 0 }} />
+        <p style={{ fontSize: 11.5, color: 'rgba(210,210,210,0.58)', lineHeight: 1.65 }}>
+          <span style={{ fontFamily: 'monospace', fontSize: 7.5, textTransform: 'uppercase', letterSpacing: '0.22em', color: 'rgba(195,195,195,0.22)', marginRight: 8 }}>DECISÃO</span>
+          {decisao}
+        </p>
+      </div>
+    </motion.div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  01 — ECONOMIA
+// ════════════════════════════════════════════════════════════════════════════
+
+function EconomiaCard({ data }: { data: MarketData }) {
+  const { selic, ipca, usdBrl, pib } = data.macro
+  const signal =
+    selic.value > 13 && ipca.value > 5 ? { label: 'APERTO', color: '#f87171' } :
+    selic.value > 10 || ipca.value > 4  ? { label: 'CAUTELA', color: '#fbbf24' } :
+    { label: 'ESTÁVEL', color: '#34d399' }
+  const decisao =
+    selic.value > 13
+      ? `SELIC ${selic.value}% + IPCA ${ipca.value}% comprimem margens. Revise custo de capital, negocie prazos com fornecedores e evite novos financiamentos de longo prazo.`
+      : selic.value > 10
+      ? `SELIC ${selic.value}% — crédito ainda caro. Priorize capital próprio para expansão. Câmbio R$${usdBrl.value} exige atenção em insumos importados.`
+      : `Juros controlados e PIB projetado em ${pib.value}% — janela para expansão. Acesse BNDES e Pronampe antes que o ciclo mude.`
+  return (
+    <DomainCard num="01" label="Economia" badge={signal.label} badgeColor={signal.color}
+      kpis={[
+        { label: 'SELIC',   value: `${selic.value}%`,  sub: 'ao ano · COPOM',   color: selic.value > 13 ? '#f87171' : selic.value > 10 ? '#fbbf24' : '#34d399' },
+        { label: 'IPCA',    value: `${ipca.value}%`,   sub: '12m · IBGE',        color: ipca.value > 5 ? '#f87171' : ipca.value > 3.5 ? '#fbbf24' : '#34d399' },
+        { label: 'USD/BRL', value: `R$${usdBrl.value}`, sub: pctSign(usdBrl.delta), delta: usdBrl.delta },
+        { label: 'PIB',     value: `${pib.value}%`,    sub: 'projeção Focus',    delta: pib.delta },
+      ]}
+      decisao={decisao} decisaoColor={signal.color}
+    />
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  02 — MERCADO & BOLSA
+// ════════════════════════════════════════════════════════════════════════════
+
+function MercadoBolsaCard({ data }: { data: MarketData }) {
+  const ibov    = data.stocks?.ibov
+  const ibovPct = ibov?.pct ?? 0
+  const agents  = data.globalAgents ?? []
+  const signal  =
+    ibovPct < -1.5 ? { label: 'QUEDA',   color: '#f87171' } :
+    ibovPct >  1.5 ? { label: 'ALTA',    color: '#34d399' } :
+    { label: 'LATERAL', color: '#fbbf24' }
+  const decisao =
+    ibovPct < -1.5
+      ? 'Bolsa em queda — risco de contração de crédito e fuga de capital. Revise valuation de ativos e monitore posições em renda variável.'
+      : ibovPct > 1.5
+      ? `IBOVESPA em alta (+${ibovPct.toFixed(1)}%) — apetite por risco elevado. Boa janela para captação e M&A via equity.`
+      : 'Mercado lateral — aguarde definição de tendência antes de decisões estruturais de capital. Foco em eficiência operacional.'
+  const kpis: KPIItem[] = [
+    { label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000), sub: pctSign(ibovPct), delta: ibovPct },
+    ...agents.slice(0, 2).map(a => ({
+      label: a.label.toUpperCase().slice(0, 10),
+      value: pctSign(a.delta),
+      sub: a.impact.slice(0, 20),
+      delta: a.delta,
+    })),
+    { label: 'SENTIMENTO', value: signal.label, sub: 'consenso do dia', color: signal.color },
+  ]
+  return (
+    <DomainCard num="02" label="Mercado & Bolsa" badge={signal.label} badgeColor={signal.color}
+      kpis={kpis.slice(0, 4)} decisao={decisao} decisaoColor={signal.color}
+    />
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  04 — COMMODITIES
+// ════════════════════════════════════════════════════════════════════════════
+
+function CommoditiesCard({ data }: { data: MarketData }) {
+  const oil    = data.commodities.oil
+  const gold   = data.commodities.gold
+  const silver = data.commodities.silver
+  const oilDelta  = oil?.delta ?? 0
+  const goldDelta = gold?.delta ?? 0
+  const signal =
+    oilDelta > 3  ? { label: 'PRESSÃO', color: '#f87171' } :
+    goldDelta > 2 ? { label: 'ALERTA',  color: '#fbbf24' } :
+    { label: 'ESTÁVEL', color: '#34d399' }
+  const decisao =
+    oilDelta > 2
+      ? `Petróleo +${oilDelta.toFixed(1)}% pressiona frete, energia e plásticos. Renegocie contratos logísticos e revise repasse de custos na precificação agora.`
+      : goldDelta > 1.5
+      ? 'Alta do ouro sinaliza aversão a risco global. Revise exposição cambial e considere hedge para operações em dólar.'
+      : 'Commodities estáveis — janela para fixar contratos de insumos ao preço atual antes de nova volatilidade.'
+  return (
+    <DomainCard num="04" label="Commodities" badge={signal.label} badgeColor={signal.color}
+      kpis={[
+        { label: 'PETRÓLEO', value: oil?.value  ? `$${oil.value}`    : '—', sub: oil?.delta    !== undefined ? pctSign(oil.delta)    : '—', delta: oilDelta },
+        { label: 'OURO',     value: gold?.value ? `$${gold.value}`   : '—', sub: gold?.delta   !== undefined ? pctSign(gold.delta)   : '—', delta: goldDelta },
+        { label: 'PRATA',    value: silver?.value ? `$${silver.value}` : '—', sub: silver?.delta !== undefined ? pctSign(silver.delta) : '—', delta: silver?.delta ?? 0 },
+        { label: 'ÍNDICE',   value: 'BCom', sub: 'commodities global', color: 'rgba(195,195,195,0.45)' },
+      ]}
+      decisao={decisao} decisaoColor={signal.color}
+    />
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  05 — FINANÇAS
+// ════════════════════════════════════════════════════════════════════════════
+
+function FinancasCard({ data }: { data: MarketData }) {
+  const rates = data.creditRates
+  const selic = data.macro.selic.value
+  const items = rates ? [
+    { label: 'PJ Total',  value: rates.total?.value     ?? 0 },
+    { label: 'Comércio',  value: rates.comercio?.value  ?? 0 },
+    { label: 'Serviços',  value: rates.servicos?.value  ?? 0 },
+    { label: 'Indústria', value: rates.industria?.value ?? 0 },
+    { label: 'Agro',      value: rates.agro?.value      ?? 0 },
+  ] : []
+  const valid   = items.filter(i => i.value > 0)
+  const avgRate = valid.length > 0 ? valid.reduce((s, i) => s + i.value, 0) / valid.length : selic + 15
+  const signal  =
+    avgRate > 28 ? { label: 'CARO',       color: '#f87171' } :
+    avgRate > 18 ? { label: 'MODERADO',   color: '#fbbf24' } :
+    { label: 'ACESSÍVEL', color: '#34d399' }
+  const decisao =
+    avgRate > 28
+      ? `Crédito PJ médio ${avgRate.toFixed(0)}% a.a. — evite financiar capital de giro com dívida bancária. Use adiantamento de recebíveis (FIDC/factoring).`
+      : avgRate > 18
+      ? 'Taxas moderadas — acesse BNDES e linhas com FGI para reduzir spread. Compare antes de contratar.'
+      : 'Crédito acessível — refinancie dívidas caras e estenda prazo de capital de giro enquanto as taxas permitem.'
+  const maxR = valid.length > 0 ? Math.max(...valid.map(i => i.value), 1) : 40
+  return (
+    <DomainCard num="05" label="Finanças" badge={signal.label} badgeColor={signal.color}
+      kpis={[
+        { label: 'SELIC',      value: `${selic}%`,              sub: 'custo-base BCB',  color: selic > 13 ? '#f87171' : '#fbbf24' },
+        { label: 'SPREAD PJ',  value: `+${(avgRate - selic).toFixed(0)}pp`, sub: 'acima da SELIC', color: 'rgba(195,195,195,0.55)' },
+        { label: 'TAXA MÉDIA', value: `${avgRate.toFixed(1)}%`, sub: 'crédito PJ a.a.', color: signal.color },
+      ]}
+      decisao={decisao} decisaoColor={signal.color}
+    >
+      {valid.length > 0 && (
+        <div style={{ padding: '10px 18px 14px' }}>
+          {valid.map((item, idx) => {
+            const rc = item.value > 28 ? '#f87171' : item.value > 18 ? '#fbbf24' : '#34d399'
+            return (
+              <motion.div key={item.label}
+                initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+                viewport={{ once: true }} transition={{ delay: idx * 0.06 }}
+                style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: idx < valid.length - 1 ? 8 : 0 }}
+              >
+                <span style={{ fontSize: 8.5, fontFamily: 'monospace', color: 'rgba(195,195,195,0.30)', width: 64, flexShrink: 0 }}>{item.label}</span>
+                <div style={{ flex: 1, height: 5, background: 'rgba(200,200,200,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+                  <motion.div
+                    initial={{ width: 0 }} whileInView={{ width: `${(item.value / maxR) * 100}%` }}
+                    viewport={{ once: true }} transition={{ duration: 0.9, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ height: '100%', borderRadius: 3, background: `linear-gradient(90deg, ${rc}50, ${rc})` }}
+                  />
+                </div>
+                <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: rc, width: 44, textAlign: 'right', flexShrink: 0 }}>{item.value}%</span>
+              </motion.div>
+            )
+          })}
+        </div>
+      )}
+    </DomainCard>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  06 — MARKETING
+// ════════════════════════════════════════════════════════════════════════════
+
+function MarketingCard({ data }: { data: MarketData }) {
+  const { ipca, pib, selic } = data.macro
+  const retail = data.sectors.find(s => s.id === 'retail')
+  const media  = data.sectors.find(s => s.id === 'media')
+  const icc    = Math.round(clamp(60 + pib.value * 4 - ipca.value * 3 - (selic.value - 10) * 1.5, 20, 90))
+  const iccCol = icc >= 65 ? '#34d399' : icc >= 50 ? '#fbbf24' : '#f87171'
+  const signal = icc >= 65 ? { label: 'AQUECIDA', color: '#34d399' } : icc >= 50 ? { label: 'MODERADA', color: '#fbbf24' } : { label: 'RETRAÍDA', color: '#f87171' }
+  const decisao =
+    icc >= 65
+      ? 'Confiança elevada — invista em aquisição agora. CAC tende a ser mais eficiente em ciclos de expansão de consumo.'
+      : icc >= 50
+      ? `IPCA ${ipca.value}% comprime poder de compra. Enfatize custo-benefício, parcelamento e valor percebido na comunicação.`
+      : 'Demanda retraída — priorize retenção e LTV sobre aquisição. Campanhas de fidelização têm ROI superior neste ciclo.'
+  return (
+    <DomainCard num="06" label="Marketing" badge={signal.label} badgeColor={signal.color}
+      kpis={[
+        { label: 'CONF. CONSUMIDOR', value: String(icc),                sub: 'índice proxy IPB',  color: iccCol },
+        { label: 'DEMANDA ONLINE',   value: String(retail?.heat ?? 55), sub: '/100 · heat score', color: pctColor(retail?.change ?? 0) },
+        { label: 'PRESSÃO PREÇO',    value: `${ipca.value}%`,           sub: 'IPCA 12m',          color: ipca.value > 5 ? '#f87171' : '#fbbf24' },
+        { label: 'MÍDIA DIGITAL',    value: String(media?.heat ?? 58),  sub: '/100 · heat score', color: pctColor(media?.change ?? 0) },
+      ]}
+      decisao={decisao} decisaoColor={signal.color}
+    />
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  07 — SUSTENTABILIDADE
+// ════════════════════════════════════════════════════════════════════════════
+
+function SustentabilidadeCard({ data }: { data: MarketData }) {
+  const energy = data.sectors.find(s => s.id === 'energy')
+  const agro   = data.sectors.find(s => s.id === 'agro')
+  const green  = Math.round(clamp(((energy?.heat ?? 55) + (agro?.heat ?? 50)) / 2 + 5, 10, 95))
+  const rc     = green < 50 ? '#f87171' : green < 70 ? '#fbbf24' : '#34d399'
+  const risk   = green < 50 ? 'ALTO' : green < 70 ? 'MÉDIO' : 'BAIXO'
+  const decisao =
+    green < 50
+      ? 'Risco ESG elevado — acesse crédito verde (LCA, CRA) para reduzir custo de capital e ampliar acesso a investidores institucionais.'
+      : green < 70
+      ? 'Perfil ESG moderado. Implemente relatório GRI/SASB para acessar capital verde com spread 15–25% menor que linhas convencionais.'
+      : 'Bom score ESG — capitalize na narrativa para green bonds e fundos de impacto com menor custo de capital.'
+  return (
+    <DomainCard num="07" label="Sustentabilidade" badge={`RISCO ${risk}`} badgeColor={rc}
+      kpis={[
+        { label: 'GREEN SCORE',   value: String(green),                 sub: '/100 · proxy IPB',  color: rc },
+        { label: 'ENERGIA',       value: String(energy?.heat ?? '—'),   sub: '/100 · heat score', color: pctColor(energy?.change ?? 0) },
+        { label: 'AGRO SUST.',    value: String(agro?.heat ?? '—'),     sub: '/100 · heat score', color: pctColor(agro?.change ?? 0) },
+        { label: 'CRÉDITO VERDE', value: 'LCA/CRA',                     sub: 'acesso disponível', color: '#34d399' },
+      ]}
+      decisao={decisao} decisaoColor={rc}
+    />
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  08 — LIDERANÇA
+// ════════════════════════════════════════════════════════════════════════════
+
+function LiderancaCard({ data }: { data: MarketData }) {
+  const { ipca, pib } = data.macro
+  const tech     = data.sectors.find(s => s.id === 'tech')
+  const services = data.sectors.find(s => s.id === 'services')
+  const desemp   = clamp(6.5 - pib.value * 0.4, 4.5, 12).toFixed(1)
+  const salPress = ipca.value > 4.5 ? 'ALTA' : ipca.value > 3 ? 'MÉDIA' : 'BAIXA'
+  const salCol   = ipca.value > 4.5 ? '#f87171' : ipca.value > 3 ? '#fbbf24' : '#34d399'
+  const signal   = ipca.value > 5 ? { label: 'PRESSÃO SAL.', color: '#f87171' } : pib.value > 2 ? { label: 'AQUECIDO', color: '#fbbf24' } : { label: 'ESTÁVEL', color: '#34d399' }
+  const decisao  =
+    ipca.value > 5
+      ? `IPCA ${ipca.value}% gera pressão salarial no dissídio. Antecipe revisões e implemente benefícios não-monetários para reter talentos sem pressionar folha.`
+      : pib.value > 2
+      ? 'PIB em expansão aquece o mercado de talentos. Acelere contratações estratégicas antes que o mercado fique mais restrito e caro.'
+      : 'Mercado em equilíbrio — boa janela para contratar talentos a custo moderado. Priorize roles em eficiência e tecnologia.'
+  return (
+    <DomainCard num="08" label="Liderança" badge={signal.label} badgeColor={signal.color}
+      kpis={[
+        { label: 'DESEMPREGO',   value: `${desemp}%`,                    sub: 'proxy PNAD/IBGE', color: Number(desemp) > 8 ? '#f87171' : '#34d399' },
+        { label: 'PRESSÃO SAL.', value: salPress,                         sub: `IPCA ${ipca.value}%`, color: salCol },
+        { label: 'DEMANDA TECH', value: String(tech?.heat ?? '—'),        sub: '/100 · heat',    color: pctColor(tech?.change ?? 0) },
+        { label: 'SERVIÇOS',     value: String(services?.heat ?? '—'),    sub: '/100 · empregab.', color: pctColor(services?.change ?? 0) },
+      ]}
+      decisao={decisao} decisaoColor={signal.color}
+    />
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  09 — BUSINESS (Inteligência Setorial)
 // ════════════════════════════════════════════════════════════════════════════
 
 const SECTOR_ANALYSIS: Record<string, { oportunidade: string; risco: string; como: string; quem: string }> = {
@@ -576,58 +895,34 @@ const SECTOR_ANALYSIS: Record<string, { oportunidade: string; risco: string; com
   media:     { oportunidade: 'Criadores independentes escalam com plataformas. Adtech BR cresce. Comunidades pagas em alta.', risco: 'CPM volátil com macro. Atenção fragmentada. LGPD limita targeting. Algoritmos mudam constantemente.', como: 'Owned media (newsletter, podcast). Comunidade paga. Branded content B2B.', quem: 'Agências, creators, adtechs, OTTs, publishers' },
 }
 
-// ── Circular heat gauge ────────────────────────────────────────────────────────
-function HeatGauge({ value, color }: { value: number; color: string }) {
-  const r = 24, circ = 2 * Math.PI * r
-  const dash = (value / 100) * circ
-  return (
-    <svg width={58} height={58} viewBox="0 0 58 58" style={{ flexShrink: 0 }}>
-      <circle cx={29} cy={29} r={r} fill="none" stroke="rgba(200,200,200,0.07)" strokeWidth={5} />
-      <circle cx={29} cy={29} r={r} fill="none" stroke={color} strokeWidth={5}
-        strokeDasharray={`${dash} ${circ}`} strokeDashoffset={circ * 0.25}
-        strokeLinecap="round" style={{ transition: 'stroke-dasharray 1.1s ease' }} />
-      <text x={29} y={34} textAnchor="middle" fontSize={13} fontWeight="800" fill={color} fontFamily="monospace">{value}</text>
-    </svg>
-  )
-}
-
 function SectorCard({ sector, delay }: { sector: Sector; delay: number }) {
   const analysis = SECTOR_ANALYSIS[sector.id]
-  const h  = sector.heat
-  const signal =
+  const h        = sector.heat
+  const signal   =
     h >= 75 ? { label: 'OPORTUNIDADE', color: '#34d399' } :
     h >= 50 ? { label: 'NEUTRO',       color: '#c0c0c0' } :
     h >= 30 ? { label: 'CAUTELA',      color: '#fbbf24' } :
               { label: 'ALTO RISCO',   color: '#f87171' }
   const chgColor = pctColor(sector.change)
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }} transition={{ delay, duration: 0.4 }}
       style={{ background: 'rgba(5,5,5,0.94)', border: `1px solid ${signal.color}1a`, borderRadius: 18, overflow: 'hidden', position: 'relative' }}
     >
-      {/* accent top bar */}
       <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${signal.color}70, transparent)` }} />
-
-      {/* Header */}
       <div style={{ padding: '12px 16px 10px', borderBottom: '1px solid rgba(200,200,200,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: signal.color, background: signal.color + '16', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 8px', fontWeight: 700, flexShrink: 0 }}>
-              {signal.label}
-            </span>
+            <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: signal.color, background: signal.color + '16', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 8px', fontWeight: 700, flexShrink: 0 }}>{signal.label}</span>
             <span style={{ fontSize: 12.5, fontWeight: 600, color: 'rgba(228,228,228,0.82)' }}>{sector.label}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
             <span style={{ fontSize: 22, fontWeight: 800, fontFamily: 'monospace', color: signal.color, lineHeight: 1 }}>{h}</span>
             <span style={{ fontSize: 8.5, fontFamily: 'monospace', color: 'rgba(200,200,200,0.22)', alignSelf: 'flex-end', marginBottom: 2 }}>/100</span>
-            <span style={{ fontSize: 9.5, fontFamily: 'monospace', fontWeight: 700, color: chgColor, background: chgColor + '16', border: `1px solid ${chgColor}26`, borderRadius: 99, padding: '2px 7px' }}>
-              {sector.change >= 0 ? '+' : ''}{sector.change}%
-            </span>
+            <span style={{ fontSize: 9.5, fontFamily: 'monospace', fontWeight: 700, color: chgColor, background: chgColor + '16', border: `1px solid ${chgColor}26`, borderRadius: 99, padding: '2px 7px' }}>{sector.change >= 0 ? '+' : ''}{sector.change}%</span>
           </div>
         </div>
-        {/* Heat bar */}
         <div style={{ height: 4, background: 'rgba(200,200,200,0.07)', borderRadius: 2, overflow: 'hidden' }}>
           <motion.div
             initial={{ width: 0 }} whileInView={{ width: `${h}%` }} viewport={{ once: true }}
@@ -636,8 +931,6 @@ function SectorCard({ sector, delay }: { sector: Sector; delay: number }) {
           />
         </div>
       </div>
-
-      {/* 3-column analysis */}
       {analysis && (
         <div style={{ padding: '12px 16px 14px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
           {([
@@ -655,8 +948,6 @@ function SectorCard({ sector, delay }: { sector: Sector; delay: number }) {
           ))}
         </div>
       )}
-
-      {/* Quem se beneficia */}
       {analysis?.quem && (
         <div style={{ padding: '8px 16px 10px', borderTop: '1px solid rgba(200,200,200,0.04)' }}>
           <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.16em', color: 'rgba(200,200,200,0.22)' }}>Quem se beneficia: </span>
@@ -667,25 +958,19 @@ function SectorCard({ sector, delay }: { sector: Sector; delay: number }) {
   )
 }
 
-function SectorAnalysis({ sectors }: { sectors: Sector[] }) {
+function BusinessCard({ sectors }: { sectors: Sector[] }) {
   const [mode, setMode] = useState<'3d' | 'cards'>('3d')
   const sorted = [...sectors].sort((a, b) => b.heat - a.heat)
-
   return (
     <div>
-      {/* Toggle */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, marginBottom: 14 }}>
-        {([
-          { id: '3d',    label: '3D INTERATIVO' },
-          { id: 'cards', label: 'CARDS' },
-        ] as { id: 'cards' | '3d'; label: string }[]).map(({ id, label }) => (
+        {([{ id: '3d', label: '3D INTERATIVO' }, { id: 'cards', label: 'CARDS' }] as { id: 'cards' | '3d'; label: string }[]).map(({ id, label }) => (
           <button key={id} onClick={() => setMode(id)}
             style={{ padding: '5px 16px', borderRadius: 99, fontSize: 8.5, fontFamily: 'monospace', letterSpacing: '0.18em', cursor: 'pointer', transition: 'all 0.18s', fontWeight: mode === id ? 700 : 400, background: mode === id ? 'rgba(200,200,200,0.10)' : 'rgba(200,200,200,0.03)', border: `1px solid ${mode === id ? 'rgba(200,200,200,0.22)' : 'rgba(200,200,200,0.07)'}`, color: mode === id ? 'rgba(220,220,220,0.85)' : 'rgba(200,200,200,0.28)', boxShadow: 'none' }}>
             {label}
           </button>
         ))}
       </div>
-
       <AnimatePresence mode="wait">
         {mode === '3d' ? (
           <motion.div key="3d" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
@@ -704,187 +989,15 @@ function SectorAnalysis({ sectors }: { sectors: Sector[] }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  5 — CADEIA DE IMPACTO
-// ════════════════════════════════════════════════════════════════════════════
-
-const IMPACT_CHAINS = [
-  {
-    id: 'selic', title: 'SELIC', color: '#94a3b8',
-    up:   { label: 'Sobe',   color: '#f87171', effects: ['Crédito PJ mais caro (20-45% a.a.)', 'Capital de giro encarece', 'Consumo das famílias contrai', 'Pressão em varejo e serviços', 'CDB vira concorrente direto do negócio'] },
-    down: { label: 'Cai',    color: '#34d399', effects: ['Crédito mais barato e acessível', 'Custo de capital reduz', 'Consumo aquece', 'Expansão e M&A ficam viáveis', 'Ativos de risco sobem de valor'] },
-  },
-  {
-    id: 'usdbrl', title: 'USD/BRL', color: '#60a5fa',
-    up:   { label: 'Sobe',   color: '#f87171', effects: ['Insumos importados encarecem', 'Tech e SaaS em USD ficam caros', 'Agro e exportação ganham competitividade', 'Inflação de custo pressiona PME', 'Margens reais caem'] },
-    down: { label: 'Cai',    color: '#34d399', effects: ['Importações ficam mais baratas', 'Insumos e tecnologia acessíveis', 'Margem de exportação comprime', 'Alívio inflacionário', 'Consumo de bens importados cresce'] },
-  },
-  {
-    id: 'ipca', title: 'IPCA', color: '#f87171',
-    up:   { label: 'Sobe',   color: '#f87171', effects: ['Poder de compra cai', 'Margens reais reduzem', 'Pressão salarial (dissídio)', 'PME tem menor poder de repasse', 'BCB reage subindo a SELIC'] },
-    down: { label: 'Cai',    color: '#34d399', effects: ['Poder de compra sobe', 'Margens reais expandem', 'Pressão salarial menor', 'BCB pode cortar a SELIC', 'Competitividade de exportação melhora'] },
-  },
-  {
-    id: 'pib', title: 'PIB', color: '#34d399',
-    up:   { label: 'Cresce', color: '#34d399', effects: ['Demanda agregada sobe', 'Receitas das empresas crescem', 'Emprego e renda expandem', 'Investimento privado acelera', 'Momento de expandir e contratar'] },
-    down: { label: 'Cai',    color: '#f87171', effects: ['Demanda contrai', 'Receitas sob pressão', 'Desemprego pode subir', 'Crédito fica mais restritivo', 'Preservar caixa e cortar variáveis'] },
-  },
-]
-
-function ImpactChain() {
-  const [selected, setSelected] = useState<string>('selic')
-  const chain = IMPACT_CHAINS.find(c => c.id === selected)!
-
-  return (
-    <div style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.08)', borderRadius: 20, overflow: 'hidden' }}>
-      {/* Selector */}
-      <div style={{ padding: '14px 16px', display: 'flex', gap: 8, borderBottom: '1px solid rgba(200,200,200,0.06)', background: 'rgba(0,0,0,0.25)' }}>
-        {IMPACT_CHAINS.map(c => (
-          <button key={c.id} onClick={() => setSelected(c.id)}
-            style={{ flex: 1, padding: '9px 4px', borderRadius: 12, fontSize: 9, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.16em', cursor: 'pointer', transition: 'all 0.18s', background: selected === c.id ? `${c.color}20` : 'rgba(200,200,200,0.03)', border: `1px solid ${selected === c.id ? c.color + '50' : 'rgba(200,200,200,0.07)'}`, color: selected === c.id ? c.color : 'rgba(200,200,200,0.28)', fontWeight: selected === c.id ? 700 : 400, boxShadow: selected === c.id ? `0 0 14px ${c.color}18` : 'none' }}>
-            {c.title}
-          </button>
-        ))}
-      </div>
-
-      <AnimatePresence mode="wait">
-        <motion.div key={selected}
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.22 }}
-          style={{ padding: '20px 18px' }}
-        >
-          {/* Central indicator badge */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 22 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 22px', background: `${chain.color}16`, border: `1px solid ${chain.color}45`, borderRadius: 99, boxShadow: `0 0 28px ${chain.color}20` }}>
-              <motion.div
-                style={{ width: 8, height: 8, borderRadius: '50%', background: chain.color, boxShadow: `0 0 8px ${chain.color}` }}
-                animate={{ opacity: [0.4, 1, 0.4], scale: [0.8, 1.3, 0.8] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-              <span style={{ fontSize: 11, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: chain.color, fontWeight: 700 }}>{chain.title}</span>
-              <span style={{ fontSize: 8.5, fontFamily: 'monospace', color: 'rgba(200,200,200,0.28)', letterSpacing: '0.1em' }}>INDICADOR MACRO</span>
-            </div>
-          </div>
-
-          {/* Two flow columns */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-            {[chain.up, chain.down].map((dir, di) => (
-              <div key={di}>
-                {/* Column header */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, paddingBottom: 10, borderBottom: `1px solid ${dir.color}22` }}>
-                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: `${dir.color}18`, border: `1px solid ${dir.color}45`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 0 12px ${dir.color}20` }}>
-                    <span style={{ fontSize: 13, color: dir.color, fontWeight: 700, lineHeight: 1 }}>{di === 0 ? '↑' : '↓'}</span>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: 9, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.16em', color: dir.color, fontWeight: 700 }}>{chain.title} {dir.label}</p>
-                    <p style={{ fontSize: 8, color: 'rgba(200,200,200,0.25)', marginTop: 1 }}>cascata de efeitos</p>
-                  </div>
-                </div>
-
-                {/* Flow items with vertical neon line */}
-                <div style={{ position: 'relative', paddingLeft: 22 }}>
-                  <motion.div
-                    initial={{ height: 0 }} animate={{ height: '100%' }}
-                    transition={{ duration: 0.9, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
-                    style={{ position: 'absolute', left: 8, top: 0, width: 1.5, background: `linear-gradient(180deg, ${dir.color}80, ${dir.color}10)`, borderRadius: 2 }}
-                  />
-                  {dir.effects.map((effect, i) => (
-                    <motion.div key={i}
-                      initial={{ opacity: 0, x: di === 0 ? -14 : 14 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.07 + 0.15, duration: 0.28 }}
-                      style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 10 }}
-                    >
-                      {/* Dot on the flow line */}
-                      <div style={{ position: 'absolute', left: -18, top: 5, width: 7, height: 7, borderRadius: '50%', background: dir.color, boxShadow: `0 0 8px ${dir.color}`, flexShrink: 0 }} />
-                      <span style={{ fontSize: 11.5, color: 'rgba(212,212,212,0.52)', lineHeight: 1.62 }}>
-                        <span style={{ fontSize: 8, fontFamily: 'monospace', fontWeight: 700, color: dir.color, marginRight: 5, background: dir.color + '16', borderRadius: 4, padding: '1px 5px' }}>{i + 1}</span>
-                        {effect}
-                      </span>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  )
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-// ██  6 — CRÉDITO PJ
-// ════════════════════════════════════════════════════════════════════════════
-
-function CreditBar({ data }: { data: MarketData }) {
-  const rates = data.creditRates
-  if (!rates) return null
-  const items = [
-    { label: 'PJ Total',  value: rates.total?.value     ?? 0, id: 'total' },
-    { label: 'Comércio',  value: rates.comercio?.value  ?? 0, id: 'comercio' },
-    { label: 'Serviços',  value: rates.servicos?.value  ?? 0, id: 'servicos' },
-    { label: 'Indústria', value: rates.industria?.value ?? 0, id: 'industria' },
-    { label: 'Agro',      value: rates.agro?.value      ?? 0, id: 'agro' },
-  ]
-  const max = Math.max(...items.map(i => i.value), 1)
-  return (
-    <div style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.08)', borderRadius: 18, padding: '18px 22px', position: 'relative', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <span style={{ fontSize: 9, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(200,200,200,0.28)' }}>Crédito PJ — % a.a.</span>
-        <span style={{ fontSize: 7.5, fontFamily: 'monospace', color: 'rgba(200,200,200,0.28)', border: '1px solid rgba(200,200,200,0.10)', borderRadius: 99, padding: '2px 10px' }}>BCB / SGS</span>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        {items.map((item, idx) => {
-          const risk = item.value > 28 ? { label: 'ALTO', color: '#f87171' } : item.value > 16 ? { label: 'MÉDIO', color: '#fbbf24' } : { label: 'BAIXO', color: '#34d399' }
-          return (
-            <motion.div key={item.id}
-              initial={{ opacity: 0, x: -14 }} whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }} transition={{ delay: idx * 0.08, duration: 0.38 }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <span style={{ fontSize: 9.5, fontFamily: 'monospace', color: 'rgba(200,200,200,0.45)' }}>{item.label}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 17, fontFamily: 'monospace', fontWeight: 800, color: risk.color, textShadow: `0 0 14px ${risk.color}60` }}>{item.value}%</span>
-                  <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: risk.color, background: risk.color + '16', border: `1px solid ${risk.color}28`, borderRadius: 99, padding: '2px 8px', boxShadow: `0 0 8px ${risk.color}18` }}>{risk.label}</span>
-                </div>
-              </div>
-              <div style={{ height: 8, background: 'rgba(200,200,200,0.06)', borderRadius: 4, overflow: 'hidden', position: 'relative' }}>
-                <motion.div
-                  initial={{ width: 0 }} whileInView={{ width: `${(item.value / max) * 100}%` }}
-                  viewport={{ once: true }} transition={{ duration: 1.2, delay: idx * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                  style={{ height: '100%', borderRadius: 4, background: `linear-gradient(90deg, ${risk.color}50, ${risk.color})`, boxShadow: `0 0 10px ${risk.color}40`, position: 'relative', overflow: 'hidden' }}
-                >
-                  <div style={{ position: 'absolute', inset: 0, backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(255,255,255,0.06) 3px, rgba(255,255,255,0.06) 5px)' }} />
-                </motion.div>
-              </div>
-            </motion.div>
-          )
-        })}
-      </div>
-
-      <div style={{ marginTop: 18, paddingTop: 14, borderTop: '1px solid rgba(200,200,200,0.06)', display: 'flex', gap: 18, flexWrap: 'wrap' }}>
-        {[{ label: 'BAIXO — até 16% a.a.', color: '#34d399' }, { label: 'MÉDIO — 16–28% a.a.', color: '#fbbf24' }, { label: 'ALTO — acima de 28% a.a.', color: '#f87171' }].map(l => (
-          <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: 7, height: 7, borderRadius: '50%', background: l.color, flexShrink: 0 }} />
-            <span style={{ fontSize: 8.5, color: 'rgba(200,200,200,0.28)' }}>{l.label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-// ██  7 — PLANO DE AÇÃO IA
+// ██  PLANO DE AÇÃO IA
 // ════════════════════════════════════════════════════════════════════════════
 
 function ActionPlan({ data, userSector }: { data: MarketData; userSector?: string }) {
-  const [plan, setPlan]     = useState('')
+  const [plan, setPlan]       = useState('')
   const [loading, setLoading] = useState(false)
-  const [typed, setTyped]   = useState('')
-  const typingRef           = useRef<ReturnType<typeof setInterval> | null>(null)
-  const scrollRef           = useRef<HTMLDivElement>(null)
+  const [typed, setTyped]     = useState('')
+  const typingRef             = useRef<ReturnType<typeof setInterval> | null>(null)
+  const scrollRef             = useRef<HTMLDivElement>(null)
 
   const generate = useCallback(async () => {
     if (loading) return
@@ -965,7 +1078,6 @@ Seja cirúrgico. Use os dados de mercado reais fornecidos. Zero generalidades.`
             </motion.button>
           </div>
         )}
-
         {loading && !typed && (
           <div className="flex items-center gap-2.5 py-6 text-white/20">
             <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}>
@@ -974,7 +1086,6 @@ Seja cirúrgico. Use os dados de mercado reais fornecidos. Zero generalidades.`
             <span className="text-[11px] font-mono">Analisando mercado e gerando plano...</span>
           </div>
         )}
-
         {typed && (
           <div ref={scrollRef} className="font-mono text-[11px] leading-[1.9] max-h-[340px] overflow-y-auto">
             {typed.split('\n').map((line, i) => (
@@ -989,7 +1100,6 @@ Seja cirúrgico. Use os dados de mercado reais fornecidos. Zero generalidades.`
             )}
           </div>
         )}
-
         {typed && !loading && (
           <div className="flex justify-end mt-3">
             <motion.button whileTap={{ scale: 0.96 }} onClick={generate}
@@ -1006,7 +1116,7 @@ Seja cirúrgico. Use os dados de mercado reais fornecidos. Zero generalidades.`
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  8 — IA MARKET INTELLIGENCE
+// ██  IA MARKET INTELLIGENCE
 // ════════════════════════════════════════════════════════════════════════════
 
 const IA_PRESETS = [
@@ -1141,11 +1251,6 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  9 — SIMULAÇÃO DE CENÁRIO
-// ════════════════════════════════════════════════════════════════════════════
-
-
-// ════════════════════════════════════════════════════════════════════════════
 // ██  MAIN
 // ════════════════════════════════════════════════════════════════════════════
 
@@ -1185,9 +1290,12 @@ export default function AbaBusiness() {
     : null
 
   return (
-    <motion.div className="relative flex flex-col gap-8 pb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <motion.div className="relative flex flex-col gap-6 pb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
 
-      {/* 1 — GLOBE HERO */}
+      {/* Nav — 9 domínios */}
+      <DomainNav />
+
+      {/* HERO — Globe ao Vivo */}
       <div>
         <div className="flex items-center justify-between mb-1">
           <SectionLabel label="Mercado Global ao Vivo" sub="indicadores em tempo real" />
@@ -1203,40 +1311,40 @@ export default function AbaBusiness() {
         <GlobeHero data={data} />
       </div>
 
-      {/* 2 — BOLSA & EMPRESAS */}
-      <div>
-        <SectionLabel label="Bolsa & Empresas" sub="B3 + globais" />
+      {/* Domains 01 + 02 */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 440px), 1fr))', gap: 14 }}>
+        <div id="domain-01"><EconomiaCard data={data} /></div>
+        <div id="domain-02"><MercadoBolsaCard data={data} /></div>
+      </div>
+
+      {/* Domain 03 — Empresas */}
+      <div id="domain-03">
+        <SectionLabel label="03 · Empresas" sub="B3 + mercados globais" />
         <MarketPanel data={data} />
       </div>
 
-      {/* 4 — SETORES: ANÁLISE COMPLETA */}
-      <div>
-        <SectionLabel label="Setores: Análise Completa" sub="oportunidades · riscos · como atuar" />
-        <SectorAnalysis sectors={data.sectors} />
+      {/* Domains 04 – 08 */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 440px), 1fr))', gap: 14 }}>
+        <div id="domain-04"><CommoditiesCard data={data} /></div>
+        <div id="domain-05"><FinancasCard data={data} /></div>
+        <div id="domain-06"><MarketingCard data={data} /></div>
+        <div id="domain-07"><SustentabilidadeCard data={data} /></div>
+        <div id="domain-08"><LiderancaCard data={data} /></div>
       </div>
 
-      {/* 5 — CADEIA DE IMPACTO */}
-      <div>
-        <SectionLabel label="Cadeia de Impacto" sub="como cada indicador afeta o ecossistema" />
-        <ImpactChain />
+      {/* Domain 09 — Business */}
+      <div id="domain-09">
+        <SectionLabel label="09 · Business" sub="análise competitiva setorial · onde atacar · onde defender" />
+        <BusinessCard sectors={data.sectors} />
       </div>
 
-      {/* 6 — CRÉDITO PJ */}
+      {/* Executive IA */}
       <div>
-        <SectionLabel label="Crédito PJ" sub="taxas médias BCB/SGS" />
-        <CreditBar data={data} />
-      </div>
-
-      {/* 7 — PLANO DE AÇÃO IA */}
-      <div>
-        <SectionLabel label="Plano de Ação: Hoje" sub="gerado por Groq Compound com dados reais" />
-        <ActionPlan data={data} userSector={userSector} />
-      </div>
-
-      {/* 8 — IA MARKET INTELLIGENCE */}
-      <div>
-        <SectionLabel label="Market Intelligence · IA" sub="pergunte sobre mercado, setores, macro" />
-        <IaAdvisor data={data} userSector={userSector} />
+        <SectionLabel label="Executive Intelligence · IA" sub="análise e plano de ação com dados reais" />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 440px), 1fr))', gap: 14 }}>
+          <ActionPlan data={data} userSector={userSector} />
+          <IaAdvisor data={data} userSector={userSector} />
+        </div>
       </div>
 
     </motion.div>
