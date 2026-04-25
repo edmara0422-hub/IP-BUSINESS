@@ -30,13 +30,12 @@ interface MarketData {
   opportunities?: { id: string; label: string; urgency: number; type: string }[]
   updatedAt: string
 }
+
 // ── Helpers ────────────────────────────────────────────────────────────────
-const fmtBRL = (n: number) =>
-  new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n)
-const fmtK      = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(0)}k` : n.toString()
-const pctColor  = (v: number) => v > 0 ? '#34d399' : v < 0 ? '#f87171' : 'rgba(192,192,192,0.45)'
-const pctSign   = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`
-const clamp     = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n))
+const fmtK     = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(0)}k` : n.toString()
+const pctColor = (v: number) => v > 0 ? '#34d399' : v < 0 ? '#f87171' : 'rgba(192,192,192,0.45)'
+const pctSign  = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`
+const clamp    = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n))
 
 // ── Sparkline ──────────────────────────────────────────────────────────────
 function Sparkline({ id, delta, color, w = 56, h = 20 }: { id: string; delta: number; color: string; w?: number; h?: number }) {
@@ -418,98 +417,19 @@ function GlobeHero({ data }: { data: MarketData }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  MARKET PANEL (B3 + Global)
-// ════════════════════════════════════════════════════════════════════════════
-
-function StockCard({ ticker, label, price, pct, showPrice = true }: {
-  ticker: string; label: string; price?: number; pct: number; showPrice?: boolean
-}) {
-  const col    = pctColor(pct)
-  const isBull = pct > 0.05
-  const isBear = pct < -0.05
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.94 }} whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }} transition={{ duration: 0.3 }}
-      style={{
-        background: isBull ? 'rgba(52,211,153,0.055)' : isBear ? 'rgba(248,113,113,0.055)' : 'rgba(5,5,5,0.88)',
-        border: `1px solid ${col}22`,
-        borderRadius: 14,
-        padding: '11px 13px',
-        overflow: 'hidden',
-        position: 'relative',
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-        <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(200,200,200,0.44)', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{ticker}</span>
-        <span style={{ fontSize: 10, fontFamily: 'monospace', fontWeight: 700, color: col, background: col + '18', border: `1px solid ${col}28`, borderRadius: 99, padding: '1px 7px' }}>{pctSign(pct)}</span>
-      </div>
-      <p style={{ fontSize: 11, color: 'rgba(210,210,210,0.58)', marginBottom: showPrice ? 5 : 7, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</p>
-      {showPrice && price !== undefined && (
-        <p style={{ fontSize: 18, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.92)', marginBottom: 7, lineHeight: 1 }}>R${fmtBRL(price)}</p>
-      )}
-      <Sparkline id={ticker} delta={pct} color={col} w={114} h={28} />
-    </motion.div>
-  )
-}
-
-function MarketPanel({ data }: { data: MarketData }) {
-  const brStocks = data.stocks?.br ?? []
-  const glStocks = data.stocks?.global ?? data.globalAgents?.slice(0, 4).map(a => ({ ticker: a.id.toUpperCase(), label: a.label, pct: a.delta })) ?? []
-  const fallbackBR: StockBR[] = [
-    { ticker: 'PETR4', label: 'Petrobras', price: 36.50, pct: 0 },
-    { ticker: 'VALE3', label: 'Vale',       price: 58.20, pct: 0 },
-    { ticker: 'ITUB4', label: 'Itaú',       price: 27.90, pct: 0 },
-    { ticker: 'BBDC4', label: 'Bradesco',   price: 15.80, pct: 0 },
-    { ticker: 'WEGE3', label: 'WEG',        price: 50.10, pct: 0 },
-  ]
-  const allGlobal = [
-    ...glStocks.slice(0, 4),
-    { ticker: 'XAU',  label: 'Ouro',     pct: data.commodities.gold?.delta ?? 0 },
-    { ticker: 'CL=F', label: 'Petróleo', pct: data.commodities.oil?.delta  ?? 0 },
-  ]
-  const brList = brStocks.length > 0 ? brStocks : fallbackBR
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(195,195,195,0.28)' }}>Bolsa BR · B3</span>
-          <motion.div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }}
-            animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} />
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(138px, 1fr))', gap: 8 }}>
-          {brList.map(s => <StockCard key={s.ticker} ticker={s.ticker} label={s.label} price={(s as StockBR).price} pct={s.pct} />)}
-        </div>
-      </div>
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(195,195,195,0.28)' }}>Mercados Globais</span>
-          <motion.div style={{ width: 6, height: 6, borderRadius: '50%', background: '#60a5fa' }}
-            animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2.4, repeat: Infinity }} />
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 8 }}>
-          {allGlobal.map(s => <StockCard key={s.ticker} ticker={s.ticker} label={s.label} pct={s.pct} showPrice={false} />)}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-// ██  DOMAIN NAV — barra de navegação dos 9 temas
+// ██  DOMAIN NAV
 // ════════════════════════════════════════════════════════════════════════════
 
 const DOMAIN_NAV = [
-  { num: '01', label: 'Economia',        id: 'domain-01' },
-  { num: '02', label: 'Mercado & Bolsa', id: 'domain-02' },
-  { num: '03', label: 'Empresas',        id: 'domain-03' },
-  { num: '04', label: 'Commodities',     id: 'domain-04' },
-  { num: '05', label: 'Finanças',        id: 'domain-05' },
-  { num: '06', label: 'Marketing',       id: 'domain-06' },
-  { num: '07', label: 'Sust.',           id: 'domain-07' },
-  { num: '08', label: 'Liderança',       id: 'domain-08' },
-  { num: '09', label: 'Business',        id: 'domain-09' },
+  { num: '01', label: 'Macro',        id: 'section-macro' },
+  { num: '02', label: 'Mercado',      id: 'section-mercado' },
+  { num: '03', label: 'B3',           id: 'section-b3' },
+  { num: '04', label: 'Commodities',  id: 'section-commodities' },
+  { num: '05', label: 'Crédito PJ',   id: 'section-credito' },
+  { num: '06', label: 'Setores',      id: 'section-setores' },
+  { num: '07', label: 'Marketing',    id: 'section-intel' },
+  { num: '08', label: 'Sust.',        id: 'section-intel' },
+  { num: '09', label: 'Business IA',  id: 'section-ia' },
 ]
 
 function DomainNav() {
@@ -530,7 +450,7 @@ function DomainNav() {
       scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' as React.CSSProperties['WebkitOverflowScrolling'],
     }}>
       {DOMAIN_NAV.map(d => (
-        <button key={d.id} onClick={() => scrollTo(d.id)}
+        <button key={d.num} onClick={() => scrollTo(d.id)}
           style={{
             display: 'flex', alignItems: 'center', gap: 6,
             padding: '6px 13px', borderRadius: 99, flexShrink: 0, cursor: 'pointer',
@@ -548,132 +468,255 @@ function DomainNav() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  DOMAIN CARD — base wrapper
+// ██  TICKER STRIP
 // ════════════════════════════════════════════════════════════════════════════
 
-interface KPIItem { label: string; value: string; delta?: number; sub?: string; color?: string }
-
-function DomainCard({
-  num, label, badge, badgeColor, kpis, decisao, decisaoColor, children,
-}: {
-  num: string; label: string
-  badge?: string; badgeColor?: string
-  kpis?: KPIItem[]
-  decisao: string; decisaoColor: string
-  children?: React.ReactNode
-}) {
+function TickerStrip({ data }: { data: MarketData }) {
+  const ibov = data.stocks?.ibov
+  const items = [
+    { label: 'SELIC',     value: `${data.macro.selic.value}%`,         delta: 0 },
+    { label: 'IPCA',      value: `${data.macro.ipca.value}%`,          delta: data.macro.ipca.delta },
+    { label: 'USD/BRL',   value: `R$${data.macro.usdBrl.value}`,       delta: data.macro.usdBrl.delta },
+    { label: 'PIB',       value: `${data.macro.pib.value}%`,           delta: data.macro.pib.delta },
+    { label: 'IBOVESPA',  value: fmtK(ibov?.value ?? 128000),          delta: ibov?.pct ?? 0 },
+    { label: 'PETRÓLEO',  value: `$${data.commodities.oil?.value ?? '—'}`,   delta: data.commodities.oil?.delta ?? 0 },
+    { label: 'OURO',      value: `$${data.commodities.gold?.value ?? '—'}`,  delta: data.commodities.gold?.delta ?? 0 },
+    { label: 'PRATA',     value: `$${data.commodities.silver?.value ?? '—'}`, delta: data.commodities.silver?.delta ?? 0 },
+  ]
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }} transition={{ duration: 0.38 }}
-      style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}
-    >
-      {/* Header */}
-      <div style={{ padding: '13px 18px 11px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ fontSize: 7.5, fontFamily: 'monospace', color: 'rgba(195,195,195,0.18)', letterSpacing: '0.2em' }}>{num}</span>
-        <div style={{ width: 1, height: 10, background: 'rgba(200,200,200,0.10)', flexShrink: 0 }} />
-        <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(195,195,195,0.42)', fontWeight: 700 }}>{label}</span>
-        {badge && badgeColor && (
-          <span style={{ marginLeft: 'auto', fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: badgeColor, background: badgeColor + '18', border: `1px solid ${badgeColor}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{badge}</span>
-        )}
-      </div>
-      {/* KPIs */}
-      {kpis && kpis.length > 0 && (
-        <div style={{ padding: '16px 18px 14px', display: 'grid', gridTemplateColumns: `repeat(${Math.min(kpis.length, 4)}, 1fr)`, gap: 16, borderBottom: children ? '1px solid rgba(200,200,200,0.05)' : 'none' }}>
-          {kpis.map(k => {
-            const col = k.color ?? (k.delta !== undefined ? pctColor(k.delta) : 'rgba(235,235,235,0.88)')
-            return (
-              <div key={k.label}>
-                <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(195,195,195,0.24)', marginBottom: 5 }}>{k.label}</p>
-                <p style={{ fontSize: 22, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.90)', lineHeight: 1, marginBottom: 4 }}>{k.value}</p>
-                {k.sub && <p style={{ fontSize: 9, fontFamily: 'monospace', color: col, fontWeight: k.delta !== undefined ? 700 : 400 }}>{k.sub}</p>}
+    <div style={{ background: 'rgba(4,4,4,0.98)', borderBottom: '1px solid rgba(200,200,200,0.06)', overflow: 'hidden' }}>
+      <motion.div
+        style={{ display: 'flex', gap: 0, whiteSpace: 'nowrap' }}
+        animate={{ x: ['0%', '-50%'] }}
+        transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
+      >
+        {[...items, ...items].map((item, i) => {
+          const col = item.delta !== 0 ? pctColor(item.delta) : 'rgba(192,192,192,0.35)'
+          return (
+            <div key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 22px', borderRight: '1px solid rgba(200,200,200,0.05)' }}>
+              <span style={{ fontSize: 7, fontFamily: 'monospace', color: 'rgba(192,192,192,0.26)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>{item.label}</span>
+              <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(228,228,228,0.85)' }}>{item.value}</span>
+              {item.delta !== 0 && (
+                <span style={{ fontSize: 8.5, fontFamily: 'monospace', fontWeight: 700, color: col }}>{pctSign(item.delta)}</span>
+              )}
+            </div>
+          )
+        })}
+      </motion.div>
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  AREA CHART
+// ════════════════════════════════════════════════════════════════════════════
+
+function AreaChart({ id, delta, color = '#34d399' }: { id: string; delta: number; color?: string }) {
+  const POINTS = 60
+  const W = 600, H = 140, PAD = 8
+  const cw = W - PAD * 2, ch = H - PAD * 2
+
+  const pts = useMemo(() => {
+    let seed = 0
+    const key = id + new Date().toDateString()
+    for (const c of key) seed = (Math.imul(31, seed) + c.charCodeAt(0)) | 0
+    const raw: number[] = []
+    for (let i = 0; i < POINTS; i++) {
+      seed = (Math.imul(1664525, seed) + 1013904223) | 0
+      const r = (Math.abs(seed) % 1000) / 1000
+      const trend = (delta / 100) * (i / (POINTS - 1))
+      raw.push(clamp(r * 0.55 + 0.225 + trend, 0.05, 0.95))
+    }
+    const mn = Math.min(...raw), mx = Math.max(...raw), rng = mx - mn || 0.1
+    return raw.map(v => (v - mn) / rng)
+  }, [id, delta])
+
+  const coords = pts.map((v, i) => ({ x: PAD + (i / (POINTS - 1)) * cw, y: PAD + (1 - v) * ch }))
+  const linePath = coords.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
+  const areaPath = `${linePath} L ${(PAD + cw).toFixed(1)},${(PAD + ch).toFixed(1)} L ${PAD},${(PAD + ch).toFixed(1)} Z`
+  const last = coords[coords.length - 1]
+  const gradId = `ag-${id}`
+
+  const safeColor = color.startsWith('rgba') ? '#c0c0c0' : color
+
+  return (
+    <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={safeColor} stopOpacity="0.22" />
+          <stop offset="88%" stopColor={safeColor} stopOpacity="0.01" />
+        </linearGradient>
+      </defs>
+      {[0.25, 0.5, 0.75].map(v => (
+        <line key={v} x1={PAD} y1={PAD + v * ch} x2={PAD + cw} y2={PAD + v * ch}
+          stroke="rgba(200,200,200,0.05)" strokeWidth="1" />
+      ))}
+      <path d={areaPath} fill={`url(#${gradId})`} />
+      <motion.path d={linePath} fill="none" stroke={safeColor} strokeWidth="1.8"
+        strokeLinecap="round" strokeLinejoin="round"
+        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+        transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }} />
+      <circle cx={last.x} cy={last.y} r="3.5" fill={safeColor} />
+      <circle cx={last.x} cy={last.y} r="6.5" fill={safeColor} opacity="0.18" />
+    </svg>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  MARKET CHART PANEL
+// ════════════════════════════════════════════════════════════════════════════
+
+function MarketChartPanel({ data }: { data: MarketData }) {
+  const [activeIdx, setActiveIdx] = useState('ibov')
+  const ibov = data.stocks?.ibov
+
+  const indices = [
+    { id: 'ibov',  label: 'IBOV',      value: fmtK(ibov?.value ?? 128000),                    delta: ibov?.pct ?? 0 },
+    { id: 'usd',   label: 'USD/BRL',   value: `R$${data.macro.usdBrl.value}`,                  delta: data.macro.usdBrl.delta },
+    { id: 'gold',  label: 'OURO',      value: `$${data.commodities.gold?.value ?? '—'}`,       delta: data.commodities.gold?.delta ?? 0 },
+    { id: 'oil',   label: 'PETRÓLEO',  value: `$${data.commodities.oil?.value ?? '—'}`,        delta: data.commodities.oil?.delta ?? 0 },
+  ]
+
+  const active = indices.find(i => i.id === activeIdx) ?? indices[0]
+  const chartColor = active.delta > 0 ? '#34d399' : active.delta < 0 ? '#f87171' : '#c0c0c0'
+
+  return (
+    <div style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
+      <div style={{ padding: '12px 16px 10px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+        {indices.map(idx => {
+          const isActive = activeIdx === idx.id
+          const col = pctColor(idx.delta)
+          return (
+            <button key={idx.id} onClick={() => setActiveIdx(idx.id)}
+              style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '6px 11px', borderRadius: 9, cursor: 'pointer', background: isActive ? 'rgba(200,200,200,0.08)' : 'transparent', border: `1px solid ${isActive ? 'rgba(200,200,200,0.16)' : 'transparent'}`, transition: 'all 0.15s' }}>
+              <div>
+                <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.32)', marginBottom: 1 }}>{idx.label}</p>
+                <p style={{ fontSize: 13, fontWeight: 800, fontFamily: 'monospace', color: isActive ? 'rgba(235,235,235,0.95)' : 'rgba(200,200,200,0.40)', lineHeight: 1 }}>{idx.value}</p>
               </div>
-            )
-          })}
-        </div>
-      )}
-      {children && <div style={{ borderBottom: '1px solid rgba(200,200,200,0.05)' }}>{children}</div>}
-      {/* DECISÃO */}
-      <div style={{ padding: '11px 18px 13px', display: 'flex', alignItems: 'flex-start', gap: 9 }}>
-        <div style={{ width: 6, height: 6, borderRadius: '50%', background: decisaoColor, marginTop: 4, flexShrink: 0 }} />
-        <p style={{ fontSize: 11.5, color: 'rgba(210,210,210,0.58)', lineHeight: 1.65 }}>
-          <span style={{ fontFamily: 'monospace', fontSize: 7.5, textTransform: 'uppercase', letterSpacing: '0.22em', color: 'rgba(195,195,195,0.22)', marginRight: 8 }}>DECISÃO</span>
-          {decisao}
-        </p>
+              <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: col }}>{pctSign(idx.delta)}</span>
+            </button>
+          )
+        })}
+      </div>
+      <div style={{ padding: '10px 14px 12px' }}>
+        <AnimatePresence mode="wait">
+          <motion.div key={activeIdx} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+            <AreaChart id={activeIdx} delta={active.delta} color={chartColor} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  STOCK LIST
+// ════════════════════════════════════════════════════════════════════════════
+
+function StockList({ stocks }: { stocks: { ticker: string; label: string; price?: number; pct: number }[] }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {stocks.map((s, i) => {
+        const col = pctColor(s.pct)
+        return (
+          <motion.div key={s.ticker}
+            initial={{ opacity: 0, x: 8 }} whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }} transition={{ delay: i * 0.04 }}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: 'rgba(255,255,255,0.02)', borderRadius: 8, borderLeft: `2px solid ${col}35` }}
+          >
+            <span style={{ width: 46, fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(200,200,200,0.50)', textTransform: 'uppercase', flexShrink: 0 }}>{s.ticker}</span>
+            <span style={{ flex: 1, fontSize: 9.5, color: 'rgba(200,200,200,0.32)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.label}</span>
+            {s.price !== undefined && (
+              <span style={{ fontSize: 11.5, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(220,220,220,0.75)', flexShrink: 0 }}>R${s.price.toFixed(2)}</span>
+            )}
+            <span style={{ fontSize: 9.5, fontFamily: 'monospace', fontWeight: 700, color: col, flexShrink: 0, minWidth: 52, textAlign: 'right' }}>{pctSign(s.pct)}</span>
+            <div style={{ width: 34, flexShrink: 0 }}><Sparkline id={s.ticker} delta={s.pct} color={col} w={34} h={16} /></div>
+          </motion.div>
+        )
+      })}
+    </div>
+  )
+}
+
+function StockListPanel({ data }: { data: MarketData }) {
+  const brStocks = data.stocks?.br ?? []
+  const fallback: StockBR[] = [
+    { ticker: 'PETR4', label: 'Petrobras',  price: 36.50, pct: 0 },
+    { ticker: 'VALE3', label: 'Vale',        price: 58.20, pct: 0 },
+    { ticker: 'ITUB4', label: 'Itaú Unib.',  price: 27.90, pct: 0 },
+    { ticker: 'BBDC4', label: 'Bradesco',    price: 15.80, pct: 0 },
+    { ticker: 'WEGE3', label: 'WEG',         price: 50.10, pct: 0 },
+    { ticker: 'MGLU3', label: 'Magazine Luiza', price: 8.40, pct: 0 },
+  ]
+  const list = brStocks.length > 0 ? brStocks : fallback
+
+  return (
+    <div style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden', height: '100%' }}>
+      <div style={{ padding: '12px 14px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>B3 · Ações</span>
+        <motion.div style={{ width: 5, height: 5, borderRadius: '50%', background: '#34d399', marginLeft: 2 }}
+          animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} />
+      </div>
+      <div style={{ padding: '8px 10px 10px' }}>
+        <StockList stocks={list} />
+      </div>
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  MACRO STATS PANEL
+// ════════════════════════════════════════════════════════════════════════════
+
+function MacroStatsPanel({ data }: { data: MarketData }) {
+  const { selic, ipca, usdBrl, pib } = data.macro
+  const signal =
+    selic.value > 13 && ipca.value > 5 ? { label: 'APERTO',  color: '#f87171' } :
+    selic.value > 10 || ipca.value > 4  ? { label: 'CAUTELA', color: '#fbbf24' } :
+    { label: 'ESTÁVEL', color: '#34d399' }
+  const decisao =
+    selic.value > 13
+      ? `SELIC ${selic.value}% + IPCA ${ipca.value}% comprimem margens. Revise custo de capital e evite novos financiamentos de longo prazo.`
+      : selic.value > 10
+      ? `SELIC ${selic.value}% — crédito caro. Priorize capital próprio. Câmbio R$${usdBrl.value} exige atenção em insumos importados.`
+      : `Juros controlados e PIB ${pib.value}% — janela para expansão. Acesse BNDES e Pronampe.`
+
+  const stats = [
+    { label: 'SELIC',   value: `${selic.value}%`,   sub: 'ao ano',     color: selic.value > 13 ? '#f87171' : selic.value > 10 ? '#fbbf24' : '#34d399' },
+    { label: 'IPCA',    value: `${ipca.value}%`,    sub: '12m · IBGE', color: ipca.value > 5 ? '#f87171' : ipca.value > 3.5 ? '#fbbf24' : '#34d399' },
+    { label: 'USD/BRL', value: `R$${usdBrl.value}`, sub: pctSign(usdBrl.delta), color: pctColor(usdBrl.delta) },
+    { label: 'PIB',     value: `${pib.value}%`,     sub: 'projeção Focus', color: pctColor(pib.delta) },
+  ]
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.38 }}
+      style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
+      <div style={{ padding: '11px 16px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>Macro · 01</span>
+        <span style={{ marginLeft: 'auto', fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{signal.label}</span>
+      </div>
+      <div style={{ padding: '14px 16px 10px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        {stats.map(s => (
+          <div key={s.label}>
+            <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.24)', marginBottom: 3 }}>{s.label}</p>
+            <p style={{ fontSize: 22, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.90)', lineHeight: 1, marginBottom: 3 }}>{s.value}</p>
+            <p style={{ fontSize: 9, fontFamily: 'monospace', color: s.color, fontWeight: 600 }}>{s.sub}</p>
+          </div>
+        ))}
+      </div>
+      <div style={{ padding: '10px 16px 13px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+        <div style={{ width: 5, height: 5, borderRadius: '50%', background: signal.color, marginTop: 4, flexShrink: 0 }} />
+        <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.44)', lineHeight: 1.65 }}>{decisao}</p>
       </div>
     </motion.div>
   )
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  01 — ECONOMIA
+// ██  COMMODITIES STATS PANEL
 // ════════════════════════════════════════════════════════════════════════════
 
-function EconomiaCard({ data }: { data: MarketData }) {
-  const { selic, ipca, usdBrl, pib } = data.macro
-  const signal =
-    selic.value > 13 && ipca.value > 5 ? { label: 'APERTO', color: '#f87171' } :
-    selic.value > 10 || ipca.value > 4  ? { label: 'CAUTELA', color: '#fbbf24' } :
-    { label: 'ESTÁVEL', color: '#34d399' }
-  const decisao =
-    selic.value > 13
-      ? `SELIC ${selic.value}% + IPCA ${ipca.value}% comprimem margens. Revise custo de capital, negocie prazos com fornecedores e evite novos financiamentos de longo prazo.`
-      : selic.value > 10
-      ? `SELIC ${selic.value}% — crédito ainda caro. Priorize capital próprio para expansão. Câmbio R$${usdBrl.value} exige atenção em insumos importados.`
-      : `Juros controlados e PIB projetado em ${pib.value}% — janela para expansão. Acesse BNDES e Pronampe antes que o ciclo mude.`
-  return (
-    <DomainCard num="01" label="Economia" badge={signal.label} badgeColor={signal.color}
-      kpis={[
-        { label: 'SELIC',   value: `${selic.value}%`,  sub: 'ao ano · COPOM',   color: selic.value > 13 ? '#f87171' : selic.value > 10 ? '#fbbf24' : '#34d399' },
-        { label: 'IPCA',    value: `${ipca.value}%`,   sub: '12m · IBGE',        color: ipca.value > 5 ? '#f87171' : ipca.value > 3.5 ? '#fbbf24' : '#34d399' },
-        { label: 'USD/BRL', value: `R$${usdBrl.value}`, sub: pctSign(usdBrl.delta), delta: usdBrl.delta },
-        { label: 'PIB',     value: `${pib.value}%`,    sub: 'projeção Focus',    delta: pib.delta },
-      ]}
-      decisao={decisao} decisaoColor={signal.color}
-    />
-  )
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-// ██  02 — MERCADO & BOLSA
-// ════════════════════════════════════════════════════════════════════════════
-
-function MercadoBolsaCard({ data }: { data: MarketData }) {
-  const ibov    = data.stocks?.ibov
-  const ibovPct = ibov?.pct ?? 0
-  const agents  = data.globalAgents ?? []
-  const signal  =
-    ibovPct < -1.5 ? { label: 'QUEDA',   color: '#f87171' } :
-    ibovPct >  1.5 ? { label: 'ALTA',    color: '#34d399' } :
-    { label: 'LATERAL', color: '#fbbf24' }
-  const decisao =
-    ibovPct < -1.5
-      ? 'Bolsa em queda — risco de contração de crédito e fuga de capital. Revise valuation de ativos e monitore posições em renda variável.'
-      : ibovPct > 1.5
-      ? `IBOVESPA em alta (+${ibovPct.toFixed(1)}%) — apetite por risco elevado. Boa janela para captação e M&A via equity.`
-      : 'Mercado lateral — aguarde definição de tendência antes de decisões estruturais de capital. Foco em eficiência operacional.'
-  const kpis: KPIItem[] = [
-    { label: 'IBOVESPA', value: fmtK(ibov?.value ?? 128000), sub: pctSign(ibovPct), delta: ibovPct },
-    ...agents.slice(0, 2).map(a => ({
-      label: a.label.toUpperCase().slice(0, 10),
-      value: pctSign(a.delta),
-      sub: a.impact.slice(0, 20),
-      delta: a.delta,
-    })),
-    { label: 'SENTIMENTO', value: signal.label, sub: 'consenso do dia', color: signal.color },
-  ]
-  return (
-    <DomainCard num="02" label="Mercado & Bolsa" badge={signal.label} badgeColor={signal.color}
-      kpis={kpis.slice(0, 4)} decisao={decisao} decisaoColor={signal.color}
-    />
-  )
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-// ██  04 — COMMODITIES
-// ════════════════════════════════════════════════════════════════════════════
-
-function CommoditiesCard({ data }: { data: MarketData }) {
+function CommoditiesStatsPanel({ data }: { data: MarketData }) {
   const oil    = data.commodities.oil
   const gold   = data.commodities.gold
   const silver = data.commodities.silver
@@ -685,28 +728,55 @@ function CommoditiesCard({ data }: { data: MarketData }) {
     { label: 'ESTÁVEL', color: '#34d399' }
   const decisao =
     oilDelta > 2
-      ? `Petróleo +${oilDelta.toFixed(1)}% pressiona frete, energia e plásticos. Renegocie contratos logísticos e revise repasse de custos na precificação agora.`
+      ? `Petróleo +${oilDelta.toFixed(1)}% pressiona frete e energia. Renegocie contratos logísticos e revise repasse de custos na precificação.`
       : goldDelta > 1.5
       ? 'Alta do ouro sinaliza aversão a risco global. Revise exposição cambial e considere hedge para operações em dólar.'
-      : 'Commodities estáveis — janela para fixar contratos de insumos ao preço atual antes de nova volatilidade.'
+      : 'Commodities estáveis — fixe contratos de insumos ao preço atual antes de nova volatilidade.'
+
+  const items = [
+    { id: 'oil',    label: 'PETRÓLEO', value: oil?.value    ? `$${oil.value}`    : '—', delta: oilDelta,          unit: 'USD/barril' },
+    { id: 'gold',   label: 'OURO',     value: gold?.value   ? `$${gold.value}`   : '—', delta: goldDelta,         unit: 'USD/onça' },
+    { id: 'silver', label: 'PRATA',    value: silver?.value ? `$${silver.value}` : '—', delta: silver?.delta ?? 0, unit: 'USD/onça' },
+  ]
+
   return (
-    <DomainCard num="04" label="Commodities" badge={signal.label} badgeColor={signal.color}
-      kpis={[
-        { label: 'PETRÓLEO', value: oil?.value  ? `$${oil.value}`    : '—', sub: oil?.delta    !== undefined ? pctSign(oil.delta)    : '—', delta: oilDelta },
-        { label: 'OURO',     value: gold?.value ? `$${gold.value}`   : '—', sub: gold?.delta   !== undefined ? pctSign(gold.delta)   : '—', delta: goldDelta },
-        { label: 'PRATA',    value: silver?.value ? `$${silver.value}` : '—', sub: silver?.delta !== undefined ? pctSign(silver.delta) : '—', delta: silver?.delta ?? 0 },
-        { label: 'ÍNDICE',   value: 'BCom', sub: 'commodities global', color: 'rgba(195,195,195,0.45)' },
-      ]}
-      decisao={decisao} decisaoColor={signal.color}
-    />
+    <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.38, delay: 0.06 }}
+      style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
+      <div style={{ padding: '11px 16px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>Commodities · 04</span>
+        <span style={{ marginLeft: 'auto', fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{signal.label}</span>
+      </div>
+      <div style={{ padding: '12px 16px 8px', display: 'flex', flexDirection: 'column', gap: 11 }}>
+        {items.map(item => {
+          const col = item.delta !== 0 ? pctColor(item.delta) : '#c0c0c0'
+          return (
+            <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.26)', marginBottom: 2 }}>{item.label}</p>
+                <p style={{ fontSize: 18, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.88)', lineHeight: 1 }}>{item.value}</p>
+                <p style={{ fontSize: 8.5, color: 'rgba(192,192,192,0.28)', marginTop: 1 }}>{item.unit}</p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                <Sparkline id={item.id} delta={item.delta} color={col} w={46} h={20} />
+                <span style={{ fontSize: 9.5, fontFamily: 'monospace', fontWeight: 700, color: col }}>{pctSign(item.delta)}</span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+      <div style={{ padding: '10px 16px 13px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+        <div style={{ width: 5, height: 5, borderRadius: '50%', background: signal.color, marginTop: 4, flexShrink: 0 }} />
+        <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.44)', lineHeight: 1.65 }}>{decisao}</p>
+      </div>
+    </motion.div>
   )
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  05 — FINANÇAS
+// ██  CREDIT STATS PANEL
 // ════════════════════════════════════════════════════════════════════════════
 
-function FinancasCard({ data }: { data: MarketData }) {
+function CreditStatsPanel({ data }: { data: MarketData }) {
   const rates = data.creditRates
   const selic = data.macro.selic.value
   const items = rates ? [
@@ -716,148 +786,71 @@ function FinancasCard({ data }: { data: MarketData }) {
     { label: 'Indústria', value: rates.industria?.value ?? 0 },
     { label: 'Agro',      value: rates.agro?.value      ?? 0 },
   ] : []
-  const valid   = items.filter(i => i.value > 0)
-  const avgRate = valid.length > 0 ? valid.reduce((s, i) => s + i.value, 0) / valid.length : selic + 15
-  const signal  =
+  const valid    = items.filter(i => i.value > 0)
+  const avgRate  = valid.length > 0 ? valid.reduce((s, i) => s + i.value, 0) / valid.length : selic + 15
+  const signal   =
     avgRate > 28 ? { label: 'CARO',       color: '#f87171' } :
     avgRate > 18 ? { label: 'MODERADO',   color: '#fbbf24' } :
     { label: 'ACESSÍVEL', color: '#34d399' }
-  const decisao =
+  const decisao  =
     avgRate > 28
-      ? `Crédito PJ médio ${avgRate.toFixed(0)}% a.a. — evite financiar capital de giro com dívida bancária. Use adiantamento de recebíveis (FIDC/factoring).`
+      ? `Crédito PJ médio ${avgRate.toFixed(0)}% a.a. — use adiantamento de recebíveis (FIDC/factoring) em vez de dívida bancária.`
       : avgRate > 18
-      ? 'Taxas moderadas — acesse BNDES e linhas com FGI para reduzir spread. Compare antes de contratar.'
-      : 'Crédito acessível — refinancie dívidas caras e estenda prazo de capital de giro enquanto as taxas permitem.'
+      ? 'Taxas moderadas — acesse BNDES e linhas com FGI para reduzir spread antes de contratar.'
+      : 'Crédito acessível — refinancie dívidas caras e estenda prazo de capital de giro agora.'
   const maxR = valid.length > 0 ? Math.max(...valid.map(i => i.value), 1) : 40
+
   return (
-    <DomainCard num="05" label="Finanças" badge={signal.label} badgeColor={signal.color}
-      kpis={[
-        { label: 'SELIC',      value: `${selic}%`,              sub: 'custo-base BCB',  color: selic > 13 ? '#f87171' : '#fbbf24' },
-        { label: 'SPREAD PJ',  value: `+${(avgRate - selic).toFixed(0)}pp`, sub: 'acima da SELIC', color: 'rgba(195,195,195,0.55)' },
-        { label: 'TAXA MÉDIA', value: `${avgRate.toFixed(1)}%`, sub: 'crédito PJ a.a.', color: signal.color },
-      ]}
-      decisao={decisao} decisaoColor={signal.color}
-    >
+    <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.38, delay: 0.12 }}
+      style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
+      <div style={{ padding: '11px 16px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>Crédito PJ · 05</span>
+        <span style={{ marginLeft: 'auto', fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{signal.label}</span>
+      </div>
+      <div style={{ padding: '12px 16px 6px', display: 'flex', gap: 14, alignItems: 'flex-end' }}>
+        <div>
+          <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.24)', marginBottom: 2 }}>Taxa Média</p>
+          <p style={{ fontSize: 26, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.90)', lineHeight: 1 }}>{avgRate.toFixed(1)}%</p>
+          <p style={{ fontSize: 8.5, color: 'rgba(192,192,192,0.28)', marginTop: 2 }}>a.a. · crédito PJ</p>
+        </div>
+        <div>
+          <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.24)', marginBottom: 2 }}>Spread SELIC</p>
+          <p style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: signal.color }}>+{(avgRate - selic).toFixed(0)} pp</p>
+        </div>
+      </div>
       {valid.length > 0 && (
-        <div style={{ padding: '10px 18px 14px' }}>
+        <div style={{ padding: '8px 16px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
           {valid.map((item, idx) => {
             const rc = item.value > 28 ? '#f87171' : item.value > 18 ? '#fbbf24' : '#34d399'
             return (
               <motion.div key={item.label}
                 initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
                 viewport={{ once: true }} transition={{ delay: idx * 0.06 }}
-                style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: idx < valid.length - 1 ? 8 : 0 }}
-              >
-                <span style={{ fontSize: 8.5, fontFamily: 'monospace', color: 'rgba(195,195,195,0.30)', width: 64, flexShrink: 0 }}>{item.label}</span>
-                <div style={{ flex: 1, height: 5, background: 'rgba(200,200,200,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+                style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 8, fontFamily: 'monospace', color: 'rgba(192,192,192,0.28)', width: 60, flexShrink: 0 }}>{item.label}</span>
+                <div style={{ flex: 1, height: 4, background: 'rgba(200,200,200,0.06)', borderRadius: 2, overflow: 'hidden' }}>
                   <motion.div
                     initial={{ width: 0 }} whileInView={{ width: `${(item.value / maxR) * 100}%` }}
                     viewport={{ once: true }} transition={{ duration: 0.9, delay: idx * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                    style={{ height: '100%', borderRadius: 3, background: `linear-gradient(90deg, ${rc}50, ${rc})` }}
+                    style={{ height: '100%', borderRadius: 2, background: `linear-gradient(90deg, ${rc}50, ${rc})` }}
                   />
                 </div>
-                <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: rc, width: 44, textAlign: 'right', flexShrink: 0 }}>{item.value}%</span>
+                <span style={{ fontSize: 10.5, fontFamily: 'monospace', fontWeight: 700, color: rc, width: 38, textAlign: 'right', flexShrink: 0 }}>{item.value}%</span>
               </motion.div>
             )
           })}
         </div>
       )}
-    </DomainCard>
+      <div style={{ padding: '10px 16px 13px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+        <div style={{ width: 5, height: 5, borderRadius: '50%', background: signal.color, marginTop: 4, flexShrink: 0 }} />
+        <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.44)', lineHeight: 1.65 }}>{decisao}</p>
+      </div>
+    </motion.div>
   )
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  06 — MARKETING
-// ════════════════════════════════════════════════════════════════════════════
-
-function MarketingCard({ data }: { data: MarketData }) {
-  const { ipca, pib, selic } = data.macro
-  const retail = data.sectors.find(s => s.id === 'retail')
-  const media  = data.sectors.find(s => s.id === 'media')
-  const icc    = Math.round(clamp(60 + pib.value * 4 - ipca.value * 3 - (selic.value - 10) * 1.5, 20, 90))
-  const iccCol = icc >= 65 ? '#34d399' : icc >= 50 ? '#fbbf24' : '#f87171'
-  const signal = icc >= 65 ? { label: 'AQUECIDA', color: '#34d399' } : icc >= 50 ? { label: 'MODERADA', color: '#fbbf24' } : { label: 'RETRAÍDA', color: '#f87171' }
-  const decisao =
-    icc >= 65
-      ? 'Confiança elevada — invista em aquisição agora. CAC tende a ser mais eficiente em ciclos de expansão de consumo.'
-      : icc >= 50
-      ? `IPCA ${ipca.value}% comprime poder de compra. Enfatize custo-benefício, parcelamento e valor percebido na comunicação.`
-      : 'Demanda retraída — priorize retenção e LTV sobre aquisição. Campanhas de fidelização têm ROI superior neste ciclo.'
-  return (
-    <DomainCard num="06" label="Marketing" badge={signal.label} badgeColor={signal.color}
-      kpis={[
-        { label: 'CONF. CONSUMIDOR', value: String(icc),                sub: 'índice proxy IPB',  color: iccCol },
-        { label: 'DEMANDA ONLINE',   value: String(retail?.heat ?? 55), sub: '/100 · heat score', color: pctColor(retail?.change ?? 0) },
-        { label: 'PRESSÃO PREÇO',    value: `${ipca.value}%`,           sub: 'IPCA 12m',          color: ipca.value > 5 ? '#f87171' : '#fbbf24' },
-        { label: 'MÍDIA DIGITAL',    value: String(media?.heat ?? 58),  sub: '/100 · heat score', color: pctColor(media?.change ?? 0) },
-      ]}
-      decisao={decisao} decisaoColor={signal.color}
-    />
-  )
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-// ██  07 — SUSTENTABILIDADE
-// ════════════════════════════════════════════════════════════════════════════
-
-function SustentabilidadeCard({ data }: { data: MarketData }) {
-  const energy = data.sectors.find(s => s.id === 'energy')
-  const agro   = data.sectors.find(s => s.id === 'agro')
-  const green  = Math.round(clamp(((energy?.heat ?? 55) + (agro?.heat ?? 50)) / 2 + 5, 10, 95))
-  const rc     = green < 50 ? '#f87171' : green < 70 ? '#fbbf24' : '#34d399'
-  const risk   = green < 50 ? 'ALTO' : green < 70 ? 'MÉDIO' : 'BAIXO'
-  const decisao =
-    green < 50
-      ? 'Risco ESG elevado — acesse crédito verde (LCA, CRA) para reduzir custo de capital e ampliar acesso a investidores institucionais.'
-      : green < 70
-      ? 'Perfil ESG moderado. Implemente relatório GRI/SASB para acessar capital verde com spread 15–25% menor que linhas convencionais.'
-      : 'Bom score ESG — capitalize na narrativa para green bonds e fundos de impacto com menor custo de capital.'
-  return (
-    <DomainCard num="07" label="Sustentabilidade" badge={`RISCO ${risk}`} badgeColor={rc}
-      kpis={[
-        { label: 'GREEN SCORE',   value: String(green),                 sub: '/100 · proxy IPB',  color: rc },
-        { label: 'ENERGIA',       value: String(energy?.heat ?? '—'),   sub: '/100 · heat score', color: pctColor(energy?.change ?? 0) },
-        { label: 'AGRO SUST.',    value: String(agro?.heat ?? '—'),     sub: '/100 · heat score', color: pctColor(agro?.change ?? 0) },
-        { label: 'CRÉDITO VERDE', value: 'LCA/CRA',                     sub: 'acesso disponível', color: '#34d399' },
-      ]}
-      decisao={decisao} decisaoColor={rc}
-    />
-  )
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-// ██  08 — LIDERANÇA
-// ════════════════════════════════════════════════════════════════════════════
-
-function LiderancaCard({ data }: { data: MarketData }) {
-  const { ipca, pib } = data.macro
-  const tech     = data.sectors.find(s => s.id === 'tech')
-  const services = data.sectors.find(s => s.id === 'services')
-  const desemp   = clamp(6.5 - pib.value * 0.4, 4.5, 12).toFixed(1)
-  const salPress = ipca.value > 4.5 ? 'ALTA' : ipca.value > 3 ? 'MÉDIA' : 'BAIXA'
-  const salCol   = ipca.value > 4.5 ? '#f87171' : ipca.value > 3 ? '#fbbf24' : '#34d399'
-  const signal   = ipca.value > 5 ? { label: 'PRESSÃO SAL.', color: '#f87171' } : pib.value > 2 ? { label: 'AQUECIDO', color: '#fbbf24' } : { label: 'ESTÁVEL', color: '#34d399' }
-  const decisao  =
-    ipca.value > 5
-      ? `IPCA ${ipca.value}% gera pressão salarial no dissídio. Antecipe revisões e implemente benefícios não-monetários para reter talentos sem pressionar folha.`
-      : pib.value > 2
-      ? 'PIB em expansão aquece o mercado de talentos. Acelere contratações estratégicas antes que o mercado fique mais restrito e caro.'
-      : 'Mercado em equilíbrio — boa janela para contratar talentos a custo moderado. Priorize roles em eficiência e tecnologia.'
-  return (
-    <DomainCard num="08" label="Liderança" badge={signal.label} badgeColor={signal.color}
-      kpis={[
-        { label: 'DESEMPREGO',   value: `${desemp}%`,                    sub: 'proxy PNAD/IBGE', color: Number(desemp) > 8 ? '#f87171' : '#34d399' },
-        { label: 'PRESSÃO SAL.', value: salPress,                         sub: `IPCA ${ipca.value}%`, color: salCol },
-        { label: 'DEMANDA TECH', value: String(tech?.heat ?? '—'),        sub: '/100 · heat',    color: pctColor(tech?.change ?? 0) },
-        { label: 'SERVIÇOS',     value: String(services?.heat ?? '—'),    sub: '/100 · empregab.', color: pctColor(services?.change ?? 0) },
-      ]}
-      decisao={decisao} decisaoColor={signal.color}
-    />
-  )
-}
-
-// ════════════════════════════════════════════════════════════════════════════
-// ██  09 — BUSINESS (Inteligência Setorial)
+// ██  SECTOR HEATMAP
 // ════════════════════════════════════════════════════════════════════════════
 
 const SECTOR_ANALYSIS: Record<string, { oportunidade: string; risco: string; como: string; quem: string }> = {
@@ -872,75 +865,211 @@ const SECTOR_ANALYSIS: Record<string, { oportunidade: string; risco: string; com
   media:     { oportunidade: 'Criadores independentes escalam com plataformas. Adtech BR cresce. Comunidades pagas em alta.', risco: 'CPM volátil com macro. Atenção fragmentada. LGPD limita targeting. Algoritmos mudam constantemente.', como: 'Owned media (newsletter, podcast). Comunidade paga. Branded content B2B.', quem: 'Agências, creators, adtechs, OTTs, publishers' },
 }
 
-function SectorCard({ sector, delay }: { sector: Sector; delay: number }) {
-  const analysis = SECTOR_ANALYSIS[sector.id]
-  const h        = sector.heat
-  const signal   =
-    h >= 75 ? { label: 'OPORTUNIDADE', color: '#34d399' } :
-    h >= 50 ? { label: 'NEUTRO',       color: '#c0c0c0' } :
-    h >= 30 ? { label: 'CAUTELA',      color: '#fbbf24' } :
-              { label: 'ALTO RISCO',   color: '#f87171' }
-  const chgColor = pctColor(sector.change)
+function SectorHeatmap({ sectors }: { sectors: Sector[] }) {
+  const [selected, setSelected] = useState<string | null>(null)
+  const sorted = [...sectors].sort((a, b) => b.heat - a.heat)
+
+  const heatColor = (h: number) =>
+    h >= 75 ? '#34d399' :
+    h >= 60 ? '#a3e635' :
+    h >= 45 ? '#fbbf24' :
+    h >= 30 ? '#fb923c' :
+    '#f87171'
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }} transition={{ delay, duration: 0.4 }}
-      style={{ background: 'rgba(5,5,5,0.94)', border: `1px solid ${signal.color}1a`, borderRadius: 18, overflow: 'hidden', position: 'relative' }}
-    >
-      <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${signal.color}70, transparent)` }} />
-      <div style={{ padding: '12px 16px 10px', borderBottom: '1px solid rgba(200,200,200,0.05)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: signal.color, background: signal.color + '16', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 8px', fontWeight: 700, flexShrink: 0 }}>{signal.label}</span>
-            <span style={{ fontSize: 12.5, fontWeight: 600, color: 'rgba(228,228,228,0.82)' }}>{sector.label}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-            <span style={{ fontSize: 22, fontWeight: 800, fontFamily: 'monospace', color: signal.color, lineHeight: 1 }}>{h}</span>
-            <span style={{ fontSize: 8.5, fontFamily: 'monospace', color: 'rgba(200,200,200,0.22)', alignSelf: 'flex-end', marginBottom: 2 }}>/100</span>
-            <span style={{ fontSize: 9.5, fontFamily: 'monospace', fontWeight: 700, color: chgColor, background: chgColor + '16', border: `1px solid ${chgColor}26`, borderRadius: 99, padding: '2px 7px' }}>{sector.change >= 0 ? '+' : ''}{sector.change}%</span>
-          </div>
-        </div>
-        <div style={{ height: 4, background: 'rgba(200,200,200,0.07)', borderRadius: 2, overflow: 'hidden' }}>
-          <motion.div
-            initial={{ width: 0 }} whileInView={{ width: `${h}%` }} viewport={{ once: true }}
-            transition={{ duration: 1.1, delay: delay + 0.2, ease: [0.16, 1, 0.3, 1] }}
-            style={{ height: '100%', borderRadius: 2, background: `linear-gradient(90deg, ${signal.color}40, ${signal.color}cc)` }}
-          />
-        </div>
-      </div>
-      {analysis && (
-        <div style={{ padding: '12px 16px 14px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }}>
-          {([
-            { label: 'Oportunidades', text: analysis.oportunidade, color: '#34d399' },
-            { label: 'Riscos',        text: analysis.risco,        color: '#f87171' },
-            { label: 'Como Atuar',    text: analysis.como,         color: '#c0c0c0' },
-          ] as { label: string; text: string; color: string }[]).map(({ label, text, color }) => (
-            <div key={label}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
-                <div style={{ width: 5, height: 5, borderRadius: '50%', background: color, flexShrink: 0 }} />
-                <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: color + 'aa', fontWeight: 700 }}>{label}</p>
+    <div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 175px), 1fr))', gap: 8 }}>
+        {sorted.map((s, i) => {
+          const color = heatColor(s.heat)
+          const isSelected = selected === s.id
+          const signalLabel =
+            s.heat >= 75 ? 'OPORTUNIDADE' :
+            s.heat >= 50 ? 'NEUTRO' :
+            s.heat >= 30 ? 'CAUTELA' : 'RISCO'
+          return (
+            <motion.button key={s.id}
+              initial={{ opacity: 0, scale: 0.92 }} whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }} transition={{ delay: i * 0.04 }}
+              onClick={() => setSelected(isSelected ? null : s.id)}
+              style={{ background: isSelected ? `linear-gradient(135deg, ${color}18, ${color}08)` : `linear-gradient(135deg, ${color}10, ${color}04)`, border: `1px solid ${isSelected ? color + '55' : color + '22'}`, borderRadius: 14, padding: '13px 14px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.18s' }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 9 }}>
+                <span style={{ fontSize: 10, color: 'rgba(220,220,220,0.68)', fontWeight: 600, lineHeight: 1.3, flex: 1, marginRight: 8 }}>{s.label}</span>
+                <span style={{ fontSize: 22, fontWeight: 800, fontFamily: 'monospace', color, lineHeight: 1, flexShrink: 0 }}>{s.heat}</span>
               </div>
-              <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.46)', lineHeight: 1.64, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' } as React.CSSProperties}>{text}</p>
-            </div>
-          ))}
-        </div>
-      )}
-      {analysis?.quem && (
-        <div style={{ padding: '8px 16px 10px', borderTop: '1px solid rgba(200,200,200,0.04)' }}>
-          <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.16em', color: 'rgba(200,200,200,0.22)' }}>Quem se beneficia: </span>
-          <span style={{ fontSize: 10, color: 'rgba(200,200,200,0.34)' }}>{analysis.quem}</span>
-        </div>
-      )}
+              <div style={{ height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 2, marginBottom: 6 }}>
+                <div style={{ height: '100%', width: `${s.heat}%`, background: color, borderRadius: 2 }} />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 7, fontFamily: 'monospace', color: color + '80', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>{signalLabel}</span>
+                <span style={{ fontSize: 8.5, fontFamily: 'monospace', color: pctColor(s.change), fontWeight: 700 }}>{s.change >= 0 ? '+' : ''}{s.change}%</span>
+              </div>
+            </motion.button>
+          )
+        })}
+      </div>
+
+      <AnimatePresence>
+        {selected && (() => {
+          const sector = sorted.find(s => s.id === selected)!
+          const analysis = SECTOR_ANALYSIS[selected]
+          const color = heatColor(sector.heat)
+          return (
+            <motion.div
+              key={selected}
+              initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              style={{ overflow: 'hidden', marginTop: 10 }}
+            >
+              <div style={{ background: 'rgba(5,5,5,0.96)', border: `1px solid ${color}25`, borderRadius: 16, padding: '16px 18px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(228,228,228,0.85)' }}>{sector.label}</span>
+                  <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color, background: color + '18', border: `1px solid ${color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>Heat {sector.heat}/100</span>
+                  {analysis?.quem && <span style={{ fontSize: 9, color: 'rgba(192,192,192,0.32)', marginLeft: 'auto' }}>{analysis.quem}</span>}
+                </div>
+                {analysis && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: 12 }}>
+                    {[
+                      { label: 'Oportunidades', text: analysis.oportunidade, color: '#34d399' },
+                      { label: 'Riscos',         text: analysis.risco,        color: '#f87171' },
+                      { label: 'Como Atuar',     text: analysis.como,         color: '#c0c0c0' },
+                    ].map(col => (
+                      <div key={col.label}>
+                        <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: col.color + 'aa', marginBottom: 6, fontWeight: 700 }}>{col.label}</p>
+                        <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.50)', lineHeight: 1.68 }}>{col.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )
+        })()}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ██  INTELLIGENCE CARDS  (Marketing · Sustentabilidade · Liderança)
+// ════════════════════════════════════════════════════════════════════════════
+
+interface IntelStat { label: string; value: string; color: string }
+
+function IntelCard({ num, label, badge, badgeColor, stats, insight, decisao, decisaoColor }: {
+  num: string; label: string
+  badge: string; badgeColor: string
+  stats: IntelStat[]
+  insight: string
+  decisao: string; decisaoColor: string
+}) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }} transition={{ duration: 0.38 }}
+      style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
+      <div style={{ padding: '11px 16px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 7.5, fontFamily: 'monospace', color: 'rgba(192,192,192,0.18)', letterSpacing: '0.2em' }}>{num}</span>
+        <div style={{ width: 1, height: 10, background: 'rgba(200,200,200,0.10)', flexShrink: 0 }} />
+        <span style={{ fontSize: 8, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.40)', fontWeight: 700 }}>{label}</span>
+        <span style={{ marginLeft: 'auto', fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: badgeColor, background: badgeColor + '18', border: `1px solid ${badgeColor}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{badge}</span>
+      </div>
+      <div style={{ padding: '14px 16px 10px', display: 'grid', gridTemplateColumns: `repeat(${stats.length}, 1fr)`, gap: 12 }}>
+        {stats.map(s => (
+          <div key={s.label}>
+            <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.24)', marginBottom: 4 }}>{s.label}</p>
+            <p style={{ fontSize: 20, fontWeight: 800, fontFamily: 'monospace', color: s.color, lineHeight: 1 }}>{s.value}</p>
+          </div>
+        ))}
+      </div>
+      <div style={{ padding: '8px 16px 10px', borderTop: '1px solid rgba(200,200,200,0.04)', borderBottom: '1px solid rgba(200,200,200,0.04)' }}>
+        <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.38)', lineHeight: 1.68 }}>{insight}</p>
+      </div>
+      <div style={{ padding: '10px 16px 13px', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+        <div style={{ width: 5, height: 5, borderRadius: '50%', background: decisaoColor, marginTop: 4, flexShrink: 0 }} />
+        <p style={{ fontSize: 11, color: 'rgba(210,210,210,0.52)', lineHeight: 1.65 }}>
+          <span style={{ fontFamily: 'monospace', fontSize: 7.5, textTransform: 'uppercase', letterSpacing: '0.22em', color: 'rgba(192,192,192,0.22)', marginRight: 8 }}>DECISÃO</span>
+          {decisao}
+        </p>
+      </div>
     </motion.div>
   )
 }
 
-function BusinessCard({ sectors }: { sectors: Sector[] }) {
-  const sorted = [...sectors].sort((a, b) => b.heat - a.heat)
+function MarketingIntel({ data }: { data: MarketData }) {
+  const { ipca, pib, selic } = data.macro
+  const retail = data.sectors.find(s => s.id === 'retail')
+  const media  = data.sectors.find(s => s.id === 'media')
+  const icc    = Math.round(clamp(60 + pib.value * 4 - ipca.value * 3 - (selic.value - 10) * 1.5, 20, 90))
+  const iccCol = icc >= 65 ? '#34d399' : icc >= 50 ? '#fbbf24' : '#f87171'
+  const signal = icc >= 65 ? { label: 'AQUECIDA', color: '#34d399' } : icc >= 50 ? { label: 'MODERADA', color: '#fbbf24' } : { label: 'RETRAÍDA', color: '#f87171' }
+  const decisao = icc >= 65
+    ? 'Confiança elevada — invista em aquisição agora. CAC é mais eficiente em ciclos de expansão de consumo.'
+    : icc >= 50
+    ? `IPCA ${ipca.value}% comprime poder de compra. Enfatize custo-benefício e valor percebido na comunicação.`
+    : 'Demanda retraída — priorize retenção e LTV sobre aquisição. Fidelização tem ROI superior neste ciclo.'
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
-      {sorted.map((s, i) => <SectorCard key={s.id} sector={s} delay={i * 0.05} />)}
-    </div>
+    <IntelCard num="06" label="Marketing"
+      badge={signal.label} badgeColor={signal.color}
+      stats={[
+        { label: 'Confiança', value: String(icc),                color: iccCol },
+        { label: 'Demanda',   value: String(retail?.heat ?? 55), color: pctColor(retail?.change ?? 0) },
+        { label: 'Mídia',     value: String(media?.heat ?? 58),  color: pctColor(media?.change ?? 0) },
+      ]}
+      insight={`Índice de Confiança (proxy) ${icc}/100. Demanda online ${retail?.heat ?? 55}/100, variação ${pctSign(retail?.change ?? 0)}. Mídia digital ${media?.heat ?? 58}/100.`}
+      decisao={decisao} decisaoColor={signal.color}
+    />
+  )
+}
+
+function SustentabilidadeIntel({ data }: { data: MarketData }) {
+  const energy = data.sectors.find(s => s.id === 'energy')
+  const agro   = data.sectors.find(s => s.id === 'agro')
+  const green  = Math.round(clamp(((energy?.heat ?? 55) + (agro?.heat ?? 50)) / 2 + 5, 10, 95))
+  const rc     = green < 50 ? '#f87171' : green < 70 ? '#fbbf24' : '#34d399'
+  const risk   = green < 50 ? 'ALTO' : green < 70 ? 'MÉDIO' : 'BAIXO'
+  const decisao = green < 50
+    ? 'Risco ESG elevado — acesse crédito verde (LCA, CRA) para reduzir custo de capital e atrair investidores institucionais.'
+    : green < 70
+    ? 'Perfil ESG moderado. Implemente relatório GRI/SASB para acessar capital verde com spread 15–25% menor.'
+    : 'Bom score ESG — capitalize na narrativa para green bonds e fundos de impacto com menor custo de capital.'
+  return (
+    <IntelCard num="07" label="Sustentabilidade"
+      badge={`RISCO ${risk}`} badgeColor={rc}
+      stats={[
+        { label: 'Green Score', value: String(green),               color: rc },
+        { label: 'Energia',     value: String(energy?.heat ?? '—'), color: pctColor(energy?.change ?? 0) },
+        { label: 'Agro',        value: String(agro?.heat ?? '—'),   color: pctColor(agro?.change ?? 0) },
+      ]}
+      insight={`Score ESG proxy ${green}/100. Energia renovável: ${energy?.heat ?? '—'}/100. Agro sustentável: ${agro?.heat ?? '—'}/100. Crédito verde (LCA/CRA) disponível.`}
+      decisao={decisao} decisaoColor={rc}
+    />
+  )
+}
+
+function LiderancaIntel({ data }: { data: MarketData }) {
+  const { ipca, pib } = data.macro
+  const tech     = data.sectors.find(s => s.id === 'tech')
+  const services = data.sectors.find(s => s.id === 'services')
+  const desemp   = clamp(6.5 - pib.value * 0.4, 4.5, 12).toFixed(1)
+  const salPress = ipca.value > 4.5 ? 'ALTA' : ipca.value > 3 ? 'MÉDIA' : 'BAIXA'
+  const salCol   = ipca.value > 4.5 ? '#f87171' : ipca.value > 3 ? '#fbbf24' : '#34d399'
+  const signal   = ipca.value > 5 ? { label: 'PRESSÃO SAL.', color: '#f87171' } : pib.value > 2 ? { label: 'AQUECIDO', color: '#fbbf24' } : { label: 'ESTÁVEL', color: '#34d399' }
+  const decisao  = ipca.value > 5
+    ? `IPCA ${ipca.value}% gera pressão salarial. Antecipe revisões e implemente benefícios não-monetários para reter talentos.`
+    : pib.value > 2
+    ? 'PIB em expansão aquece mercado de talentos. Acelere contratações estratégicas antes que fique mais caro.'
+    : 'Mercado equilibrado — boa janela para contratar talentos a custo moderado. Priorize tech e eficiência.'
+  return (
+    <IntelCard num="08" label="Liderança"
+      badge={signal.label} badgeColor={signal.color}
+      stats={[
+        { label: 'Desemprego',  value: `${desemp}%`,                    color: Number(desemp) > 8 ? '#f87171' : '#34d399' },
+        { label: 'Pressão Sal.', value: salPress,                        color: salCol },
+        { label: 'Demanda Tech', value: String(tech?.heat ?? '—'),       color: pctColor(tech?.change ?? 0) },
+      ]}
+      insight={`Desemprego estimado ${desemp}% (proxy PNAD). Pressão salarial ${salPress} com IPCA ${ipca.value}%. Demanda por tech ${tech?.heat ?? '—'}/100 · Serviços ${services?.heat ?? '—'}/100.`}
+      decisao={decisao} decisaoColor={signal.color}
+    />
   )
 }
 
@@ -1246,63 +1375,81 @@ export default function AbaBusiness() {
     : null
 
   return (
-    <motion.div className="relative flex flex-col gap-6 pb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <motion.div className="relative flex flex-col gap-0 pb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
 
-      {/* Nav — 9 domínios */}
-      <DomainNav />
+      {/* Live ticker strip */}
+      <TickerStrip data={data} />
 
-      {/* HERO — Globe ao Vivo */}
-      <div>
-        <div className="flex items-center justify-between mb-1">
-          <SectionLabel label="Mercado Global ao Vivo" sub="indicadores em tempo real" />
-          <button onClick={handleRefresh} disabled={refreshing}
-            className="flex items-center gap-1.5 text-[9px] font-mono text-white/20 hover:text-white/38 transition-colors disabled:opacity-40 mb-4">
-            <motion.div animate={refreshing ? { rotate: 360 } : {}}
-              transition={{ duration: 1, repeat: refreshing ? Infinity : 0, ease: 'linear' }}>
-              <RefreshCw className="w-3 h-3" />
-            </motion.div>
-            {updatedStr ? `atualizado ${updatedStr}` : 'atualizar'}
-          </button>
+      <div className="flex flex-col gap-5 pt-3">
+
+        {/* Nav */}
+        <DomainNav />
+
+        {/* Globe hero */}
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <SectionLabel label="Mercado Global ao Vivo" sub="indicadores em tempo real" />
+            <button onClick={handleRefresh} disabled={refreshing}
+              className="flex items-center gap-1.5 text-[9px] font-mono text-white/20 hover:text-white/38 transition-colors disabled:opacity-40 mb-4">
+              <motion.div animate={refreshing ? { rotate: 360 } : {}}
+                transition={{ duration: 1, repeat: refreshing ? Infinity : 0, ease: 'linear' }}>
+                <RefreshCw className="w-3 h-3" />
+              </motion.div>
+              {updatedStr ? `atualizado ${updatedStr}` : 'atualizar'}
+            </button>
+          </div>
+          <GlobeHero data={data} />
         </div>
-        <GlobeHero data={data} />
-      </div>
 
-      {/* Domains 01 + 02 */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 440px), 1fr))', gap: 14 }}>
-        <div id="domain-01"><EconomiaCard data={data} /></div>
-        <div id="domain-02"><MercadoBolsaCard data={data} /></div>
-      </div>
-
-      {/* Domain 03 — Empresas */}
-      <div id="domain-03">
-        <SectionLabel label="03 · Empresas" sub="B3 + mercados globais" />
-        <MarketPanel data={data} />
-      </div>
-
-      {/* Domains 04 – 08 */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 440px), 1fr))', gap: 14 }}>
-        <div id="domain-04"><CommoditiesCard data={data} /></div>
-        <div id="domain-05"><FinancasCard data={data} /></div>
-        <div id="domain-06"><MarketingCard data={data} /></div>
-        <div id="domain-07"><SustentabilidadeCard data={data} /></div>
-        <div id="domain-08"><LiderancaCard data={data} /></div>
-      </div>
-
-      {/* Domain 09 — Business */}
-      <div id="domain-09">
-        <SectionLabel label="09 · Business" sub="análise competitiva setorial · onde atacar · onde defender" />
-        <BusinessCard sectors={data.sectors} />
-      </div>
-
-      {/* Executive IA */}
-      <div>
-        <SectionLabel label="Executive Intelligence · IA" sub="análise e plano de ação com dados reais" />
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 440px), 1fr))', gap: 14 }}>
-          <ActionPlan data={data} userSector={userSector} />
-          <IaAdvisor data={data} userSector={userSector} />
+        {/* Chart + Stock list */}
+        <div id="section-mercado">
+          <SectionLabel label="02 · Mercado & B3" sub="índices, ações e variação" />
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'stretch' }}>
+            <div style={{ flex: '1 1 360px', minWidth: 0 }}>
+              <MarketChartPanel data={data} />
+            </div>
+            <div id="section-b3" style={{ flex: '0 1 255px', minWidth: 220 }}>
+              <StockListPanel data={data} />
+            </div>
+          </div>
         </div>
-      </div>
 
+        {/* 3-col stats */}
+        <div id="section-macro">
+          <SectionLabel label="Dados Estruturais" sub="macro · commodities · crédito" />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: 12 }}>
+            <MacroStatsPanel data={data} />
+            <div id="section-commodities"><CommoditiesStatsPanel data={data} /></div>
+            <div id="section-credito"><CreditStatsPanel data={data} /></div>
+          </div>
+        </div>
+
+        {/* Sector heatmap */}
+        <div id="section-setores">
+          <SectionLabel label="09 · Business" sub="análise competitiva setorial · onde atacar · onde defender" />
+          <SectorHeatmap sectors={data.sectors} />
+        </div>
+
+        {/* Intel 3-col */}
+        <div id="section-intel">
+          <SectionLabel label="Inteligência de Gestão" sub="marketing · sustentabilidade · liderança" />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: 12 }}>
+            <MarketingIntel data={data} />
+            <SustentabilidadeIntel data={data} />
+            <LiderancaIntel data={data} />
+          </div>
+        </div>
+
+        {/* AI */}
+        <div id="section-ia">
+          <SectionLabel label="Executive Intelligence · IA" sub="análise e plano de ação com dados reais" />
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 440px), 1fr))', gap: 14 }}>
+            <ActionPlan data={data} userSector={userSector} />
+            <IaAdvisor data={data} userSector={userSector} />
+          </div>
+        </div>
+
+      </div>
     </motion.div>
   )
 }
