@@ -539,6 +539,8 @@ const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
             )}
           </AnimatePresence>
         </div>
+        {/* Áudio — análise completa do globo (desktop) */}
+        <GlobeAudioBar chips={chips} audioText={globeAudioText} chipOffsets={chipOffsets} />
       </div>
 
       <div className="md:hidden flex flex-col gap-4">
@@ -1308,9 +1310,9 @@ const SectorCard = memo(function SectorCard({ sectors }: { sectors: Sector[] }) 
       </div>
 
       {/* Metodologia */}
-      <div style={{ padding: '6px 16px 11px', borderTop: '1px solid rgba(200,200,200,0.03)' }}>
-        <p style={{ fontSize: 7.5, fontFamily: 'monospace', color: 'rgba(192,192,192,0.18)', lineHeight: 1.65 }}>
-          <span style={{ textTransform: 'uppercase', letterSpacing: '0.18em', marginRight: 6 }}>~cálculo</span>
+      <div style={{ padding: '8px 16px 12px', borderTop: '1px solid rgba(200,200,200,0.05)', background: 'rgba(255,255,255,0.015)' }}>
+        <p style={{ fontSize: 8.5, fontFamily: 'monospace', color: 'rgba(192,192,192,0.48)', lineHeight: 1.7 }}>
+          <span style={{ color: 'rgba(192,192,192,0.30)', textTransform: 'uppercase', letterSpacing: '0.18em', marginRight: 7 }}>~cálculo</span>
           Heat score = base editorial por setor (Tech 95, Agro 88, Saúde 82, Energia 76, Fintech 71, Logística 65, Serviços 42, Varejo 18, Mídia 5) ajustada pela variação diária real da B3 (×5). Dado ao vivo.
         </p>
       </div>
@@ -1450,7 +1452,7 @@ const IntelCard = memo(function IntelCard({ num, label, badge, badgeColor, stats
             <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.24)', marginBottom: 4 }}>{s.label}</p>
             <p style={{ fontSize: 20, fontWeight: 800, fontFamily: 'monospace', color: s.color, lineHeight: 1 }}>{s.value}</p>
             {s.source && (
-              <p style={{ fontSize: 7, fontFamily: 'monospace', color: 'rgba(192,192,192,0.22)', marginTop: 4, lineHeight: 1.5 }}>{s.source}</p>
+              <p style={{ fontSize: 7.5, fontFamily: 'monospace', color: 'rgba(192,192,192,0.50)', marginTop: 5, lineHeight: 1.5, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 5, padding: '2px 6px', display: 'inline-block' }}>{s.source}</p>
             )}
           </div>
         ))}
@@ -1466,9 +1468,9 @@ const IntelCard = memo(function IntelCard({ num, label, badge, badgeColor, stats
         </p>
       </div>
       {footnote && (
-        <div style={{ padding: '7px 16px 10px', borderTop: '1px solid rgba(200,200,200,0.03)' }}>
-          <p style={{ fontSize: 7.5, fontFamily: 'monospace', color: 'rgba(192,192,192,0.18)', lineHeight: 1.65 }}>
-            <span style={{ textTransform: 'uppercase', letterSpacing: '0.18em', marginRight: 6 }}>~cálculo</span>{footnote}
+        <div style={{ padding: '8px 16px 12px', borderTop: '1px solid rgba(200,200,200,0.05)', background: 'rgba(255,255,255,0.015)' }}>
+          <p style={{ fontSize: 8.5, fontFamily: 'monospace', color: 'rgba(192,192,192,0.48)', lineHeight: 1.7 }}>
+            <span style={{ color: 'rgba(192,192,192,0.30)', textTransform: 'uppercase', letterSpacing: '0.18em', marginRight: 7 }}>~cálculo</span>{footnote}
           </p>
         </div>
       )}
