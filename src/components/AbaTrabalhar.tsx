@@ -186,7 +186,7 @@ export default function AbaTrabalhar() {
   const visibleModules = MODULES.filter(m => m.layer !== 'compliance' && (m.id !== 'admin' || isAdmin))
   const compliance = MODULES.filter(m => m.layer === 'compliance' && (m.id !== 'admin' || isAdmin))
 
-  const layers: LayerType[] = ['sig', 'sio', 'sie']
+  const layers: LayerType[] = ['sig', 'sie', 'sio']
 
   // ─────────────────────────────────────────────
   // Render
