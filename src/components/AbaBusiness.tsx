@@ -1662,18 +1662,12 @@ export default function AbaBusiness() {
         {/* 3-col stats */}
         <div id="section-macro">
           <SectionLabel label="Dados Estruturais" sub="macro · commodities · crédito" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 12 }}>
             <MacroStatsPanel data={data} />
-            <div id="section-commodities"><CommoditiesStatsPanel data={data} /></div>
-            <div id="section-credito"><CreditStatsPanel data={data} /></div>
-            <div id="section-setores-card"><SectorCard sectors={data.sectors} /></div>
+            <CommoditiesStatsPanel data={data} />
+            <CreditStatsPanel data={data} />
+            <SectorCard sectors={data.sectors} />
           </div>
-        </div>
-
-        {/* Sector heatmap */}
-        <div id="section-setores">
-          <SectionLabel label="09 · Business" sub="análise competitiva setorial · onde atacar · onde defender" />
-          <SectorHeatmap sectors={data.sectors} />
         </div>
 
         {/* Intel 3-col */}
