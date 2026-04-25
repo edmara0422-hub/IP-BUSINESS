@@ -528,20 +528,115 @@ function AreaChart({ id, delta, color = '#34d399' }: { id: string; delta: number
 
 function MarketChartPanel({ data }: { data: MarketData }) {
   const [activeIdx, setActiveIdx] = useState('ibov')
-  const ibov = data.stocks?.ibov
+  const ibov  = data.stocks?.ibov
+  const { usdBrl } = data.macro
+  const oil   = data.commodities.oil
+  const gold  = data.commodities.gold
 
   const indices = [
-    { id: 'ibov',  label: 'IBOV',      value: fmtK(ibov?.value ?? 128000),                    delta: ibov?.pct ?? 0 },
-    { id: 'usd',   label: 'USD/BRL',   value: `R$${data.macro.usdBrl.value}`,                  delta: data.macro.usdBrl.delta },
-    { id: 'gold',  label: 'OURO',      value: `$${data.commodities.gold?.value ?? '—'}`,       delta: data.commodities.gold?.delta ?? 0 },
-    { id: 'oil',   label: 'PETRÓLEO',  value: `$${data.commodities.oil?.value ?? '—'}`,        delta: data.commodities.oil?.delta ?? 0 },
+    { id: 'ibov',  label: 'IBOV',     value: fmtK(ibov?.value ?? 128000), delta: ibov?.pct ?? 0 },
+    { id: 'usd',   label: 'USD/BRL',  value: `R$${usdBrl.value}`,          delta: usdBrl.delta },
+    { id: 'gold',  label: 'OURO',     value: `$${gold?.value ?? '—'}`,      delta: gold?.delta ?? 0 },
+    { id: 'oil',   label: 'PETRÓLEO', value: `$${oil?.value ?? '—'}`,       delta: oil?.delta ?? 0 },
   ]
 
-  const active = indices.find(i => i.id === activeIdx) ?? indices[0]
+  type Analysis = { signal: string; signalColor: string; cenario: string; impacto: string; decisao: string }
+
+  const analysis: Record<string, Analysis> = {
+    ibov: (() => {
+      const pct = ibov?.pct ?? 0
+      const val = fmtK(ibov?.value ?? 128000)
+      if (pct > 1.5) return {
+        signal: 'ALTA', signalColor: '#34d399',
+        cenario: `IBOVESPA em alta de ${pctSign(pct)} operando a ${val} pontos. Fluxo de capital estrangeiro positivo e apetite por risco elevado no mercado doméstico.`,
+        impacto: 'Bolsa em alta facilita captação via equity, melhora valuation de PMEs e reabre linhas de crédito bancário. Momento de antecipar negociações e revisão de contratos.',
+        decisao: 'Aproveite para captações, renegociações e acesso a crédito. Avalie M&A — múltiplos sobem com o índice. Janela curta.',
+      }
+      if (pct < -1.5) return {
+        signal: 'QUEDA', signalColor: '#f87171',
+        cenario: `IBOVESPA em queda de ${pctSign(pct)} a ${val} pontos. Saída de capital de risco, aversão elevada e pressão vendedora nas principais ações da B3.`,
+        impacto: 'Queda comprime valuation, dificulta captação e sinaliza potencial contração de crédito bancário. PMEs com caixa curto devem revisar vencimentos de dívida.',
+        decisao: 'Preserve caixa, evite compromissos de capital fixo no curto prazo. Foque em eficiência e monitoramento de inadimplência da carteira.',
+      }
+      return {
+        signal: 'LATERAL', signalColor: '#fbbf24',
+        cenario: `IBOVESPA operando lateral a ${val} pontos (${pctSign(pct)} no dia). Mercado aguarda sinalizações do COPOM e dados fiscais para definir nova tendência.`,
+        impacto: 'Incerteza de mercado. Crédito disponível mas com cautela. Boa janela para renegociar passivos e revisar precificação antes da próxima tendência.',
+        decisao: 'Aguarde definição antes de decisões estruturais de capital. Priorize eficiência e reduza custos fixos enquanto o cenário não clareia.',
+      }
+    })(),
+    usd: (() => {
+      const v = usdBrl.value, d = usdBrl.delta
+      if (v > 5.8) return {
+        signal: 'DÓLAR PRESSIONADO', signalColor: '#f87171',
+        cenario: `Dólar cotado a R$${v} (${pctSign(d)} hoje). Câmbio acima de R$5,80 reflete pressão fiscal doméstica, saída de capital e percepção de risco-Brasil elevada.`,
+        impacto: 'Insumos importados, máquinas, software e matérias-primas estrangeiras ficam 20–35% mais caras. Energia e combustíveis sobem por repasse. Exportadores ganham; importadores perdem.',
+        decisao: 'Antecipe compras de insumos importados. Negocie hedge cambial. Repasse o custo gradualmente para não perder competitividade de mercado.',
+      }
+      if (v > 5.0) return {
+        signal: 'CÂMBIO ELEVADO', signalColor: '#fbbf24',
+        cenario: `Dólar a R$${v} (${pctSign(d)} hoje). Câmbio elevado gera pressão inflacionária em insumos importados e frete internacional, mas ainda sem patamar de emergência.`,
+        impacto: 'Custo de importação cresce. Varejo, tech e indústria com fornecedores externos sentem aperto de margem. Agro e exportadoras se beneficiam diretamente.',
+        decisao: `Com câmbio R$${v}, avalie substituição de insumos importados por nacionais onde possível. Revise precificação de produtos com componentes em dólar.`,
+      }
+      return {
+        signal: 'CÂMBIO FAVORÁVEL', signalColor: '#34d399',
+        cenario: `Dólar a R$${v} (${pctSign(d)} hoje). Real valorizado indica confiança externa e fluxo de capital positivo. Patamar abaixo de R$5,00 é historicamente favorável para importadores.`,
+        impacto: 'Boa janela para importar equipamentos, tecnologia e insumos. Custo de software SaaS e serviços em dólar cai. Indústria pode renovar maquinário com menor custo.',
+        decisao: 'Aproveite o câmbio favorável para importar, atualizar equipamentos e fixar contratos de fornecimento em dólar pelo menor valor possível.',
+      }
+    })(),
+    gold: (() => {
+      const d = gold?.delta ?? 0, v = gold?.value ?? 0
+      if (d > 1.5) return {
+        signal: 'REFÚGIO ATIVO', signalColor: '#fbbf24',
+        cenario: `Ouro em alta de ${pctSign(d)} a $${v}/onça. Alta demanda por ativo-refúgio sinaliza aversão a risco global — tensão geopolítica, instabilidade bancária ou expectativa de corte de juros no Fed.`,
+        impacto: 'Stress financeiro global eleva custo de capital externo. Empresas com dívida em dólar ou exposição cambial ficam vulneráveis. Crédito internacional pode encarecer.',
+        decisao: 'Revise exposição cambial e dívidas estrangeiras. Considere hedge. Evite compromissos de longo prazo com fornecedores internacionais até o cenário estabilizar.',
+      }
+      if (d < -1.5) return {
+        signal: 'AVERSÃO A RISCO CAI', signalColor: '#34d399',
+        cenario: `Ouro em queda de ${pctSign(d)} a $${v}/onça. Redução de aversão a risco ou alta de juros americanos comprimem a demanda por refúgio. Capital migra para ativos de maior risco.`,
+        impacto: 'Ambiente de menor stress global: capital retorna para bolsas emergentes e crédito corporativo. Pode indicar melhora no apetite por investimento produtivo.',
+        decisao: 'Boa janela para acesso a crédito e captação. Câmbio pode se valorizar com retorno de fluxo. Monitore condições de crédito externo.',
+      }
+      return {
+        signal: 'OURO ESTÁVEL', signalColor: '#c0c0c0',
+        cenario: `Ouro a $${v}/onça (${pctSign(d)} no dia). Mercado sem gatilhos de aversão a risco expressivos. Movimento dentro da faixa normal de oscilação diária do ativo-refúgio.`,
+        impacto: 'Impacto limitado no curto prazo para PMEs nacionais. Estabilidade do ouro indica ambiente neutro — nem expansão de risco nem fuga de capital.',
+        decisao: 'Sem ação urgente. Monitore para detectar mudança. Se tiver operações em dólar, acompanhe correlação ouro/USD — costumam se mover juntos.',
+      }
+    })(),
+    oil: (() => {
+      const d = oil?.delta ?? 0, v = oil?.value ?? 0
+      if (d > 2) return {
+        signal: 'PRESSÃO ALTA', signalColor: '#f87171',
+        cenario: `Petróleo (Brent) em alta de ${pctSign(d)} a $${v}/barril. Cortes da OPEP+, tensões geopolíticas no Oriente Médio ou demanda aquecida pressionam o preço do crude.`,
+        impacto: 'Cada +10% no petróleo representa +4–8% no diesel, +6–12% no frete rodoviário e pressão em plásticos, embalagens e derivados. Logística, varejo e indústria sentem direto no caixa.',
+        decisao: 'Antecipe renegociação de contratos logísticos com cláusula de reajuste. Revise precificação de produtos com alto componente de frete. Avalie contratos futuros de diesel.',
+      }
+      if (d < -2) return {
+        signal: 'ALÍVIO DE CUSTOS', signalColor: '#34d399',
+        cenario: `Petróleo em queda de ${pctSign(d)} a $${v}/barril. Excesso de oferta, queda de demanda global ou liquidação especulativa comprimem o preço do Brent.`,
+        impacto: 'Queda do petróleo reduz frete, combustível, energia industrial e insumos petroquímicos. Impacto direto positivo no caixa de transportadoras, distribuidoras e indústria.',
+        decisao: 'Negocie contratos logísticos com preço fixo agora, antes de eventual recuperação. Revise orçamento de energia — possibilidade real de redução de custo operacional.',
+      }
+      return {
+        signal: 'PETRÓLEO ESTÁVEL', signalColor: '#fbbf24',
+        cenario: `Petróleo a $${v}/barril (${pctSign(d)} no dia). Equilíbrio entre oferta da OPEP+ e demanda global. Sem evento disruptivo no curto prazo no mercado de energia.`,
+        impacto: 'Custo de frete e energia previsíveis. Empresas logísticas e industriais ganham janela para planejamento. Orçamentos com custo de energia podem ser mantidos.',
+        decisao: 'Momento estável para fixar contratos de frete e energia com preço definido. Monitore conflitos geopolíticos que possam afetar a oferta de forma abrupta.',
+      }
+    })(),
+  }
+
+  const active    = indices.find(i => i.id === activeIdx) ?? indices[0]
   const chartColor = active.delta > 0 ? '#34d399' : active.delta < 0 ? '#f87171' : '#c0c0c0'
+  const activeAnalysis = analysis[activeIdx]
 
   return (
     <div style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
+      {/* Tab switcher */}
       <div style={{ padding: '12px 16px 10px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
         {indices.map(idx => {
           const isActive = activeIdx === idx.id
@@ -558,13 +653,44 @@ function MarketChartPanel({ data }: { data: MarketData }) {
           )
         })}
       </div>
-      <div style={{ padding: '10px 14px 12px' }}>
+
+      {/* Chart */}
+      <div style={{ padding: '10px 14px 6px' }}>
         <AnimatePresence mode="wait">
           <motion.div key={activeIdx} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
             <AreaChart id={activeIdx} delta={active.delta} color={chartColor} />
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Analysis */}
+      <AnimatePresence mode="wait">
+        <motion.div key={activeIdx + '-analysis'}
+          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.22 }}
+          style={{ borderTop: '1px solid rgba(200,200,200,0.05)', padding: '14px 16px 16px' }}
+        >
+          {/* Signal badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: activeAnalysis.signalColor, background: activeAnalysis.signalColor + '18', border: `1px solid ${activeAnalysis.signalColor}30`, borderRadius: 99, padding: '3px 10px', textTransform: 'uppercase', letterSpacing: '0.18em' }}>{activeAnalysis.signal}</span>
+            <div style={{ flex: 1, height: 1, background: 'rgba(200,200,200,0.04)' }} />
+          </div>
+
+          {/* 3-col analysis */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: 14 }}>
+            {[
+              { label: 'Cenário', text: activeAnalysis.cenario,  color: 'rgba(192,192,192,0.26)' },
+              { label: 'Impacto no Negócio', text: activeAnalysis.impacto, color: '#f87171aa' },
+              { label: 'Decisão', text: activeAnalysis.decisao,  color: '#34d399aa' },
+            ].map(col => (
+              <div key={col.label}>
+                <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: col.color, marginBottom: 6, fontWeight: 700 }}>{col.label}</p>
+                <p style={{ fontSize: 11.5, color: 'rgba(208,208,208,0.50)', lineHeight: 1.7 }}>{col.text}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </AnimatePresence>
     </div>
   )
 }
