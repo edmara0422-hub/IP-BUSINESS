@@ -1339,9 +1339,6 @@ export default function AbaBusiness() {
 
       <div className="flex flex-col gap-5">
 
-        {/* Nav */}
-        <DomainNav />
-
         {/* Globe hero */}
         <div>
           <div className="flex items-center justify-between mb-1">
