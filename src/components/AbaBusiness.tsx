@@ -523,6 +523,57 @@ function AreaChart({ id, delta, color = '#34d399' }: { id: string; delta: number
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+// ██  B3 STOCKS GRID (embedded inside MarketChartPanel)
+// ════════════════════════════════════════════════════════════════════════════
+
+function StocksGrid({ data }: { data: MarketData }) {
+  const brStocks = data.stocks?.br ?? []
+  const fallback: StockBR[] = [
+    { ticker: 'PETR4', label: 'Petrobras',     price: 36.50, pct: 0 },
+    { ticker: 'VALE3', label: 'Vale',           price: 58.20, pct: 0 },
+    { ticker: 'ITUB4', label: 'Itaú Unib.',    price: 27.90, pct: 0 },
+    { ticker: 'BBDC4', label: 'Bradesco',       price: 15.80, pct: 0 },
+    { ticker: 'WEGE3', label: 'WEG',            price: 50.10, pct: 0 },
+    { ticker: 'MGLU3', label: 'Magalu',         price:  8.40, pct: 0 },
+    { ticker: 'RENT3', label: 'Localiza',       price: 52.30, pct: 0 },
+    { ticker: 'ABEV3', label: 'Ambev',          price: 13.20, pct: 0 },
+  ]
+  const list = brStocks.length > 0 ? brStocks : fallback
+
+  return (
+    <div style={{ borderTop: '1px solid rgba(200,200,200,0.05)', padding: '14px 16px 16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
+        <span style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.22em', color: 'rgba(192,192,192,0.26)', fontWeight: 700 }}>B3 · Principais Ações</span>
+        <motion.div style={{ width: 5, height: 5, borderRadius: '50%', background: '#34d399' }}
+          animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 160px), 1fr))', gap: 6 }}>
+        {list.map((s, i) => {
+          const col = pctColor(s.pct)
+          return (
+            <motion.div key={s.ticker}
+              initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }} transition={{ delay: i * 0.04 }}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: 'rgba(255,255,255,0.025)', borderRadius: 9, borderLeft: `2px solid ${col}30` }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 8.5, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(200,200,200,0.55)', textTransform: 'uppercase' }}>{s.ticker}</p>
+                <p style={{ fontSize: 9.5, color: 'rgba(200,200,200,0.30)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.label}</p>
+              </div>
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                {s.price !== undefined && <p style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(220,220,220,0.75)' }}>R${s.price.toFixed(2)}</p>}
+                <p style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: col }}>{pctSign(s.pct)}</p>
+              </div>
+              <Sparkline id={s.ticker} delta={s.pct} color={col} w={32} h={16} />
+            </motion.div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 // ██  MARKET CHART PANEL
 // ════════════════════════════════════════════════════════════════════════════
 
@@ -691,6 +742,9 @@ function MarketChartPanel({ data }: { data: MarketData }) {
           </div>
         </motion.div>
       </AnimatePresence>
+
+      {/* B3 stocks — compact grid inside the same card */}
+      <StocksGrid data={data} />
     </div>
   )
 }
@@ -1481,17 +1535,10 @@ export default function AbaBusiness() {
           <GlobeHero data={data} />
         </div>
 
-        {/* Chart + Stock list */}
+        {/* Chart + Analysis + B3 */}
         <div id="section-mercado">
           <SectionLabel label="02 · Mercado & B3" sub="índices, ações e variação" />
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'stretch' }}>
-            <div style={{ flex: '1 1 360px', minWidth: 0 }}>
-              <MarketChartPanel data={data} />
-            </div>
-            <div id="section-b3" style={{ flex: '0 1 255px', minWidth: 220 }}>
-              <StockListPanel data={data} />
-            </div>
-          </div>
+          <MarketChartPanel data={data} />
         </div>
 
         {/* 3-col stats */}
