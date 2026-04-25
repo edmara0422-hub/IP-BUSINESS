@@ -523,216 +523,284 @@ function AreaChart({ id, delta, color = '#34d399' }: { id: string; delta: number
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  B3 STOCKS GRID (embedded inside MarketChartPanel)
+// ██  ANNOTATED AREA CHART
 // ════════════════════════════════════════════════════════════════════════════
 
-function StocksGrid({ data }: { data: MarketData }) {
-  const brStocks = data.stocks?.br ?? []
-  const fallback: StockBR[] = [
-    { ticker: 'PETR4', label: 'Petrobras',     price: 36.50, pct: 0 },
-    { ticker: 'VALE3', label: 'Vale',           price: 58.20, pct: 0 },
-    { ticker: 'ITUB4', label: 'Itaú Unib.',    price: 27.90, pct: 0 },
-    { ticker: 'BBDC4', label: 'Bradesco',       price: 15.80, pct: 0 },
-    { ticker: 'WEGE3', label: 'WEG',            price: 50.10, pct: 0 },
-    { ticker: 'MGLU3', label: 'Magalu',         price:  8.40, pct: 0 },
-    { ticker: 'RENT3', label: 'Localiza',       price: 52.30, pct: 0 },
-    { ticker: 'ABEV3', label: 'Ambev',          price: 13.20, pct: 0 },
-  ]
-  const list = brStocks.length > 0 ? brStocks : fallback
+function AnnotatedAreaChart({ id, delta, color, peakLabel, peakSub, troughLabel, troughSub }: {
+  id: string; delta: number; color: string
+  peakLabel: string; peakSub: string; troughLabel: string; troughSub: string
+}) {
+  const POINTS = 60
+  const W = 700, PAD = 10
+  const CHART_TOP = 46, CHART_H = 140, CHART_BOT = CHART_TOP + CHART_H
+  const H = CHART_BOT + 46
+  const cw = W - PAD * 2
+
+  const pts = useMemo(() => {
+    let seed = 0
+    const key = id + new Date().toDateString()
+    for (const c of key) seed = (Math.imul(31, seed) + c.charCodeAt(0)) | 0
+    const raw: number[] = []
+    for (let i = 0; i < POINTS; i++) {
+      seed = (Math.imul(1664525, seed) + 1013904223) | 0
+      const r = (Math.abs(seed) % 1000) / 1000
+      const trend = (delta / 100) * (i / (POINTS - 1))
+      raw.push(clamp(r * 0.55 + 0.225 + trend, 0.05, 0.95))
+    }
+    const mn = Math.min(...raw), mx = Math.max(...raw), rng = mx - mn || 0.1
+    return raw.map(v => (v - mn) / rng)
+  }, [id, delta])
+
+  const coords = pts.map((v, i) => ({
+    x: PAD + (i / (POINTS - 1)) * cw,
+    y: CHART_TOP + (1 - v) * CHART_H,
+  }))
+
+  const linePath = coords.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
+  const areaPath = `${linePath} L ${(PAD + cw).toFixed(1)},${CHART_BOT} L ${PAD},${CHART_BOT} Z`
+  const last = coords[coords.length - 1]
+  const gradId = `aac-${id}`
+  const safeColor = color.startsWith('rgba') ? '#c0c0c0' : color
+
+  let peakIdx = 8, troughIdx = 8
+  for (let i = 8; i < POINTS - 8; i++) {
+    if (pts[i] > pts[peakIdx]) peakIdx = i
+    if (pts[i] < pts[troughIdx]) troughIdx = i
+  }
+  const peakPt  = coords[peakIdx]
+  const troughPt = coords[troughIdx]
+
+  const ANN_W = 114
+  const cx = (x: number) => Math.max(4, Math.min(W - ANN_W - 4, x - ANN_W / 2))
 
   return (
-    <div style={{ borderTop: '1px solid rgba(200,200,200,0.05)', padding: '14px 16px 16px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
-        <span style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.22em', color: 'rgba(192,192,192,0.26)', fontWeight: 700 }}>B3 · Principais Ações</span>
-        <motion.div style={{ width: 5, height: 5, borderRadius: '50%', background: '#34d399' }}
-          animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} />
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 160px), 1fr))', gap: 6 }}>
-        {list.map((s, i) => {
-          const col = pctColor(s.pct)
-          return (
-            <motion.div key={s.ticker}
-              initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }} transition={{ delay: i * 0.04 }}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: 'rgba(255,255,255,0.025)', borderRadius: 9, borderLeft: `2px solid ${col}30` }}
-            >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 8.5, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(200,200,200,0.55)', textTransform: 'uppercase' }}>{s.ticker}</p>
-                <p style={{ fontSize: 9.5, color: 'rgba(200,200,200,0.30)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.label}</p>
-              </div>
-              <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                {s.price !== undefined && <p style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(220,220,220,0.75)' }}>R${s.price.toFixed(2)}</p>}
-                <p style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: col }}>{pctSign(s.pct)}</p>
-              </div>
-              <Sparkline id={s.ticker} delta={s.pct} color={col} w={32} h={16} />
-            </motion.div>
-          )
-        })}
-      </div>
-    </div>
+    <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={safeColor} stopOpacity="0.18" />
+          <stop offset="90%" stopColor={safeColor} stopOpacity="0.01" />
+        </linearGradient>
+      </defs>
+      {[0.25, 0.5, 0.75].map(v => (
+        <line key={v} x1={PAD} y1={CHART_TOP + v * CHART_H} x2={PAD + cw} y2={CHART_TOP + v * CHART_H}
+          stroke="rgba(200,200,200,0.04)" strokeWidth="1" />
+      ))}
+      <path d={areaPath} fill={`url(#${gradId})`} />
+      <motion.path d={linePath} fill="none" stroke={safeColor} strokeWidth="1.8"
+        strokeLinecap="round" strokeLinejoin="round"
+        initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+        transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }} />
+
+      {/* Peak callout — above chart */}
+      <line x1={peakPt.x} y1={peakPt.y - 5} x2={peakPt.x} y2={CHART_TOP - 4}
+        stroke={safeColor} strokeWidth="0.8" strokeDasharray="3 2" opacity="0.4" />
+      <circle cx={peakPt.x} cy={peakPt.y} r="3.5" fill={safeColor} />
+      <circle cx={peakPt.x} cy={peakPt.y} r="7"   fill={safeColor} opacity="0.12" />
+      <rect x={cx(peakPt.x)} y={2} width={ANN_W} height={38} rx="6"
+        fill="rgba(6,6,6,0.94)" stroke={safeColor} strokeOpacity="0.25" strokeWidth="0.7" />
+      <text x={cx(peakPt.x) + ANN_W / 2} y={15} textAnchor="middle"
+        fontSize="8" fontFamily="monospace" fontWeight="700" fill={safeColor} letterSpacing="0.8">{peakLabel}</text>
+      <text x={cx(peakPt.x) + ANN_W / 2} y={30} textAnchor="middle"
+        fontSize="7.5" fontFamily="monospace" fill="rgba(200,200,200,0.42)">{peakSub}</text>
+
+      {/* Trough callout — below chart */}
+      <line x1={troughPt.x} y1={troughPt.y + 5} x2={troughPt.x} y2={CHART_BOT + 4}
+        stroke={safeColor} strokeWidth="0.8" strokeDasharray="3 2" opacity="0.4" />
+      <circle cx={troughPt.x} cy={troughPt.y} r="3.5" fill={safeColor} />
+      <circle cx={troughPt.x} cy={troughPt.y} r="7"   fill={safeColor} opacity="0.12" />
+      <rect x={cx(troughPt.x)} y={CHART_BOT + 6} width={ANN_W} height={38} rx="6"
+        fill="rgba(6,6,6,0.94)" stroke={safeColor} strokeOpacity="0.25" strokeWidth="0.7" />
+      <text x={cx(troughPt.x) + ANN_W / 2} y={CHART_BOT + 19} textAnchor="middle"
+        fontSize="8" fontFamily="monospace" fontWeight="700" fill={safeColor} letterSpacing="0.8">{troughLabel}</text>
+      <text x={cx(troughPt.x) + ANN_W / 2} y={CHART_BOT + 34} textAnchor="middle"
+        fontSize="7.5" fontFamily="monospace" fill="rgba(200,200,200,0.42)">{troughSub}</text>
+
+      {/* Current dot */}
+      <circle cx={last.x} cy={last.y} r="4"   fill={safeColor} />
+      <circle cx={last.x} cy={last.y} r="8.5" fill={safeColor} opacity="0.14" />
+      <text x={Math.min(last.x + 6, W - 38)} y={last.y - 7}
+        fontSize="8" fontFamily="monospace" fontWeight="700" fill={safeColor} opacity="0.8">AGORA</text>
+    </svg>
   )
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  MARKET CHART PANEL
+// ██  MARKET PANEL — unified chart + annotations + analysis per stock/index
 // ════════════════════════════════════════════════════════════════════════════
 
-function MarketChartPanel({ data }: { data: MarketData }) {
-  const [activeIdx, setActiveIdx] = useState('ibov')
+function MarketPanel({ data }: { data: MarketData }) {
   const ibov  = data.stocks?.ibov
   const { usdBrl } = data.macro
   const oil   = data.commodities.oil
   const gold  = data.commodities.gold
-
-  const indices = [
-    { id: 'ibov',  label: 'IBOV',     value: fmtK(ibov?.value ?? 128000), delta: ibov?.pct ?? 0 },
-    { id: 'usd',   label: 'USD/BRL',  value: `R$${usdBrl.value}`,          delta: usdBrl.delta },
-    { id: 'gold',  label: 'OURO',     value: `$${gold?.value ?? '—'}`,      delta: gold?.delta ?? 0 },
-    { id: 'oil',   label: 'PETRÓLEO', value: `$${oil?.value ?? '—'}`,       delta: oil?.delta ?? 0 },
+  const brStocks = data.stocks?.br ?? []
+  const fallback: StockBR[] = [
+    { ticker: 'PETR4', label: 'Petrobras',  price: 36.50, pct: 0 },
+    { ticker: 'VALE3', label: 'Vale',        price: 58.20, pct: 0 },
+    { ticker: 'ITUB4', label: 'Itaú Unib.', price: 27.90, pct: 0 },
+    { ticker: 'BBDC4', label: 'Bradesco',   price: 15.80, pct: 0 },
+    { ticker: 'WEGE3', label: 'WEG',        price: 50.10, pct: 0 },
+    { ticker: 'ABEV3', label: 'Ambev',      price: 13.20, pct: 0 },
   ]
+  const stocks = brStocks.length > 0 ? brStocks : fallback
+  const [activeId, setActiveId] = useState('ibov')
 
-  type Analysis = { signal: string; signalColor: string; cenario: string; impacto: string; decisao: string }
+  type TabDef = { id: string; label: string; value: string; delta: number; group: string; peakLabel: string; peakSub: string; troughLabel: string; troughSub: string; signal: string; signalColor: string; cenario: string; impacto: string; decisao: string }
 
-  const analysis: Record<string, Analysis> = {
-    ibov: (() => {
-      const pct = ibov?.pct ?? 0
-      const val = fmtK(ibov?.value ?? 128000)
-      if (pct > 1.5) return {
-        signal: 'ALTA', signalColor: '#34d399',
-        cenario: `IBOVESPA em alta de ${pctSign(pct)} operando a ${val} pontos. Fluxo de capital estrangeiro positivo e apetite por risco elevado no mercado doméstico.`,
-        impacto: 'Bolsa em alta facilita captação via equity, melhora valuation de PMEs e reabre linhas de crédito bancário. Momento de antecipar negociações e revisão de contratos.',
-        decisao: 'Aproveite para captações, renegociações e acesso a crédito. Avalie M&A — múltiplos sobem com o índice. Janela curta.',
-      }
-      if (pct < -1.5) return {
-        signal: 'QUEDA', signalColor: '#f87171',
-        cenario: `IBOVESPA em queda de ${pctSign(pct)} a ${val} pontos. Saída de capital de risco, aversão elevada e pressão vendedora nas principais ações da B3.`,
-        impacto: 'Queda comprime valuation, dificulta captação e sinaliza potencial contração de crédito bancário. PMEs com caixa curto devem revisar vencimentos de dívida.',
-        decisao: 'Preserve caixa, evite compromissos de capital fixo no curto prazo. Foque em eficiência e monitoramento de inadimplência da carteira.',
-      }
-      return {
-        signal: 'LATERAL', signalColor: '#fbbf24',
-        cenario: `IBOVESPA operando lateral a ${val} pontos (${pctSign(pct)} no dia). Mercado aguarda sinalizações do COPOM e dados fiscais para definir nova tendência.`,
-        impacto: 'Incerteza de mercado. Crédito disponível mas com cautela. Boa janela para renegociar passivos e revisar precificação antes da próxima tendência.',
-        decisao: 'Aguarde definição antes de decisões estruturais de capital. Priorize eficiência e reduza custos fixos enquanto o cenário não clareia.',
-      }
-    })(),
-    usd: (() => {
-      const v = usdBrl.value, d = usdBrl.delta
-      if (v > 5.8) return {
-        signal: 'DÓLAR PRESSIONADO', signalColor: '#f87171',
-        cenario: `Dólar cotado a R$${v} (${pctSign(d)} hoje). Câmbio acima de R$5,80 reflete pressão fiscal doméstica, saída de capital e percepção de risco-Brasil elevada.`,
-        impacto: 'Insumos importados, máquinas, software e matérias-primas estrangeiras ficam 20–35% mais caras. Energia e combustíveis sobem por repasse. Exportadores ganham; importadores perdem.',
-        decisao: 'Antecipe compras de insumos importados. Negocie hedge cambial. Repasse o custo gradualmente para não perder competitividade de mercado.',
-      }
-      if (v > 5.0) return {
-        signal: 'CÂMBIO ELEVADO', signalColor: '#fbbf24',
-        cenario: `Dólar a R$${v} (${pctSign(d)} hoje). Câmbio elevado gera pressão inflacionária em insumos importados e frete internacional, mas ainda sem patamar de emergência.`,
-        impacto: 'Custo de importação cresce. Varejo, tech e indústria com fornecedores externos sentem aperto de margem. Agro e exportadoras se beneficiam diretamente.',
-        decisao: `Com câmbio R$${v}, avalie substituição de insumos importados por nacionais onde possível. Revise precificação de produtos com componentes em dólar.`,
-      }
-      return {
-        signal: 'CÂMBIO FAVORÁVEL', signalColor: '#34d399',
-        cenario: `Dólar a R$${v} (${pctSign(d)} hoje). Real valorizado indica confiança externa e fluxo de capital positivo. Patamar abaixo de R$5,00 é historicamente favorável para importadores.`,
-        impacto: 'Boa janela para importar equipamentos, tecnologia e insumos. Custo de software SaaS e serviços em dólar cai. Indústria pode renovar maquinário com menor custo.',
-        decisao: 'Aproveite o câmbio favorável para importar, atualizar equipamentos e fixar contratos de fornecimento em dólar pelo menor valor possível.',
-      }
-    })(),
-    gold: (() => {
-      const d = gold?.delta ?? 0, v = gold?.value ?? 0
-      if (d > 1.5) return {
-        signal: 'REFÚGIO ATIVO', signalColor: '#fbbf24',
-        cenario: `Ouro em alta de ${pctSign(d)} a $${v}/onça. Alta demanda por ativo-refúgio sinaliza aversão a risco global — tensão geopolítica, instabilidade bancária ou expectativa de corte de juros no Fed.`,
-        impacto: 'Stress financeiro global eleva custo de capital externo. Empresas com dívida em dólar ou exposição cambial ficam vulneráveis. Crédito internacional pode encarecer.',
-        decisao: 'Revise exposição cambial e dívidas estrangeiras. Considere hedge. Evite compromissos de longo prazo com fornecedores internacionais até o cenário estabilizar.',
-      }
-      if (d < -1.5) return {
-        signal: 'AVERSÃO A RISCO CAI', signalColor: '#34d399',
-        cenario: `Ouro em queda de ${pctSign(d)} a $${v}/onça. Redução de aversão a risco ou alta de juros americanos comprimem a demanda por refúgio. Capital migra para ativos de maior risco.`,
-        impacto: 'Ambiente de menor stress global: capital retorna para bolsas emergentes e crédito corporativo. Pode indicar melhora no apetite por investimento produtivo.',
-        decisao: 'Boa janela para acesso a crédito e captação. Câmbio pode se valorizar com retorno de fluxo. Monitore condições de crédito externo.',
-      }
-      return {
-        signal: 'OURO ESTÁVEL', signalColor: '#c0c0c0',
-        cenario: `Ouro a $${v}/onça (${pctSign(d)} no dia). Mercado sem gatilhos de aversão a risco expressivos. Movimento dentro da faixa normal de oscilação diária do ativo-refúgio.`,
-        impacto: 'Impacto limitado no curto prazo para PMEs nacionais. Estabilidade do ouro indica ambiente neutro — nem expansão de risco nem fuga de capital.',
-        decisao: 'Sem ação urgente. Monitore para detectar mudança. Se tiver operações em dólar, acompanhe correlação ouro/USD — costumam se mover juntos.',
-      }
-    })(),
-    oil: (() => {
-      const d = oil?.delta ?? 0, v = oil?.value ?? 0
-      if (d > 2) return {
-        signal: 'PRESSÃO ALTA', signalColor: '#f87171',
-        cenario: `Petróleo (Brent) em alta de ${pctSign(d)} a $${v}/barril. Cortes da OPEP+, tensões geopolíticas no Oriente Médio ou demanda aquecida pressionam o preço do crude.`,
-        impacto: 'Cada +10% no petróleo representa +4–8% no diesel, +6–12% no frete rodoviário e pressão em plásticos, embalagens e derivados. Logística, varejo e indústria sentem direto no caixa.',
-        decisao: 'Antecipe renegociação de contratos logísticos com cláusula de reajuste. Revise precificação de produtos com alto componente de frete. Avalie contratos futuros de diesel.',
-      }
-      if (d < -2) return {
-        signal: 'ALÍVIO DE CUSTOS', signalColor: '#34d399',
-        cenario: `Petróleo em queda de ${pctSign(d)} a $${v}/barril. Excesso de oferta, queda de demanda global ou liquidação especulativa comprimem o preço do Brent.`,
-        impacto: 'Queda do petróleo reduz frete, combustível, energia industrial e insumos petroquímicos. Impacto direto positivo no caixa de transportadoras, distribuidoras e indústria.',
-        decisao: 'Negocie contratos logísticos com preço fixo agora, antes de eventual recuperação. Revise orçamento de energia — possibilidade real de redução de custo operacional.',
-      }
-      return {
-        signal: 'PETRÓLEO ESTÁVEL', signalColor: '#fbbf24',
-        cenario: `Petróleo a $${v}/barril (${pctSign(d)} no dia). Equilíbrio entre oferta da OPEP+ e demanda global. Sem evento disruptivo no curto prazo no mercado de energia.`,
-        impacto: 'Custo de frete e energia previsíveis. Empresas logísticas e industriais ganham janela para planejamento. Orçamentos com custo de energia podem ser mantidos.',
-        decisao: 'Momento estável para fixar contratos de frete e energia com preço definido. Monitore conflitos geopolíticos que possam afetar a oferta de forma abrupta.',
-      }
-    })(),
+  const ibovPct = ibov?.pct ?? 0
+  const ibovVal = fmtK(ibov?.value ?? 128000)
+  const selic   = data.macro.selic.value
+
+  const stockTab = (s: StockBR, peak: [string,string], trough: [string,string], cenario: string, impacto: string, decisao: string): TabDef => {
+    const col = s.pct > 0.5 ? '#34d399' : s.pct < -0.5 ? '#f87171' : '#fbbf24'
+    const sig = s.pct > 0.5 ? 'EM ALTA' : s.pct < -0.5 ? 'EM QUEDA' : 'ESTÁVEL'
+    return { id: s.ticker, label: s.ticker, value: s.price ? `R$${s.price.toFixed(2)}` : '—', delta: s.pct, group: 'ação', peakLabel: peak[0], peakSub: peak[1], troughLabel: trough[0], troughSub: trough[1], signal: sig, signalColor: col, cenario, impacto, decisao }
   }
 
-  const active    = indices.find(i => i.id === activeIdx) ?? indices[0]
+  const petr = stocks.find(s => s.ticker === 'PETR4')
+  const vale = stocks.find(s => s.ticker === 'VALE3')
+  const itub = stocks.find(s => s.ticker === 'ITUB4')
+  const bbdc = stocks.find(s => s.ticker === 'BBDC4')
+  const wege = stocks.find(s => s.ticker === 'WEGE3')
+  const abev = stocks.find(s => s.ticker === 'ABEV3')
+
+  const tabs: TabDef[] = [
+    {
+      id: 'ibov', label: 'IBOV', value: ibovVal, delta: ibovPct, group: 'índice',
+      peakLabel: 'RESISTÊNCIA', peakSub: 'euforia / fluxo externo',
+      troughLabel: 'SUPORTE', troughSub: 'saída de capital risco',
+      signal: ibovPct > 1.5 ? 'ALTA' : ibovPct < -1.5 ? 'QUEDA' : 'LATERAL',
+      signalColor: ibovPct > 1.5 ? '#34d399' : ibovPct < -1.5 ? '#f87171' : '#fbbf24',
+      cenario: ibovPct > 1.5 ? `IBOV em alta de ${pctSign(ibovPct)} a ${ibovVal} pts. Apetite por risco elevado, fluxo estrangeiro positivo.` : ibovPct < -1.5 ? `IBOV em queda de ${pctSign(ibovPct)} a ${ibovVal} pts. Saída de capital, aversão a risco elevada.` : `IBOV lateral a ${ibovVal} pts (${pctSign(ibovPct)}). Mercado aguarda COPOM e dados fiscais para definir tendência.`,
+      impacto: ibovPct > 1.5 ? 'Captação via equity facilitada, crédito flui melhor, valuation de PMEs sobe. Janela para captações estratégicas.' : ibovPct < -1.5 ? 'Crédito se contrai, valuation cai. PMEs com caixa curto devem revisar vencimentos e evitar novos compromissos.' : 'Incerteza — crédito disponível mas cauteloso. Boa janela para renegociar passivos antes da próxima tendência.',
+      decisao: ibovPct > 1.5 ? 'Aproveite para captações e renegociações. Avalie M&A — múltiplos sobem com o índice. Janela curta.' : ibovPct < -1.5 ? 'Preserve caixa. Evite capital fixo no curto prazo. Monitore inadimplência da carteira.' : 'Aguarde definição antes de decisões estruturais de capital. Priorize eficiência e reduza custos fixos.',
+    },
+    ...(petr ? [stockTab(petr,
+      ['ALTA C/ PETRÓLEO', 'brent puxou valorização'],
+      ['PRESSÃO POLÍTICA', 'risco dividendo + câmbio'],
+      `Petrobras (PETR4) a ${petr.price ? `R$${petr.price.toFixed(2)}` : '—'} (${pctSign(petr.pct)}). Desempenho atrelado ao Brent, política de dividendos e câmbio. Pré-sal garante base sólida, mas risco político pressiona prêmio de risco.`,
+      'Alta da Petrobras sinaliza otimismo com energia e câmbio. Fornecedores do segmento (serviços, equipamentos, logística) se beneficiam com o ambiente favorável.',
+      petr.pct > 0.5 ? 'Alta reforça tese de energia brasileira. Setores correlatos ganham — avalie parceiros fornecedores.' : petr.pct < -0.5 ? 'Queda reflete risco político. Revise exposição ao setor energético e monitore política de preços de combustíveis.' : 'Lateral — aguarde clareza sobre dividendos e Brent antes de decisão de exposição ao setor.',
+    )] : []),
+    ...(vale ? [stockTab(vale,
+      ['DEMANDA CHINA', 'minério de ferro em alta'],
+      ['DESACELERAÇÃO', 'China corta produção aço'],
+      `Vale (VALE3) a ${vale.price ? `R$${vale.price.toFixed(2)}` : '—'} (${pctSign(vale.pct)}). Maior produtora de minério de ferro do mundo — preço ditado pelo mercado de aço chinês. USD/BRL amplifica receitas em reais.`,
+      'Alta da Vale reflete expansão industrial global. Beneficia exportação de minério, siderurgia nacional e cadeia logística de exportação. Empresas com insumos metálicos ganham em ambiente de alta.',
+      vale.pct > 0.5 ? 'Expansão industrial global — cadeia siderúrgica nacional ganha. Avalie parceiros e fornecedores correlatos.' : vale.pct < -0.5 ? 'Fraqueza da China comprime commodities metálicas. Revise exposição à indústria pesada e avalie pressão de custos.' : 'Estável — monitore China e Brent para sinalizar o próximo movimento.',
+    )] : []),
+    ...(itub ? [stockTab(itub,
+      ['SPREAD FAVORÁVEL', `SELIC ${selic}% + inadimp. baixa`],
+      ['COMPRESSÃO NIM', 'inadimplência pressiona'],
+      `Itaú Unibanco (ITUB4) a ${itub.price ? `R$${itub.price.toFixed(2)}` : '—'} (${pctSign(itub.pct)}). Maior banco privado do Brasil — resultado ditado por spread de crédito, SELIC em ${selic}% e qualidade da carteira.`,
+      `SELIC ${selic}% gera spread ${selic > 13 ? 'elevado — banco lucra mas comprime tomadores PJ' : 'moderado'}. Alta do Itaú = confiança no sistema de crédito e inadimplência controlada — bom sinal para o mercado geral.`,
+      itub.pct > 0.5 ? 'Crédito saudável — momento para renegociar taxas e ampliar linhas de capital de giro com bancos.' : itub.pct < -0.5 ? 'Piora no crédito. Monitore inadimplência no seu setor e revise política de prazo com clientes.' : 'Crédito disponível sem catalisador. Mantenha negociação ativa com gerente de conta.',
+    )] : []),
+    ...(bbdc ? [stockTab(bbdc,
+      ['INADIMP. CONTROLADA', 'expansão crédito varejo'],
+      ['PIORA DE CARTEIRA', 'provisões sobem'],
+      `Bradesco (BBDC4) a ${bbdc.price ? `R$${bbdc.price.toFixed(2)}` : '—'} (${pctSign(bbdc.pct)}). Banco de varejo com forte exposição à inadimplência de pessoas físicas e PMEs. Termômetro real do crédito popular.`,
+      'Bradesco é espelho do crédito popular e PMEs. Alta sinaliza queda de inadimplência — bom para quem financia clientes. Queda alerta para piora da carteira nacional.',
+      bbdc.pct > 0.5 ? 'Crédito ao consumidor aquecido. Bom momento para ampliar parcelamentos e condições de crédito ao cliente.' : bbdc.pct < -0.5 ? 'Pressão de inadimplência no varejo. Revise política de crédito, prazos e exposição a clientes vulneráveis.' : 'Estável. Monitore provisões do próximo resultado para antecipar tendência.',
+    )] : []),
+    ...(wege ? [stockTab(wege,
+      ['EXPORTAÇÃO AQUECIDA', 'câmbio + demanda global'],
+      ['INDÚSTRIA FRACA', 'capex corporativo cai'],
+      `WEG (WEGE3) a ${wege.price ? `R$${wege.price.toFixed(2)}` : '—'} (${pctSign(wege.pct)}). Líder em motores elétricos e automação industrial. Mais de 60% das receitas fora do Brasil — protege de flutuações domésticas.`,
+      'WEG é proxy de atividade industrial global. Alta = empresas investindo em capex e automação. Queda indica postergação de investimentos industriais — cuidado com projetos de expansão.',
+      wege.pct > 0.5 ? 'Empresas industriais estão investindo. Bom momento para capex em automação e eficiência energética.' : wege.pct < -0.5 ? 'Desaceleração industrial. Postergue capex não urgente e revise ROI de automação antes de aprovar.' : 'Neutro. Projetos com payback <24 meses podem avançar com segurança.',
+    )] : []),
+    ...(abev ? [stockTab(abev,
+      ['CONSUMO AQUECIDO', 'renda e vendas sazonais'],
+      ['PRESSÃO DE CUSTO', 'insumos + câmbio sobem'],
+      `Ambev (ABEV3) a ${abev.price ? `R$${abev.price.toFixed(2)}` : '—'} (${pctSign(abev.pct)}). Maior bebidas da América Latina — termômetro de consumo doméstico, poder de precificação e eficiência de cadeia.`,
+      'Ambev reflete consumo popular e poder de repasse de custos. Alta = confiança do consumidor + margens saudáveis. Queda = pressão de custos ou queda de volume.',
+      abev.pct > 0.5 ? 'Consumo aquecido. Ampliar canais de distribuição e pontos de venda pode capturar demanda incremental.' : abev.pct < -0.5 ? 'Pressão no consumo. Revise mix de produto e canal — foque em itens de maior margem.' : 'Estável. Foque em eficiência de cadeia e margem por canal.',
+    )] : []),
+    {
+      id: 'usd', label: 'USD/BRL', value: `R$${usdBrl.value}`, delta: usdBrl.delta, group: 'macro',
+      peakLabel: 'DÓLAR EM ALTA', peakSub: 'fuga de risco / pressão fiscal',
+      troughLabel: 'REAL FORTE', troughSub: 'fluxo estrangeiro positivo',
+      signal: usdBrl.value > 5.8 ? 'PRESSIONADO' : usdBrl.value > 5.0 ? 'ELEVADO' : 'FAVORÁVEL',
+      signalColor: usdBrl.value > 5.8 ? '#f87171' : usdBrl.value > 5.0 ? '#fbbf24' : '#34d399',
+      cenario: `Dólar a R$${usdBrl.value} (${pctSign(usdBrl.delta)}). ${usdBrl.value > 5.8 ? 'Câmbio acima de R$5,80 reflete pressão fiscal e percepção de risco-Brasil elevada.' : usdBrl.value > 5.0 ? 'Câmbio elevado gera pressão em insumos importados e frete internacional.' : 'Real valorizado, fluxo de capital positivo — patamar historicamente favorável para importadores.'}`,
+      impacto: usdBrl.value > 5.0 ? 'Insumos importados, máquinas, software e matérias-primas estrangeiras encarecem. Energia e combustíveis sobem por repasse. Exportadores ganham; importadores perdem.' : 'Boa janela para importar equipamentos, tecnologia e insumos. Custo de software SaaS e serviços em dólar cai.',
+      decisao: usdBrl.value > 5.8 ? 'Antecipe compras de insumos importados. Negocie hedge cambial. Repasse o custo gradualmente.' : usdBrl.value > 5.0 ? `Avalie substituição de insumos importados por nacionais. Revise precificação de produtos com componentes em dólar.` : 'Aproveite para importar, atualizar equipamentos e fixar contratos de fornecimento em dólar.',
+    },
+    {
+      id: 'gold', label: 'OURO', value: `$${gold?.value ?? '—'}`, delta: gold?.delta ?? 0, group: 'macro',
+      peakLabel: 'REFÚGIO MÁXIMO', peakSub: 'stress financeiro global',
+      troughLabel: 'APETITE POR RISCO', troughSub: 'capital migra p/ renda variável',
+      signal: (gold?.delta ?? 0) > 1.5 ? 'REFÚGIO ATIVO' : (gold?.delta ?? 0) < -1.5 ? 'RISCO CAI' : 'ESTÁVEL',
+      signalColor: (gold?.delta ?? 0) > 1.5 ? '#fbbf24' : (gold?.delta ?? 0) < -1.5 ? '#34d399' : '#c0c0c0',
+      cenario: `Ouro a $${gold?.value ?? '—'}/onça (${pctSign(gold?.delta ?? 0)}). ${(gold?.delta ?? 0) > 1.5 ? 'Alta demanda por refúgio — tensão geopolítica ou expectativa de corte de juros no Fed.' : (gold?.delta ?? 0) < -1.5 ? 'Capital migra para ativos de risco — menor aversão, bolsas e crédito corporativo ganham fluxo.' : 'Ambiente neutro de risco global.'}`,
+      impacto: (gold?.delta ?? 0) > 1.5 ? 'Stress global eleva custo de capital externo. Empresas com dívida em dólar ficam vulneráveis.' : 'Ambiente favorável para captação e crédito internacional. Câmbio pode valorizar com retorno de fluxo.',
+      decisao: (gold?.delta ?? 0) > 1.5 ? 'Revise exposição cambial. Considere hedge. Evite compromissos de longo prazo com fornecedores internacionais.' : (gold?.delta ?? 0) < -1.5 ? 'Boa janela para captação. Câmbio pode valorizar — monitore condições de crédito externo.' : 'Sem ação urgente. Monitore correlação ouro/USD para detectar mudança de tendência.',
+    },
+    {
+      id: 'oil', label: 'PETRÓLEO', value: `$${oil?.value ?? '—'}`, delta: oil?.delta ?? 0, group: 'macro',
+      peakLabel: 'OFERTA RESTRITA', peakSub: 'OPEP+ corta / tensão geopolítica',
+      troughLabel: 'EXCESSO DE OFERTA', troughSub: 'OPEP+ relaxa / demanda fraca',
+      signal: (oil?.delta ?? 0) > 2 ? 'PRESSÃO ALTA' : (oil?.delta ?? 0) < -2 ? 'ALÍVIO DE CUSTOS' : 'ESTÁVEL',
+      signalColor: (oil?.delta ?? 0) > 2 ? '#f87171' : (oil?.delta ?? 0) < -2 ? '#34d399' : '#fbbf24',
+      cenario: `Petróleo (Brent) a $${oil?.value ?? '—'}/barril (${pctSign(oil?.delta ?? 0)}). ${(oil?.delta ?? 0) > 2 ? 'Cortes da OPEP+ ou tensões geopolíticas pressionam o crude.' : (oil?.delta ?? 0) < -2 ? 'Excesso de oferta ou queda de demanda global comprimem o Brent.' : 'Equilíbrio entre oferta OPEP+ e demanda global.'}`,
+      impacto: (oil?.delta ?? 0) > 2 ? 'Cada +10% no petróleo = +4–8% no diesel e +6–12% no frete rodoviário. Logística, varejo e indústria sentem direto no caixa.' : (oil?.delta ?? 0) < -2 ? 'Queda reduz frete, combustível, energia industrial e petroquímicos — impacto positivo direto no caixa.' : 'Custo de frete e energia previsíveis — janela de planejamento para empresas logísticas.',
+      decisao: (oil?.delta ?? 0) > 2 ? 'Antecipe renegociação de contratos logísticos. Revise precificação com alto frete. Avalie contratos futuros de diesel.' : (oil?.delta ?? 0) < -2 ? 'Negocie contratos logísticos com preço fixo agora. Revise orçamento de energia.' : 'Momento estável para fixar contratos de frete. Monitore conflitos geopolíticos.',
+    },
+  ]
+
+  const active    = tabs.find(t => t.id === activeId) ?? tabs[0]
   const chartColor = active.delta > 0 ? '#34d399' : active.delta < 0 ? '#f87171' : '#c0c0c0'
-  const activeAnalysis = analysis[activeIdx]
 
   return (
     <div style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
-      {/* Tab switcher */}
-      <div style={{ padding: '12px 16px 10px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-        {indices.map(idx => {
-          const isActive = activeIdx === idx.id
-          const col = pctColor(idx.delta)
+      {/* Tab row */}
+      <div style={{ display: 'flex', overflowX: 'auto', scrollbarWidth: 'none', borderBottom: '1px solid rgba(200,200,200,0.05)' }}>
+        {tabs.map(tab => {
+          const isActive = activeId === tab.id
+          const col = tab.delta > 0 ? '#34d399' : tab.delta < 0 ? '#f87171' : '#c0c0c0'
           return (
-            <button key={idx.id} onClick={() => setActiveIdx(idx.id)}
-              style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '6px 11px', borderRadius: 9, cursor: 'pointer', background: isActive ? 'rgba(200,200,200,0.08)' : 'transparent', border: `1px solid ${isActive ? 'rgba(200,200,200,0.16)' : 'transparent'}`, transition: 'all 0.15s' }}>
-              <div>
-                <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.32)', marginBottom: 1 }}>{idx.label}</p>
-                <p style={{ fontSize: 13, fontWeight: 800, fontFamily: 'monospace', color: isActive ? 'rgba(235,235,235,0.95)' : 'rgba(200,200,200,0.40)', lineHeight: 1 }}>{idx.value}</p>
-              </div>
-              <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: col }}>{pctSign(idx.delta)}</span>
+            <button key={tab.id} onClick={() => setActiveId(tab.id)}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '10px 14px', flexShrink: 0, cursor: 'pointer', background: isActive ? 'rgba(200,200,200,0.06)' : 'transparent', borderBottom: `2px solid ${isActive ? col : 'transparent'}`, transition: 'all 0.14s', borderRight: '1px solid rgba(200,200,200,0.04)' }}>
+              <span style={{ fontSize: 6.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.14em', color: isActive ? col + 'cc' : 'rgba(192,192,192,0.22)' }}>{tab.group}</span>
+              <span style={{ fontSize: 11, fontWeight: 800, fontFamily: 'monospace', color: isActive ? 'rgba(235,235,235,0.95)' : 'rgba(192,192,192,0.42)' }}>{tab.label}</span>
+              <span style={{ fontSize: 9.5, fontFamily: 'monospace', fontWeight: 700, color: isActive ? 'rgba(228,228,228,0.80)' : 'rgba(192,192,192,0.35)' }}>{tab.value}</span>
+              <span style={{ fontSize: 8, fontFamily: 'monospace', fontWeight: 700, color: col }}>{pctSign(tab.delta)}</span>
             </button>
           )
         })}
       </div>
 
-      {/* Chart */}
-      <div style={{ padding: '10px 14px 6px' }}>
+      {/* Annotated chart */}
+      <div style={{ padding: '4px 10px 0' }}>
         <AnimatePresence mode="wait">
-          <motion.div key={activeIdx} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
-            <AreaChart id={activeIdx} delta={active.delta} color={chartColor} />
+          <motion.div key={activeId} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
+            <AnnotatedAreaChart
+              id={activeId} delta={active.delta} color={chartColor}
+              peakLabel={active.peakLabel} peakSub={active.peakSub}
+              troughLabel={active.troughLabel} troughSub={active.troughSub}
+            />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* Analysis */}
+      {/* Signal + 3-col analysis */}
       <AnimatePresence mode="wait">
-        <motion.div key={activeIdx + '-analysis'}
-          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-          transition={{ duration: 0.22 }}
-          style={{ borderTop: '1px solid rgba(200,200,200,0.05)', padding: '14px 16px 16px' }}
+        <motion.div key={activeId + '-a'}
+          initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          style={{ borderTop: '1px solid rgba(200,200,200,0.05)', padding: '14px 16px 18px' }}
         >
-          {/* Signal badge */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: activeAnalysis.signalColor, background: activeAnalysis.signalColor + '18', border: `1px solid ${activeAnalysis.signalColor}30`, borderRadius: 99, padding: '3px 10px', textTransform: 'uppercase', letterSpacing: '0.18em' }}>{activeAnalysis.signal}</span>
+            <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: active.signalColor, background: active.signalColor + '18', border: `1px solid ${active.signalColor}30`, borderRadius: 99, padding: '3px 10px', textTransform: 'uppercase', letterSpacing: '0.18em' }}>{active.signal}</span>
             <div style={{ flex: 1, height: 1, background: 'rgba(200,200,200,0.04)' }} />
+            <span style={{ fontSize: 8, fontFamily: 'monospace', color: 'rgba(192,192,192,0.28)' }}>{active.label} · {active.value}</span>
           </div>
-
-          {/* 3-col analysis */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: 14 }}>
             {[
-              { label: 'Cenário', text: activeAnalysis.cenario,  color: 'rgba(192,192,192,0.26)' },
-              { label: 'Impacto no Negócio', text: activeAnalysis.impacto, color: '#f87171aa' },
-              { label: 'Decisão', text: activeAnalysis.decisao,  color: '#34d399aa' },
+              { label: 'Cenário', text: active.cenario, color: 'rgba(192,192,192,0.26)' },
+              { label: 'Impacto no Negócio', text: active.impacto, color: '#f87171aa' },
+              { label: 'Decisão', text: active.decisao, color: '#34d399aa' },
             ].map(col => (
               <div key={col.label}>
                 <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: col.color, marginBottom: 6, fontWeight: 700 }}>{col.label}</p>
@@ -742,67 +810,10 @@ function MarketChartPanel({ data }: { data: MarketData }) {
           </div>
         </motion.div>
       </AnimatePresence>
-
-      {/* B3 stocks — compact grid inside the same card */}
-      <StocksGrid data={data} />
     </div>
   )
 }
 
-// ════════════════════════════════════════════════════════════════════════════
-// ██  STOCK LIST
-// ════════════════════════════════════════════════════════════════════════════
-
-function StockList({ stocks }: { stocks: { ticker: string; label: string; price?: number; pct: number }[] }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      {stocks.map((s, i) => {
-        const col = pctColor(s.pct)
-        return (
-          <motion.div key={s.ticker}
-            initial={{ opacity: 0, x: 8 }} whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }} transition={{ delay: i * 0.04 }}
-            style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: 'rgba(255,255,255,0.02)', borderRadius: 8, borderLeft: `2px solid ${col}35` }}
-          >
-            <span style={{ width: 46, fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(200,200,200,0.50)', textTransform: 'uppercase', flexShrink: 0 }}>{s.ticker}</span>
-            <span style={{ flex: 1, fontSize: 9.5, color: 'rgba(200,200,200,0.32)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.label}</span>
-            {s.price !== undefined && (
-              <span style={{ fontSize: 11.5, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(220,220,220,0.75)', flexShrink: 0 }}>R${s.price.toFixed(2)}</span>
-            )}
-            <span style={{ fontSize: 9.5, fontFamily: 'monospace', fontWeight: 700, color: col, flexShrink: 0, minWidth: 52, textAlign: 'right' }}>{pctSign(s.pct)}</span>
-            <div style={{ width: 34, flexShrink: 0 }}><Sparkline id={s.ticker} delta={s.pct} color={col} w={34} h={16} /></div>
-          </motion.div>
-        )
-      })}
-    </div>
-  )
-}
-
-function StockListPanel({ data }: { data: MarketData }) {
-  const brStocks = data.stocks?.br ?? []
-  const fallback: StockBR[] = [
-    { ticker: 'PETR4', label: 'Petrobras',  price: 36.50, pct: 0 },
-    { ticker: 'VALE3', label: 'Vale',        price: 58.20, pct: 0 },
-    { ticker: 'ITUB4', label: 'Itaú Unib.',  price: 27.90, pct: 0 },
-    { ticker: 'BBDC4', label: 'Bradesco',    price: 15.80, pct: 0 },
-    { ticker: 'WEGE3', label: 'WEG',         price: 50.10, pct: 0 },
-    { ticker: 'MGLU3', label: 'Magazine Luiza', price: 8.40, pct: 0 },
-  ]
-  const list = brStocks.length > 0 ? brStocks : fallback
-
-  return (
-    <div style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden', height: '100%' }}>
-      <div style={{ padding: '12px 14px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>B3 · Ações</span>
-        <motion.div style={{ width: 5, height: 5, borderRadius: '50%', background: '#34d399', marginLeft: 2 }}
-          animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} />
-      </div>
-      <div style={{ padding: '8px 10px 10px' }}>
-        <StockList stocks={list} />
-      </div>
-    </div>
-  )
-}
 
 // ════════════════════════════════════════════════════════════════════════════
 // ██  MACRO STATS PANEL
@@ -1538,7 +1549,7 @@ export default function AbaBusiness() {
         {/* Chart + Analysis + B3 */}
         <div id="section-mercado">
           <SectionLabel label="02 · Mercado & B3" sub="índices, ações e variação" />
-          <MarketChartPanel data={data} />
+          <MarketPanel data={data} />
         </div>
 
         {/* 3-col stats */}
