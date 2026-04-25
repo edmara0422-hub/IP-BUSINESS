@@ -454,6 +454,11 @@ function GlobeHero({ data }: { data: MarketData }) {
             </div>
           )}
         </AnimatePresence>
+
+        {/* Audio resumo do globo */}
+        <div className="flex justify-center mt-1">
+          <AudioButton color="#34d399" text={chips.map(c => `${c.label}: ${c.value}. ${c.signal?.text ?? ''}. ${c.oque ?? ''}`).join(' ')} />
+        </div>
       </div>
     </div>
   )
@@ -915,7 +920,8 @@ function MacroStatsPanel({ data }: { data: MarketData }) {
       style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
       <div style={{ padding: '11px 16px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>Macro · 01</span>
-        <span style={{ marginLeft: 'auto', fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{signal.label}</span>
+        <AudioButton color={signal.color} text={`Indicadores macro. SELIC ${selic.value} por cento ao ano. IPCA ${ipca.value} por cento em doze meses. Dólar R$${usdBrl.value}. PIB projeção ${pib.value} por cento. ${decisao}`} />
+        <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{signal.label}</span>
       </div>
       <div style={{ padding: '14px 16px 10px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         {stats.map(s => (
@@ -966,7 +972,8 @@ function CommoditiesStatsPanel({ data }: { data: MarketData }) {
       style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
       <div style={{ padding: '11px 16px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>Commodities · 04</span>
-        <span style={{ marginLeft: 'auto', fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{signal.label}</span>
+        <AudioButton color={signal.color} text={`Commodities. Petróleo ${oil?.value ? `$${oil.value} por barril` : 'indisponível'}, variação ${pctSign(oilDelta)}. Ouro ${gold?.value ? `$${gold.value} por onça` : 'indisponível'}, variação ${pctSign(goldDelta)}. Prata ${silver?.value ? `$${silver.value} por onça` : 'indisponível'}. ${decisao}`} />
+        <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{signal.label}</span>
       </div>
       <div style={{ padding: '12px 16px 8px', display: 'flex', flexDirection: 'column', gap: 11 }}>
         {items.map(item => {
@@ -1278,7 +1285,8 @@ function IntelCard({ num, label, badge, badgeColor, stats, insight, decisao, dec
         <span style={{ fontSize: 7.5, fontFamily: 'monospace', color: 'rgba(192,192,192,0.18)', letterSpacing: '0.2em' }}>{num}</span>
         <div style={{ width: 1, height: 10, background: 'rgba(200,200,200,0.10)', flexShrink: 0 }} />
         <span style={{ fontSize: 8, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.40)', fontWeight: 700 }}>{label}</span>
-        <span style={{ marginLeft: 'auto', fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: badgeColor, background: badgeColor + '18', border: `1px solid ${badgeColor}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{badge}</span>
+        <AudioButton color={badgeColor} text={`${label}. ${stats.map(s => `${s.label}: ${s.value}`).join('. ')}. ${insight} Decisão: ${decisao}`} />
+        <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: badgeColor, background: badgeColor + '18', border: `1px solid ${badgeColor}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{badge}</span>
       </div>
       <div style={{ padding: '14px 16px 10px', display: 'grid', gridTemplateColumns: `repeat(${stats.length}, 1fr)`, gap: 12 }}>
         {stats.map(s => (
@@ -1493,7 +1501,8 @@ Seja cirúrgico. Use os dados de mercado reais fornecidos. Zero generalidades.`
           </div>
         )}
         {typed && !loading && (
-          <div className="flex justify-end mt-3">
+          <div className="flex justify-between items-center mt-3">
+            <AudioButton color="#34d399" text={typed} />
             <motion.button whileTap={{ scale: 0.96 }} onClick={generate}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9px] font-mono"
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.25)' }}>
@@ -1517,6 +1526,50 @@ const IA_PRESETS = [
   'Impacto da SELIC no meu negócio',
   'Riscos externos mais críticos',
 ]
+
+function MicButton({ onResult }: { onResult: (text: string) => void }) {
+  const [listening, setListening] = useState(false)
+  const recRef = useRef<unknown>(null)
+
+  const toggle = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SRClass = ((window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition) as (new() => any) | undefined
+    if (!SRClass) return
+    if (listening) { (recRef.current as any)?.stop(); setListening(false); return }
+    const rec = new SRClass()
+    rec.lang = 'pt-BR'
+    rec.continuous = false
+    rec.interimResults = false
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rec.onresult = (e: any) => { onResult(e.results[0][0].transcript); setListening(false) }
+    rec.onerror = () => setListening(false)
+    rec.onend = () => setListening(false)
+    recRef.current = rec
+    rec.start()
+    setListening(true)
+  }
+
+  return (
+    <button onClick={toggle} title={listening ? 'Parar gravação' : 'Falar pergunta'}
+      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: listening ? 'rgba(248,113,113,0.15)' : 'rgba(255,255,255,0.06)', border: `1px solid ${listening ? '#f87171' : 'rgba(255,255,255,0.10)'}`, cursor: 'pointer', flexShrink: 0, transition: 'all 0.15s' }}>
+      {listening ? (
+        <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 0.7, repeat: Infinity }}>
+          <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+            <rect x="4" y="1" width="4" height="6" rx="2" fill="#f87171" />
+            <path d="M2 6c0 2.2 1.8 4 4 4s4-1.8 4-4" stroke="#f87171" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+            <line x1="6" y1="10" x2="6" y2="12" stroke="#f87171" strokeWidth="1.2" strokeLinecap="round" />
+          </svg>
+        </motion.div>
+      ) : (
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+          <rect x="4" y="1" width="4" height="6" rx="2" fill="rgba(255,255,255,0.35)" />
+          <path d="M2 6c0 2.2 1.8 4 4 4s4-1.8 4-4" stroke="rgba(255,255,255,0.35)" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+          <line x1="6" y1="10" x2="6" y2="12" stroke="rgba(255,255,255,0.35)" strokeWidth="1.2" strokeLinecap="round" />
+        </svg>
+      )}
+    </button>
+  )
+}
 
 function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string }) {
   const [answer, setAnswer]   = useState('')
@@ -1576,6 +1629,7 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
         </div>
         <Zap className="w-3 h-3 text-white/22 ml-1" />
         <span className="text-[10px] font-mono text-white/20 tracking-wider">IPB · Market Intelligence · Groq Compound</span>
+        {typed && !loading && <AudioButton color={signalColor} text={typed} />}
         <motion.div className="ml-auto flex items-center gap-1.5"
           animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }}>
           <div className="w-1.5 h-1.5 rounded-full" style={{ background: loading ? '#fbbf24' : '#34d399' }} />
@@ -1628,6 +1682,7 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
 
       <div className="px-4 pb-4 flex items-center gap-2"
         style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '0.75rem' }}>
+        <MicButton onResult={text => { setInput(text); setTimeout(() => { runQuery(text); setInput('') }, 200) }} />
         <input value={input} onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') { runQuery(input); setInput('') } }}
           placeholder="Pergunte sobre mercado, setores, macro..."
