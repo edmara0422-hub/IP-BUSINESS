@@ -813,7 +813,7 @@ function MarketPanel({ data }: { data: MarketData }) {
     <div style={{ maxWidth: 860, margin: '0 auto' }}>
     <div style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
       {/* Tab row */}
-      <div style={{ display: 'flex', overflowX: 'auto', scrollbarWidth: 'none', borderBottom: '1px solid rgba(200,200,200,0.05)', justifyContent: 'center', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', overflowX: 'auto', scrollbarWidth: 'none', borderBottom: '1px solid rgba(200,200,200,0.05)' }}>
         {tabs.map(tab => {
           const isActive = activeId === tab.id
           const col = tab.delta > 0 ? '#34d399' : tab.delta < 0 ? '#f87171' : '#c0c0c0'
