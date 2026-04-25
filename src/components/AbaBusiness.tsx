@@ -468,46 +468,6 @@ function DomainNav() {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ██  TICKER STRIP
-// ════════════════════════════════════════════════════════════════════════════
-
-function TickerStrip({ data }: { data: MarketData }) {
-  const ibov = data.stocks?.ibov
-  const items = [
-    { label: 'SELIC',     value: `${data.macro.selic.value}%`,         delta: 0 },
-    { label: 'IPCA',      value: `${data.macro.ipca.value}%`,          delta: data.macro.ipca.delta },
-    { label: 'USD/BRL',   value: `R$${data.macro.usdBrl.value}`,       delta: data.macro.usdBrl.delta },
-    { label: 'PIB',       value: `${data.macro.pib.value}%`,           delta: data.macro.pib.delta },
-    { label: 'IBOVESPA',  value: fmtK(ibov?.value ?? 128000),          delta: ibov?.pct ?? 0 },
-    { label: 'PETRÓLEO',  value: `$${data.commodities.oil?.value ?? '—'}`,   delta: data.commodities.oil?.delta ?? 0 },
-    { label: 'OURO',      value: `$${data.commodities.gold?.value ?? '—'}`,  delta: data.commodities.gold?.delta ?? 0 },
-    { label: 'PRATA',     value: `$${data.commodities.silver?.value ?? '—'}`, delta: data.commodities.silver?.delta ?? 0 },
-  ]
-  return (
-    <div style={{ background: 'rgba(4,4,4,0.98)', borderBottom: '1px solid rgba(200,200,200,0.06)', overflow: 'hidden' }}>
-      <motion.div
-        style={{ display: 'flex', gap: 0, whiteSpace: 'nowrap' }}
-        animate={{ x: ['0%', '-50%'] }}
-        transition={{ duration: 28, repeat: Infinity, ease: 'linear' }}
-      >
-        {[...items, ...items].map((item, i) => {
-          const col = item.delta !== 0 ? pctColor(item.delta) : 'rgba(192,192,192,0.35)'
-          return (
-            <div key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '8px 22px', borderRight: '1px solid rgba(200,200,200,0.05)' }}>
-              <span style={{ fontSize: 7, fontFamily: 'monospace', color: 'rgba(192,192,192,0.26)', textTransform: 'uppercase', letterSpacing: '0.2em' }}>{item.label}</span>
-              <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 700, color: 'rgba(228,228,228,0.85)' }}>{item.value}</span>
-              {item.delta !== 0 && (
-                <span style={{ fontSize: 8.5, fontFamily: 'monospace', fontWeight: 700, color: col }}>{pctSign(item.delta)}</span>
-              )}
-            </div>
-          )
-        })}
-      </motion.div>
-    </div>
-  )
-}
-
-// ════════════════════════════════════════════════════════════════════════════
 // ██  AREA CHART
 // ════════════════════════════════════════════════════════════════════════════
 
@@ -1375,12 +1335,9 @@ export default function AbaBusiness() {
     : null
 
   return (
-    <motion.div className="relative flex flex-col gap-0 pb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+    <motion.div className="relative flex flex-col gap-5 pb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
 
-      {/* Live ticker strip */}
-      <TickerStrip data={data} />
-
-      <div className="flex flex-col gap-5 pt-3">
+      <div className="flex flex-col gap-5">
 
         {/* Nav */}
         <DomainNav />
