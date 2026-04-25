@@ -1025,6 +1025,89 @@ function CreditStatsPanel({ data }: { data: MarketData }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+// ██  SECTOR CARD  (compact — mesmo estilo CreditStatsPanel)
+// ════════════════════════════════════════════════════════════════════════════
+
+function SectorCard({ sectors }: { sectors: Sector[] }) {
+  const sorted  = [...sectors].sort((a, b) => b.heat - a.heat)
+  const top     = sorted[0]
+  const bottom  = sorted[sorted.length - 1]
+
+  const heatColor = (h: number) =>
+    h >= 75 ? '#34d399' : h >= 60 ? '#a3e635' : h >= 45 ? '#fbbf24' : h >= 30 ? '#fb923c' : '#f87171'
+
+  const signalLabel = (h: number) =>
+    h >= 75 ? 'OPORTUNIDADE' : h >= 50 ? 'NEUTRO' : h >= 30 ? 'CAUTELA' : 'RISCO'
+
+  const topColor   = heatColor(top?.heat ?? 0)
+  const badge      = { label: signalLabel(top?.heat ?? 0), color: topColor }
+
+  const decisao =
+    (top?.heat ?? 0) >= 75
+      ? `${top.label} lidera com heat ${top.heat}/100. Concentre recursos aqui — janela de oportunidade aberta. Evite ${bottom.label} (heat ${bottom.heat}/100).`
+      : (top?.heat ?? 0) >= 50
+      ? `Mercado neutro — nenhum setor em alta forte. Foque em eficiência antes de expansão. Monitor ${top.label} como candidato.`
+      : `Ambiente de cautela generalizada. Preserve caixa e aguarde sinal de reversão antes de novos projetos.`
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.38, delay: 0.18 }}
+      style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
+
+      {/* Header */}
+      <div style={{ padding: '11px 16px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>Setores · 09</span>
+        <span style={{ marginLeft: 'auto', fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: badge.color, background: badge.color + '18', border: `1px solid ${badge.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{badge.label}</span>
+      </div>
+
+      {/* Top stat */}
+      {top && (
+        <div style={{ padding: '12px 16px 6px', display: 'flex', gap: 14, alignItems: 'flex-end' }}>
+          <div>
+            <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.24)', marginBottom: 2 }}>Setor Líder</p>
+            <p style={{ fontSize: 22, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.90)', lineHeight: 1 }}>{top.heat}<span style={{ fontSize: 12, color: 'rgba(192,192,192,0.35)', marginLeft: 2 }}>/100</span></p>
+            <p style={{ fontSize: 8.5, color: topColor, marginTop: 3, fontWeight: 600 }}>{top.label}</p>
+          </div>
+          <div>
+            <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.24)', marginBottom: 2 }}>Maior Risco</p>
+            <p style={{ fontSize: 14, fontWeight: 700, fontFamily: 'monospace', color: heatColor(bottom?.heat ?? 0) }}>{bottom?.heat ?? 0}/100</p>
+            <p style={{ fontSize: 8.5, color: 'rgba(192,192,192,0.30)', marginTop: 1 }}>{bottom?.label}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Bar list */}
+      <div style={{ padding: '8px 16px 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {sorted.map((s, idx) => {
+          const col = heatColor(s.heat)
+          return (
+            <motion.div key={s.id}
+              initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+              viewport={{ once: true }} transition={{ delay: idx * 0.05 }}
+              style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 8, fontFamily: 'monospace', color: 'rgba(192,192,192,0.28)', width: 100, flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</span>
+              <div style={{ flex: 1, height: 4, background: 'rgba(200,200,200,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+                <motion.div
+                  initial={{ width: 0 }} whileInView={{ width: `${s.heat}%` }}
+                  viewport={{ once: true }} transition={{ duration: 0.9, delay: idx * 0.07, ease: [0.16, 1, 0.3, 1] }}
+                  style={{ height: '100%', borderRadius: 2, background: `linear-gradient(90deg, ${col}50, ${col})` }}
+                />
+              </div>
+              <span style={{ fontSize: 10.5, fontFamily: 'monospace', fontWeight: 700, color: col, width: 26, textAlign: 'right', flexShrink: 0 }}>{s.heat}</span>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      {/* Decisão */}
+      <div style={{ padding: '10px 16px 13px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+        <div style={{ width: 5, height: 5, borderRadius: '50%', background: topColor, marginTop: 4, flexShrink: 0 }} />
+        <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.44)', lineHeight: 1.65 }}>{decisao}</p>
+      </div>
+    </motion.div>
+  )
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 // ██  SECTOR HEATMAP
 // ════════════════════════════════════════════════════════════════════════════
 
@@ -1583,6 +1666,7 @@ export default function AbaBusiness() {
             <MacroStatsPanel data={data} />
             <div id="section-commodities"><CommoditiesStatsPanel data={data} /></div>
             <div id="section-credito"><CreditStatsPanel data={data} /></div>
+            <div id="section-setores-card"><SectorCard sectors={data.sectors} /></div>
           </div>
         </div>
 
