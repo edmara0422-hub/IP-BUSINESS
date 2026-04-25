@@ -84,8 +84,8 @@ ${stockLines ? `AÇÕES BR:\n  ${stockLines}` : ''}
 ${userSector ? `\nSETOR DO USUÁRIO: ${userSector}` : ''}
 `
 
-    const res = await groqFetch({
-      model: 'compound-beta',
+    let res = await groqFetch({
+      model: 'llama-3.3-70b-versatile',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: `${context}\n\nPERGUNTA: ${question}` },
@@ -93,6 +93,19 @@ ${userSector ? `\nSETOR DO USUÁRIO: ${userSector}` : ''}
       max_tokens: 900,
       temperature: 0.25,
     }, apiKey)
+
+    // fallback para modelo menor se quota excedida
+    if (!res.ok && (res.status === 429 || res.status === 413)) {
+      res = await groqFetch({
+        model: 'llama-3.1-8b-instant',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: `${context}\n\nPERGUNTA: ${question}` },
+        ],
+        max_tokens: 600,
+        temperature: 0.3,
+      }, apiKey)
+    }
 
     if (!res.ok) {
       const err = await res.text().catch(() => res.status.toString())
