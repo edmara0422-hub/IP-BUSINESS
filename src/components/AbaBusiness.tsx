@@ -645,16 +645,25 @@ function MarketPanel({ data }: { data: MarketData }) {
   const stocks = brStocks.length > 0 ? brStocks : fallback
   const [activeId, setActiveId] = useState('ibov')
 
-  type TabDef = { id: string; label: string; value: string; delta: number; group: string; peakLabel: string; peakSub: string; troughLabel: string; troughSub: string; signal: string; signalColor: string; cenario: string; impacto: string; decisao: string }
+  type TabDef = { id: string; label: string; value: string; delta: number; group: string; desc: string; peakLabel: string; peakSub: string; troughLabel: string; troughSub: string; signal: string; signalColor: string; cenario: string; impacto: string; decisao: string }
 
   const ibovPct = ibov?.pct ?? 0
   const ibovVal = fmtK(ibov?.value ?? 128000)
   const selic   = data.macro.selic.value
 
+  const STOCK_DESC: Record<string, string> = {
+    PETR4: 'Petrobras · pré-sal',
+    VALE3: 'Vale · minério de ferro',
+    ITUB4: 'Itaú · maior banco privado',
+    BBDC4: 'Bradesco · crédito varejo',
+    WEGE3: 'WEG · automação industrial',
+    ABEV3: 'Ambev · consumo & bebidas',
+  }
+
   const stockTab = (s: StockBR, peak: [string,string], trough: [string,string], cenario: string, impacto: string, decisao: string): TabDef => {
     const col = s.pct > 0.5 ? '#34d399' : s.pct < -0.5 ? '#f87171' : '#fbbf24'
     const sig = s.pct > 0.5 ? 'EM ALTA' : s.pct < -0.5 ? 'EM QUEDA' : 'ESTÁVEL'
-    return { id: s.ticker, label: s.ticker, value: s.price ? `R$${s.price.toFixed(2)}` : '—', delta: s.pct, group: 'ação', peakLabel: peak[0], peakSub: peak[1], troughLabel: trough[0], troughSub: trough[1], signal: sig, signalColor: col, cenario, impacto, decisao }
+    return { id: s.ticker, label: s.ticker, value: s.price ? `R$${s.price.toFixed(2)}` : '—', delta: s.pct, group: 'ação', desc: STOCK_DESC[s.ticker] ?? s.label, peakLabel: peak[0], peakSub: peak[1], troughLabel: trough[0], troughSub: trough[1], signal: sig, signalColor: col, cenario, impacto, decisao }
   }
 
   const petr = stocks.find(s => s.ticker === 'PETR4')
@@ -666,7 +675,7 @@ function MarketPanel({ data }: { data: MarketData }) {
 
   const tabs: TabDef[] = [
     {
-      id: 'ibov', label: 'IBOV', value: ibovVal, delta: ibovPct, group: 'índice',
+      id: 'ibov', label: 'IBOV', value: ibovVal, delta: ibovPct, group: 'índice', desc: '~500 maiores da B3',
       peakLabel: 'RESISTÊNCIA', peakSub: 'euforia / fluxo externo',
       troughLabel: 'SUPORTE', troughSub: 'saída de capital risco',
       signal: ibovPct > 1.5 ? 'ALTA' : ibovPct < -1.5 ? 'QUEDA' : 'LATERAL',
@@ -718,7 +727,7 @@ function MarketPanel({ data }: { data: MarketData }) {
       abev.pct > 0.5 ? 'Consumo aquecido. Ampliar canais de distribuição e pontos de venda pode capturar demanda incremental.' : abev.pct < -0.5 ? 'Pressão no consumo. Revise mix de produto e canal — foque em itens de maior margem.' : 'Estável. Foque em eficiência de cadeia e margem por canal.',
     )] : []),
     {
-      id: 'usd', label: 'USD/BRL', value: `R$${usdBrl.value}`, delta: usdBrl.delta, group: 'macro',
+      id: 'usd', label: 'USD/BRL', value: `R$${usdBrl.value}`, delta: usdBrl.delta, group: 'macro', desc: 'câmbio real × dólar',
       peakLabel: 'DÓLAR EM ALTA', peakSub: 'fuga de risco / pressão fiscal',
       troughLabel: 'REAL FORTE', troughSub: 'fluxo estrangeiro positivo',
       signal: usdBrl.value > 5.8 ? 'PRESSIONADO' : usdBrl.value > 5.0 ? 'ELEVADO' : 'FAVORÁVEL',
@@ -728,7 +737,7 @@ function MarketPanel({ data }: { data: MarketData }) {
       decisao: usdBrl.value > 5.8 ? 'Antecipe compras de insumos importados. Negocie hedge cambial. Repasse o custo gradualmente.' : usdBrl.value > 5.0 ? `Avalie substituição de insumos importados por nacionais. Revise precificação de produtos com componentes em dólar.` : 'Aproveite para importar, atualizar equipamentos e fixar contratos de fornecimento em dólar.',
     },
     {
-      id: 'gold', label: 'OURO', value: `$${gold?.value ?? '—'}`, delta: gold?.delta ?? 0, group: 'macro',
+      id: 'gold', label: 'OURO', value: `$${gold?.value ?? '—'}`, delta: gold?.delta ?? 0, group: 'macro', desc: 'ativo-refúgio global',
       peakLabel: 'REFÚGIO MÁXIMO', peakSub: 'stress financeiro global',
       troughLabel: 'APETITE POR RISCO', troughSub: 'capital migra p/ renda variável',
       signal: (gold?.delta ?? 0) > 1.5 ? 'REFÚGIO ATIVO' : (gold?.delta ?? 0) < -1.5 ? 'RISCO CAI' : 'ESTÁVEL',
@@ -738,7 +747,7 @@ function MarketPanel({ data }: { data: MarketData }) {
       decisao: (gold?.delta ?? 0) > 1.5 ? 'Revise exposição cambial. Considere hedge. Evite compromissos de longo prazo com fornecedores internacionais.' : (gold?.delta ?? 0) < -1.5 ? 'Boa janela para captação. Câmbio pode valorizar — monitore condições de crédito externo.' : 'Sem ação urgente. Monitore correlação ouro/USD para detectar mudança de tendência.',
     },
     {
-      id: 'oil', label: 'PETRÓLEO', value: `$${oil?.value ?? '—'}`, delta: oil?.delta ?? 0, group: 'macro',
+      id: 'oil', label: 'PETRÓLEO', value: `$${oil?.value ?? '—'}`, delta: oil?.delta ?? 0, group: 'macro', desc: 'Brent · frete & energia',
       peakLabel: 'OFERTA RESTRITA', peakSub: 'OPEP+ corta / tensão geopolítica',
       troughLabel: 'EXCESSO DE OFERTA', troughSub: 'OPEP+ relaxa / demanda fraca',
       signal: (oil?.delta ?? 0) > 2 ? 'PRESSÃO ALTA' : (oil?.delta ?? 0) < -2 ? 'ALÍVIO DE CUSTOS' : 'ESTÁVEL',
@@ -753,9 +762,10 @@ function MarketPanel({ data }: { data: MarketData }) {
   const chartColor = active.delta > 0 ? '#34d399' : active.delta < 0 ? '#f87171' : '#c0c0c0'
 
   return (
+    <div style={{ maxWidth: 860, margin: '0 auto' }}>
     <div style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
       {/* Tab row */}
-      <div style={{ display: 'flex', overflowX: 'auto', scrollbarWidth: 'none', borderBottom: '1px solid rgba(200,200,200,0.05)' }}>
+      <div style={{ display: 'flex', overflowX: 'auto', scrollbarWidth: 'none', borderBottom: '1px solid rgba(200,200,200,0.05)', justifyContent: 'center', flexWrap: 'wrap' }}>
         {tabs.map(tab => {
           const isActive = activeId === tab.id
           const col = tab.delta > 0 ? '#34d399' : tab.delta < 0 ? '#f87171' : '#c0c0c0'
@@ -766,6 +776,7 @@ function MarketPanel({ data }: { data: MarketData }) {
               <span style={{ fontSize: 11, fontWeight: 800, fontFamily: 'monospace', color: isActive ? 'rgba(235,235,235,0.95)' : 'rgba(192,192,192,0.42)' }}>{tab.label}</span>
               <span style={{ fontSize: 9.5, fontFamily: 'monospace', fontWeight: 700, color: isActive ? 'rgba(228,228,228,0.80)' : 'rgba(192,192,192,0.35)' }}>{tab.value}</span>
               <span style={{ fontSize: 8, fontFamily: 'monospace', fontWeight: 700, color: col }}>{pctSign(tab.delta)}</span>
+              <span style={{ fontSize: 7, color: isActive ? 'rgba(180,180,180,0.38)' : 'rgba(150,150,150,0.18)', whiteSpace: 'nowrap', fontFamily: 'sans-serif' }}>{tab.desc}</span>
             </button>
           )
         })}
@@ -810,6 +821,7 @@ function MarketPanel({ data }: { data: MarketData }) {
           </div>
         </motion.div>
       </AnimatePresence>
+    </div>
     </div>
   )
 }
