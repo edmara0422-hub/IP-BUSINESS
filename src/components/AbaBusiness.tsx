@@ -645,25 +645,26 @@ function MarketPanel({ data }: { data: MarketData }) {
   const stocks = brStocks.length > 0 ? brStocks : fallback
   const [activeId, setActiveId] = useState('ibov')
 
-  type TabDef = { id: string; label: string; value: string; delta: number; group: string; desc: string; peakLabel: string; peakSub: string; troughLabel: string; troughSub: string; signal: string; signalColor: string; cenario: string; impacto: string; decisao: string }
+  type TabDef = { id: string; label: string; value: string; delta: number; group: string; desc: string; oQueE: string; peakLabel: string; peakSub: string; troughLabel: string; troughSub: string; signal: string; signalColor: string; cenario: string; impacto: string; decisao: string }
 
   const ibovPct = ibov?.pct ?? 0
   const ibovVal = fmtK(ibov?.value ?? 128000)
   const selic   = data.macro.selic.value
 
-  const STOCK_DESC: Record<string, string> = {
-    PETR4: 'Petrobras · pré-sal',
-    VALE3: 'Vale · minério de ferro',
-    ITUB4: 'Itaú · maior banco privado',
-    BBDC4: 'Bradesco · crédito varejo',
-    WEGE3: 'WEG · automação industrial',
-    ABEV3: 'Ambev · consumo & bebidas',
+  const STOCK_META: Record<string, { desc: string; oQueE: string }> = {
+    PETR4: { desc: 'Petrobras · pré-sal', oQueE: 'Petrobras (PETR4) é a maior empresa de petróleo do Brasil e uma das maiores do mundo. Opera no pré-sal — camada de óleo de altíssima qualidade no fundo do oceano. O preço da ação oscila com o petróleo Brent, o câmbio e decisões políticas do governo, que é acionista controlador.' },
+    VALE3: { desc: 'Vale · minério de ferro', oQueE: 'Vale (VALE3) é a maior produtora de minério de ferro do mundo e a 2ª de níquel. Exporta para a China, que usa minério para fabricar aço. Quando a China cresce, a Vale sobe. Quando a China freia, cai. O dólar alto também aumenta as receitas em reais.' },
+    ITUB4: { desc: 'Itaú · maior banco privado', oQueE: 'Itaú Unibanco (ITUB4) é o maior banco privado da América Latina. Lucra com a diferença entre o juro que cobra em empréstimos e o que paga em depósitos. Com SELIC alta, essa diferença (spread) cresce — o banco lucra mais, mas o crédito fica caro para empresas.' },
+    BBDC4: { desc: 'Bradesco · crédito varejo', oQueE: 'Bradesco (BBDC4) é o 2º maior banco privado do Brasil, com forte presença no crédito ao consumidor e para PMEs. É um termômetro real da inadimplência popular: quando as famílias brasileiras não conseguem pagar, o Bradesco sente primeiro.' },
+    WEGE3: { desc: 'WEG · automação industrial', oQueE: 'WEG (WEGE3) fabrica motores elétricos, geradores e equipamentos de automação. É uma das poucas empresas brasileiras com receita global — mais de 60% vem de fora do Brasil. Quando indústrias no mundo inteiro investem em eficiência e automação, a WEG cresce.' },
+    ABEV3: { desc: 'Ambev · consumo & bebidas', oQueE: 'Ambev (ABEV3) é a maior empresa de bebidas da América Latina — Brahma, Skol, Antarctica, Corona. Reflete diretamente o poder de consumo da população brasileira. Alta indica confiança do consumidor; queda indica aperto de renda ou custos subindo mais que o repasse.' },
   }
 
   const stockTab = (s: StockBR, peak: [string,string], trough: [string,string], cenario: string, impacto: string, decisao: string): TabDef => {
     const col = s.pct > 0.5 ? '#34d399' : s.pct < -0.5 ? '#f87171' : '#fbbf24'
     const sig = s.pct > 0.5 ? 'EM ALTA' : s.pct < -0.5 ? 'EM QUEDA' : 'ESTÁVEL'
-    return { id: s.ticker, label: s.ticker, value: s.price ? `R$${s.price.toFixed(2)}` : '—', delta: s.pct, group: 'ação', desc: STOCK_DESC[s.ticker] ?? s.label, peakLabel: peak[0], peakSub: peak[1], troughLabel: trough[0], troughSub: trough[1], signal: sig, signalColor: col, cenario, impacto, decisao }
+    const meta = STOCK_META[s.ticker] ?? { desc: s.label, oQueE: s.label }
+    return { id: s.ticker, label: s.ticker, value: s.price ? `R$${s.price.toFixed(2)}` : '—', delta: s.pct, group: 'ação', desc: meta.desc, oQueE: meta.oQueE, peakLabel: peak[0], peakSub: peak[1], troughLabel: trough[0], troughSub: trough[1], signal: sig, signalColor: col, cenario, impacto, decisao }
   }
 
   const petr = stocks.find(s => s.ticker === 'PETR4')
@@ -676,6 +677,7 @@ function MarketPanel({ data }: { data: MarketData }) {
   const tabs: TabDef[] = [
     {
       id: 'ibov', label: 'IBOV', value: ibovVal, delta: ibovPct, group: 'índice', desc: '~500 maiores da B3',
+      oQueE: 'O IBOVESPA é o principal índice da Bolsa de Valores brasileira (B3). Reúne as ~500 ações mais negociadas e serve de termômetro da economia: sobe quando há otimismo com o Brasil, cai quando há medo de crise, alta de juros ou instabilidade política. É o primeiro número que investidores e analistas olham todo dia.',
       peakLabel: 'RESISTÊNCIA', peakSub: 'euforia / fluxo externo',
       troughLabel: 'SUPORTE', troughSub: 'saída de capital risco',
       signal: ibovPct > 1.5 ? 'ALTA' : ibovPct < -1.5 ? 'QUEDA' : 'LATERAL',
@@ -728,6 +730,7 @@ function MarketPanel({ data }: { data: MarketData }) {
     )] : []),
     {
       id: 'usd', label: 'USD/BRL', value: `R$${usdBrl.value}`, delta: usdBrl.delta, group: 'macro', desc: 'câmbio real × dólar',
+      oQueE: 'A taxa de câmbio USD/BRL mostra quantos reais são necessários para comprar 1 dólar americano. Afeta diretamente qualquer empresa que importe insumos, pague software estrangeiro, tenha dívida em dólar ou concorra com produtos importados. Dólar alto = custos sobem. Dólar baixo = importar fica mais barato.',
       peakLabel: 'DÓLAR EM ALTA', peakSub: 'fuga de risco / pressão fiscal',
       troughLabel: 'REAL FORTE', troughSub: 'fluxo estrangeiro positivo',
       signal: usdBrl.value > 5.8 ? 'PRESSIONADO' : usdBrl.value > 5.0 ? 'ELEVADO' : 'FAVORÁVEL',
@@ -738,6 +741,7 @@ function MarketPanel({ data }: { data: MarketData }) {
     },
     {
       id: 'gold', label: 'OURO', value: `$${gold?.value ?? '—'}`, delta: gold?.delta ?? 0, group: 'macro', desc: 'ativo-refúgio global',
+      oQueE: 'O ouro é o principal ativo-refúgio do mundo. Quando há medo — guerra, crise bancária, inflação fora de controle — investidores compram ouro e o preço sobe. Quando o ambiente volta ao normal e o risco cai, o capital migra para ações e o ouro recua. É um termômetro do medo global.',
       peakLabel: 'REFÚGIO MÁXIMO', peakSub: 'stress financeiro global',
       troughLabel: 'APETITE POR RISCO', troughSub: 'capital migra p/ renda variável',
       signal: (gold?.delta ?? 0) > 1.5 ? 'REFÚGIO ATIVO' : (gold?.delta ?? 0) < -1.5 ? 'RISCO CAI' : 'ESTÁVEL',
@@ -748,6 +752,7 @@ function MarketPanel({ data }: { data: MarketData }) {
     },
     {
       id: 'oil', label: 'PETRÓLEO', value: `$${oil?.value ?? '—'}`, delta: oil?.delta ?? 0, group: 'macro', desc: 'Brent · frete & energia',
+      oQueE: 'O petróleo Brent é a referência global de energia. Seu preço afeta diretamente o frete, o diesel, a gasolina, plásticos e embalagens. Quando sobe, toda a cadeia logística fica mais cara — distribuidoras, transportadoras, varejo. É controlado pela OPEP+, que regula a oferta mundial para influenciar o preço.',
       peakLabel: 'OFERTA RESTRITA', peakSub: 'OPEP+ corta / tensão geopolítica',
       troughLabel: 'EXCESSO DE OFERTA', troughSub: 'OPEP+ relaxa / demanda fraca',
       signal: (oil?.delta ?? 0) > 2 ? 'PRESSÃO ALTA' : (oil?.delta ?? 0) < -2 ? 'ALÍVIO DE CUSTOS' : 'ESTÁVEL',
@@ -802,11 +807,18 @@ function MarketPanel({ data }: { data: MarketData }) {
           transition={{ duration: 0.2 }}
           style={{ borderTop: '1px solid rgba(200,200,200,0.05)', padding: '14px 16px 18px' }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: active.signalColor, background: active.signalColor + '18', border: `1px solid ${active.signalColor}30`, borderRadius: 99, padding: '3px 10px', textTransform: 'uppercase', letterSpacing: '0.18em' }}>{active.signal}</span>
             <div style={{ flex: 1, height: 1, background: 'rgba(200,200,200,0.04)' }} />
             <span style={{ fontSize: 8, fontFamily: 'monospace', color: 'rgba(192,192,192,0.28)' }}>{active.label} · {active.value}</span>
           </div>
+
+          {/* O que é */}
+          <div style={{ marginBottom: 14, padding: '10px 12px', background: 'rgba(255,255,255,0.025)', borderRadius: 10, borderLeft: `2px solid ${active.signalColor}40` }}>
+            <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.22em', color: active.signalColor + '99', marginBottom: 5, fontWeight: 700 }}>O que é</p>
+            <p style={{ fontSize: 12, color: 'rgba(210,210,210,0.60)', lineHeight: 1.75 }}>{active.oQueE}</p>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 200px), 1fr))', gap: 14 }}>
             {[
               { label: 'Cenário', text: active.cenario, color: 'rgba(192,192,192,0.26)' },
