@@ -37,6 +37,49 @@ const pctColor = (v: number) => v > 0 ? '#34d399' : v < 0 ? '#f87171' : 'rgba(19
 const pctSign  = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`
 const clamp    = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n))
 
+// ── Audio Button (Web Speech API) ─────────────────────────────────────────
+function AudioButton({ text, color = 'rgba(192,192,192,0.35)' }: { text: string; color?: string }) {
+  const [playing, setPlaying] = useState(false)
+
+  const toggle = () => {
+    if (!('speechSynthesis' in window)) return
+    if (playing) {
+      window.speechSynthesis.cancel()
+      setPlaying(false)
+      return
+    }
+    const utt = new SpeechSynthesisUtterance(text)
+    utt.lang = 'pt-BR'
+    utt.rate = 1.05
+    utt.pitch = 1
+    const voices = window.speechSynthesis.getVoices()
+    const ptBr = voices.find(v => v.lang === 'pt-BR') ?? voices.find(v => v.lang.startsWith('pt'))
+    if (ptBr) utt.voice = ptBr
+    utt.onend = () => setPlaying(false)
+    utt.onerror = () => setPlaying(false)
+    window.speechSynthesis.speak(utt)
+    setPlaying(true)
+  }
+
+  return (
+    <button onClick={toggle}
+      title={playing ? 'Parar áudio' : 'Ouvir análise'}
+      style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', background: playing ? 'rgba(52,211,153,0.1)' : 'rgba(255,255,255,0.04)', border: `1px solid ${playing ? '#34d39940' : 'rgba(200,200,200,0.1)'}`, borderRadius: 7, cursor: 'pointer', transition: 'all 0.15s', flexShrink: 0 }}>
+      {playing ? (
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+          <rect x="2" y="1" width="3" height="10" rx="1" fill="#34d399" />
+          <rect x="7" y="1" width="3" height="10" rx="1" fill="#34d399" />
+        </svg>
+      ) : (
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+          <path d="M3 2L10 6L3 10V2Z" fill={color} />
+        </svg>
+      )}
+      <span style={{ fontSize: 7, fontFamily: 'monospace', color: playing ? '#34d399' : color, letterSpacing: '0.1em' }}>{playing ? 'PARAR' : 'OUVIR'}</span>
+    </button>
+  )
+}
+
 // ── Sparkline ──────────────────────────────────────────────────────────────
 function Sparkline({ id, delta, color, w = 56, h = 20 }: { id: string; delta: number; color: string; w?: number; h?: number }) {
   const pts = useMemo(() => {
@@ -810,6 +853,10 @@ function MarketPanel({ data }: { data: MarketData }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
             <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: active.signalColor, background: active.signalColor + '18', border: `1px solid ${active.signalColor}30`, borderRadius: 99, padding: '3px 10px', textTransform: 'uppercase', letterSpacing: '0.18em' }}>{active.signal}</span>
             <div style={{ flex: 1, height: 1, background: 'rgba(200,200,200,0.04)' }} />
+            <AudioButton
+              color={active.signalColor}
+              text={`${active.label}. ${active.oQueE} Cenário: ${active.cenario} Impacto no negócio: ${active.impacto} Decisão: ${active.decisao}`}
+            />
             <span style={{ fontSize: 8, fontFamily: 'monospace', color: 'rgba(192,192,192,0.28)' }}>{active.label} · {active.value}</span>
           </div>
 
@@ -980,7 +1027,8 @@ function CreditStatsPanel({ data }: { data: MarketData }) {
       style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
       <div style={{ padding: '11px 16px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>Crédito PJ · 05</span>
-        <span style={{ marginLeft: 'auto', fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{signal.label}</span>
+        <AudioButton color={signal.color} text={`Crédito PJ. Taxa média ${avgRate.toFixed(1)} por cento ao ano. Spread sobre SELIC: mais ${(avgRate - selic).toFixed(0)} pontos percentuais. ${decisao}`} />
+        <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{signal.label}</span>
       </div>
       <div style={{ padding: '12px 16px 6px', display: 'flex', gap: 14, alignItems: 'flex-end' }}>
         <div>
@@ -1056,7 +1104,8 @@ function SectorCard({ sectors }: { sectors: Sector[] }) {
       {/* Header */}
       <div style={{ padding: '11px 16px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>Setores · 09</span>
-        <span style={{ marginLeft: 'auto', fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: badge.color, background: badge.color + '18', border: `1px solid ${badge.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{badge.label}</span>
+        <AudioButton color={badge.color} text={`Análise setorial. Setor líder: ${top?.label}, score ${top?.heat} de 100. Maior risco: ${bottom?.label}, score ${bottom?.heat} de 100. ${sorted.map(s => `${s.label}: ${s.heat}`).join('. ')}. ${decisao}`} />
+        <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: badge.color, background: badge.color + '18', border: `1px solid ${badge.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{badge.label}</span>
       </div>
 
       {/* Top stat */}

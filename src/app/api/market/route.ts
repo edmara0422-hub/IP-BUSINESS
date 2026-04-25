@@ -95,6 +95,10 @@ export async function GET() {
   let ipca = 4.14, pib = 1.86, selic = 14.75
   // BCB taxas de crédito PJ por setor (% a.a.) — séries SGS
   let creditPjTotal = 28.5, creditPjIndustria = 19.2, creditPjAgro = 12.8, creditPjComercio = 30.4, creditPjServicos = 26.7
+  // Novos dados reais
+  let inadimplenciaPJ = 5.8   // BCB série 21082 — inadimplência PJ (%)
+  let ibcBr = 1.2             // BCB série 24363 — IBC-Br var. % (proxy mensal do PIB)
+  let desemprego = 6.2        // IBGE PNAD Contínua — taxa de desocupação (%)
 
   // commodities
   let goldP = 4817, goldD = 0
@@ -126,6 +130,7 @@ export async function GET() {
       goldRes, silverRes, oilRes,
       petr4R, vale3R, itub4R, bbdc4R, wege3R, ibovR,
       totvs3D, slce3D, rdor3D, egie3D, mglu3D, rail3D,
+      inadimpRes, ibcBrRes, desempRes,
     ] = await Promise.allSettled([
       // Macro
       safeFetch('https://economia.awesomeapi.com.br/json/last/USD-BRL'),
@@ -156,6 +161,10 @@ export async function GET() {
       yfChangePercent('EGIE3.SA'),
       yfChangePercent('MGLU3.SA'),
       yfChangePercent('RAIL3.SA'),
+      // Novos dados reais
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.21082/dados/ultimos/1?formato=json'),  // Inadimplência PJ
+      safeFetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.24363/dados/ultimos/1?formato=json'),  // IBC-Br
+      safeFetch('https://servicodados.ibge.gov.br/api/v3/agregados/6381/periodos/last%7C1/variaveis/4099?localidades=N1[all]', 7000), // PNAD Desemprego
     ])
 
     // ── Parse macro ──────────────────────────────────────────────────────
@@ -202,6 +211,32 @@ export async function GET() {
     if (rAgro !== null)  creditPjAgro = rAgro
     if (rCom !== null)   creditPjComercio = rCom
     if (rSvc !== null)   creditPjServicos = rSvc
+
+    // ── Parse novos dados reais ──────────────────────────────────────────
+    // Inadimplência PJ (BCB série 21082)
+    if (inadimpRes.status === 'fulfilled' && inadimpRes.value) {
+      try {
+        const d = await inadimpRes.value.json()
+        const v = parseFloat(d?.[0]?.valor)
+        if (Number.isFinite(v)) inadimplenciaPJ = v
+      } catch { /* fallback */ }
+    }
+    // IBC-Br — variação mensal % (BCB série 24363)
+    if (ibcBrRes.status === 'fulfilled' && ibcBrRes.value) {
+      try {
+        const d = await ibcBrRes.value.json()
+        const v = parseFloat(d?.[0]?.valor)
+        if (Number.isFinite(v)) ibcBr = v
+      } catch { /* fallback */ }
+    }
+    // Desemprego PNAD (IBGE SIDRA agregado 6381, variável 4099)
+    if (desempRes.status === 'fulfilled' && desempRes.value) {
+      try {
+        const d = await desempRes.value.json()
+        const v = parseFloat(d?.[0]?.resultados?.[0]?.series?.[0]?.serie?.[Object.keys(d?.[0]?.resultados?.[0]?.series?.[0]?.serie ?? {})[0]])
+        if (Number.isFinite(v)) desemprego = v
+      } catch { /* fallback */ }
+    }
 
     // ── Parse commodities (AwesomeAPI) ──────────────────────────────────
     if (goldRes.status === 'fulfilled' && goldRes.value) {
@@ -385,6 +420,10 @@ export async function GET() {
         { ticker: 'AMZN',  label: 'Amazon',  pct: r2(amznD)  },
       ],
     },
+    // Novos dados reais
+    inadimplenciaPJ: r2(inadimplenciaPJ),
+    ibcBr:           r2(ibcBr),
+    desemprego:      r2(desemprego),
     updatedAt: new Date().toISOString(),
   }
 

@@ -83,22 +83,38 @@ export async function POST(request: Request) {
       ? `\nUSUÁRIO: ${nomeNeg || '?'} | ${fase} | ${setorUser} | ${userSectorLine}\nFILTRE para setor "${setorUser}" e fase "${fase}".`
       : ''
 
-    // Prompt compacto — ~250 tokens (era ~600)
-    const prompt = `Analista-chefe IPB. Cruze dados, análises profundas com números exatos.
-DADOS: SELIC ${selic}% | IPCA ${ipca}% | PIB ${pib}% | USD R$${usd} | Juro real ${taxaReal}%
-Setores top: ${topSetores}
-CAC R$${cac} (${cacD > 0 ? '+' : ''}${cacD}%) | CPM R$${cpmBrl}/mil | Orgânico ${org}%${perfilBlock}
+    const inadimpStr = (body.inadimplenciaPJ ?? 0) > 0 ? ` | Inadimplência PJ: ${body.inadimplenciaPJ}%` : ''
+    const desempStr  = (body.desemprego ?? 0) > 0 ? ` | Desemprego PNAD: ${body.desemprego}%` : ''
+    const ibcStr     = (body.ibcBr ?? 0) !== 0 ? ` | IBC-Br (GDP proxy): ${body.ibcBr}%` : ''
+    const creditTop  = body.creditRates?.total?.value ?? 28.5
+    const stocksStr  = (body.stocks?.br ?? []).map((s: {ticker:string;price:number;pct:number}) =>
+      `${s.ticker} R$${s.price} (${s.pct >= 0 ? '+' : ''}${s.pct}%)`).join(' | ')
 
-REGRAS: 1)Cruze 2+ indicadores 2)Números exatos do prompt 3)Impacto concreto 4)Se há usuário, foco no setor e fase dele
+    const prompt = `Você é o analista-chefe da IPB — Bloomberg Intelligence para PMEs brasileiras. Seja cirúrgico, direto, com números reais.
 
-Responda APENAS JSON:
-{"panorama":"string","macro_insights":["s","s","s","s"],"marketing_insights":["CRESCER AGORA: SIM/NÃO — justificativa numérica","s","s"],"riscos":["RISCO: desc — Como lucrar: ação","s","s"],"oportunidades":["s","s"],"cockpit_alerts":["SELIC ${selic}%: financiar R$10k custa R$${juros10k}/mês — ação","IPCA ${ipca}%: sem reajuste perde ${ipca}pp de margem — ação","CAC +${cacD}%: LTV precisa compensar — ação"]}`
+DADOS REAIS AGORA:
+Macro: SELIC ${selic}% | IPCA ${ipca}% | PIB projeção ${pib}% | USD R$${usd} | Juro real ${taxaReal}%${ibcStr}${inadimpStr}${desempStr}
+Crédito PJ médio: ${creditTop}% a.a. | Custo mensal R$10k = R$${juros10k}/mês
+Setores líderes: ${topSetores}
+Marketing: CAC R$${cac} (${cacD > 0 ? '+' : ''}${cacD}%) | CPM R$${cpmBrl}/mil | Orgânico ${org}%
+Ações BR: ${stocksStr || '—'}${perfilBlock}
+
+REGRAS OBRIGATÓRIAS:
+1. Cruce SEMPRE 2+ indicadores — nunca análise isolada
+2. Use APENAS os números acima — nunca invente
+3. Cada insight: causa → impacto concreto em R$ ou % → ação executável
+4. panorama: 2 frases densas com os 3 maiores sinais do momento
+5. cockpit_alerts: sempre os 3 alertas com número + ação desta semana
+6. Se há perfil de usuário, todos os itens devem refletir o setor e fase dele
+
+Responda APENAS JSON válido:
+{"panorama":"2 frases densas com sinais do momento","macro_insights":["SELIC ${selic}% + IPCA ${ipca}% = juro real ${taxaReal}% — impacto e ação","PIB ${pib}% + setor em números — o que fazer","USD R$${usd} — quem ganha quem perde","IBC-Br / atividade real — o que está acelerando ou travando"],"marketing_insights":["CRESCER AGORA: SIM/NÃO — justificativa com CAC e CPM reais","Canal com melhor ROI agora com números","Retenção vs aquisição — qual priorizar com esses dados"],"riscos":["RISCO CRÍTICO: causa com número — ação de proteção esta semana","segundo risco com número","terceiro risco com ação"],"oportunidades":["oportunidade 1 com setor + número + janela temporal","oportunidade 2 acionável"],"cockpit_alerts":["SELIC ${selic}%: R$10k/mês de crédito custa R$${juros10k} — renegocie ou quite até [prazo]","IPCA ${ipca}%: sem reajuste você perde ${ipca}pp de margem — reajuste até [data]","CAC ${cacD > 0 ? '+' : ''}${cacD}%: se LTV não subiu proporcionalmente, canal está queimando caixa — ação"]}`
 
     const res = await groqFetch({
-      model: 'llama-3.1-8b-instant',
+      model: 'llama-3.3-70b-versatile',
       messages: [{ role: 'user', content: prompt }],
-      max_tokens: 650,
-      temperature: 0.25,
+      max_tokens: 900,
+      temperature: 0.2,
       response_format: { type: 'json_object' },
     }, apiKey)
 

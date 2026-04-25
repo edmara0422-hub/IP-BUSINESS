@@ -70,13 +70,13 @@ REGRAS:
 ${historyBlock}`
 
     const res = await groqFetch({
-      model: 'groq/compound',
+      model: 'compound-beta',
       messages: [
         { role: 'system', content: systemMsg },
         { role: 'user',   content: question },
       ],
-      max_tokens: 1000,
-      temperature: 0.35,
+      max_tokens: 1200,
+      temperature: 0.3,
     }, apiKey)
 
     if (!res.ok) {
@@ -84,7 +84,7 @@ ${historyBlock}`
       // Fallback para modelo menor se quota excedida
       if (res.status === 429 || res.status === 413) {
         const fallback = await groqFetch({
-          model: 'llama-3.1-8b-instant',
+          model: 'llama-3.3-70b-versatile',
           messages: [
             { role: 'system', content: `Analista financeiro PME Brasil. ${BR_BENCHMARKS}` },
             { role: 'user',   content: question },

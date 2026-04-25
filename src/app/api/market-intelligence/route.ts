@@ -85,13 +85,13 @@ ${userSector ? `\nSETOR DO USUÁRIO: ${userSector}` : ''}
 `
 
     const res = await groqFetch({
-      model: 'groq/compound',
+      model: 'compound-beta',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: `${context}\n\nPERGUNTA: ${question}` },
       ],
-      max_tokens: 700,
-      temperature: 0.3,
+      max_tokens: 900,
+      temperature: 0.25,
     }, apiKey)
 
     if (!res.ok) {
