@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   RefreshCw, Send, ChevronRight, TrendingUp, TrendingDown, Minus,
@@ -81,7 +81,7 @@ function AudioButton({ text, color = 'rgba(192,192,192,0.35)' }: { text: string;
 }
 
 // ── Sparkline ──────────────────────────────────────────────────────────────
-function Sparkline({ id, delta, color, w = 56, h = 20 }: { id: string; delta: number; color: string; w?: number; h?: number }) {
+const Sparkline = memo(function Sparkline({ id, delta, color, w = 56, h = 20 }: { id: string; delta: number; color: string; w?: number; h?: number }) {
   const pts = useMemo(() => {
     const dateStr = new Date().toDateString()
     let seed = 0
@@ -103,10 +103,10 @@ function Sparkline({ id, delta, color, w = 56, h = 20 }: { id: string; delta: nu
         strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
     </svg>
   )
-}
+})
 
 // ── Section Label ──────────────────────────────────────────────────────────
-function SectionLabel({ label, sub }: { label: string; sub?: string }) {
+const SectionLabel = memo(function SectionLabel({ label, sub }: { label: string; sub?: string }) {
   return (
     <motion.div initial={{ opacity: 0, x: -8 }} whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }} transition={{ duration: 0.5 }}
@@ -117,7 +117,7 @@ function SectionLabel({ label, sub }: { label: string; sub?: string }) {
       <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(192,192,192,0.07), transparent)' }} />
     </motion.div>
   )
-}
+})
 
 // ════════════════════════════════════════════════════════════════════════════
 // ██  GLOBE HERO  (chips em órbita elíptica + painel de detalhe)
@@ -262,7 +262,7 @@ function DetailPanel({ chip, onClose }: { chip: ChipData; onClose: () => void })
   )
 }
 
-function GlobeHero({ data }: { data: MarketData }) {
+const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const m      = data.macro
@@ -278,7 +278,7 @@ function GlobeHero({ data }: { data: MarketData }) {
   const gp = ibov?.pct ?? 0
   const op = oil?.delta ?? 0
 
-  const chips: ChipData[] = [
+  const chips: ChipData[] = useMemo(() => [
     {
       id: 'selic', label: 'SELIC', value: `${sv}`, unit: '% ao ano', delta: 0, color: '#94a3b8',
       signal: sv > 13 ? { text: 'Crédito restritivo', color: '#f87171' } : sv > 10 ? { text: 'Neutro', color: '#fbbf24' } : { text: 'Expansivo', color: '#34d399' },
@@ -327,7 +327,8 @@ function GlobeHero({ data }: { data: MarketData }) {
       oque: 'Brent: referência global de petróleo. Afeta diretamente combustíveis, plásticos, frete e logística.',
       como: 'Alta → combustível mais caro → frete sobe → preços ao consumidor pressionados. PME logística e transportes sentem primeiro.',
     },
-  ]
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ], [sv, uv, iv, pv, gp, op, gold?.value, gold?.delta, silver?.value, silver?.delta, oil?.value])
 
   const selectedChip = chips.find(c => c.id === selectedId) ?? null
 
@@ -462,7 +463,7 @@ function GlobeHero({ data }: { data: MarketData }) {
       </div>
     </div>
   )
-}
+})
 
 // ════════════════════════════════════════════════════════════════════════════
 // ██  DOMAIN NAV
@@ -676,7 +677,7 @@ function AnnotatedAreaChart({ id, delta, color, peakLabel, peakSub, troughLabel,
 // ██  MARKET PANEL — unified chart + annotations + analysis per stock/index
 // ════════════════════════════════════════════════════════════════════════════
 
-function MarketPanel({ data }: { data: MarketData }) {
+const MarketPanel = memo(function MarketPanel({ data }: { data: MarketData }) {
   const ibov  = data.stocks?.ibov
   const { usdBrl } = data.macro
   const oil   = data.commodities.oil
@@ -888,14 +889,14 @@ function MarketPanel({ data }: { data: MarketData }) {
     </div>
     </div>
   )
-}
+})
 
 
 // ════════════════════════════════════════════════════════════════════════════
 // ██  MACRO STATS PANEL
 // ════════════════════════════════════════════════════════════════════════════
 
-function MacroStatsPanel({ data }: { data: MarketData }) {
+const MacroStatsPanel = memo(function MacroStatsPanel({ data }: { data: MarketData }) {
   const { selic, ipca, usdBrl, pib } = data.macro
   const signal =
     selic.value > 13 && ipca.value > 5 ? { label: 'APERTO',  color: '#f87171' } :
@@ -938,13 +939,13 @@ function MacroStatsPanel({ data }: { data: MarketData }) {
       </div>
     </motion.div>
   )
-}
+})
 
 // ════════════════════════════════════════════════════════════════════════════
 // ██  COMMODITIES STATS PANEL
 // ════════════════════════════════════════════════════════════════════════════
 
-function CommoditiesStatsPanel({ data }: { data: MarketData }) {
+const CommoditiesStatsPanel = memo(function CommoditiesStatsPanel({ data }: { data: MarketData }) {
   const oil    = data.commodities.oil
   const gold   = data.commodities.gold
   const silver = data.commodities.silver
@@ -999,13 +1000,13 @@ function CommoditiesStatsPanel({ data }: { data: MarketData }) {
       </div>
     </motion.div>
   )
-}
+})
 
 // ════════════════════════════════════════════════════════════════════════════
 // ██  CREDIT STATS PANEL
 // ════════════════════════════════════════════════════════════════════════════
 
-function CreditStatsPanel({ data }: { data: MarketData }) {
+const CreditStatsPanel = memo(function CreditStatsPanel({ data }: { data: MarketData }) {
   const rates = data.creditRates
   const selic = data.macro.selic.value
   const items = rates ? [
@@ -1077,13 +1078,13 @@ function CreditStatsPanel({ data }: { data: MarketData }) {
       </div>
     </motion.div>
   )
-}
+})
 
 // ════════════════════════════════════════════════════════════════════════════
 // ██  SECTOR CARD  (compact — mesmo estilo CreditStatsPanel)
 // ════════════════════════════════════════════════════════════════════════════
 
-function SectorCard({ sectors }: { sectors: Sector[] }) {
+const SectorCard = memo(function SectorCard({ sectors }: { sectors: Sector[] }) {
   const sorted  = [...sectors].sort((a, b) => b.heat - a.heat)
   const top     = sorted[0]
   const bottom  = sorted[sorted.length - 1]
@@ -1161,7 +1162,7 @@ function SectorCard({ sectors }: { sectors: Sector[] }) {
       </div>
     </motion.div>
   )
-}
+})
 
 // ════════════════════════════════════════════════════════════════════════════
 // ██  SECTOR HEATMAP
@@ -1179,7 +1180,7 @@ const SECTOR_ANALYSIS: Record<string, { oportunidade: string; risco: string; com
   media:     { oportunidade: 'Criadores independentes escalam com plataformas. Adtech BR cresce. Comunidades pagas em alta.', risco: 'CPM volátil com macro. Atenção fragmentada. LGPD limita targeting. Algoritmos mudam constantemente.', como: 'Owned media (newsletter, podcast). Comunidade paga. Branded content B2B.', quem: 'Agências, creators, adtechs, OTTs, publishers' },
 }
 
-function SectorHeatmap({ sectors }: { sectors: Sector[] }) {
+const SectorHeatmap = memo(function SectorHeatmap({ sectors }: { sectors: Sector[] }) {
   const [selected, setSelected] = useState<string | null>(null)
   const sorted = [...sectors].sort((a, b) => b.heat - a.heat)
 
@@ -1262,7 +1263,7 @@ function SectorHeatmap({ sectors }: { sectors: Sector[] }) {
       </AnimatePresence>
     </div>
   )
-}
+})
 
 // ════════════════════════════════════════════════════════════════════════════
 // ██  INTELLIGENCE CARDS  (Marketing · Sustentabilidade · Liderança)
@@ -1270,7 +1271,7 @@ function SectorHeatmap({ sectors }: { sectors: Sector[] }) {
 
 interface IntelStat { label: string; value: string; color: string }
 
-function IntelCard({ num, label, badge, badgeColor, stats, insight, decisao, decisaoColor }: {
+const IntelCard = memo(function IntelCard({ num, label, badge, badgeColor, stats, insight, decisao, decisaoColor }: {
   num: string; label: string
   badge: string; badgeColor: string
   stats: IntelStat[]
@@ -1308,9 +1309,9 @@ function IntelCard({ num, label, badge, badgeColor, stats, insight, decisao, dec
       </div>
     </motion.div>
   )
-}
+})
 
-function MarketingIntel({ data }: { data: MarketData }) {
+const MarketingIntel = memo(function MarketingIntel({ data }: { data: MarketData }) {
   const { ipca, pib, selic } = data.macro
   const retail = data.sectors.find(s => s.id === 'retail')
   const media  = data.sectors.find(s => s.id === 'media')
@@ -1334,9 +1335,9 @@ function MarketingIntel({ data }: { data: MarketData }) {
       decisao={decisao} decisaoColor={signal.color}
     />
   )
-}
+})
 
-function SustentabilidadeIntel({ data }: { data: MarketData }) {
+const SustentabilidadeIntel = memo(function SustentabilidadeIntel({ data }: { data: MarketData }) {
   const energy = data.sectors.find(s => s.id === 'energy')
   const agro   = data.sectors.find(s => s.id === 'agro')
   const green  = Math.round(clamp(((energy?.heat ?? 55) + (agro?.heat ?? 50)) / 2 + 5, 10, 95))
@@ -1359,9 +1360,9 @@ function SustentabilidadeIntel({ data }: { data: MarketData }) {
       decisao={decisao} decisaoColor={rc}
     />
   )
-}
+})
 
-function LiderancaIntel({ data }: { data: MarketData }) {
+const LiderancaIntel = memo(function LiderancaIntel({ data }: { data: MarketData }) {
   const { ipca, pib } = data.macro
   const tech     = data.sectors.find(s => s.id === 'tech')
   const services = data.sectors.find(s => s.id === 'services')
@@ -1386,13 +1387,13 @@ function LiderancaIntel({ data }: { data: MarketData }) {
       decisao={decisao} decisaoColor={signal.color}
     />
   )
-}
+})
 
 // ════════════════════════════════════════════════════════════════════════════
 // ██  PLANO DE AÇÃO IA
 // ════════════════════════════════════════════════════════════════════════════
 
-function ActionPlan({ data, userSector }: { data: MarketData; userSector?: string }) {
+const ActionPlan = memo(function ActionPlan({ data, userSector }: { data: MarketData; userSector?: string }) {
   const [plan, setPlan]       = useState('')
   const [loading, setLoading] = useState(false)
   const [typed, setTyped]     = useState('')
@@ -1514,7 +1515,7 @@ Seja cirúrgico. Use os dados de mercado reais fornecidos. Zero generalidades.`
       </div>
     </div>
   )
-}
+})
 
 // ════════════════════════════════════════════════════════════════════════════
 // ██  IA MARKET INTELLIGENCE
@@ -1571,7 +1572,7 @@ function MicButton({ onResult }: { onResult: (text: string) => void }) {
   )
 }
 
-function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string }) {
+const IaAdvisor = memo(function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string }) {
   const [answer, setAnswer]   = useState('')
   const [loading, setLoading] = useState(false)
   const [typed, setTyped]     = useState('')
@@ -1695,7 +1696,7 @@ function IaAdvisor({ data, userSector }: { data: MarketData; userSector?: string
       </div>
     </div>
   )
-}
+})
 
 // ════════════════════════════════════════════════════════════════════════════
 // ██  MAIN
@@ -1718,12 +1719,12 @@ export default function AbaBusiness() {
 
   const data = useMemo(() => rawData as MarketData | null, [rawData])
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     if (refreshing || !refetch) return
     setRefreshing(true)
     await refetch()
     setTimeout(() => setRefreshing(false), 1200)
-  }
+  }, [refreshing, refetch])
 
   if (!data) return (
     <div className="flex min-h-[60vh] items-center justify-center">
