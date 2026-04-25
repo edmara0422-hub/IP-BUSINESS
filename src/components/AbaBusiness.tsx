@@ -11,9 +11,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { createClient } from '@/lib/supabase/client'
 import dynamic from 'next/dynamic'
 
-const Globe3D            = dynamic(() => import('@/components/business/Globe3D'),            { ssr: false })
-const SectorScene3D      = dynamic(() => import('@/components/business/SectorScene3D'),      { ssr: false, loading: () => <div style={{ height: 540, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(200,200,200,0.22)', fontSize: 10, fontFamily: 'monospace', letterSpacing: '0.3em' }}>INICIALIZANDO 3D…</div> })
-const SkyscraperMarket3D = dynamic(() => import('@/components/business/SkyscraperMarket3D'), { ssr: false, loading: () => <div style={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(200,200,200,0.22)', fontSize: 10, fontFamily: 'monospace', letterSpacing: '0.3em' }}>INICIALIZANDO 3D…</div> })
+const Globe3D = dynamic(() => import('@/components/business/Globe3D'), { ssr: false })
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface MacroPoint   { value: number; delta: number; sentiment: string }
@@ -456,7 +454,6 @@ function StockCard({ ticker, label, price, pct, showPrice = true }: {
 }
 
 function MarketPanel({ data }: { data: MarketData }) {
-  const [mode, setMode] = useState<'3d' | 'cards'>('3d')
   const brStocks = data.stocks?.br ?? []
   const glStocks = data.stocks?.global ?? data.globalAgents?.slice(0, 4).map(a => ({ ticker: a.id.toUpperCase(), label: a.label, pct: a.delta })) ?? []
   const fallbackBR: StockBR[] = [
@@ -468,42 +465,22 @@ function MarketPanel({ data }: { data: MarketData }) {
   ]
   const allGlobal = [
     ...glStocks.slice(0, 4),
-    { ticker: 'XAU',  label: 'Ouro',      pct: data.commodities.gold?.delta ?? 0 },
-    { ticker: 'CL=F', label: 'Petróleo',  pct: data.commodities.oil?.delta  ?? 0 },
+    { ticker: 'XAU',  label: 'Ouro',     pct: data.commodities.gold?.delta ?? 0 },
+    { ticker: 'CL=F', label: 'Petróleo', pct: data.commodities.oil?.delta  ?? 0 },
   ]
   const brList = brStocks.length > 0 ? brStocks : fallbackBR
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(195,195,195,0.28)' }}>Bolsa BR · B3</span>
-            <motion.div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }}
-              animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} />
-          </div>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {([{ id: '3d', label: '3D' }, { id: 'cards', label: 'CARDS' }] as { id: '3d' | 'cards'; label: string }[]).map(({ id, label }) => (
-              <button key={id} onClick={() => setMode(id)}
-                style={{ padding: '4px 12px', borderRadius: 99, fontSize: 8, fontFamily: 'monospace', letterSpacing: '0.18em', cursor: 'pointer', transition: 'all 0.15s', fontWeight: mode === id ? 700 : 400, background: mode === id ? 'rgba(192,192,192,0.12)' : 'rgba(200,200,200,0.04)', border: `1px solid ${mode === id ? 'rgba(192,192,192,0.28)' : 'rgba(200,200,200,0.07)'}`, color: mode === id ? 'rgba(228,228,228,0.85)' : 'rgba(200,200,200,0.32)' }}>
-                {label}
-              </button>
-            ))}
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <span style={{ fontSize: 8.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(195,195,195,0.28)' }}>Bolsa BR · B3</span>
+          <motion.div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }}
+            animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 2, repeat: Infinity }} />
         </div>
-        <AnimatePresence mode="wait">
-          {mode === '3d' ? (
-            <motion.div key="3d" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
-              <SkyscraperMarket3D stocks={brList} />
-            </motion.div>
-          ) : (
-            <motion.div key="cards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(138px, 1fr))', gap: 8 }}>
-                {brList.map(s => <StockCard key={s.ticker} ticker={s.ticker} label={s.label} price={(s as StockBR).price} pct={s.pct} />)}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(138px, 1fr))', gap: 8 }}>
+          {brList.map(s => <StockCard key={s.ticker} ticker={s.ticker} label={s.label} price={(s as StockBR).price} pct={s.pct} />)}
+        </div>
       </div>
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
@@ -959,31 +936,10 @@ function SectorCard({ sector, delay }: { sector: Sector; delay: number }) {
 }
 
 function BusinessCard({ sectors }: { sectors: Sector[] }) {
-  const [mode, setMode] = useState<'3d' | 'cards'>('3d')
   const sorted = [...sectors].sort((a, b) => b.heat - a.heat)
   return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, marginBottom: 14 }}>
-        {([{ id: '3d', label: '3D INTERATIVO' }, { id: 'cards', label: 'CARDS' }] as { id: 'cards' | '3d'; label: string }[]).map(({ id, label }) => (
-          <button key={id} onClick={() => setMode(id)}
-            style={{ padding: '5px 16px', borderRadius: 99, fontSize: 8.5, fontFamily: 'monospace', letterSpacing: '0.18em', cursor: 'pointer', transition: 'all 0.18s', fontWeight: mode === id ? 700 : 400, background: mode === id ? 'rgba(200,200,200,0.10)' : 'rgba(200,200,200,0.03)', border: `1px solid ${mode === id ? 'rgba(200,200,200,0.22)' : 'rgba(200,200,200,0.07)'}`, color: mode === id ? 'rgba(220,220,220,0.85)' : 'rgba(200,200,200,0.28)', boxShadow: 'none' }}>
-            {label}
-          </button>
-        ))}
-      </div>
-      <AnimatePresence mode="wait">
-        {mode === '3d' ? (
-          <motion.div key="3d" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
-            <SectorScene3D sectors={sorted} />
-          </motion.div>
-        ) : (
-          <motion.div key="cards" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
-              {sorted.map((s, i) => <SectorCard key={s.id} sector={s} delay={i * 0.05} />)}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
+      {sorted.map((s, i) => <SectorCard key={s.id} sector={s} delay={i * 0.05} />)}
     </div>
   )
 }
