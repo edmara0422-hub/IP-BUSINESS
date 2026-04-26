@@ -121,7 +121,7 @@ export default function AbaTrabalhar() {
   const { mode, changeMode } = useAccessibility()
   const { profile, user } = useAuth()
   const isAdmin = profile?.role === 'admin'
-  const [activeId, setActiveId] = useState('ia')
+  const [activeId, setActiveId] = useState('pessoas')
   const [contextMode, setContextMode] = useState<ContextMode>('gestao')
   const [userProfile, setUserProfile] = useState<WorkspaceProfile | null>(null)
 
