@@ -111,10 +111,10 @@ const SectionLabel = memo(function SectionLabel({ label, sub }: { label: string;
     <motion.div initial={{ opacity: 0, x: -8 }} whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true }} transition={{ duration: 0.5 }}
       className="flex items-center gap-3 mb-4">
-      <div className="w-0.5 h-4 rounded-full" style={{ background: 'rgba(192,192,192,0.22)' }} />
-      <span className="text-[9px] font-mono uppercase tracking-[0.4em] text-white/25">{label}</span>
-      {sub && <span className="text-[9px] font-mono text-white/12">{sub}</span>}
-      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(192,192,192,0.07), transparent)' }} />
+      <div style={{ width: 3, height: 20, borderRadius: 99, flexShrink: 0, background: 'rgba(210,210,210,0.55)', boxShadow: '0 0 10px rgba(210,210,210,0.18)' }} />
+      <span style={{ fontSize: 13, fontFamily: 'monospace', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.22em', color: 'rgba(228,228,228,0.72)' }}>{label}</span>
+      {sub && <span style={{ fontSize: 9, fontFamily: 'monospace', color: 'rgba(192,192,192,0.30)', marginLeft: 2 }}>{sub}</span>}
+      <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, rgba(192,192,192,0.18), transparent)' }} />
     </motion.div>
   )
 })
@@ -544,21 +544,23 @@ const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
       </div>
 
       <div className="md:hidden flex flex-col gap-4">
-        <div className="relative mx-auto w-full" style={{ maxWidth: 300 }}>
-          {[1.08, 1.28].map((s, i) => (
-            <motion.div key={i}
-              style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '1px solid rgba(192,192,192,0.06)', transform: `scale(${s})`, pointerEvents: 'none' }}
-              animate={{ opacity: [0.5, 0.07, 0.5] }}
-              transition={{ duration: 3.5 + i * 1.8, repeat: Infinity, delay: i * 1.2 }}
-            />
-          ))}
-          <div className="w-full" style={{ aspectRatio: '1 / 1' }}><Globe3D /></div>
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 4 }}>
-            <motion.div style={{ background: 'rgba(3,5,8,0.88)', border: '1px solid rgba(52,211,153,0.28)', backdropFilter: 'blur(16px)', borderRadius: 99, padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 6 }}>
-              <motion.div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }}
-                animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.6, repeat: Infinity }} />
-              <span style={{ fontSize: 8, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(52,211,153,0.8)' }}>Ao Vivo</span>
-            </motion.div>
+        <div className="flex justify-center w-full">
+          <div className="relative" style={{ width: 270, height: 270, flexShrink: 0 }}>
+            {[1.08, 1.28].map((s, i) => (
+              <motion.div key={i}
+                style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '1px solid rgba(192,192,192,0.06)', transform: `scale(${s})`, pointerEvents: 'none' }}
+                animate={{ opacity: [0.5, 0.07, 0.5] }}
+                transition={{ duration: 3.5 + i * 1.8, repeat: Infinity, delay: i * 1.2 }}
+              />
+            ))}
+            <div style={{ width: '100%', height: '100%' }}><Globe3D /></div>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 4 }}>
+              <motion.div style={{ background: 'rgba(3,5,8,0.88)', border: '1px solid rgba(52,211,153,0.28)', backdropFilter: 'blur(16px)', borderRadius: 99, padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <motion.div style={{ width: 6, height: 6, borderRadius: '50%', background: '#34d399' }}
+                  animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 1.6, repeat: Infinity }} />
+                <span style={{ fontSize: 8, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.3em', color: 'rgba(52,211,153,0.8)' }}>Ao Vivo</span>
+              </motion.div>
+            </div>
           </div>
         </div>
 
@@ -1936,8 +1938,8 @@ export default function AbaBusiness() {
 
         {/* 3-col stats */}
         <div id="section-macro">
-          <SectionLabel label="Dados Estruturais" sub="macro · commodities · crédito" />
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 12 }}>
+          <SectionLabel label="03 · Dados Estruturais" sub="macro · commodities · crédito · setores" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <MacroStatsPanel data={data} />
             <CommoditiesStatsPanel data={data} />
             <CreditStatsPanel data={data} />
