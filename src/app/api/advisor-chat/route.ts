@@ -44,8 +44,8 @@ export async function POST(request: Request) {
 
   try {
     const { question, marketContext, snapshotHistory, role } = await request.json()
-    // Truncate to avoid Groq 413 — HTTP body limit hit when curriculum + benchmarks + full market ctx combine
-    const safeCtx = typeof marketContext === 'string' ? marketContext.slice(0, 2200) : ''
+    // Limite agressivo — compound-beta rejeita body grande mesmo com tokens baixos
+    const safeCtx = typeof marketContext === 'string' ? marketContext.slice(0, 900) : ''
 
     // Contexto de histórico: compara com snapshots anteriores se disponíveis
     const historyBlock = snapshotHistory && snapshotHistory.length > 0
