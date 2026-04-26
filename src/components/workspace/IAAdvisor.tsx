@@ -116,16 +116,16 @@ export default function IAAdvisor({ marketData, userProfile, contextMode = 'gest
     const usdD  = m.usdBrl?.delta ?? 0
 
     const sectors = (marketData.sectors ?? []).map((s: any) =>
-      `${s.label}: heat ${s.heat}/100 | ${s.change >= 0 ? '+' : ''}${s.change?.toFixed(1)}% hoje | tendência: ${s.trend}`
-    ).join('\n  ')
+      `${s.label}: ${s.heat}/100 ${s.change >= 0 ? '+' : ''}${s.change?.toFixed(1)}%`
+    ).join(' | ')
 
     const commodities = Object.entries(marketData.commodities ?? {}).map(([, c]: [string, any]) =>
       `${c.label}: US$${c.value?.toFixed(c.value > 100 ? 0 : 2)} (${c.delta >= 0 ? '+' : ''}${c.delta?.toFixed(1)}%)`
     ).join('\n  ')
 
     const agents = (marketData.globalAgents ?? []).map((a: any) =>
-      `${a.label}: ${a.delta >= 0 ? '+' : ''}${a.delta?.toFixed(1)}% — ${a.impact}`
-    ).join('\n  ')
+      `${a.label}: ${a.delta >= 0 ? '+' : ''}${a.delta?.toFixed(1)}%`
+    ).join(' | ')
 
     const stocks = (marketData.stocks?.br ?? []).map((s: any) =>
       `${s.ticker} R$${s.price} (${s.pct >= 0 ? '+' : ''}${s.pct}%)`
@@ -141,16 +141,16 @@ export default function IAAdvisor({ marketData, userProfile, contextMode = 'gest
 
     const mkt = marketData.marketing ?? {}
     const platforms = (marketData.platforms ?? []).map((p: any) =>
-      `${p.label}: CPM US$${p.cpm ?? p.cpc ?? '—'} (${(p.cpmDelta ?? p.cpcDelta ?? 0) >= 0 ? '+' : ''}${(p.cpmDelta ?? p.cpcDelta ?? 0).toFixed(1)}%) — ${p.note ?? ''}`
-    ).join('\n  ')
+      `${p.label}: CPM US$${p.cpm ?? p.cpc ?? '—'} (${(p.cpmDelta ?? p.cpcDelta ?? 0) >= 0 ? '+' : ''}${(p.cpmDelta ?? p.cpcDelta ?? 0).toFixed(1)}%)`
+    ).join(' | ')
 
     const problems = (marketData.centralProblems ?? []).map((p: any) =>
-      `${p.label}: afeta ${p.affected}% das empresas`
-    ).join('\n  ')
+      `${p.label} ${p.affected}%`
+    ).join(' | ')
 
     const opps = (marketData.opportunities ?? []).map((o: any) =>
-      `${o.label} (urgência ${o.urgency}%)`
-    ).join('\n  ')
+      `${o.label} ${o.urgency}%`
+    ).join(' | ')
 
     const phaseCtx = userProfile ? `PERFIL DO USUÁRIO:
   Tipo: ${userProfile.type === 'pj' ? 'Pessoa Jurídica' : 'Pessoa Física'}

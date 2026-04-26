@@ -44,6 +44,8 @@ export async function POST(request: Request) {
 
   try {
     const { question, marketContext, snapshotHistory, role } = await request.json()
+    // Truncate to avoid Groq 413 — HTTP body limit hit when curriculum + benchmarks + full market ctx combine
+    const safeCtx = typeof marketContext === 'string' ? marketContext.slice(0, 2200) : ''
 
     // Contexto de histórico: compara com snapshots anteriores se disponíveis
     const historyBlock = snapshotHistory && snapshotHistory.length > 0
@@ -85,7 +87,7 @@ M8 · Pesquisa e Identidade
   M8.01 Educação, Identidade e Solidariedade | M8.02 Pesquisa Aplicada a Negócios
 
 DADOS DE MERCADO REAIS AGORA (use para ilustrar teoria com números reais):
-${marketContext || 'não disponível'}
+${safeCtx || 'não disponível'}
 
 ${BR_BENCHMARKS}
 
@@ -99,7 +101,7 @@ REGRAS:
       : `Você é um analista financeiro sênior especialista em PME Brasil. Diagnóstico preciso, direto, sem enrolação.
 
 CONTEXTO DE MERCADO ATUAL:
-${marketContext || 'não disponível'}
+${safeCtx || 'não disponível'}
 
 ${BR_BENCHMARKS}
 
