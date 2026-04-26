@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useRef, useCallback, memo } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   RefreshCw, Send, ChevronRight, TrendingUp, TrendingDown, Minus,
@@ -270,9 +271,8 @@ function DetailPanelMobile({ chip, onClose }: { chip: ChipData; onClose: () => v
   const deltaLabel = chip.delta > 0.05 ? `▲ ${deltaStr}%` : chip.delta < -0.05 ? `▼ ${deltaStr}%` : '→ estável'
   const accent     = chip.signal?.color ?? chip.color
   return (
-    <div style={{ background: 'rgba(4,4,4,0.98)', border: `1px solid ${accent}35`, backdropFilter: 'blur(40px)', borderRadius: '20px 20px 0 0', padding: '16px 18px 28px', boxShadow: `0 -20px 60px rgba(0,0,0,0.96), 0 0 40px ${accent}10`, position: 'relative', overflow: 'hidden' }}>
+    <div style={{ background: 'rgba(4,4,4,0.98)', border: `1px solid ${accent}35`, backdropFilter: 'blur(40px)', borderRadius: 24, padding: '18px 20px 24px', boxShadow: `0 0 80px ${accent}12, 0 24px 60px rgba(0,0,0,0.95), inset 0 1px 0 rgba(200,200,200,0.07)`, position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', top: 0, left: '10%', right: '10%', height: 1.5, background: `linear-gradient(90deg, transparent, ${accent}55, transparent)` }} />
-      <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(200,200,200,0.18)', margin: '0 auto 14px' }} />
       <button onClick={onClose} style={{ position: 'absolute', right: 14, top: 14, width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(200,200,200,0.06)', border: '1px solid rgba(200,200,200,0.12)', borderRadius: 8, cursor: 'pointer', color: 'rgba(200,200,200,0.45)', fontSize: 17 }}>×</button>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 14, paddingRight: 36 }}>
         <div style={{ flex: 1 }}>
@@ -591,8 +591,8 @@ const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
       </div>
 
       {/* ── MOBILE: globo grande + chips orbitando com sparkline ── */}
-      {/* Negative margins break out of px-2 parent so globe centers on full screen width */}
-      <div className="md:hidden flex flex-col gap-3" style={{ marginLeft: -8, marginRight: -8, width: 'calc(100% + 16px)' }}>
+      {/* mob-globe-full counter-zooms (zoom:1.282) to undo parent zoom:0.78 → net 1x, true screen centering */}
+      <div className="md:hidden mob-globe-full flex flex-col gap-3" style={{ marginLeft: -8, marginRight: -8, width: 'calc(100% + 16px)' }}>
         <div className="relative w-full select-none" style={{ height: 580, overflow: 'hidden' }} onClick={() => setSelectedId(null)}>
           {/* Orbit ellipse guide */}
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} overflow="visible">
@@ -679,7 +679,7 @@ const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
               </motion.div>
             )
           })}
-          {/* Backdrop only — chips dim when panel open */}
+          {/* Backdrop — chips dim when panel open */}
           <AnimatePresence>
             {selectedChip && (
               <motion.div
@@ -691,30 +691,36 @@ const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
             )}
           </AnimatePresence>
         </div>
-        {/* Detail bottom sheet — fixed, escapes overflow:hidden, slides up from bottom */}
+        <GlobeAudioBar chips={chips} audioText={globeAudioText} chipOffsets={chipOffsets} />
+      </div>
+      {/* Detail panel portal — rendered in document.body, escapes zoom:0.78, centered on true viewport */}
+      {createPortal(
         <AnimatePresence>
           {selectedChip && (
             <>
               <motion.div
-                style={{ position: 'fixed', inset: 0, zIndex: 290 }}
-                initial={{ opacity: 0 }} animate={{ opacity: 0 }} exit={{ opacity: 0 }}
+                style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(12px)', zIndex: 9998 }}
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                transition={{ duration: 0.22 }}
                 onClick={() => setSelectedId(null)}
               />
-              <motion.div
-                style={{ position: 'fixed', bottom: 72, left: 0, right: 0, zIndex: 300 }}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 40 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                onClick={e => e.stopPropagation()}
-              >
-                <DetailPanelMobile chip={selectedChip} onClose={() => setSelectedId(null)} />
-              </motion.div>
+              <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 16px', pointerEvents: 'none' }}>
+                <motion.div
+                  style={{ pointerEvents: 'auto', width: '100%', maxWidth: 360 }}
+                  initial={{ opacity: 0, scale: 0.88, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.92, y: 10 }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  <DetailPanelMobile chip={selectedChip} onClose={() => setSelectedId(null)} />
+                </motion.div>
+              </div>
             </>
           )}
-        </AnimatePresence>
-        <GlobeAudioBar chips={chips} audioText={globeAudioText} chipOffsets={chipOffsets} />
-      </div>
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   )
 })

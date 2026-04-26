@@ -18,6 +18,10 @@ body {
   .mobile-scale {
     zoom: 0.78;
   }
+  /* Counter-zoom for globe hero: 0.78 × 1.282 ≈ 1.0 — centers orbit on true screen center */
+  .mobile-scale .mob-globe-full {
+    zoom: 1.282;
+  }
 }
 
 @theme {
