@@ -114,11 +114,12 @@ REGRAS:
 - Se há histórico, identifique se o negócio está melhorando ou piorando
 ${historyBlock}`
 
-    // Educator precisa de mais tokens para cobrir todos os módulos
-    const maxTok = isEducator ? 3000 : 2500
+    // llama-3.3-70b: primary — 2000 RPD, rápido para saídas grandes, sem limite diário restritivo
+    // compound-beta: reservado como upgrade (30 RPM / 250 RPD — esgota rápido entre 4 rotas)
+    const maxTok = isEducator ? 1800 : 1400
 
     const res = await groqFetch({
-      model: 'compound-beta',
+      model: 'llama-3.3-70b-versatile',
       messages: [
         { role: 'system', content: systemMsg },
         { role: 'user',   content: question },
@@ -129,16 +130,16 @@ ${historyBlock}`
 
     if (!res.ok) {
       const errBody = await res.text()
-      // Fallback para modelo menor se quota excedida
+      // Fallback para compound-beta se llama estiver com quota
       if (res.status === 429 || res.status === 413) {
         const fallback = await groqFetch({
-          model: 'llama-3.3-70b-versatile',
+          model: 'compound-beta',
           messages: [
-            { role: 'system', content: `Analista financeiro PME Brasil. ${BR_BENCHMARKS}` },
+            { role: 'system', content: systemMsg },
             { role: 'user',   content: question },
           ],
-          max_tokens: isEducator ? 2000 : 1500,
-          temperature: 0.4,
+          max_tokens: maxTok,
+          temperature: isEducator ? 0.4 : 0.3,
         }, apiKey)
         if (fallback.ok) {
           const fj = await fallback.json()

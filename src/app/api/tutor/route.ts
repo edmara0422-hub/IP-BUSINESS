@@ -104,12 +104,21 @@ export async function POST(request: Request) {
       { role: 'user', content: question },
     ]
 
-    const completion = await getGroq().chat.completions.create({
-      model: 'compound-beta',
+    let completion = await getGroq().chat.completions.create({
+      model: 'llama-3.3-70b-versatile',
       messages,
       max_tokens: maxTokens,
       temperature: action === 'generate-probe' ? 0.9 : 0.7,
-    })
+    }).catch(() => null)
+
+    if (!completion) {
+      completion = await getGroq().chat.completions.create({
+        model: 'compound-beta',
+        messages,
+        max_tokens: maxTokens,
+        temperature: action === 'generate-probe' ? 0.9 : 0.7,
+      })
+    }
 
     const text = completion.choices[0]?.message?.content?.trim() ?? ''
 
