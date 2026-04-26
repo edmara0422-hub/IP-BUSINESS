@@ -175,29 +175,33 @@ OPORTUNIDADES ABERTAS:
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          question: `${
-            contextMode === 'estudo'
-              ? 'Você é um PESQUISADOR E PROFESSOR de Inteligência Organizacional (OBI) baseado em Rezende, Peter e Mintzberg. Responda como um educador que transforma teoria em funcionalidade de software. '
-              : contextMode === 'gestao' && userProfile
-              ? `Você está falando com um(a) empreendedor(a) na fase "${userProfile.subtype ?? 'não informada'}", setor "${userProfile.sectors?.join(', ') || 'não informado'}", faturamento "${userProfile.revenue || 'não informado'}". FILTRE toda a análise por esse perfil — cite números do setor dele, riscos da fase dele, oportunidades do tamanho dele.\n\n`
-              : ''
-          }Faça uma ANÁLISE EXECUTIVA COMPLETA cruzando TODOS os dados abaixo. Organize assim:
+          question: contextMode === 'estudo'
+            ? `Analise os dados de mercado abaixo e explique de forma didática, conectando os números reais à teoria de gestão (OBI, Inteligência Organizacional, estratégia). Estruture assim:
 
-📊 PANORAMA (2 frases densas — cruze macro + setor + momento${userProfile?.subtype ? ` para fase ${userProfile.subtype}` : ''})
+📚 O QUE ESTÁ ACONTECENDO — leia os dados e explique em linguagem clara o que cada indicador significa na prática (SELIC, IPCA, setores, B3, crédito PJ)
 
-💰 MACRO CRUZADO — SELIC + IPCA + IBC-Br + inadimplência PJ + câmbio: o que está apertando e o que está abrindo${userProfile?.sectors?.length ? ` para ${userProfile.sectors[0]}` : ''}. Use os números reais.
+🔗 CONEXÃO COM TEORIA — como os dados se encaixam nos frameworks de gestão: ciclos econômicos, análise setorial, custo de capital, comportamento do consumidor
 
-📈 SETORES & AÇÕES — quais heats mais altos, qual ação subiu mais, onde está o dinheiro hoje. Cruze B3 com setores.${userProfile?.sectors?.length ? ` Destaque ${userProfile.sectors[0]}.` : ''}
+📊 LEITURA DOS SETORES — quais setores estão em expansão (heat alto), quais estão em contração, e como isso se conecta às 5 Forças e curva S de inovação
 
-🎯 MARKETING & CUSTO DE CRESCER — CAC atual, qual plataforma está mais barata (CPM/CPC), orgânico vs pago agora. Recomende canal específico com número.
+💡 APRENDIZADO PRÁTICO — 3 lições que um gestor ou estudante deve extrair desse momento de mercado, com base nos números reais
 
-💳 CRÉDITO & CAIXA — taxa de crédito PJ hoje, quanto custa R$10k/mês, como otimizar estrutura de capital nesse cenário.
+Use os números reais fornecidos. Seja um educador que transforma dados em aprendizado.${iaModifier}`
+            : `${userProfile ? `PERFIL: fase "${userProfile.subtype ?? '?'}", setor "${userProfile.sectors?.join(', ') || '?'}", faturamento "${userProfile.revenue || '?'}". Filtre TODA análise por esse perfil.\n\n` : ''}Faça uma ANÁLISE EXECUTIVA COMPLETA cruzando TODOS os dados. Organize assim:
 
-⚠️ 3 RISCOS CRÍTICOS — cada um com número + ação de proteção ESTA SEMANA.
+📊 PANORAMA — 2 frases densas cruzando macro + setor + momento${userProfile?.subtype ? ` para fase ${userProfile.subtype}` : ''}
 
-🚀 3 AÇÕES IMEDIATAS — o que ${userProfile?.subtype ? `empresa na fase ${userProfile.subtype}` : 'qualquer PME'} deve fazer AGORA com base nesses dados. Nada genérico.
+💰 MACRO CRUZADO — SELIC ${marketData?.macro?.selic?.value ?? '?'}% + IPCA ${marketData?.macro?.ipca?.value ?? '?'}% + IBC-Br + inadimplência PJ + câmbio: o que está apertando e o que está abrindo${userProfile?.sectors?.length ? ` para ${userProfile.sectors[0]}` : ''}
 
-REGRA: cite pelo menos 6 números reais dos dados fornecidos. Zero generalidades.${iaModifier}`,
+📈 SETORES & AÇÕES — quais heats mais altos, qual ação subiu mais, onde está o dinheiro. Cruze B3 com setores.${userProfile?.sectors?.length ? ` Destaque ${userProfile.sectors[0]}.` : ''}
+
+🎯 MARKETING & CUSTO DE CRESCER — CAC atual, plataforma mais barata (CPM/CPC), orgânico vs pago. Canal específico com número.
+
+💳 CRÉDITO & CAIXA — taxa PJ hoje por setor, custo mensal de R$10k, como otimizar capital nesse cenário.
+
+⚠️ 3 RISCOS CRÍTICOS — número + ação de proteção ESTA SEMANA
+
+🚀 3 AÇÕES IMEDIATAS — o que ${userProfile?.subtype ? `empresa ${userProfile.subtype}` : 'qualquer PME'} deve fazer AGORA. Mínimo 6 números reais. Zero generalidades.${iaModifier}`,
           marketContext: ctx,
         }),
       })
@@ -231,7 +235,11 @@ REGRA: cite pelo menos 6 números reais dos dados fornecidos. Zero generalidades
       const res = await fetch('/api/advisor-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: userMsg.content + iaModifier, marketContext: ctx }),
+        body: JSON.stringify({
+          question: userMsg.content + iaModifier,
+          marketContext: ctx,
+          ...(contextMode === 'estudo' ? { role: 'educator' } : {}),
+        }),
       })
       const data = await res.json()
       setMessages(prev => [...prev, {

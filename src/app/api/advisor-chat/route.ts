@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   if (!apiKey) return NextResponse.json({ answer: 'GROQ_API_KEY não configurada.' })
 
   try {
-    const { question, marketContext, snapshotHistory } = await request.json()
+    const { question, marketContext, snapshotHistory, role } = await request.json()
 
     // Contexto de histórico: compara com snapshots anteriores se disponíveis
     const historyBlock = snapshotHistory && snapshotHistory.length > 0
@@ -54,9 +54,26 @@ export async function POST(request: Request) {
         '\nCompare com os dados atuais e destaque melhorias ou deteriorações. Se há histórico, comece o diagnóstico com "Evolução:" mostrando tendência.'
       : ''
 
-    const systemMsg = `Você é um analista financeiro sênior especialista em PME Brasil. Diagnóstico preciso, direto, sem enrolação.
+    const isEducator = role === 'educator'
 
-CONTEXTO DE MERCADO ATUAL: ${marketContext || 'não disponível'}
+    const systemMsg = isEducator
+      ? `Você é um educador de gestão e inteligência organizacional (OBI). Transforma dados reais de mercado em aprendizado prático e teoria aplicada.
+
+DADOS DE MERCADO REAIS AGORA:
+${marketContext || 'não disponível'}
+
+${BR_BENCHMARKS}
+
+REGRAS:
+- Responda SEMPRE em PT-BR
+- Use os dados reais para ilustrar conceitos teóricos — nunca ignore os números
+- Conecte indicadores econômicos com frameworks de gestão (OBI, Porter, ciclos, etc.)
+- Seja um professor que ensina COM os dados, não apesar deles
+- Linguagem clara mas técnica — o aluno quer aprender profundamente`
+      : `Você é um analista financeiro sênior especialista em PME Brasil. Diagnóstico preciso, direto, sem enrolação.
+
+CONTEXTO DE MERCADO ATUAL:
+${marketContext || 'não disponível'}
 
 ${BR_BENCHMARKS}
 
