@@ -84,6 +84,7 @@ ${stockLines ? `AÇÕES BR:\n  ${stockLines}` : ''}
 ${userSector ? `\nSETOR DO USUÁRIO: ${userSector}` : ''}
 `
 
+    // maxRetries=0 — sem wait de retry; Vercel hobby tem timeout de 10s
     let res = await groqFetch({
       model: 'compound-beta',
       messages: [
@@ -92,19 +93,19 @@ ${userSector ? `\nSETOR DO USUÁRIO: ${userSector}` : ''}
       ],
       max_tokens: 900,
       temperature: 0.25,
-    }, apiKey)
+    }, apiKey, 0)
 
-    // fallback se quota compound excedida
+    // fallback para compound-beta-mini se quota excedida
     if (!res.ok && (res.status === 429 || res.status === 413)) {
       res = await groqFetch({
-        model: 'llama-3.3-70b-versatile',
+        model: 'compound-beta-mini',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: `${context}\n\nPERGUNTA: ${question}` },
         ],
         max_tokens: 900,
         temperature: 0.25,
-      }, apiKey)
+      }, apiKey, 0)
     }
 
     if (!res.ok) {

@@ -114,33 +114,32 @@ REGRAS:
 - Se há histórico, identifique se o negócio está melhorando ou piorando
 ${historyBlock}`
 
-    // llama-3.3-70b: primary — 2000 RPD, rápido para saídas grandes, sem limite diário restritivo
-    // compound-beta: reservado como upgrade (30 RPM / 250 RPD — esgota rápido entre 4 rotas)
-    const maxTok = isEducator ? 1800 : 1400
+    const maxTok = isEducator ? 2500 : 2000
 
+    // maxRetries=0 — sem espera de retry (8s+16s estouraria o limite Vercel de 10s)
     const res = await groqFetch({
-      model: 'llama-3.3-70b-versatile',
+      model: 'compound-beta',
       messages: [
         { role: 'system', content: systemMsg },
         { role: 'user',   content: question },
       ],
       max_tokens: maxTok,
       temperature: isEducator ? 0.4 : 0.3,
-    }, apiKey)
+    }, apiKey, 0)
 
     if (!res.ok) {
       const errBody = await res.text()
-      // Fallback para compound-beta se llama estiver com quota
+      // Fallback imediato para llama — sem retry wait
       if (res.status === 429 || res.status === 413) {
         const fallback = await groqFetch({
-          model: 'compound-beta',
+          model: 'compound-beta-mini',
           messages: [
             { role: 'system', content: systemMsg },
             { role: 'user',   content: question },
           ],
           max_tokens: maxTok,
           temperature: isEducator ? 0.4 : 0.3,
-        }, apiKey)
+        }, apiKey, 0)
         if (fallback.ok) {
           const fj = await fallback.json()
           return NextResponse.json({ answer: fj.choices?.[0]?.message?.content?.trim() ?? 'Sem resposta.' })
