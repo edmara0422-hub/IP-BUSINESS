@@ -1306,13 +1306,13 @@ const SectorCard = memo(function SectorCard({ sectors }: { sectors: Sector[] }) 
       </div>
 
       {/* Decisão */}
-      <div style={{ padding: '10px 16px 10px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+      <div style={{ padding: '10px 12px 10px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
         <div style={{ width: 5, height: 5, borderRadius: '50%', background: topColor, marginTop: 4, flexShrink: 0 }} />
-        <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.44)', lineHeight: 1.65 }}>{decisao}</p>
+        <p style={{ fontSize: 10.5, color: 'rgba(208,208,208,0.44)', lineHeight: 1.65 }}>{decisao}</p>
       </div>
 
       {/* Metodologia */}
-      <div style={{ padding: '8px 16px 12px', borderTop: '1px solid rgba(200,200,200,0.05)', background: 'rgba(255,255,255,0.015)' }}>
+      <div style={{ padding: '8px 12px 12px', borderTop: '1px solid rgba(200,200,200,0.05)', background: 'rgba(255,255,255,0.015)' }}>
         <p style={{ fontSize: 8.5, fontFamily: 'monospace', color: 'rgba(192,192,192,0.48)', lineHeight: 1.7 }}>
           <span style={{ color: 'rgba(192,192,192,0.30)', textTransform: 'uppercase', letterSpacing: '0.18em', marginRight: 7 }}>~cálculo</span>
           Heat score = base editorial por setor (Tech 95, Agro 88, Saúde 82, Energia 76, Fintech 71, Logística 65, Serviços 42, Varejo 18, Mídia 5) ajustada pela variação diária real da B3 (×5). Dado ao vivo.
