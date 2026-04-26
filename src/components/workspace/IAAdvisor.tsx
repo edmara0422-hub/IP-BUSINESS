@@ -63,67 +63,93 @@ export default function IAAdvisor({ marketData, userProfile, contextMode = 'gest
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages])
 
-  // Build full market context string
+  // Build full market context string — todos os campos da API /market
   const buildContext = useCallback(() => {
     if (!marketData?.macro) return ''
-    const selic = marketData.macro?.selic?.value ?? 'N/A'
-    const ipca = marketData.macro?.ipca?.value ?? 'N/A'
-    const pib = marketData.macro?.pib?.value ?? 'N/A'
-    const usd = marketData.macro?.usdBrl?.value ?? 'N/A'
-    const sectors = marketData.sectors?.map((s: any) =>
-      `${s.label}: heat ${s.heat}/100, variação ${s.change > 0 ? '+' : ''}${s.change?.toFixed(1)}%`
-    ).join('\n  ') ?? ''
-    const commodities = Object.entries(marketData.commodities ?? {}).map(([, c]: [string, any]) =>
-      `${c.label}: US$${c.value?.toFixed(c.value > 100 ? 0 : 2)} (${c.delta > 0 ? '+' : ''}${c.delta?.toFixed(1)}%)`
-    ).join('\n  ') ?? ''
-    const agents = marketData.globalAgents?.map((a: any) =>
-      `${a.label}: ${a.delta > 0 ? '+' : ''}${a.delta?.toFixed(1)}%`
-    ).join(', ') ?? ''
-    const cac = marketData.marketing?.cacTrend?.value ?? 'N/A'
-    const cacD = marketData.marketing?.cacTrend?.delta ?? 'N/A'
-    const cpm = marketData.marketing?.cpmGlobal?.value ?? 'N/A'
-    const organic = marketData.marketing?.organicShare?.value ?? 'N/A'
-    const problems = marketData.centralProblems?.map((p: any) =>
-      `${p.label}: afeta ${p.affected}% das empresas`
-    ).join('\n  ') ?? ''
-    const opps = marketData.opportunities?.map((o: any) =>
-      `${o.label}: urgência ${o.urgency}%`
-    ).join('\n  ') ?? ''
+    const m   = marketData.macro
+    const selic = m.selic?.value ?? 'N/A'
+    const ipca  = m.ipca?.value  ?? 'N/A'
+    const pib   = m.pib?.value   ?? 'N/A'
+    const usd   = m.usdBrl?.value ?? 'N/A'
+    const usdD  = m.usdBrl?.delta ?? 0
 
-    const phaseCtx = userProfile ? `
-PERFIL DO USUÁRIO:
-  Tipo: ${userProfile.type === 'pj' ? 'Pessoa Jurídica' : userProfile.type === 'pf' ? 'Pessoa Física' : 'Indefinido'}
+    const sectors = (marketData.sectors ?? []).map((s: any) =>
+      `${s.label}: heat ${s.heat}/100 | ${s.change >= 0 ? '+' : ''}${s.change?.toFixed(1)}% hoje | tendência: ${s.trend}`
+    ).join('\n  ')
+
+    const commodities = Object.entries(marketData.commodities ?? {}).map(([, c]: [string, any]) =>
+      `${c.label}: US$${c.value?.toFixed(c.value > 100 ? 0 : 2)} (${c.delta >= 0 ? '+' : ''}${c.delta?.toFixed(1)}%)`
+    ).join('\n  ')
+
+    const agents = (marketData.globalAgents ?? []).map((a: any) =>
+      `${a.label}: ${a.delta >= 0 ? '+' : ''}${a.delta?.toFixed(1)}% — ${a.impact}`
+    ).join('\n  ')
+
+    const stocks = (marketData.stocks?.br ?? []).map((s: any) =>
+      `${s.ticker} R$${s.price} (${s.pct >= 0 ? '+' : ''}${s.pct}%)`
+    ).join(' | ')
+    const ibov = marketData.stocks?.ibov
+      ? `IBOVESPA: ${marketData.stocks.ibov.value?.toLocaleString('pt-BR')} pts (${marketData.stocks.ibov.pct >= 0 ? '+' : ''}${marketData.stocks.ibov.pct}%)`
+      : ''
+
+    const credit = marketData.creditRates ?? {}
+    const creditLines = Object.entries(credit).map(([, c]: [string, any]) =>
+      `${c.label}: ${c.value}% a.a.`
+    ).join(' | ')
+
+    const mkt = marketData.marketing ?? {}
+    const platforms = (marketData.platforms ?? []).map((p: any) =>
+      `${p.label}: CPM US$${p.cpm ?? p.cpc ?? '—'} (${(p.cpmDelta ?? p.cpcDelta ?? 0) >= 0 ? '+' : ''}${(p.cpmDelta ?? p.cpcDelta ?? 0).toFixed(1)}%) — ${p.note ?? ''}`
+    ).join('\n  ')
+
+    const problems = (marketData.centralProblems ?? []).map((p: any) =>
+      `${p.label}: afeta ${p.affected}% das empresas`
+    ).join('\n  ')
+
+    const opps = (marketData.opportunities ?? []).map((o: any) =>
+      `${o.label} (urgência ${o.urgency}%)`
+    ).join('\n  ')
+
+    const phaseCtx = userProfile ? `PERFIL DO USUÁRIO:
+  Tipo: ${userProfile.type === 'pj' ? 'Pessoa Jurídica' : 'Pessoa Física'}
   Fase: ${userProfile.subtype ?? 'não informada'}
   Setor(es): ${userProfile.sectors?.join(', ') || 'não informado'}
   Faturamento: ${userProfile.revenue || 'não informado'}
   Produto/Serviço: ${userProfile.product?.join(', ') || 'não informado'}
+
 ` : ''
 
-    return `${phaseCtx}DADOS MACRO:
-  SELIC: ${selic}%
-  IPCA: ${ipca}%
-  PIB: ${pib}%
-  USD/BRL: R$${usd}
+    return `${phaseCtx}MACRO (dados reais BCB/IBGE/Focus):
+  SELIC: ${selic}% a.a. | IPCA 12m: ${ipca}% | PIB projeção: ${pib}% | USD/BRL: R$${usd} (${usdD >= 0 ? '+' : ''}${usdD})
+  IBC-Br (atividade real): ${marketData.ibcBr ?? '—'}% | Inadimplência PJ: ${marketData.inadimplenciaPJ ?? '—'}% | Desemprego PNAD: ${marketData.desemprego ?? '—'}%
 
-SETORES (heat 0-100):
+CRÉDITO PJ (BCB, taxa média a.a.):
+  ${creditLines}
+
+SETORES (heat 0–100 | base editorial + variação B3 ×5):
   ${sectors}
 
 COMMODITIES:
   ${commodities}
 
-AGENTES GLOBAIS: ${agents}
+AÇÕES BR (Yahoo Finance ao vivo):
+  ${ibov}
+  ${stocks}
 
-MARKETING:
-  CAC médio: R$${cac} (${cacD}% delta)
-  CPM global: US$${cpm}
-  Tráfego orgânico: ${organic}%
+AGENTES GLOBAIS:
+  ${agents}
 
-PROBLEMAS CENTRAIS:
+MARKETING & PLATAFORMAS:
+  CAC médio BR: R$${mkt.cacTrend?.value ?? '—'} (${(mkt.cacTrend?.delta ?? 0) >= 0 ? '+' : ''}${mkt.cacTrend?.delta ?? 0}% delta)
+  CPM global médio: US$${mkt.cpmGlobal?.value ?? '—'} | Orgânico: ${mkt.organicShare?.value ?? '—'}% | Vídeo: ${mkt.videoShare?.value ?? '—'}% | IA Mkt adoção: ${mkt.aiAdoption?.value ?? '—'}%
+  ${platforms}
+
+PROBLEMAS CENTRAIS PME BR:
   ${problems}
 
-OPORTUNIDADES:
+OPORTUNIDADES ABERTAS:
   ${opps}`
-  }, [marketData])
+  }, [marketData, userProfile])
 
   // Auto-generate full briefing on mount
   useEffect(() => {
