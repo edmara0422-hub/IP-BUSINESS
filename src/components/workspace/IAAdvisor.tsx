@@ -5,6 +5,48 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Brain, SendHorizontal, Loader2, Sparkles, RefreshCw } from 'lucide-react'
 import { useAccessibility } from '@/hooks/useAccessibility'
 
+function MicBtn({ onResult }: { onResult: (text: string) => void }) {
+  const [listening, setListening] = useState(false)
+  const recRef = useRef<unknown>(null)
+
+  const toggle = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SRClass = ((window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition) as (new() => any) | undefined
+    if (!SRClass) return
+    if (listening) { (recRef.current as any)?.stop(); setListening(false); return }
+    const rec = new SRClass()
+    rec.lang = 'pt-BR'; rec.continuous = false; rec.interimResults = false
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rec.onresult = (e: any) => { onResult(e.results[0][0].transcript); setListening(false) }
+    rec.onerror = () => setListening(false)
+    rec.onend   = () => setListening(false)
+    recRef.current = rec
+    rec.start()
+    setListening(true)
+  }
+
+  return (
+    <button onClick={toggle} title={listening ? 'Parar gravação' : 'Falar pergunta'}
+      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 32, height: 32, borderRadius: '50%', background: listening ? 'rgba(248,113,113,0.15)' : 'rgba(255,255,255,0.05)', border: `1.5px solid ${listening ? '#f87171' : 'rgba(255,255,255,0.10)'}`, cursor: 'pointer', flexShrink: 0, transition: 'all 0.15s' }}>
+      {listening ? (
+        <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 0.7, repeat: Infinity }}>
+          <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
+            <rect x="4" y="1" width="4" height="6" rx="2" fill="#f87171" />
+            <path d="M2 6c0 2.2 1.8 4 4 4s4-1.8 4-4" stroke="#f87171" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+            <line x1="6" y1="10" x2="6" y2="12" stroke="#f87171" strokeWidth="1.2" strokeLinecap="round" />
+          </svg>
+        </motion.div>
+      ) : (
+        <svg width="13" height="13" viewBox="0 0 12 12" fill="none">
+          <rect x="4" y="1" width="4" height="6" rx="2" fill="rgba(255,255,255,0.30)" />
+          <path d="M2 6c0 2.2 1.8 4 4 4s4-1.8 4-4" stroke="rgba(255,255,255,0.30)" strokeWidth="1.2" strokeLinecap="round" fill="none" />
+          <line x1="6" y1="10" x2="6" y2="12" stroke="rgba(255,255,255,0.30)" strokeWidth="1.2" strokeLinecap="round" />
+        </svg>
+      )}
+    </button>
+  )
+}
+
 function AudioBtn({ text }: { text: string }) {
   const [playing, setPlaying] = useState(false)
 
@@ -223,10 +265,10 @@ Use os números reais fornecidos. Seja um educador que transforma dados em apren
     }
   }
 
-  const sendMessage = async () => {
-    if (!input.trim() || loading) return
+  const sendText = useCallback(async (text: string) => {
+    if (!text.trim() || loading) return
     const ctx = buildContext()
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: input.trim() }
+    const userMsg: Message = { id: Date.now().toString(), role: 'user', content: text.trim() }
     setMessages(prev => [...prev, userMsg])
     setInput('')
     setLoading(true)
@@ -236,7 +278,7 @@ Use os números reais fornecidos. Seja um educador que transforma dados em apren
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          question: userMsg.content + iaModifier,
+          question: text.trim() + iaModifier,
           marketContext: ctx,
           ...(contextMode === 'estudo' ? { role: 'educator' } : {}),
         }),
@@ -256,7 +298,9 @@ Use os números reais fornecidos. Seja um educador que transforma dados em apren
     } finally {
       setLoading(false)
     }
-  }
+  }, [buildContext, contextMode, iaModifier, loading])
+
+  const sendMessage = () => { sendText(input) }
 
   return (
     <div className="flex flex-col h-[75vh] max-h-[700px]">
@@ -343,6 +387,7 @@ Use os números reais fornecidos. Seja um educador que transforma dados em apren
             placeholder="Ex: Como reduzir meu CAC? Devo investir em tech? Qual preço cobrar?"
             className="flex-1 bg-transparent text-[13px] text-white/80 placeholder:text-white/20 outline-none"
           />
+          <MicBtn onResult={text => sendText(text)} />
           <button
             onClick={sendMessage}
             disabled={loading || !input.trim()}
