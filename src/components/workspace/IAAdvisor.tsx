@@ -218,17 +218,21 @@ OPORTUNIDADES ABERTAS:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           question: contextMode === 'estudo'
-            ? `Analise os dados de mercado abaixo e explique de forma didática, conectando os números reais à teoria de gestão (OBI, Inteligência Organizacional, estratégia). Estruture assim:
+            ? `Faça uma aula inaugural conectando o momento atual de mercado com os 8 módulos do currículo IPB. Estruture assim:
 
-📚 O QUE ESTÁ ACONTECENDO — leia os dados e explique em linguagem clara o que cada indicador significa na prática (SELIC, IPCA, setores, B3, crédito PJ)
+🎯 MOMENTO DO MERCADO COMO CASO REAL — explique em 2 frases o que está acontecendo agora (use os números reais: SELIC, IPCA, setores, B3) como se fosse a abertura de uma aula
 
-🔗 CONEXÃO COM TEORIA — como os dados se encaixam nos frameworks de gestão: ciclos econômicos, análise setorial, custo de capital, comportamento do consumidor
+📘 MÓDULOS EM DESTAQUE AGORA — quais dos 8 módulos são mais relevantes para este momento de mercado e POR QUÊ (ex: M5.03 Ambiente Macroeconômico, M3.01 Economia de Empresa, M2.03 Matemática Financeira)
 
-📊 LEITURA DOS SETORES — quais setores estão em expansão (heat alto), quais estão em contração, e como isso se conecta às 5 Forças e curva S de inovação
+🔗 TEORIA VIVA — escolha 2 conceitos dos módulos e mostre como os dados reais de hoje os ilustram perfeitamente (ex: como a SELIC alta ilustra o custo de capital de M2.03, como o heat setorial ilustra as 5 Forças de M3.01)
 
-💡 APRENDIZADO PRÁTICO — 3 lições que um gestor ou estudante deve extrair desse momento de mercado, com base nos números reais
+💡 INOVAÇÃO & TRANSFORMAÇÃO — o que M1 (Inovação, Criatividade) ensina sobre como empresas devem reagir a este cenário? Conecte com dados reais.
 
-Use os números reais fornecidos. Seja um educador que transforma dados em aprendizado.${iaModifier}`
+🧭 LIDERANÇA & ESTRATÉGIA — o que M3.02 (Liderança) e M5.02 (Empreendedorismo) dizem sobre tomar decisões neste ambiente?
+
+❓ 3 PERGUNTAS PARA APROFUNDAR — perguntas desafiadoras que o aluno pode me fazer para continuar aprendendo sobre este momento com base nos módulos
+
+Tom: inspirador, profundo, como um professor que transforma o mundo real em sala de aula.${iaModifier}`
             : `${userProfile ? `PERFIL: fase "${userProfile.subtype ?? '?'}", setor "${userProfile.sectors?.join(', ') || '?'}", faturamento "${userProfile.revenue || '?'}". Filtre TODA análise por esse perfil.\n\n` : ''}Faça uma ANÁLISE EXECUTIVA COMPLETA cruzando TODOS os dados. Organize assim:
 
 📊 PANORAMA — 2 frases densas cruzando macro + setor + momento${userProfile?.subtype ? ` para fase ${userProfile.subtype}` : ''}
@@ -378,13 +382,15 @@ Use os números reais fornecidos. Seja um educador que transforma dados em apren
 
       {/* Input */}
       <div className="px-4 py-3 border-t border-white/5">
-        <p className="text-[10px] text-white/15 mb-2 font-mono">PERGUNTE MAIS — A IA CRUZA COM TODOS OS DADOS DE MERCADO</p>
+        <p className="text-[10px] text-white/15 mb-2 font-mono">
+          {contextMode === 'estudo' ? 'PERGUNTE SOBRE QUALQUER MÓDULO — A IA CONECTA COM O MERCADO REAL' : 'PERGUNTE MAIS — A IA CRUZA COM TODOS OS DADOS DE MERCADO'}
+        </p>
         <div className="flex items-center gap-2 rounded-xl px-3 py-2.5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && sendMessage()}
-            placeholder="Ex: Como reduzir meu CAC? Devo investir em tech? Qual preço cobrar?"
+            placeholder={contextMode === 'estudo' ? 'Ex: Explique M3.01, o que é inovação disruptiva, como aplicar as 5 Forças...' : 'Ex: Como reduzir meu CAC? Devo investir em tech? Qual preço cobrar?'}
             className="flex-1 bg-transparent text-[13px] text-white/80 placeholder:text-white/20 outline-none"
           />
           <MicBtn onResult={text => sendText(text)} />
