@@ -1069,23 +1069,23 @@ const MacroStatsPanel = memo(function MacroStatsPanel({ data }: { data: MarketDa
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.38 }}
       style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
-      <div style={{ padding: '11px 16px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>Macro · 01</span>
+      <div style={{ padding: '11px 12px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.28)', fontWeight: 700, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', minWidth: 0, flex: 1 }}>Macro · 01</span>
         <AudioButton color={signal.color} text={`Indicadores macro. SELIC ${selic.value} por cento ao ano. IPCA ${ipca.value} por cento em doze meses. Dólar R$${usdBrl.value}. PIB projeção ${pib.value} por cento. ${decisao}`} />
-        <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{signal.label}</span>
+        <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 7px', textTransform: 'uppercase', letterSpacing: '0.10em', flexShrink: 0 }}>{signal.label}</span>
       </div>
-      <div style={{ padding: '14px 16px 10px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div style={{ padding: '12px 12px 10px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         {stats.map(s => (
           <div key={s.label}>
-            <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.24)', marginBottom: 3 }}>{s.label}</p>
-            <p style={{ fontSize: 22, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.90)', lineHeight: 1, marginBottom: 3 }}>{s.value}</p>
+            <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(192,192,192,0.24)', marginBottom: 3 }}>{s.label}</p>
+            <p style={{ fontSize: 17, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.90)', lineHeight: 1, marginBottom: 3 }}>{s.value}</p>
             <p style={{ fontSize: 9, fontFamily: 'monospace', color: s.color, fontWeight: 600 }}>{s.sub}</p>
           </div>
         ))}
       </div>
-      <div style={{ padding: '10px 16px 13px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+      <div style={{ padding: '10px 12px 13px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
         <div style={{ width: 5, height: 5, borderRadius: '50%', background: signal.color, marginTop: 4, flexShrink: 0 }} />
-        <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.44)', lineHeight: 1.65 }}>{decisao}</p>
+        <p style={{ fontSize: 10.5, color: 'rgba(208,208,208,0.44)', lineHeight: 1.65 }}>{decisao}</p>
       </div>
     </motion.div>
   )
@@ -1121,32 +1121,32 @@ const CommoditiesStatsPanel = memo(function CommoditiesStatsPanel({ data }: { da
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.38, delay: 0.06 }}
       style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
-      <div style={{ padding: '11px 16px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>Commodities · 04</span>
+      <div style={{ padding: '11px 12px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.28)', fontWeight: 700, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', minWidth: 0, flex: 1 }}>Comod · 04</span>
         <AudioButton color={signal.color} text={`Commodities. Petróleo ${oil?.value ? `$${oil.value} por barril` : 'indisponível'}, variação ${pctSign(oilDelta)}. Ouro ${gold?.value ? `$${gold.value} por onça` : 'indisponível'}, variação ${pctSign(goldDelta)}. Prata ${silver?.value ? `$${silver.value} por onça` : 'indisponível'}. ${decisao}`} />
-        <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{signal.label}</span>
+        <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 7px', textTransform: 'uppercase', letterSpacing: '0.10em', flexShrink: 0 }}>{signal.label}</span>
       </div>
-      <div style={{ padding: '12px 16px 8px', display: 'flex', flexDirection: 'column', gap: 11 }}>
+      <div style={{ padding: '12px 12px 8px', display: 'flex', flexDirection: 'column', gap: 9 }}>
         {items.map(item => {
           const col = item.delta !== 0 ? pctColor(item.delta) : '#c0c0c0'
           return (
-            <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.26)', marginBottom: 2 }}>{item.label}</p>
-                <p style={{ fontSize: 18, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.88)', lineHeight: 1 }}>{item.value}</p>
-                <p style={{ fontSize: 8.5, color: 'rgba(192,192,192,0.28)', marginTop: 1 }}>{item.unit}</p>
+                <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(192,192,192,0.26)', marginBottom: 2 }}>{item.label}</p>
+                <p style={{ fontSize: 15, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.88)', lineHeight: 1 }}>{item.value}</p>
+                <p style={{ fontSize: 8, color: 'rgba(192,192,192,0.28)', marginTop: 1 }}>{item.unit}</p>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                <Sparkline id={item.id} delta={item.delta} color={col} w={46} h={20} />
-                <span style={{ fontSize: 9.5, fontFamily: 'monospace', fontWeight: 700, color: col }}>{pctSign(item.delta)}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3 }}>
+                <Sparkline id={item.id} delta={item.delta} color={col} w={36} h={16} />
+                <span style={{ fontSize: 9, fontFamily: 'monospace', fontWeight: 700, color: col }}>{pctSign(item.delta)}</span>
               </div>
             </div>
           )
         })}
       </div>
-      <div style={{ padding: '10px 16px 13px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+      <div style={{ padding: '10px 12px 13px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
         <div style={{ width: 5, height: 5, borderRadius: '50%', background: signal.color, marginTop: 4, flexShrink: 0 }} />
-        <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.44)', lineHeight: 1.65 }}>{decisao}</p>
+        <p style={{ fontSize: 10.5, color: 'rgba(208,208,208,0.44)', lineHeight: 1.65 }}>{decisao}</p>
       </div>
     </motion.div>
   )
@@ -1183,32 +1183,32 @@ const CreditStatsPanel = memo(function CreditStatsPanel({ data }: { data: Market
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.38, delay: 0.12 }}
       style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
-      <div style={{ padding: '11px 16px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>Crédito PJ · 05</span>
+      <div style={{ padding: '11px 12px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.28)', fontWeight: 700, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', minWidth: 0, flex: 1 }}>Crédito PJ · 05</span>
         <AudioButton color={signal.color} text={`Crédito PJ. Taxa média ${avgRate.toFixed(1)} por cento ao ano. Spread sobre SELIC: mais ${(avgRate - selic).toFixed(0)} pontos percentuais. ${decisao}`} />
-        <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{signal.label}</span>
+        <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: signal.color, background: signal.color + '18', border: `1px solid ${signal.color}28`, borderRadius: 99, padding: '2px 7px', textTransform: 'uppercase', letterSpacing: '0.10em', flexShrink: 0 }}>{signal.label}</span>
       </div>
-      <div style={{ padding: '12px 16px 6px', display: 'flex', gap: 14, alignItems: 'flex-end' }}>
+      <div style={{ padding: '12px 12px 6px', display: 'flex', gap: 10, alignItems: 'flex-end' }}>
         <div>
-          <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.24)', marginBottom: 2 }}>Taxa Média</p>
-          <p style={{ fontSize: 26, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.90)', lineHeight: 1 }}>{avgRate.toFixed(1)}%</p>
-          <p style={{ fontSize: 8.5, color: 'rgba(192,192,192,0.28)', marginTop: 2 }}>a.a. · crédito PJ</p>
+          <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(192,192,192,0.24)', marginBottom: 2 }}>Taxa Média</p>
+          <p style={{ fontSize: 18, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.90)', lineHeight: 1 }}>{avgRate.toFixed(1)}%</p>
+          <p style={{ fontSize: 8, color: 'rgba(192,192,192,0.28)', marginTop: 2 }}>a.a. PJ</p>
         </div>
         <div>
-          <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.24)', marginBottom: 2 }}>Spread SELIC</p>
-          <p style={{ fontSize: 15, fontWeight: 700, fontFamily: 'monospace', color: signal.color }}>+{(avgRate - selic).toFixed(0)} pp</p>
+          <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(192,192,192,0.24)', marginBottom: 2 }}>Spread</p>
+          <p style={{ fontSize: 13, fontWeight: 700, fontFamily: 'monospace', color: signal.color }}>+{(avgRate - selic).toFixed(0)} pp</p>
         </div>
       </div>
       {valid.length > 0 && (
-        <div style={{ padding: '8px 16px 10px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+        <div style={{ padding: '8px 12px 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
           {valid.map((item, idx) => {
             const rc = item.value > 28 ? '#f87171' : item.value > 18 ? '#fbbf24' : '#34d399'
             return (
               <motion.div key={item.label}
                 initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
                 viewport={{ once: true }} transition={{ delay: idx * 0.06 }}
-                style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ fontSize: 8, fontFamily: 'monospace', color: 'rgba(192,192,192,0.28)', width: 60, flexShrink: 0 }}>{item.label}</span>
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 7.5, fontFamily: 'monospace', color: 'rgba(192,192,192,0.28)', width: 48, flexShrink: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</span>
                 <div style={{ flex: 1, height: 4, background: 'rgba(200,200,200,0.06)', borderRadius: 2, overflow: 'hidden' }}>
                   <motion.div
                     initial={{ width: 0 }} whileInView={{ width: `${(item.value / maxR) * 100}%` }}
@@ -1216,15 +1216,15 @@ const CreditStatsPanel = memo(function CreditStatsPanel({ data }: { data: Market
                     style={{ height: '100%', borderRadius: 2, background: `linear-gradient(90deg, ${rc}50, ${rc})` }}
                   />
                 </div>
-                <span style={{ fontSize: 10.5, fontFamily: 'monospace', fontWeight: 700, color: rc, width: 38, textAlign: 'right', flexShrink: 0 }}>{item.value}%</span>
+                <span style={{ fontSize: 9.5, fontFamily: 'monospace', fontWeight: 700, color: rc, width: 30, textAlign: 'right', flexShrink: 0 }}>{item.value}%</span>
               </motion.div>
             )
           })}
         </div>
       )}
-      <div style={{ padding: '10px 16px 13px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+      <div style={{ padding: '10px 12px 13px', borderTop: '1px solid rgba(200,200,200,0.04)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
         <div style={{ width: 5, height: 5, borderRadius: '50%', background: signal.color, marginTop: 4, flexShrink: 0 }} />
-        <p style={{ fontSize: 11, color: 'rgba(208,208,208,0.44)', lineHeight: 1.65 }}>{decisao}</p>
+        <p style={{ fontSize: 10.5, color: 'rgba(208,208,208,0.44)', lineHeight: 1.65 }}>{decisao}</p>
       </div>
     </motion.div>
   )
@@ -1260,22 +1260,22 @@ const SectorCard = memo(function SectorCard({ sectors }: { sectors: Sector[] }) 
       style={{ background: 'rgba(5,5,5,0.94)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 18, overflow: 'hidden' }}>
 
       {/* Header */}
-      <div style={{ padding: '11px 16px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.28em', color: 'rgba(192,192,192,0.28)', fontWeight: 700 }}>Setores · 09</span>
+      <div style={{ padding: '11px 12px 9px', borderBottom: '1px solid rgba(200,200,200,0.05)', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.28)', fontWeight: 700, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', minWidth: 0, flex: 1 }}>Setores · 09</span>
         <AudioButton color={badge.color} text={`Análise setorial. Setor líder: ${top?.label}, score ${top?.heat} de 100. Maior risco: ${bottom?.label}, score ${bottom?.heat} de 100. ${sorted.map(s => `${s.label}: ${s.heat}`).join('. ')}. ${decisao}`} />
-        <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: badge.color, background: badge.color + '18', border: `1px solid ${badge.color}28`, borderRadius: 99, padding: '2px 9px', textTransform: 'uppercase', letterSpacing: '0.14em' }}>{badge.label}</span>
+        <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: badge.color, background: badge.color + '18', border: `1px solid ${badge.color}28`, borderRadius: 99, padding: '2px 7px', textTransform: 'uppercase', letterSpacing: '0.10em', flexShrink: 0 }}>{badge.label}</span>
       </div>
 
       {/* Top stat */}
       {top && (
-        <div style={{ padding: '12px 16px 6px', display: 'flex', gap: 14, alignItems: 'flex-end' }}>
+        <div style={{ padding: '12px 12px 6px', display: 'flex', gap: 10, alignItems: 'flex-end' }}>
           <div>
-            <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.24)', marginBottom: 2 }}>Setor Líder</p>
-            <p style={{ fontSize: 22, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.90)', lineHeight: 1 }}>{top.heat}<span style={{ fontSize: 12, color: 'rgba(192,192,192,0.35)', marginLeft: 2 }}>/100</span></p>
-            <p style={{ fontSize: 8.5, color: topColor, marginTop: 3, fontWeight: 600 }}>{top.label}</p>
+            <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(192,192,192,0.24)', marginBottom: 2 }}>Setor Líder</p>
+            <p style={{ fontSize: 17, fontWeight: 800, fontFamily: 'monospace', color: 'rgba(235,235,235,0.90)', lineHeight: 1 }}>{top.heat}<span style={{ fontSize: 11, color: 'rgba(192,192,192,0.35)', marginLeft: 2 }}>/100</span></p>
+            <p style={{ fontSize: 8, color: topColor, marginTop: 3, fontWeight: 600 }}>{top.label}</p>
           </div>
           <div>
-            <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(192,192,192,0.24)', marginBottom: 2 }}>Maior Risco</p>
+            <p style={{ fontSize: 7, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(192,192,192,0.24)', marginBottom: 2 }}>Maior Risco</p>
             <p style={{ fontSize: 14, fontWeight: 700, fontFamily: 'monospace', color: heatColor(bottom?.heat ?? 0) }}>{bottom?.heat ?? 0}/100</p>
             <p style={{ fontSize: 8.5, color: 'rgba(192,192,192,0.30)', marginTop: 1 }}>{bottom?.label}</p>
           </div>
@@ -1283,15 +1283,15 @@ const SectorCard = memo(function SectorCard({ sectors }: { sectors: Sector[] }) 
       )}
 
       {/* Bar list */}
-      <div style={{ padding: '8px 16px 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div style={{ padding: '8px 12px 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
         {sorted.map((s, idx) => {
           const col = heatColor(s.heat)
           return (
             <motion.div key={s.id}
               initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
               viewport={{ once: true }} transition={{ delay: idx * 0.05 }}
-              style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 8, fontFamily: 'monospace', color: 'rgba(192,192,192,0.28)', width: 100, flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</span>
+              style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 7.5, fontFamily: 'monospace', color: 'rgba(192,192,192,0.28)', width: 68, flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</span>
               <div style={{ flex: 1, height: 4, background: 'rgba(200,200,200,0.06)', borderRadius: 2, overflow: 'hidden' }}>
                 <motion.div
                   initial={{ width: 0 }} whileInView={{ width: `${s.heat}%` }}
