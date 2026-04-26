@@ -1932,13 +1932,13 @@ export default function AbaBusiness() {
 
         {/* Chart + Analysis + B3 */}
         <div id="section-mercado">
-          <SectionLabel label="02 · Mercado & B3" sub="índices, ações e variação" />
+          <SectionLabel label="Mercado & B3" sub="índices, ações e variação" />
           <MarketPanel data={data} />
         </div>
 
         {/* 3-col stats */}
         <div id="section-macro">
-          <SectionLabel label="03 · Dados Estruturais" sub="macro · commodities · crédito · setores" />
+          <SectionLabel label="Dados Estruturais" sub="macro · commodities · crédito · setores" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <MacroStatsPanel data={data} />
             <CommoditiesStatsPanel data={data} />

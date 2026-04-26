@@ -1,9 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk'
 import { NextResponse } from 'next/server'
-
-function getClient() {
-  return new Anthropic()
-}
 
 export const dynamic = 'force-dynamic'
 
@@ -33,7 +28,21 @@ interface AdvisorRequest {
   }
 }
 
+async function groqFetch(payload: object, apiKey: string): Promise<Response> {
+  return fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+}
+
 export async function POST(request: Request) {
+  const apiKey = process.env.GROQ_API_KEY
+  if (!apiKey) return NextResponse.json(
+    { primary: 'GROQ_API_KEY não configurada.', narrative: '', recommendation: '' },
+    { status: 200 },
+  )
+
   try {
     const body = (await request.json()) as AdvisorRequest
     const { snapshot, inputs, workspace } = body
@@ -63,27 +72,40 @@ Forneça uma análise executiva estratégica. Responda APENAS com JSON válido n
 
 Seja direto, use os números, evite generalidades. Responda APENAS o JSON.`
 
-    const message = await getClient().messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 512,
+    let res = await groqFetch({
+      model: 'compound-beta',
       messages: [{ role: 'user', content: prompt }],
-    })
+      max_tokens: 512,
+      temperature: 0.25,
+    }, apiKey)
 
-    const text = message.content[0].type === 'text' ? message.content[0].text.trim() : ''
+    if (!res.ok && (res.status === 429 || res.status === 413)) {
+      res = await groqFetch({
+        model: 'compound-beta-mini',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 512,
+        temperature: 0.25,
+      }, apiKey)
+    }
 
+    if (!res.ok) {
+      const err = await res.text().catch(() => String(res.status))
+      return NextResponse.json(
+        { primary: `Erro Groq ${res.status}: ${err.slice(0, 100)}`, narrative: '', recommendation: '' },
+        { status: 200 },
+      )
+    }
+
+    const data = await res.json()
+    const text = (data.choices?.[0]?.message?.content ?? '').trim()
     const jsonMatch = text.match(/\{[\s\S]*\}/)
-    const jsonText = jsonMatch ? jsonMatch[0] : text
-    const analysis = JSON.parse(jsonText) as { primary: string; narrative: string; recommendation: string }
+    const analysis = JSON.parse(jsonMatch ? jsonMatch[0] : text) as { primary: string; narrative: string; recommendation: string }
 
     return NextResponse.json(analysis)
   } catch (error) {
     console.error('[advisor] error:', error)
     return NextResponse.json(
-      {
-        primary: 'Configure a variável ANTHROPIC_API_KEY no arquivo .env.local para ativar o diagnóstico por IA.',
-        narrative: 'O advisor usa o Claude Haiku para gerar análises estratégicas em tempo real a partir dos dados do cockpit.',
-        recommendation: 'Crie o arquivo .env.local na raiz do projeto com: ANTHROPIC_API_KEY=sua_chave_aqui',
-      },
+      { primary: 'Erro ao gerar análise.', narrative: '', recommendation: '' },
       { status: 200 },
     )
   }
