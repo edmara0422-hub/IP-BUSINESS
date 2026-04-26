@@ -85,7 +85,7 @@ ${userSector ? `\nSETOR DO USUÁRIO: ${userSector}` : ''}
 `
 
     let res = await groqFetch({
-      model: 'llama-3.3-70b-versatile',
+      model: 'compound-beta',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: `${context}\n\nPERGUNTA: ${question}` },
@@ -94,16 +94,16 @@ ${userSector ? `\nSETOR DO USUÁRIO: ${userSector}` : ''}
       temperature: 0.25,
     }, apiKey)
 
-    // fallback para modelo menor se quota excedida
+    // fallback se quota compound excedida
     if (!res.ok && (res.status === 429 || res.status === 413)) {
       res = await groqFetch({
-        model: 'llama-3.1-8b-instant',
+        model: 'llama-3.3-70b-versatile',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: `${context}\n\nPERGUNTA: ${question}` },
         ],
-        max_tokens: 600,
-        temperature: 0.3,
+        max_tokens: 900,
+        temperature: 0.25,
       }, apiKey)
     }
 

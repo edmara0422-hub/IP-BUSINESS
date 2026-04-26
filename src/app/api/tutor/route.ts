@@ -105,7 +105,7 @@ export async function POST(request: Request) {
     ]
 
     const completion = await getGroq().chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'compound-beta',
       messages,
       max_tokens: maxTokens,
       temperature: action === 'generate-probe' ? 0.9 : 0.7,

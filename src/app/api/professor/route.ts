@@ -161,7 +161,7 @@ export async function POST(request: Request) {
     const userMessage = contextParts.join('\n\n') + anchorInstruction
 
     const completion = await getGroq().chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'compound-beta',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userMessage },
