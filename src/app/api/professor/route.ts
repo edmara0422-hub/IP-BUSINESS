@@ -161,7 +161,7 @@ export async function POST(request: Request) {
     const userMessage = contextParts.join('\n\n') + anchorInstruction
 
     let completion = await getGroq().chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'compound-beta',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userMessage },
@@ -172,7 +172,7 @@ export async function POST(request: Request) {
 
     if (!completion) {
       completion = await getGroq().chat.completions.create({
-        model: 'compound-beta',
+        model: 'compound-beta-mini',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userMessage },

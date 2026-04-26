@@ -110,13 +110,14 @@ REGRAS OBRIGATÓRIAS:
 Responda APENAS JSON válido:
 {"panorama":"2 frases densas com sinais do momento","macro_insights":["SELIC ${selic}% + IPCA ${ipca}% = juro real ${taxaReal}% — impacto e ação","PIB ${pib}% + setor em números — o que fazer","USD R$${usd} — quem ganha quem perde","IBC-Br / atividade real — o que está acelerando ou travando"],"marketing_insights":["CRESCER AGORA: SIM/NÃO — justificativa com CAC e CPM reais","Canal com melhor ROI agora com números","Retenção vs aquisição — qual priorizar com esses dados"],"riscos":["RISCO CRÍTICO: causa com número — ação de proteção esta semana","segundo risco com número","terceiro risco com ação"],"oportunidades":["oportunidade 1 com setor + número + janela temporal","oportunidade 2 acionável"],"cockpit_alerts":["SELIC ${selic}%: R$10k/mês de crédito custa R$${juros10k} — renegocie ou quite até [prazo]","IPCA ${ipca}%: sem reajuste você perde ${ipca}pp de margem — reajuste até [data]","CAC ${cacD > 0 ? '+' : ''}${cacD}%: se LTV não subiu proporcionalmente, canal está queimando caixa — ação"]}`
 
+    // intelligence usa compound-beta-mini — preserva compound-beta para IAs interativas
     const res = await groqFetch({
-      model: 'llama-3.3-70b-versatile',
+      model: 'compound-beta-mini',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 900,
       temperature: 0.2,
       response_format: { type: 'json_object' },
-    }, apiKey)
+    }, apiKey, 0)
 
     if (!res.ok) throw new Error(`Groq ${res.status}`)
 
