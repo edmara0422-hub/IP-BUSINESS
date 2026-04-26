@@ -5,6 +5,45 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Brain, SendHorizontal, Loader2, Sparkles, RefreshCw } from 'lucide-react'
 import { useAccessibility } from '@/hooks/useAccessibility'
 
+function AudioBtn({ text }: { text: string }) {
+  const [playing, setPlaying] = useState(false)
+
+  const toggle = () => {
+    if (!('speechSynthesis' in window)) return
+    if (playing) { window.speechSynthesis.cancel(); setPlaying(false); return }
+    const utt = new SpeechSynthesisUtterance(text)
+    utt.lang = 'pt-BR'; utt.rate = 1.05; utt.pitch = 1
+    const voices = window.speechSynthesis.getVoices()
+    const ptBr = voices.find(v => v.lang === 'pt-BR') ?? voices.find(v => v.lang.startsWith('pt'))
+    if (ptBr) utt.voice = ptBr
+    utt.onend = () => setPlaying(false)
+    utt.onerror = () => setPlaying(false)
+    window.speechSynthesis.speak(utt)
+    setPlaying(true)
+  }
+
+  useEffect(() => () => { if (playing) window.speechSynthesis.cancel() }, [playing])
+
+  return (
+    <button onClick={toggle} title={playing ? 'Parar áudio' : 'Ouvir resposta'}
+      style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 8px', borderRadius: 6, cursor: 'pointer', transition: 'all 0.15s', background: playing ? 'rgba(93,173,226,0.12)' : 'rgba(255,255,255,0.04)', border: `1px solid ${playing ? 'rgba(93,173,226,0.35)' : 'rgba(255,255,255,0.08)'}` }}>
+      {playing ? (
+        <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+          <rect x="2" y="1" width="3" height="10" rx="1" fill="#5dade2" />
+          <rect x="7" y="1" width="3" height="10" rx="1" fill="#5dade2" />
+        </svg>
+      ) : (
+        <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+          <path d="M3 2L10 6L3 10V2Z" fill="rgba(93,173,226,0.7)" />
+        </svg>
+      )}
+      <span style={{ fontSize: 7, fontFamily: 'monospace', letterSpacing: '0.1em', color: playing ? '#5dade2' : 'rgba(255,255,255,0.28)' }}>
+        {playing ? 'PARAR' : 'OUVIR'}
+      </span>
+    </button>
+  )
+}
+
 interface Message {
   id: string
   role: 'user' | 'assistant' | 'system'
@@ -227,9 +266,12 @@ Use TODOS os dados que te passei. Seja específico com números reais. Não seja
               ) : (
                 <div className="rounded-xl px-4 py-3"
                   style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <Sparkles size={11} color="#5dade2" />
-                    <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: '#5dade2' }}>ANÁLISE IPB</span>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <Sparkles size={11} color="#5dade2" />
+                      <span className="text-[10px] font-mono font-bold tracking-wider" style={{ color: '#5dade2' }}>ANÁLISE IPB</span>
+                    </div>
+                    <AudioBtn text={msg.content} />
                   </div>
                   <div className="text-[13px] text-white/65 leading-relaxed whitespace-pre-line">
                     {msg.content}
