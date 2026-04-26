@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 30
+export const maxDuration = 60
 
 // Benchmarks reais PME brasileira — fontes: Sebrae, BCB, CVM, FGV (2024)
 const BR_BENCHMARKS = `
@@ -112,14 +112,17 @@ REGRAS:
 - Se há histórico, identifique se o negócio está melhorando ou piorando
 ${historyBlock}`
 
+    // Educator precisa de mais tokens para cobrir todos os módulos
+    const maxTok = isEducator ? 3000 : 2500
+
     const res = await groqFetch({
       model: 'compound-beta',
       messages: [
         { role: 'system', content: systemMsg },
         { role: 'user',   content: question },
       ],
-      max_tokens: 1200,
-      temperature: 0.3,
+      max_tokens: maxTok,
+      temperature: isEducator ? 0.4 : 0.3,
     }, apiKey)
 
     if (!res.ok) {
@@ -132,7 +135,7 @@ ${historyBlock}`
             { role: 'system', content: `Analista financeiro PME Brasil. ${BR_BENCHMARKS}` },
             { role: 'user',   content: question },
           ],
-          max_tokens: 800,
+          max_tokens: isEducator ? 2000 : 1500,
           temperature: 0.4,
         }, apiKey)
         if (fallback.ok) {

@@ -218,21 +218,29 @@ OPORTUNIDADES ABERTAS:
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           question: contextMode === 'estudo'
-            ? `Faça uma aula inaugural conectando o momento atual de mercado com os 8 módulos do currículo IPB. Estruture assim:
+            ? `Faça uma aula completa conectando o momento atual de mercado com TODOS os 8 módulos do currículo IPB. Use os dados reais fornecidos como caso prático para cada módulo. Estruture assim:
 
-🎯 MOMENTO DO MERCADO COMO CASO REAL — explique em 2 frases o que está acontecendo agora (use os números reais: SELIC, IPCA, setores, B3) como se fosse a abertura de uma aula
+🌐 ABERTURA — 2 frases sobre o cenário atual (SELIC ${marketData?.macro?.selic?.value ?? '?'}%, IPCA, setores, B3) como caso de estudo vivo
 
-📘 MÓDULOS EM DESTAQUE AGORA — quais dos 8 módulos são mais relevantes para este momento de mercado e POR QUÊ (ex: M5.03 Ambiente Macroeconômico, M3.01 Economia de Empresa, M2.03 Matemática Financeira)
+📘 M1 · INOVAÇÃO, CRIATIVIDADE E SUSTENTABILIDADE — como este cenário exige inovação e transformação digital (M1.01)? O que o pensamento criativo (M1.02) oferece? Como a sustentabilidade (M1.03) vira vantagem competitiva agora?
 
-🔗 TEORIA VIVA — escolha 2 conceitos dos módulos e mostre como os dados reais de hoje os ilustram perfeitamente (ex: como a SELIC alta ilustra o custo de capital de M2.03, como o heat setorial ilustra as 5 Forças de M3.01)
+📗 M2 · FUNDAMENTOS DE GESTÃO — o que a gestão de negócios (M2.01) diz sobre este momento? Como ler as demonstrações contábeis (M2.02) para identificar risco? Qual matemática financeira (M2.03) aplicar com juros a ${marketData?.macro?.selic?.value ?? '?'}%?
 
-💡 INOVAÇÃO & TRANSFORMAÇÃO — o que M1 (Inovação, Criatividade) ensina sobre como empresas devem reagir a este cenário? Conecte com dados reais.
+📙 M3 · MERCADO E PESSOAS — como analisar este ambiente de mercado (M3.01) com as 5 Forças? O que liderança (M3.02) exige em cenário de pressão inflacionária e desemprego?
 
-🧭 LIDERANÇA & ESTRATÉGIA — o que M3.02 (Liderança) e M5.02 (Empreendedorismo) dizem sobre tomar decisões neste ambiente?
+📒 M4 · LÓGICA E HUMANIDADES — que raciocínio filosófico (M4.01) ajuda a decidir em incerteza? Como o cálculo (M4.02) e a estatística (M4.03) leem este momento?
 
-❓ 3 PERGUNTAS PARA APROFUNDAR — perguntas desafiadoras que o aluno pode me fazer para continuar aprendendo sobre este momento com base nos módulos
+📓 M5 · EMPREENDEDORISMO E ESTRATÉGIA — como empreender (M5.02) com SELIC alta? O que o ambiente macroeconômico (M5.03) está sinalizando para estratégia?
 
-Tom: inspirador, profundo, como um professor que transforma o mundo real em sala de aula.${iaModifier}`
+📔 M6 · FINANÇAS AVANÇADAS — como a análise financeira (M6.01) lê os dados de crédito PJ? Como precificar (M6.02) com inflação ${marketData?.macro?.ipca?.value ?? '?'}%? Que questão ética (M6.03) surge neste cenário?
+
+📕 M7 · INTERVENÇÃO E SOCIEDADE — como o empreendedorismo social (M7.01) age neste cenário? Que projeto de intervenção (M7.03) faz sentido agora?
+
+📖 M8 · PESQUISA E IDENTIDADE — como pesquisar (M8.02) e validar decisões com os dados disponíveis? O que identidade organizacional (M8.01) significa em tempos de transformação?
+
+❓ 3 PERGUNTAS DESAFIADORAS — que o aluno pode me fazer para aprofundar qualquer um dos módulos
+
+Tom: inspirador, denso, como um professor que transforma dados reais em aprendizado vivo. Cite autores reais de cada área.${iaModifier}`
             : `${userProfile ? `PERFIL: fase "${userProfile.subtype ?? '?'}", setor "${userProfile.sectors?.join(', ') || '?'}", faturamento "${userProfile.revenue || '?'}". Filtre TODA análise por esse perfil.\n\n` : ''}Faça uma ANÁLISE EXECUTIVA COMPLETA cruzando TODOS os dados. Organize assim:
 
 📊 PANORAMA — 2 frases densas cruzando macro + setor + momento${userProfile?.subtype ? ` para fase ${userProfile.subtype}` : ''}
