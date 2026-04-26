@@ -242,7 +242,7 @@ function DetailPanel({ chip, onClose }: { chip: ChipData; onClose: () => void })
       </div>
       <div style={{ marginBottom: 16, padding: '10px 12px 8px', background: 'rgba(200,200,200,0.025)', border: '1px solid rgba(200,200,200,0.07)', borderRadius: 12, overflow: 'hidden' }}>
         <p style={{ fontSize: 7.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(195,195,195,0.22)', marginBottom: 7 }}>Variação 14 dias</p>
-        <Sparkline id={chip.id} delta={chip.delta} color={accent} w={480} h={50} />
+        <Sparkline id={chip.id} delta={chip.delta} color={accent} w={280} h={44} />
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         {chip.oque && (
@@ -543,16 +543,16 @@ const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
         <GlobeAudioBar chips={chips} audioText={globeAudioText} chipOffsets={chipOffsets} />
       </div>
 
-      {/* ── MOBILE: globo grande + chips pequenos orbitando ── */}
+      {/* ── MOBILE: globo grande + chips orbitando com sparkline ── */}
       <div className="md:hidden flex flex-col gap-3">
-        <div className="relative w-full select-none" style={{ height: 540, overflow: 'hidden' }} onClick={() => setSelectedId(null)}>
+        <div className="relative w-full select-none" style={{ height: 560, overflow: 'hidden' }} onClick={() => setSelectedId(null)}>
           {/* Orbit ellipse guide */}
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }} overflow="visible">
-            <ellipse cx="50%" cy="50%" rx={145} ry={150}
+            <ellipse cx="50%" cy="50%" rx={142} ry={175}
               fill="none" stroke="rgba(195,195,195,0.05)" strokeWidth="1" strokeDasharray="4 10" />
           </svg>
           {/* Globe — elemento dominante */}
-          <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', width: 260, height: 260, zIndex: 2 }}>
+          <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', width: 280, height: 280, zIndex: 2 }}>
             {[1.06, 1.18, 1.34, 1.52].map((s, i) => (
               <motion.div key={i}
                 style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `1px solid rgba(192,192,192,${0.07 - i * 0.014})`, transform: `scale(${s})`, pointerEvents: 'none' }}
@@ -571,9 +571,9 @@ const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
               </motion.div>
             </div>
           </div>
-          {/* Orbital chips — pequenos para não colidir */}
+          {/* Orbital chips — com sparkline + signal como desktop */}
           {chips.map((chip, i) => {
-            const MOB_AX = 145, MOB_AY = 150, MOB_N = 40
+            const MOB_AX = 142, MOB_AY = 175, MOB_N = 40
             const startAngle = (i / 8) * 2 * Math.PI - Math.PI / 2
             const times = Array.from({ length: MOB_N + 1 }, (_, k) => k / MOB_N)
             const xKF = times.map(t => Math.round(MOB_AX * Math.cos(startAngle + t * 2 * Math.PI)))
@@ -587,37 +587,46 @@ const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
             const isSelected = selectedId === chip.id
             return (
               <motion.div key={chip.id}
-                style={{ position: 'absolute', left: '50%', top: '50%', width: 72, marginLeft: -36, marginTop: -24, zIndex: isSelected ? 20 : 10, cursor: 'pointer' }}
+                style={{ position: 'absolute', left: '50%', top: '50%', width: 84, marginLeft: -42, marginTop: -34, zIndex: isSelected ? 20 : 10, cursor: 'pointer' }}
                 animate={{ x: xKF, y: yKF }}
                 transition={{ duration: ORB_DUR, repeat: Infinity, ease: 'linear', times }}
                 onClick={e => { e.stopPropagation(); setSelectedId(prev => prev === chip.id ? null : chip.id) }}
               >
                 <motion.div
                   initial={{ opacity: 0, scale: 0.75 }}
-                  animate={{ opacity: 1, scale: isSelected ? 1.08 : 1 }}
+                  animate={{ opacity: 1, scale: isSelected ? 1.07 : 1 }}
                   transition={{ delay: i * 0.12 + 0.3, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                   style={{
                     background: isSelected ? 'rgba(10,10,10,0.98)' : 'rgba(5,5,5,0.94)',
-                    border: `1px solid ${isSelected ? accent + '60' : 'rgba(195,195,195,0.12)'}`,
+                    border: `1px solid ${isSelected ? accent + '55' : 'rgba(195,195,195,0.11)'}`,
                     backdropFilter: 'blur(26px)',
-                    borderRadius: 10,
-                    padding: '6px 8px 7px',
+                    borderRadius: 11,
+                    padding: '7px 9px 8px',
                     boxShadow: isSelected
-                      ? `0 0 20px ${accent}30, 0 6px 18px rgba(0,0,0,0.9), inset 0 1px 0 rgba(210,210,210,0.08)`
-                      : `0 3px 12px rgba(0,0,0,0.7), inset 0 1px 0 rgba(200,200,200,0.05)`,
+                      ? `0 0 24px ${accent}28, 0 8px 22px rgba(0,0,0,0.88), inset 0 1px 0 rgba(210,210,210,0.08)`
+                      : `0 4px 14px rgba(0,0,0,0.72), inset 0 1px 0 rgba(200,200,200,0.05)`,
                     overflow: 'hidden',
                   }}
                 >
-                  <p style={{ fontSize: 5.5, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(195,195,195,0.28)', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <motion.div
+                    style={{ position: 'absolute', inset: 0, background: `linear-gradient(105deg, transparent 25%, ${accent}08 50%, transparent 75%)`, pointerEvents: 'none' }}
+                    animate={{ x: ['-140%', '240%'] }}
+                    transition={{ duration: 6 + i * 0.7, delay: i * 0.6, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                  <p style={{ fontSize: 6, fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.18em', color: 'rgba(195,195,195,0.30)', marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {chip.label}
                   </p>
-                  <p style={{ fontSize: 12, fontWeight: 700, fontFamily: 'monospace', color: 'rgba(235,235,235,0.96)', lineHeight: 1, marginBottom: 4 }}>
+                  <p style={{ fontSize: 14, fontWeight: 700, fontFamily: 'monospace', color: 'rgba(235,235,235,0.96)', lineHeight: 1, marginBottom: 4 }}>
                     {chip.value}
                   </p>
-                  <span style={{ fontSize: 6.5, fontFamily: 'monospace', fontWeight: 700, color: deltaColor, background: deltaColor + '18', border: `1px solid ${deltaColor}28`, borderRadius: 99, padding: '1px 5px', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
-                    <DeltaIcon style={{ width: 6, height: 6, flexShrink: 0 }} />
+                  <div style={{ marginBottom: 3, opacity: 0.6 }}>
+                    <Sparkline id={chip.id} delta={chip.delta} color={deltaColor} w={42} h={11} />
+                  </div>
+                  <span style={{ fontSize: 7, fontFamily: 'monospace', fontWeight: 700, color: deltaColor, background: deltaColor + '16', border: `1px solid ${deltaColor}26`, borderRadius: 99, padding: '1px 5px', display: 'inline-flex', alignItems: 'center', gap: 2 }}>
+                    <DeltaIcon style={{ width: 7, height: 7, flexShrink: 0 }} />
                     {deltaSign}{deltaStr}%
                   </span>
+                  {chip.signal && <p style={{ fontSize: 6, color: chip.signal.color, marginTop: 3, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{chip.signal.text}</p>}
                 </motion.div>
               </motion.div>
             )
@@ -632,7 +641,7 @@ const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
                   transition={{ duration: 0.22 }}
                   onClick={() => setSelectedId(null)}
                 />
-                <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', zIndex: 30, pointerEvents: 'none', width: '90vw', maxWidth: 360 }}>
+                <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', zIndex: 30, pointerEvents: 'none', width: '92vw', maxWidth: 340, maxHeight: '82%', overflowY: 'auto', borderRadius: 20 }}>
                   <motion.div
                     style={{ pointerEvents: 'auto' }}
                     initial={{ opacity: 0, scale: 0.88, y: 18 }}
