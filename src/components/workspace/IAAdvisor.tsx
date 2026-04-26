@@ -175,21 +175,29 @@ OPORTUNIDADES ABERTAS:
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          question: `${contextMode === 'estudo' ? 'Você é um PESQUISADOR E PROFESSOR de Inteligência Organizacional (OBI) baseado em Rezende, Peter e Mintzberg. Responda como um educador que transforma teoria em funcionalidade de software. ' : contextMode === 'gestao' && userProfile ? `Você está falando com um(a) empreendedor(a) na fase "${userProfile.subtype ?? 'não informada'}", setor "${userProfile.sectors?.join(', ') || 'não informado'}", faturamento "${userProfile.revenue || 'não informado'}". TODA a análise deve ser filtrada por esse contexto — o que é relevante para essa fase, esse setor, esse tamanho.\n\n` : ''}Faça uma ANÁLISE COMPLETA do mercado brasileiro agora. Organize assim:
+          question: `${
+            contextMode === 'estudo'
+              ? 'Você é um PESQUISADOR E PROFESSOR de Inteligência Organizacional (OBI) baseado em Rezende, Peter e Mintzberg. Responda como um educador que transforma teoria em funcionalidade de software. '
+              : contextMode === 'gestao' && userProfile
+              ? `Você está falando com um(a) empreendedor(a) na fase "${userProfile.subtype ?? 'não informada'}", setor "${userProfile.sectors?.join(', ') || 'não informado'}", faturamento "${userProfile.revenue || 'não informado'}". FILTRE toda a análise por esse perfil — cite números do setor dele, riscos da fase dele, oportunidades do tamanho dele.\n\n`
+              : ''
+          }Faça uma ANÁLISE EXECUTIVA COMPLETA cruzando TODOS os dados abaixo. Organize assim:
 
-📊 PANORAMA GERAL (1 parágrafo resumindo o momento${userProfile?.subtype ? ` para quem está na fase ${userProfile.subtype}` : ''})
+📊 PANORAMA (2 frases densas — cruze macro + setor + momento${userProfile?.subtype ? ` para fase ${userProfile.subtype}` : ''})
 
-💰 MACRO — como SELIC, IPCA, câmbio e PIB se conectam e o que isso gera${userProfile?.sectors?.length ? ` para o setor de ${userProfile.sectors[0]}` : ' pra quem tem negócio'}
+💰 MACRO CRUZADO — SELIC + IPCA + IBC-Br + inadimplência PJ + câmbio: o que está apertando e o que está abrindo${userProfile?.sectors?.length ? ` para ${userProfile.sectors[0]}` : ''}. Use os números reais.
 
-📈 SETORES — quais estão quentes, quais estão frios, onde está a oportunidade${userProfile?.sectors?.length ? ` (destaque ${userProfile.sectors[0]})` : ''}
+📈 SETORES & AÇÕES — quais heats mais altos, qual ação subiu mais, onde está o dinheiro hoje. Cruze B3 com setores.${userProfile?.sectors?.length ? ` Destaque ${userProfile.sectors[0]}.` : ''}
 
-🎯 MARKETING — CAC, CPM, orgânico: está caro crescer? o que fazer?
+🎯 MARKETING & CUSTO DE CRESCER — CAC atual, qual plataforma está mais barata (CPM/CPC), orgânico vs pago agora. Recomende canal específico com número.
 
-⚠️ RISCOS — os 3 maiores riscos agora e como LUCRAR com cada um
+💳 CRÉDITO & CAIXA — taxa de crédito PJ hoje, quanto custa R$10k/mês, como otimizar estrutura de capital nesse cenário.
 
-🚀 AÇÃO IMEDIATA — as 3 coisas que ${userProfile?.subtype ? `uma empresa ${userProfile.subtype}` : 'qualquer empresa'} deveria fazer AGORA baseado nesses dados
+⚠️ 3 RISCOS CRÍTICOS — cada um com número + ação de proteção ESTA SEMANA.
 
-Use TODOS os dados que te passei. Seja específico com números reais. Não seja genérico.${iaModifier}`,
+🚀 3 AÇÕES IMEDIATAS — o que ${userProfile?.subtype ? `empresa na fase ${userProfile.subtype}` : 'qualquer PME'} deve fazer AGORA com base nesses dados. Nada genérico.
+
+REGRA: cite pelo menos 6 números reais dos dados fornecidos. Zero generalidades.${iaModifier}`,
           marketContext: ctx,
         }),
       })
