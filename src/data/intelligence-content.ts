@@ -4696,6 +4696,97 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
                 kind: 'paragraph',
                 text: 'O custo de não delegar: líder sobrecarregado (burnout), equipe desmotivada (não cresce), empresa lenta (bottleneck). A regra: se alguém pode fazer 80% tão bem quanto você, {{delegue}}. Os 20% que faltam a pessoa aprende fazendo.',
               },
+              {
+                kind: 'heading',
+                text: 'Estratégias para Construir Equipes de Alto Desempenho',
+              },
+              {
+                kind: 'pillar-grid',
+                title: '7 pilares práticos',
+                pillars: [
+                  { icon: '🎯', title: 'Recrutamento e Seleção', description: 'Escolha {{criteriosa}} de talentos com habilidades complementares — não apenas os disponíveis, mas os ideais para o projeto.' },
+                  { icon: '📡', title: 'Comunicação Transparente', description: 'Fomentar troca de informações para evitar {{ruídos}}. O que não é dito explicitamente vira interpretação errada.' },
+                  { icon: '🧭', title: 'Propósito Claro', description: 'Definir metas e objetivos {{compartilhados}}. Equipe sem propósito claro executa tarefas — não constrói resultados.' },
+                  { icon: '📚', title: 'Treinamento e Capacitação', description: 'Desenvolver competências técnicas e {{interpessoais}}. Habilidade técnica sem capacidade relacional paralisa equipes.' },
+                  { icon: '👑', title: 'Liderança de Exemplo', description: 'O líder deve atuar como guia — fomentando {{engajamento}} e mediando conflitos com postura, não com autoridade.' },
+                  { icon: '🔄', title: 'Cultura de Feedback', description: 'Conversas periódicas (semanais/mensais) para {{alinhamento}}. Feedback raro = problema crônico descoberto tarde demais.' },
+                  { icon: '🏆', title: 'Reconhecimento', description: 'Programas de mérito e {{incentivo}}. Pessoas que se sentem valorizadas entregam mais — e ficam na empresa.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Por quem a equipe é formada — os 5 níveis',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A composição de uma equipe é uma decisão {{estratégica}} que envolve diferentes camadas da organização. Cada nível tem um papel específico — e ignorar um deles compromete a execução.',
+              },
+              {
+                kind: 'step-flow',
+                title: '5 níveis de composição de equipe',
+                steps: [
+                  { number: 1, title: 'Nível Estratégico (C-Level/Diretoria)', description: 'Define {{para onde}} a empresa vai. CEO, CFO, CTO — são a cabeça. Estabelecem direção e alocam recursos entre projetos.', caseSnippet: 'Sem alinhamento do C-Level, qualquer equipe operacional trabalha no escuro.' },
+                  { number: 2, title: 'Nível Tático (Gerência/Coordenação)', description: 'O meio de campo. Transforma planos da diretoria em projetos reais. {{Gerentes e líderes}} definem necessidades e alinham membros aos objetivos.', caseSnippet: 'Gerentes e headhunters: responsáveis por buscar e filtrar os talentos certos para cada função.' },
+                  { number: 3, title: 'Nível Operacional (Execução)', description: 'Quem faz acontecer. {{Seniores}} treinam e resolvem complexidade. Plenos executam com autonomia. Juniores aprendem e dão suporte.', caseSnippet: 'A pirâmide júnior→pleno→sênior não é hierarquia — é pipeline de desenvolvimento.' },
+                  { number: 4, title: 'Áreas de Suporte (Back Office)', description: '{{RH}}, Financeiro, TI e Jurídico. Sem eles a equipe não funciona. São os órgãos vitais que mantêm o ambiente operacional.', caseSnippet: 'RH cuida do ciclo completo do colaborador — atração, treinamento e retenção.' },
+                  { number: 5, title: 'Equipe Estendida', description: 'Terceirizados, outsourcing e prestadores que trabalham "dentro" mas pertencem a outra empresa. São {{parte funcional}} da equipe.', caseSnippet: 'Limpeza, manutenção, suporte técnico — invisíveis até que falhem. Gestão eficaz inclui quem está nos bastidores.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Tipos de Desenvolvimento de Equipe',
+              },
+              {
+                kind: 'compare-table',
+                title: 'Intraequipes vs Interequipes',
+                headers: ['', 'Intraequipes', 'Interequipes'],
+                rows: [
+                  { label: 'Foco', values: ['Relações {{dentro}} de uma mesma área', 'Relações {{entre}} diferentes departamentos'] },
+                  { label: 'Quando usar', values: ['Conflitos internos, baixa coesão de setor', 'Projetos cross-funcional, integração entre áreas'] },
+                  { label: 'Objetivo', values: ['Melhorar relações sob mesma gerência', 'Alinhar áreas com contato profissional mútuo'] },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Grupos: Definição e Classificação',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Um grupo é composto por dois ou mais indivíduos unidos em prol de um objetivo. Podem ser {{formais}} (estrutura definida pela organização, com funções e metas claras) ou {{informais}} (parcerias não estruturadas que surgem naturalmente pela necessidade de contato social). Ambos influenciam a cultura e o desempenho.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: '4 tipos de grupos nas organizações',
+                pillars: [
+                  { icon: '🏢', title: 'Grupo de Comando', description: 'Definido pelo {{organograma}}. Formado pelos subordinados diretos de um gerente. A hierarquia é a cola.' },
+                  { icon: '⚙️', title: 'Grupo de Tarefa', description: 'Criado para uma tarefa específica. Pode {{cruzar hierarquias}} — não se limita ao grupo de comando.' },
+                  { icon: '🤝', title: 'Grupo de Interesse', description: 'Formado por objetivo comum, independente de hierarquia. Surge quando pessoas {{convergem}} em torno de uma causa.' },
+                  { icon: '💬', title: 'Grupo Informal', description: 'Nasce da necessidade de {{contato social}}. Não estruturado pela organização, mas influencia profundamente a cultura.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Status na Equipe — os 3 fatores',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O status de um membro é definido por três fatores: (1) o {{poder}} que exerce sobre outros — o líder formal tem alto status por controlar tarefas e remuneração; (2) sua {{capacidade de contribuir}} para as metas — o artilheiro de um time tem mais prestígio; (3) suas {{características pessoais}} — inteligência ou simpatia valorizadas pelo grupo. Status alto = maior autonomia e maior resistência a pressões externas.',
+              },
+              {
+                kind: 'heading',
+                text: '5 Sugestões de Fischer para Equipes Virtuosas',
+              },
+              {
+                kind: 'step-flow',
+                title: 'Como construir equipes que inovam de verdade',
+                steps: [
+                  { number: 1, title: 'Escolha os melhores, não os disponíveis', description: 'Busque pessoas com {{habilidades necessárias}}, não apenas as interessadas. Abrir mão dessas habilidades faz o projeto falhar antes de começar.', caseSnippet: 'Quanto mais diálogo para entender as habilidades necessárias, mais acertada a composição.' },
+                  { number: 2, title: 'Gerencie a diversidade do time', description: 'Equipes com habilidades similares fazem incremental. Para {{disrupção}}, diversidade é essencial — quanto mais variadas as habilidades, mais eficiente a equipe.', caseSnippet: 'Projetos revolucionários exigem perspectivas diferentes. Homogeneidade gera previsibilidade, não inovação.' },
+                  { number: 3, title: 'Ideias em movimento, não em perfeição', description: 'Executar e aprender em tempo real é melhor que buscar {{perfeição}} sem implementar. Monitore processos enquanto acontecem para corrigir e aprender.', caseSnippet: 'Quando processos não são monitorados, não se consegue antecipar os problemas que surgem.' },
+                  { number: 4, title: 'Não tenha medo de compartilhar ideias', description: 'Ampliar horizontes e conversar com pessoas do mesmo meio abre possibilidades e revela {{talentos}}. O futuro da liderança está no que você pode aprender, não no que já aprendeu.', caseSnippet: 'Consulta externa serve como referência e identifica potenciais talentos para o processo criativo.' },
+                  { number: 5, title: 'Avalie todos os detalhes do contexto', description: 'Convidados alinhados à pauta, local que estimule {{criatividade}}, infraestrutura adequada. Ideias precisam de ambiente para florescer.', caseSnippet: 'As ideias são essenciais para inovar, mas raramente damos a infraestrutura necessária para que aconteçam.' },
+                ],
+              },
             ],
             application: {
               kind: 'compare-and-drag',
