@@ -85,6 +85,8 @@ function analyzeSentiment(text: string): { score: number; weakWords: string[]; l
 }
 
 // ─── State ───────────────────────────────────────────────────────────────────
+interface ManifPratica { principioId: number; date: string; serviuPara?: string }
+
 interface PesState {
   pesLiderados: number
   pesMetaEquipe: string; pesKpiEquipe: string
@@ -93,10 +95,11 @@ interface PesState {
   pesGapHabilidade: string; pesPlanoDev: string
   pesMaturidade: number
   pesRituais: boolean[]
+  pesRituaisNomes: string[]
   pesBloqueios: string; pesDesbloqueioHoras: number
   pesPerfScore: number; pesReconhecimento: boolean; pesReflexao: string
   pesNpsUtilidade: number
-  pesDig: boolean[]
+  pesManifLog: ManifPratica[]
 }
 
 const DEFAULT: PesState = {
@@ -106,10 +109,11 @@ const DEFAULT: PesState = {
   pesGapHabilidade: '', pesPlanoDev: '',
   pesMaturidade: 0,
   pesRituais: [false, false, false],
+  pesRituaisNomes: ['Daily de equipe', 'Weekly Review', '1:1 semanal'],
   pesBloqueios: '', pesDesbloqueioHoras: 0,
   pesPerfScore: 0, pesReconhecimento: false, pesReflexao: '',
   pesNpsUtilidade: 0,
-  pesDig: [false, false, false, false, false],
+  pesManifLog: [],
 }
 
 // ─── Vector score engine ──────────────────────────────────────────────────────
@@ -154,8 +158,11 @@ function calcRawDims(s: PesState): number[] {
   const reconScore = s.pesReconhecimento && s.pesNpsUtilidade > 5 ? 4 : s.pesReconhecimento ? 2 : 0
   const d5 = Math.min(20, npsScore + reconScore)
 
-  const practiced = (s.pesDig ?? []).filter(Boolean).length
-  const d6 = Math.round((practiced / 5) * 20)
+  const now = new Date()
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+  const log = s.pesManifLog ?? []
+  const practicedThisMonth = new Set(log.filter(p => p.date >= monthStart).map(p => p.principioId))
+  const d6 = Math.round((practicedThisMonth.size / 5) * 20)
 
   return [d1, d2, d3, d4, d5, d6]
 }
@@ -164,8 +171,20 @@ function calcIndex6D(dims: number[], practicedCount: number): number {
   const [d1, d2, d3, d4, d5, d6] = dims
   const base  = d1 + d2 + d3 + d4 + d5
   const mult  = 0.5 + (d6 / 20) * 1.0
-  const bonus = (practicedCount / 5) * 10
+  const bonus = (practicedCount / 5) * 8
   return Math.min(100, Math.round(base * mult + bonus))
+}
+
+function getPracticedThisMonth(log: ManifPratica[]): Set<number> {
+  const now = new Date()
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+  return new Set(log.filter(p => p.date >= monthStart).map(p => p.principioId))
+}
+
+function getDaysSinceLastPractice(log: ManifPratica[]): number | null {
+  if (!log.length) return null
+  const sorted = [...log].sort((a, b) => b.date.localeCompare(a.date))
+  return Math.floor((Date.now() - new Date(sorted[0].date).getTime()) / 86400000)
 }
 
 // ─── Canvas particle field ────────────────────────────────────────────────────
@@ -281,7 +300,12 @@ function EnergyOrb({ score, d6mult }: { score: number; d6mult: number }) {
 // ─── Snapshot + team types ────────────────────────────────────────────────────
 interface Snap { date: string; index6D: number; dims: number[] }
 interface SnapStore { snaps: Snap[] }
-interface Liderado { id: string; nome: string; scores: number[] }
+interface SbiFeedback { id: string; date: string; situacao: string; comportamento: string; impacto: string }
+interface AcordoItem { id: string; texto: string; prazo: string; feito: boolean }
+interface Liderado {
+  id: string; nome: string; cargo: string; maturidade: number
+  ultimo1a1: string; acordos: AcordoItem[]; sbiFeedbacks: SbiFeedback[]; notas: string
+}
 interface TeamStore { liderados: Liderado[] }
 
 // ─── Hex Radar ────────────────────────────────────────────────────────────────
@@ -585,21 +609,26 @@ function DimPanel({ id, s, update }: { id: number; s: PesState; update: (p: Part
     )
   }
 
-  // D6 — linked to manifesto
+  // D6 — linked to manifesto log
+  const now6 = new Date()
+  const ms6 = new Date(now6.getFullYear(), now6.getMonth(), 1).toISOString()
+  const practicedIds = new Set((s.pesManifLog ?? []).filter(p => p.date >= ms6).map(p => p.principioId))
   return (
     <div className="flex flex-col gap-1.5">
-      <p className="text-[11px] text-white/35 mb-2 leading-relaxed">D6 é o <span style={{ color: RED }}>multiplicador</span> de todos os outros. Marque os princípios que sua equipe pratica — cada um eleva o fator Dignidade no cálculo.</p>
-      {MANIFESTO.map((m, mi) => (
-        <button key={mi} onClick={() => { const arr = [...(s.pesDig ?? [false,false,false,false,false])]; arr[mi] = !arr[mi]; update({ pesDig: arr }) }}
-          className="flex items-start gap-3 text-left p-3 rounded-lg transition-all"
-          style={{ background: (s.pesDig ?? [])[mi] ? `${m.color}12` : 'rgba(0,0,0,0.2)', border: `1px solid ${(s.pesDig ?? [])[mi] ? m.color + '40' : 'rgba(255,255,255,0.06)'}` }}>
-          {(s.pesDig ?? [])[mi] ? <CheckCircle2 size={13} style={{ color: m.color, marginTop: 2, flexShrink: 0 }} /> : <Circle size={13} style={{ color: 'rgba(255,255,255,0.15)', marginTop: 2, flexShrink: 0 }} />}
-          <div>
-            <p className="text-[11px] font-semibold" style={{ color: (s.pesDig ?? [])[mi] ? m.color : 'rgba(255,255,255,0.45)' }}>{m.num} · {m.title}</p>
-            <p className="text-[9.5px] text-white/20 mt-0.5 italic">"{m.ritual}"</p>
+      <p className="text-[11px] text-white/35 mb-2 leading-relaxed">D6 é o <span style={{ color: RED }}>multiplicador</span> de tudo. Registre no Manifesto abaixo quando praticar cada princípio — o log alimenta este score automaticamente.</p>
+      {MANIFESTO.map((m, mi) => {
+        const active = practicedIds.has(mi)
+        return (
+          <div key={mi} className="flex items-start gap-3 p-3 rounded-lg"
+            style={{ background: active ? `${m.color}12` : 'rgba(0,0,0,0.2)', border: `1px solid ${active ? m.color + '40' : 'rgba(255,255,255,0.06)'}` }}>
+            {active ? <CheckCircle2 size={13} style={{ color: m.color, marginTop: 2, flexShrink: 0 }} /> : <Circle size={13} style={{ color: 'rgba(255,255,255,0.15)', marginTop: 2, flexShrink: 0 }} />}
+            <div>
+              <p className="text-[11px] font-semibold" style={{ color: active ? m.color : 'rgba(255,255,255,0.45)' }}>{m.num} · {m.title}</p>
+              <p className="text-[9.5px] text-white/20 mt-0.5 italic">"{m.ritual}"</p>
+            </div>
           </div>
-        </button>
-      ))}
+        )
+      })}
     </div>
   )
 }
@@ -682,7 +711,16 @@ export default function PessoasLideranca() {
     : null
 
   const rawDims = calcRawDims(s)
-  const practicedCount = (s.pesDig ?? []).filter(Boolean).length
+  const manifLog = s.pesManifLog ?? []
+  const practicedThisMonth = getPracticedThisMonth(manifLog)
+  const practicedCount = practicedThisMonth.size
+  const daysSinceManif = getDaysSinceLastPractice(manifLog)
+  const manifEntropia = daysSinceManif !== null && daysSinceManif >= 7
+  const manifMetaMensal = 2
+  const manifPraticasMes = manifLog.filter(p => {
+    const now = new Date(); const ms = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+    return p.date >= ms
+  }).length
   const index6D = calcIndex6D(rawDims, practicedCount)
   const d6mult = 0.5 + (rawDims[5] / 20) * 1.0
   const pcts = rawDims.map(d => Math.round((d / 20) * 100))
@@ -778,7 +816,7 @@ export default function PessoasLideranca() {
       } else if (dimId === 4) {
         ctx = `${base} | NPS Interno: ${s.pesNpsUtilidade > 0 ? s.pesNpsUtilidade + '/10' : 'não avaliado'} | Reconhecimento: ${s.pesReconhecimento ? 'feito' : 'não feito'} | Reflexão: "${s.pesReflexao.slice(0, 100) || 'não registrada'}"`
       } else if (dimId === 5) {
-        ctx = `${base} | Princípios praticados: ${(s.pesDig ?? []).filter(Boolean).length}/5 | Multiplicador D6: ×${d6mult.toFixed(2)}`
+        ctx = `${base} | Princípios praticados este mês: ${practicedCount}/5 | Multiplicador D6: ×${d6mult.toFixed(2)}`
       }
       const res = await fetch('/api/advisor-chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -793,7 +831,7 @@ export default function PessoasLideranca() {
     setManifIaLoading(mi)
     try {
       const ctx = [
-        `Manifesto princípio ${mi + 1}: ${MANIFESTO[mi].title} | Praticado: ${(s.pesDig ?? [])[mi] ? 'sim' : 'não'}`,
+        `Manifesto princípio ${mi + 1}: ${MANIFESTO[mi].title} | Praticado este mês: ${practicedThisMonth.has(mi) ? 'sim' : 'não'} | Total práticas: ${manifLog.filter(p => p.principioId === mi).length}x`,
         `Índice 6D: ${index6D}/100 | D6 mult ×${d6mult.toFixed(2)} | ${practicedCount}/5 princípios ativos`,
         `Time: ${s.pesLiderados || '?'} pessoas | Fase: ${faseLabel}`,
         daysSince1a1 !== null ? `Último 1:1: ${daysSince1a1}d atrás` : 'Último 1:1: nunca',
@@ -1318,66 +1356,173 @@ export default function PessoasLideranca() {
         ))}
       </div>
 
-      {/* ── Team Table ── */}
+      {/* ── Time Tab ── */}
       {activeTab === 'time' && (
-        <div>
-          <div className="flex items-center justify-between px-1 mb-3">
-            <p className="text-[14px] font-black text-white/70">Tabela do Time</p>
-            <button onClick={() => updateTeamStore({ liderados: [...liderados, { id: Date.now().toString(), nome: '', scores: [0, 0, 0, 0, 0, 0] }] })}
-              className="text-[10px] font-mono px-2.5 py-1 rounded-lg transition-all"
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between px-1">
+            <p className="text-[14px] font-black text-white/70">Liderados</p>
+            <button onClick={() => updateTeamStore({ liderados: [...liderados, { id: Date.now().toString(), nome: '', cargo: '', maturidade: 0, ultimo1a1: '', acordos: [], sbiFeedbacks: [], notas: '' }] })}
+              className="text-[10px] font-mono px-2.5 py-1 rounded-lg"
               style={{ background: `${TEAL}15`, color: TEAL, border: `1px solid ${TEAL}30` }}>
-              + liderado
+              + pessoa
             </button>
           </div>
-          <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            {/* Header row */}
-            <div className="grid items-center px-3 py-2" style={{ gridTemplateColumns: '1fr repeat(6, 36px) 44px 20px', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-              <p className="text-[8px] font-mono text-white/20 uppercase">Nome</p>
-              {DIMS.map(d => <p key={d.id} className="text-[8px] font-mono text-center uppercase" style={{ color: d.color, opacity: 0.5 }}>{d.code}</p>)}
-              <p className="text-[8px] font-mono text-white/20 uppercase text-center">6D</p>
-              <div />
-            </div>
-            {liderados.length === 0 && (
-              <p className="text-[10px] text-white/18 text-center py-5 font-mono">Clique em + liderado para adicionar</p>
-            )}
-            {liderados.map((l, li) => {
-              const lScore = calcIndex6D(l.scores, 0)
-              const lColor = lScore >= 70 ? TEAL : lScore >= 45 ? AMBER : RED
-              return (
-                <div key={l.id} className="grid items-center px-3 py-2" style={{ gridTemplateColumns: '1fr repeat(6, 36px) 44px 20px', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                  <input value={l.nome} onChange={e => { const u = [...liderados]; u[li] = { ...l, nome: e.target.value }; updateTeamStore({ liderados: u }) }}
-                    placeholder="nome..." className="text-[11px] bg-transparent outline-none font-mono text-white/55 min-w-0"
-                    style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }} />
-                  {l.scores.map((sc, si) => (
-                    <input key={si} type="number" min={0} max={20} value={sc || ''}
-                      onChange={e => { const v = Math.min(20, Math.max(0, parseInt(e.target.value) || 0)); const u = [...liderados]; u[li] = { ...l, scores: l.scores.map((x, i) => i === si ? v : x) }; updateTeamStore({ liderados: u }) }}
-                      className="w-full text-center text-[10px] font-mono font-bold bg-transparent outline-none rounded py-0.5"
-                      style={{ color: DIM_COLORS[si], border: `1px solid ${DIM_COLORS[si]}20` }} />
-                  ))}
-                  <span className="text-[13px] font-black font-mono text-center" style={{ color: lColor }}>{lScore > 0 ? lScore : '—'}</span>
-                  <button onClick={() => updateTeamStore({ liderados: liderados.filter((_, i) => i !== li) })}
-                    className="text-[11px] text-white/15 hover:text-red-400 transition-colors text-center">×</button>
-                </div>
-              )
-            })}
-          </div>
-          {liderados.length > 1 && (
-            <div className="mt-2 rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <p className="text-[8.5px] font-mono text-white/18 uppercase tracking-widest mb-2">Distribuição do time</p>
-              {DIMS.map(d => {
-                const avg = Math.round(liderados.reduce((acc, l) => acc + l.scores[d.id], 0) / liderados.length / 20 * 100)
-                return (
-                  <div key={d.id} className="flex items-center gap-2 mb-1.5">
-                    <span className="text-[8.5px] font-mono w-6 shrink-0" style={{ color: d.color, opacity: 0.6 }}>{d.code}</span>
-                    <div className="flex-1 h-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                      <motion.div className="h-full rounded-full" animate={{ width: `${avg}%` }} transition={{ duration: 0.5 }} style={{ background: d.color }} />
-                    </div>
-                    <span className="text-[9px] font-mono w-7 text-right" style={{ color: d.color, opacity: 0.7 }}>{avg}%</span>
-                  </div>
-                )
-              })}
+
+          {liderados.length === 0 && (
+            <div className="rounded-xl px-4 py-8 text-center" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <p className="text-[11px] text-white/25">Adicione seus liderados para acompanhar 1:1s,<br/>acordos e desenvolvimento individual</p>
             </div>
           )}
+
+          {liderados.map((l, li) => {
+            const daysl1a1 = l.ultimo1a1 ? Math.floor((Date.now() - new Date(l.ultimo1a1).getTime()) / 86400000) : null
+            const l1a1Color = daysl1a1 === null ? 'rgba(255,255,255,0.2)' : daysl1a1 > 14 ? RED : daysl1a1 > 7 ? AMBER : TEAL
+            const mat = MATURITY.find(m => m.id === l.maturidade)
+            const acordosPend = (l.acordos ?? []).filter(a => !a.feito).length
+            const updateL = (patch: Partial<Liderado>) => { const u = liderados.map((x, i) => i === li ? { ...x, ...patch } : x); updateTeamStore({ liderados: u }) }
+
+            return (
+              <div key={l.id} className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                {/* Person header */}
+                <div className="px-4 pt-4 pb-3 flex items-start gap-3">
+                  <div className="flex-1 min-w-0">
+                    <input value={l.nome} onChange={e => updateL({ nome: e.target.value })}
+                      placeholder="Nome do liderado" className="text-[14px] font-bold bg-transparent outline-none text-white/75 w-full"
+                      style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }} />
+                    <input value={l.cargo} onChange={e => updateL({ cargo: e.target.value })}
+                      placeholder="Cargo / função" className="text-[11px] bg-transparent outline-none text-white/30 w-full mt-1" />
+                  </div>
+                  <button onClick={() => updateTeamStore({ liderados: liderados.filter((_, i) => i !== li) })}
+                    className="text-[11px] text-white/15 hover:text-red-400 mt-0.5">×</button>
+                </div>
+
+                {/* Signal strip */}
+                <div className="grid grid-cols-3 gap-px mx-4 mb-3">
+                  {/* Maturidade */}
+                  <div className="rounded-lg px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.3)' }}>
+                    <p className="text-[7.5px] font-mono text-white/20 uppercase mb-1">Maturidade</p>
+                    <div className="flex gap-1">
+                      {MATURITY.map(m => (
+                        <button key={m.id} onClick={() => updateL({ maturidade: l.maturidade === m.id ? 0 : m.id })}
+                          className="flex-1 py-0.5 rounded text-[8px] font-mono font-bold transition-all"
+                          style={{ background: l.maturidade === m.id ? `${TEAL}25` : 'rgba(255,255,255,0.04)', color: l.maturidade === m.id ? TEAL : 'rgba(255,255,255,0.2)', border: `1px solid ${l.maturidade === m.id ? TEAL + '40' : 'rgba(255,255,255,0.06)'}` }}>
+                          {m.label}
+                        </button>
+                      ))}
+                    </div>
+                    {mat && <p className="text-[8px] text-white/20 mt-1 truncate">{mat.title}</p>}
+                  </div>
+
+                  {/* Último 1:1 */}
+                  <div className="rounded-lg px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.3)' }}>
+                    <p className="text-[7.5px] font-mono text-white/20 uppercase mb-1">Último 1:1</p>
+                    <input type="date" value={l.ultimo1a1} onChange={e => updateL({ ultimo1a1: e.target.value })}
+                      className="text-[9px] bg-transparent outline-none font-mono w-full"
+                      style={{ color: l1a1Color }} />
+                    <p className="text-[8px] mt-0.5" style={{ color: l1a1Color }}>
+                      {daysl1a1 === null ? 'nunca' : daysl1a1 === 0 ? 'hoje' : `${daysl1a1}d atrás`}
+                    </p>
+                  </div>
+
+                  {/* Acordos */}
+                  <div className="rounded-lg px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.3)' }}>
+                    <p className="text-[7.5px] font-mono text-white/20 uppercase mb-1">Acordos</p>
+                    <p className="text-[18px] font-black font-mono leading-none" style={{ color: acordosPend > 0 ? AMBER : 'rgba(255,255,255,0.2)' }}>{acordosPend}</p>
+                    <p className="text-[8px] text-white/20">pendentes</p>
+                  </div>
+                </div>
+
+                {/* Estratégia M1-M4 */}
+                {mat && (
+                  <div className="mx-4 mb-3 rounded-lg px-3 py-2" style={{ background: `${TEAL}08`, border: `1px solid ${TEAL}15` }}>
+                    <p className="text-[9px] font-mono" style={{ color: TEAL, opacity: 0.7 }}>{mat.script}</p>
+                  </div>
+                )}
+
+                {/* Acordos list */}
+                <div className="mx-4 mb-3">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className="text-[8.5px] font-mono text-white/20 uppercase tracking-wider">Acordos</p>
+                    <button onClick={() => updateL({ acordos: [...(l.acordos ?? []), { id: Date.now().toString(), texto: '', prazo: '', feito: false }] })}
+                      className="text-[8px] font-mono px-1.5 py-0.5 rounded"
+                      style={{ color: TEAL, border: `1px solid ${TEAL}25`, background: `${TEAL}08` }}>+ acordo</button>
+                  </div>
+                  {(l.acordos ?? []).map((a, ai) => (
+                    <div key={a.id} className="flex items-center gap-2 mb-1.5">
+                      <button onClick={() => { const ac = [...(l.acordos ?? [])]; ac[ai] = { ...a, feito: !a.feito }; updateL({ acordos: ac }) }}
+                        style={{ color: a.feito ? TEAL : 'rgba(255,255,255,0.2)', flexShrink: 0 }}>
+                        {a.feito ? <CheckCircle2 size={12} /> : <Circle size={12} />}
+                      </button>
+                      <input value={a.texto} onChange={e => { const ac = [...(l.acordos ?? [])]; ac[ai] = { ...a, texto: e.target.value }; updateL({ acordos: ac }) }}
+                        placeholder="Acordo / compromisso..."
+                        className="flex-1 text-[10.5px] bg-transparent outline-none min-w-0"
+                        style={{ color: a.feito ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.55)', textDecoration: a.feito ? 'line-through' : 'none' }} />
+                      <input type="date" value={a.prazo} onChange={e => { const ac = [...(l.acordos ?? [])]; ac[ai] = { ...a, prazo: e.target.value }; updateL({ acordos: ac }) }}
+                        className="text-[9px] font-mono bg-transparent outline-none w-24 shrink-0"
+                        style={{ color: 'rgba(255,255,255,0.2)' }} />
+                      <button onClick={() => updateL({ acordos: (l.acordos ?? []).filter((_, i) => i !== ai) })}
+                        className="text-[10px] text-white/10 hover:text-red-400 shrink-0">×</button>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Feedback SBI */}
+                <div className="mx-4 mb-4">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className="text-[8.5px] font-mono text-white/20 uppercase tracking-wider">Feedback SBI</p>
+                    <button onClick={() => updateL({ sbiFeedbacks: [...(l.sbiFeedbacks ?? []), { id: Date.now().toString(), date: new Date().toISOString().split('T')[0], situacao: '', comportamento: '', impacto: '' }] })}
+                      className="text-[8px] font-mono px-1.5 py-0.5 rounded"
+                      style={{ color: BLUE, border: `1px solid ${BLUE}25`, background: `${BLUE}08` }}>+ feedback</button>
+                  </div>
+                  {(l.sbiFeedbacks ?? []).slice(-2).map((fb, fi) => (
+                    <div key={fb.id} className="rounded-lg p-2.5 mb-1.5" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[8px] font-mono text-white/20">{fb.date}</span>
+                        <button onClick={() => updateL({ sbiFeedbacks: (l.sbiFeedbacks ?? []).filter(f => f.id !== fb.id) })} className="text-[9px] text-white/10 hover:text-red-400">×</button>
+                      </div>
+                      {(['situacao', 'comportamento', 'impacto'] as const).map((field, fi2) => (
+                        <div key={field} className="flex items-start gap-1.5 mb-1">
+                          <span className="text-[7.5px] font-mono uppercase shrink-0 mt-0.5 w-16" style={{ color: BLUE, opacity: 0.6 }}>{field === 'situacao' ? 'situação' : field === 'comportamento' ? 'comportamento' : 'impacto'}</span>
+                          <input value={fb[field]} onChange={e => { const fbs = [...(l.sbiFeedbacks ?? [])]; const idx = fbs.findIndex(f => f.id === fb.id); if (idx >= 0) { fbs[idx] = { ...fbs[idx], [field]: e.target.value }; updateL({ sbiFeedbacks: fbs }) } }}
+                            className="flex-1 text-[10px] bg-transparent outline-none text-white/50 min-w-0"
+                            placeholder={field === 'situacao' ? 'Em qual contexto...' : field === 'comportamento' ? 'Você fez / disse...' : 'O efeito foi...'} />
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+
+                {/* IA por pessoa */}
+                <div className="mx-4 mb-4 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div className="flex flex-col gap-1.5">
+                    {[
+                      mat ? `${l.nome || 'Este liderado'} está em ${mat.label} — como aplicar ${mat.script.split(':')[0]}?` : `Como identificar o nível de maturidade de ${l.nome || 'este liderado'}?`,
+                      daysl1a1 !== null && daysl1a1 > 7 ? `${daysl1a1} dias sem 1:1 com ${l.nome || 'este liderado'} — como retomar?` : `Como preparar o próximo 1:1 com ${l.nome || 'este liderado'}?`,
+                      acordosPend > 0 ? `${acordosPend} acordo${acordosPend > 1 ? 's' : ''} pendente${acordosPend > 1 ? 's' : ''} com ${l.nome || 'este liderado'} — como garantir o cumprimento?` : `Como criar acordos que ${l.nome || 'este liderado'} realmente vai cumprir?`,
+                    ].slice(0, 2).map(q => (
+                      <button key={q} onClick={() => askManifIa(-1 - li, q)}
+                        className="text-left px-3 py-2 rounded-lg text-[10px] font-mono leading-snug"
+                        style={{ background: `${TEAL}08`, border: `1px solid ${TEAL}18`, color: TEAL, opacity: 0.75 }}>
+                        › {q}
+                      </button>
+                    ))}
+                  </div>
+                  {manifIaLoading === -1 - li && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <Loader2 size={10} style={{ color: TEAL }} className="animate-spin" />
+                      <span className="text-[9.5px] font-mono" style={{ color: TEAL, opacity: 0.6 }}>analisando...</span>
+                    </div>
+                  )}
+                  {manifIaAnswers[-1 - li] && manifIaLoading !== -1 - li && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-lg px-3 py-2.5 mt-2"
+                      style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <p className="text-[11px] text-white/60 leading-relaxed whitespace-pre-wrap">{manifIaAnswers[-1 - li]}</p>
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
         </div>
       )}
 
@@ -1437,10 +1582,10 @@ export default function PessoasLideranca() {
       </AnimatePresence>
 
       {/* ════════════════════════════════════
-          MANIFESTO — 5 Princípios + IA
+          MANIFESTO — Log + IA + Dashboard
           ════════════════════════════════════ */}
       <div>
-        {/* Header com multiplicador ao vivo */}
+        {/* Header com dashboard de contagem */}
         <div className="px-1 mb-4">
           <p className="text-[9px] font-mono tracking-[0.25em] text-white/18 uppercase mb-1">Código de Cultura · D6</p>
           <div className="flex items-end gap-3">
@@ -1449,7 +1594,7 @@ export default function PessoasLideranca() {
               <span className="text-[18px] font-black font-mono leading-none" style={{ color: d6Low ? RED : d6mult >= 1.3 ? TEAL : AMBER }}>
                 ×{d6mult.toFixed(2)}
               </span>
-              <span className="text-[8px] font-mono text-white/20">{practicedCount}/5 ativos</span>
+              <span className="text-[8px] font-mono text-white/20">{practicedCount}/5 este mês</span>
             </div>
           </div>
           <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
@@ -1460,6 +1605,46 @@ export default function PessoasLideranca() {
             <span className="text-[7.5px] font-mono text-white/15">×0.5 — inativo</span>
             <span className="text-[7.5px] font-mono text-white/15">×1.5 — plena força</span>
           </div>
+
+          {/* Métricas do mês */}
+          <div className="grid grid-cols-3 gap-2 mt-3">
+            <div className="rounded-lg px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <p className="text-[7.5px] font-mono text-white/18 uppercase mb-0.5">Práticas/mês</p>
+              <div className="flex items-end gap-1">
+                <span className="text-[20px] font-black font-mono leading-none" style={{ color: manifPraticasMes >= manifMetaMensal ? TEAL : AMBER }}>{manifPraticasMes}</span>
+                <span className="text-[9px] font-mono text-white/20 pb-0.5">/{manifMetaMensal} meta</span>
+              </div>
+            </div>
+            <div className="rounded-lg px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <p className="text-[7.5px] font-mono text-white/18 uppercase mb-0.5">Última prática</p>
+              <span className="text-[13px] font-black font-mono leading-none" style={{ color: manifEntropia ? RED : daysSinceManif === null ? 'rgba(255,255,255,0.2)' : TEAL }}>
+                {daysSinceManif === null ? '—' : daysSinceManif === 0 ? 'hoje' : `${daysSinceManif}d`}
+              </span>
+            </div>
+            <div className="rounded-lg px-2.5 py-2" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <p className="text-[7.5px] font-mono text-white/18 uppercase mb-0.5">Total log</p>
+              <span className="text-[20px] font-black font-mono leading-none text-white/40">{manifLog.length}</span>
+            </div>
+          </div>
+
+          {/* Entropia alert */}
+          {manifEntropia && (
+            <div className="mt-2 rounded-lg px-3 py-2 flex items-start gap-2" style={{ background: `${RED}0c`, border: `1px solid ${RED}30` }}>
+              <AlertTriangle size={11} style={{ color: RED, marginTop: 1, flexShrink: 0 }} />
+              <p className="text-[10px] leading-relaxed" style={{ color: RED, opacity: 0.8 }}>
+                {daysSinceManif}d sem praticar o Manifesto — sistema operando no modo sobrevivência. Cultura se deteriora sem rituais.
+              </p>
+            </div>
+          )}
+
+          {/* Incoerência detectada */}
+          {practicedCount > 0 && pcts[1] < 40 && (
+            <div className="mt-2 rounded-lg px-3 py-2" style={{ background: `${AMBER}08`, border: `1px solid ${AMBER}25` }}>
+              <p className="text-[9.5px] leading-relaxed" style={{ color: AMBER, opacity: 0.8 }}>
+                Incoerência detectada — {practicedCount} princípio{practicedCount > 1 ? 's' : ''} marcado{practicedCount > 1 ? 's' : ''} mas D2 (Diálogo) em {pcts[1]}%. O manifesto não está chegando no time via conversas reais.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Princípios */}
@@ -1467,7 +1652,8 @@ export default function PessoasLideranca() {
           <div className="absolute left-5 top-5 bottom-5 w-px" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.02))' }} />
 
           {MANIFESTO.map((m, mi) => {
-            const practiced = (s.pesDig ?? [])[mi]
+            const practiced = practicedThisMonth.has(mi)
+            const praticasTotal = manifLog.filter(p => p.principioId === mi).length
             const manifQs = (() => {
               const nps = s.pesNpsUtilidade
               const gap = s.pesGapHabilidade.trim()
@@ -1548,13 +1734,22 @@ export default function PessoasLideranca() {
                     )}
                   </div>
 
-                  <div className="flex justify-end mt-3">
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-center gap-2">
+                      {praticasTotal > 0 && (
+                        <span className="text-[8px] font-mono text-white/22">{praticasTotal}× praticado</span>
+                      )}
+                      {practiced && (
+                        <span className="text-[8px] font-mono flex items-center gap-1" style={{ color: m.color, opacity: 0.7 }}>
+                          <CheckCircle2 size={9} /> este mês
+                        </span>
+                      )}
+                    </div>
                     <button
-                      onClick={() => { const arr = [...(s.pesDig ?? [false,false,false,false,false])]; arr[mi] = !arr[mi]; update({ pesDig: arr }) }}
+                      onClick={() => update({ pesManifLog: [...manifLog, { principioId: mi, date: new Date().toISOString(), serviuPara: '' }] })}
                       className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9.5px] font-bold font-mono transition-all uppercase tracking-wider"
-                      style={{ background: practiced ? `${m.color}20` : 'rgba(255,255,255,0.04)', border: `1px solid ${practiced ? m.color + '45' : 'rgba(255,255,255,0.07)'}`, color: practiced ? m.color : 'rgba(255,255,255,0.22)' }}>
-                      {practiced ? <CheckCircle2 size={10} /> : <Circle size={10} />}
-                      {practiced ? 'praticamos' : 'marcar'}
+                      style={{ background: `${m.color}18`, border: `1px solid ${m.color}40`, color: m.color }}>
+                      + registrar prática
                     </button>
                   </div>
                 </div>
@@ -1563,18 +1758,25 @@ export default function PessoasLideranca() {
           })}
         </div>
 
-        {practicedCount === 0 && (
-          <div className="rounded-xl px-3 py-3" style={{ background: `${AMBER}08`, border: `1px solid ${AMBER}20` }}>
-            <p className="text-[10px] leading-relaxed" style={{ color: AMBER, opacity: 0.75 }}>
-              Nenhum princípio ativo. Multiplicador ×{d6mult.toFixed(2)} reduzindo todos os scores em {Math.round((1 - d6mult) * 100)}%.
-            </p>
-          </div>
-        )}
-        {practicedCount === 5 && (
-          <div className="rounded-xl px-3 py-3" style={{ background: `${TEAL}08`, border: `1px solid ${TEAL}20` }}>
-            <p className="text-[10px] leading-relaxed" style={{ color: TEAL, opacity: 0.75 }}>
-              Cultura plena — ×{d6mult.toFixed(2)} amplificando todos os scores.
-            </p>
+        {manifLog.length > 0 && (
+          <div className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <p className="text-[8.5px] font-mono text-white/20 uppercase tracking-wider mb-2">Histórico de práticas</p>
+            <div className="flex flex-col gap-1">
+              {[...manifLog].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6).map((p, i) => {
+                const d = new Date(p.date)
+                const label = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+                const mc = MANIFESTO[p.principioId]
+                return (
+                  <div key={i} className="flex items-center gap-2.5">
+                    <span className="text-[8px] font-mono text-white/18 w-24 shrink-0">{label}</span>
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ background: mc?.color ?? TEAL }} />
+                    <span className="text-[9.5px] text-white/40 flex-1 truncate">{mc?.title ?? `P0${p.principioId + 1}`}</span>
+                    <button onClick={() => update({ pesManifLog: manifLog.filter((_, ii) => ii !== manifLog.findIndex(x => x === p)) })}
+                      className="text-[9px] text-white/10 hover:text-red-400 shrink-0">×</button>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )}
       </div>
