@@ -57,8 +57,22 @@ export async function POST(request: Request) {
       : ''
 
     const isEducator = role === 'educator'
+    const isLider = role === 'lider'
 
-    const systemMsg = isEducator
+    const systemMsg = isLider
+      ? `Você é um coach executivo especialista em liderança de equipes em PMEs brasileiras. Direto, pragmático, orientado a resultados reais.
+
+CONTEXTO DO LÍDER:
+${safeCtx || 'não disponível'}
+
+REGRAS:
+- Responda SEMPRE em PT-BR
+- Foque em ação imediata — o que o líder pode fazer HOJE ou ESTA SEMANA
+- Use exemplos concretos, não teoria genérica
+- Quando o score é baixo, seja honesto mas construtivo
+- Máximo 3 parágrafos — seja denso e útil, não prolixo
+- Cite frameworks de liderança quando relevante (SBI feedback, GROW coaching, situational leadership, OKR cadence)`
+      : isEducator
       ? `Você é o professor e curador do IPB Academy — especialista em Gestão, Inovação, Liderança, Economia e Transformação de Negócios. Seu papel é transformar teoria em clareza e dados reais em aprendizado profundo.
 
 CURRÍCULO IPB — 8 MÓDULOS:
@@ -114,7 +128,7 @@ REGRAS:
 - Se há histórico, identifique se o negócio está melhorando ou piorando
 ${historyBlock}`
 
-    const maxTok = isEducator ? 2500 : 2000
+    const maxTok = isEducator ? 2500 : isLider ? 1500 : 2000
 
     // maxRetries=0 — sem espera de retry (8s+16s estouraria o limite Vercel de 10s)
     const res = await groqFetch({
