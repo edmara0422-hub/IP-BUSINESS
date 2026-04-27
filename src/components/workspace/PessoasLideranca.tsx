@@ -543,14 +543,41 @@ const COCKPIT_ZERO = { receita: 0, despesas: 0, caixa: 0, clientesAtivos: 0 }
 const ADMIN_ZERO = { faseEmpresa: 0, norteStar: '', cultura: '', okrs: [] as OKR[] }
 const FASE_LABELS = ['Infra', 'Processo', 'Estratégia', 'Digitização', 'Transformação', 'Nativa']
 
-// ─── IA questions per dimension ───────────────────────────────────────────────
-const DIM_IA_Q: Record<number, string[]> = {
-  0: ['Como reduzir o Ruído de Direção na equipe?', 'Como alinhar expectativas de meta com o liderado?', 'O que torna um KPI realmente acionável?'],
-  1: ['Como conduzir um 1:1 que gera resultado?', 'O que devo registrar como acordo?', 'Com que frequência fazer 1:1?'],
-  2: ['Como identificar o gap de habilidade certo?', 'Como criar um plano de desenvolvimento real?', 'Qual método de desenvolvimento funciona melhor?'],
-  3: ['Como implementar uma daily que não vira reunião?', 'Como salvar uma retrospectiva que está vazia?', 'Rituais não estão funcionando — o que fazer?'],
-  4: ['NPS Interno baixo — o que fazer agora?', 'Como criar senso de utilidade no trabalho do time?', 'Como reconhecer entrega sem parecer forçado?'],
-  5: ['Qual princípio do Manifesto praticar primeiro?', 'Como criar senso de propósito no dia a dia?', 'Como medir se a cultura está sendo vivida?'],
+// ─── IA questions — dynamic, referencing what the user actually filled in ────
+function getDimIaQ(id: number, s: PesState): string[] {
+  switch (id) {
+    case 0: return [
+      s.pesMetaEquipe ? `Avalie se esta meta está clara e acionável: "${s.pesMetaEquipe.slice(0, 70)}"` : 'Me ajuda a escrever uma meta trimestral para meu time',
+      s.pesKpiEquipe ? `Este KPI mede o que importa? "${s.pesKpiEquipe.slice(0, 60)}"` : 'Como transformar minha meta em um KPI mensurável?',
+      'Como conversar com o liderado para medir o alinhamento real sobre a meta?',
+    ]
+    case 1: return [
+      s.pesAcordos.trim().length > 10 ? `Analise estes acordos e aponte risco de não cumprimento: "${s.pesAcordos.slice(0, 120)}"` : 'Me ajuda a estruturar os acordos do próximo 1:1',
+      'Como registrar compromissos no 1:1 que garantam execução real?',
+      'Que perguntas fazer no 1:1 para identificar bloqueios que o liderado não diz?',
+    ]
+    case 2: return [
+      s.pesGapHabilidade.trim() ? `Como desenvolver esta habilidade no liderado: "${s.pesGapHabilidade.slice(0, 60)}"?` : 'Me ajuda a identificar o principal gap de habilidade do meu time',
+      s.pesMaturidade ? `Liderado em ${MATURITY.find(m => m.id === s.pesMaturidade)?.label} — que abordagem usar no dia a dia?` : 'Como identificar o nível de maturidade M1-M4 do meu liderado?',
+      'Como montar um plano de desenvolvimento que o liderado realmente vai seguir?',
+    ]
+    case 3: return [
+      s.pesBloqueios.trim() ? `Como resolver este bloqueio rápido: "${s.pesBloqueios.slice(0, 70)}"?` : 'Qual tipo de bloqueio devo eliminar primeiro para liberar a energia do time?',
+      'Como fazer a Daily de 15 min sem virar reunião de status?',
+      'Minha retrospectiva mensal não engaja o time — o que devo mudar?',
+    ]
+    case 4: return [
+      s.pesNpsUtilidade > 0 && s.pesNpsUtilidade <= 5 ? `NPS Interno em ${s.pesNpsUtilidade}/10 — o que fazer esta semana para reverter?` : 'Como criar senso real de utilidade no trabalho do time?',
+      'Como dar reconhecimento que realmente eleva o engajamento?',
+      s.pesReflexao.trim() ? `Sobre esta reflexão: "${s.pesReflexao.slice(0, 80)}" — o que me sugere?` : 'Como identificar o que está drenando a energia e utilidade percebida do time?',
+    ]
+    case 5: return [
+      'Qual dos 5 princípios do Manifesto meu time deve praticar primeiro e por quê?',
+      'Como introduzir os valores de cultura no dia a dia sem parecer forçado?',
+      'Como saber se a cultura de utilidade está sendo vivida ou só declarada?',
+    ]
+    default: return []
+  }
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -561,6 +588,7 @@ export default function PessoasLideranca() {
   const [iaAnswer, setIaAnswer] = useState('')
   const [dimIaLoading, setDimIaLoading] = useState<number | null>(null)
   const [dimIaAnswers, setDimIaAnswers] = useState<Record<number, string>>({})
+  const [showClear, setShowClear] = useState(false)
 
   // Cross-module context
   const { data: cockpit } = useWorkspaceData<typeof COCKPIT_ZERO>('cockpit', COCKPIT_ZERO)
@@ -638,7 +666,24 @@ export default function PessoasLideranca() {
     setDimIaLoading(dimId)
     try {
       const dim = DIMS[dimId]
-      const ctx = `Dimensão ${dim.code} (${dim.label}) — score atual: ${pcts[dimId]}/100. Índice 6D: ${index6D}/100. Meta: ${s.pesMetaEquipe || 'não definida'}. Liderados: ${s.pesLiderados || '?'}.`
+      const base = `${dim.code} (${dim.label}) score: ${pcts[dimId]}/100 | Índice 6D: ${index6D}/100 | Time: ${s.pesLiderados || '?'} pessoas`
+      let ctx = base
+      if (dimId === 0)
+        ctx = `${base} | Meta: "${s.pesMetaEquipe || 'não definida'}" | KPI: "${s.pesKpiEquipe || 'não definido'}" | Nota Líder: ${s.pesNotaLider || '—'}/10 · Nota Liderado: ${s.pesNotaLiderado || '—'}/10`
+      else if (dimId === 1) {
+        const diff = s.pesUltimo1a1 ? Math.floor((Date.now() - new Date(s.pesUltimo1a1).getTime()) / 86400000) : null
+        const sent = analyzeSentiment(s.pesAcordos)
+        ctx = `${base} | Último 1:1: ${diff !== null ? diff + 'd atrás' : 'nunca'} | Acordos: "${s.pesAcordos.slice(0, 150) || 'não registrados'}" | Comprometimento: ${Math.round(sent.score)}/10 (${sent.label || 'não avaliado'})`
+      } else if (dimId === 2) {
+        const mat = MATURITY.find(m => m.id === s.pesMaturidade)
+        ctx = `${base} | Gap: "${s.pesGapHabilidade || 'não mapeado'}" | Plano: "${s.pesPlanoDev.slice(0, 100) || 'não definido'}" | Maturidade: ${mat ? mat.label + ' — ' + mat.title : 'não avaliada'}`
+      } else if (dimId === 3) {
+        ctx = `${base} | Rituais ativos: ${s.pesRituais.filter(Boolean).length}/3 | Bloqueio: "${s.pesBloqueios || 'não reportado'}" | Desbloqueio: ${s.pesDesbloqueioHoras > 0 ? s.pesDesbloqueioHoras + 'h' : 'não medido'}`
+      } else if (dimId === 4) {
+        ctx = `${base} | NPS Interno: ${s.pesNpsUtilidade > 0 ? s.pesNpsUtilidade + '/10' : 'não avaliado'} | Reconhecimento: ${s.pesReconhecimento ? 'feito' : 'não feito'} | Reflexão: "${s.pesReflexao.slice(0, 100) || 'não registrada'}"`
+      } else if (dimId === 5) {
+        ctx = `${base} | Princípios praticados: ${(s.pesDig ?? []).filter(Boolean).length}/5 | Multiplicador D6: ×${d6mult.toFixed(2)}`
+      }
       const res = await fetch('/api/advisor-chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: q, marketContext: ctx, role: 'lider' }),
@@ -666,12 +711,35 @@ export default function PessoasLideranca() {
           <p className="text-[9px] font-mono tracking-[0.22em] text-white/18 uppercase">Neural Leadership OS</p>
           <p className="text-[10px] font-mono text-white/30 mt-0.5">SIG · Gerencial · Pessoas</p>
         </div>
-        <motion.div animate={{ opacity: [0.6, 1, 0.6] }} transition={{ duration: 2.4, repeat: Infinity }}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-full"
-          style={{ border: `1px solid ${TEAL}45`, background: `${TEAL}0a` }}>
-          <div className="w-1.5 h-1.5 rounded-full" style={{ background: TEAL, boxShadow: `0 0 6px ${TEAL}` }} />
-          <span className="text-[9px] font-mono font-bold" style={{ color: TEAL }}>SISTEMA ATIVO</span>
-        </motion.div>
+        <div className="flex items-center gap-2">
+          <AnimatePresence mode="wait">
+            {!showClear ? (
+              <motion.button key="btn" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onClick={() => setShowClear(true)}
+                className="text-[9px] font-mono text-white/18 px-2 py-1 rounded-lg transition-colors hover:text-white/35"
+                style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+                limpar
+              </motion.button>
+            ) : (
+              <motion.div key="confirm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex items-center gap-1.5">
+                <span className="text-[9px] font-mono text-white/30">zerar tudo?</span>
+                <button onClick={() => { update(DEFAULT); setShowClear(false) }}
+                  className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded"
+                  style={{ color: RED, border: `1px solid ${RED}30`, background: `${RED}0a` }}>sim</button>
+                <button onClick={() => setShowClear(false)}
+                  className="text-[9px] font-mono px-1.5 py-0.5 rounded text-white/25"
+                  style={{ border: '1px solid rgba(255,255,255,0.06)' }}>não</button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <motion.div animate={{ opacity: [0.6, 1, 0.6] }} transition={{ duration: 2.4, repeat: Infinity }}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full"
+            style={{ border: `1px solid ${TEAL}45`, background: `${TEAL}0a` }}>
+            <div className="w-1.5 h-1.5 rounded-full" style={{ background: TEAL, boxShadow: `0 0 6px ${TEAL}` }} />
+            <span className="text-[9px] font-mono font-bold" style={{ color: TEAL }}>SISTEMA ATIVO</span>
+          </motion.div>
+        </div>
       </div>
 
       {/* ── Intelligence Strip — dados cruzados de outros módulos ── */}
@@ -935,7 +1003,7 @@ export default function PessoasLideranca() {
                   <span className="text-[9.5px] font-mono text-white/30">IA pode ajudar nesta dimensão</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mb-2">
-                  {(DIM_IA_Q[activeCard] ?? []).map(q => (
+                  {getDimIaQ(activeCard, s).map(q => (
                     <button key={q} onClick={() => askDimIa(activeCard, q)}
                       className="px-2.5 py-1 rounded-lg text-[10px] font-mono transition-all"
                       style={{ background: 'rgba(23,165,137,0.08)', border: '1px solid rgba(23,165,137,0.2)', color: TEAL }}>
