@@ -4856,6 +4856,368 @@ export const INTELLIGENCE_CONTENT: ModuleContent[] = [
           },
         ],
       },
+      {
+        id: 'M3-2',
+        title: 'Comunicacao, Disfuncoes e Lideranca Digital',
+        blocks: [
+          {
+            id: 'M3-2-cap1',
+            type: 'chapter',
+            number: 1,
+            title: 'Comunicação Estratégica na Liderança',
+            subtitle: 'CNV, Feedforward, Candura Radical e a matemática dos canais',
+            opening: {
+              leadText: 'Comunicação não é transmissão de dados — é {{construção de significados compartilhados}}. O líder que domina a comunicação estratégica não apenas informa: alinha, inspira e resolve conflitos antes que virem crises.',
+            },
+            body: [
+              {
+                kind: 'paragraph',
+                text: 'Em uma equipe de 5 pessoas, há 10 canais de comunicação simultâneos. Em uma equipe de 15 pessoas, {{105 canais}}. A fórmula: C = n(n−1)/2. Isso explica por que grandes equipes sofrem de ineficiência e por que o líder precisa simplificar canais e criar rituais de alinhamento.',
+              },
+              {
+                kind: 'heading',
+                text: 'CNV — Comunicação Não-Violenta (Marshall Rosenberg)',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A CNV transforma críticas destrutivas em diálogos construtivos. Em vez de "Você é irresponsável com prazos", o líder treinado em CNV descreve fatos, sentimentos, necessidades e pedidos. O objetivo: focar na solução sem destruir o {{relacionamento}}.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: '4 componentes da CNV',
+                pillars: [
+                  { icon: '👁️', title: 'Observação', description: 'Descreva o {{fato}} concreto, sem interpretação. "O relatório foi entregue 2 dias após o prazo" — não "você é irresponsável".' },
+                  { icon: '💙', title: 'Sentimento', description: 'Expresse como você se sente com isso. "Fico {{preocupado}} com o cronograma do projeto." Emoção real, não julgamento disfarçado.' },
+                  { icon: '🌱', title: 'Necessidade', description: 'Identifique a necessidade por trás do sentimento. "Preciso de {{previsibilidade}} para reportar aos diretores." Transparência gera empatia.' },
+                  { icon: '🎯', title: 'Pedido', description: 'Faça um pedido claro e específico. "Podemos combinar que você me avisa {{24h antes}} se houver risco de atraso?" Pedido, não exigência.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Feedback vs Feedforward',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Feedback olha para o passado: avalia o que foi feito. Feedforward olha para o futuro: desenvolve o que {{ainda vai ser feito}}. A liderança moderna usa os dois — feedback para corrigir, feedforward para crescer. Um sistema eficaz: oportuno, específico, balanceado e contínuo.',
+              },
+              {
+                kind: 'heading',
+                text: 'Candura Radical (Kim Scott)',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O feedback eficaz ocorre na interseção entre dois eixos: {{Cuidado Pessoal}} (você se importa genuinamente com a pessoa) e {{Desafio Direto}} (você diz a verdade mesmo que desconfortável). Sem cuidado = agressividade. Sem desafio = empatia ruinosa. Com os dois = Candura Radical.',
+              },
+              {
+                kind: 'compare-table',
+                title: 'Mapa da Candura Radical',
+                headers: ['', 'Alto Desafio Direto', 'Baixo Desafio Direto'],
+                rows: [
+                  { label: 'Alto Cuidado Pessoal', values: ['✅ Candura Radical — ideal', '😔 Empatia Ruinosa — evita conflito, não ajuda'] },
+                  { label: 'Baixo Cuidado Pessoal', values: ['😡 Agressividade Ofensiva — machuca', '🙈 Insinceridade Manipuladora — pior caso'] },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Oratória e Persuasão Executiva',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A persuasão legítima baseia-se em três pilares da retórica aristotélica: {{Ethos}} (credibilidade do líder — quem você é), {{Pathos}} (conexão emocional — como você faz as pessoas se sentirem) e {{Logos}} (consistência lógica — seus dados e argumentos). O líder que domina os três transforma dados abstratos em visões inspiradoras.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Os 4 componentes da CNV têm uma ordem. Classifique o que cada frase representa.',
+              compare: {
+                columnHeaders: ['Observação', 'Sentimento', 'Necessidade', 'Pedido'],
+                rows: [
+                  { label: 'Foco', values: ['Fato concreto', 'Emoção real', 'Por que importa', 'Ação específica'] },
+                  { label: 'Erro comum', values: ['Generalizar', 'Julgar', 'Omitir', 'Exigir'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual componente da CNV cada frase representa?',
+                zones: [
+                  { id: 'obs', label: 'Observação' },
+                  { id: 'sent', label: 'Sentimento' },
+                  { id: 'nec', label: 'Necessidade' },
+                  { id: 'ped', label: 'Pedido' },
+                ],
+                items: [
+                  { id: 'atr', label: '"O projeto foi entregue sem os dados do cliente"', correctZone: 'obs', correctFeedback: 'Certo. Fato específico sem julgamento = Observação.', wrongFeedback: 'Descrever o fato concreto = Observação.' },
+                  { id: 'frust', label: '"Fico frustrado quando isso acontece"', correctZone: 'sent', correctFeedback: 'Certo. Emoção real = Sentimento.', wrongFeedback: 'Expressar como se sente = Sentimento.' },
+                  { id: 'qual', label: '"Preciso de entregas completas para garantir qualidade"', correctZone: 'nec', correctFeedback: 'Certo. A necessidade por trás do sentimento = Necessidade.', wrongFeedback: 'Por que importa = Necessidade.' },
+                  { id: 'rev', label: '"Podemos revisar o checklist antes da entrega?"', correctZone: 'ped', correctFeedback: 'Certo. Pedido claro e específico = Pedido.', wrongFeedback: 'Ação concreta solicitada = Pedido.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Comunicação estratégica não é sobre falar melhor — é sobre {{criar significado compartilhado}}. CNV elimina a reatividade. Feedforward constrói futuro. Candura Radical combina cuidado com verdade.',
+              keyInsights: [
+                'CNV: Observação + Sentimento + Necessidade + Pedido. Elimina {{julgamento}} e foca na solução.',
+                'Candura Radical: cuidado + desafio = feedback que {{transforma}} sem destruir.',
+                'Equipe de 15 = {{105 canais}} de comunicação. Rituais e simplicidade são a resposta.',
+              ],
+              nextChapterHint: 'Capítulo 2 · Disfunções, OKRs e Sucessão',
+              nextChapterBlurb: 'Lencioni, Nine Box e Jim Collins — arquitetura de equipes de alta performance.',
+            },
+          },
+          {
+            id: 'M3-2-cap2',
+            type: 'chapter',
+            number: 2,
+            title: 'Disfunções, OKRs e Desenvolvimento de Líderes',
+            subtitle: 'Lencioni, Nine Box, Jim Collins e como construir um pipeline de liderança',
+            opening: {
+              leadText: 'Alta performance não é consequência de talento individual — é consequência de {{arquitetura social}}. O líder que entende as disfunções que travam equipes, usa OKRs para alinhar estratégia e desenvolve sucessores garante que a organização não dependa de ninguém específico.',
+            },
+            body: [
+              {
+                kind: 'heading',
+                text: 'As 5 Disfunções de uma Equipe (Patrick Lencioni)',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Lencioni identificou que equipes falham não por falta de competência, mas por disfunções em cascata. A base da pirâmide é a {{ausência de confiança}}: sem vulnerabilidade, os membros escondem erros. Sem confiança, surge o medo de conflito. Sem conflito produtivo, não há comprometimento real.',
+              },
+              {
+                kind: 'step-flow',
+                title: 'Pirâmide das 5 Disfunções — da base ao topo',
+                steps: [
+                  { number: 1, title: 'Ausência de Confiança', description: 'Membros escondem erros e fraquezas. Raiz de tudo. {{Intervenção}}: líder demonstra vulnerabilidade primeiro — admite erros, pede ajuda.', caseSnippet: 'Equipe que não admite erros = aprendizado zero. Amazon usa "escritura" onde todos expõem falhas em projetos.' },
+                  { number: 2, title: 'Medo de Conflitos', description: 'Reuniões tediosas, harmonia artificial. Divergências produtivas são suprimidas. {{Intervenção}}: extrair conflitos latentes, garantir que todas as vozes sejam ouvidas.', caseSnippet: 'Netflix incentiva "disagreement": discorde em público, mas implemente com total comprometimento depois.' },
+                  { number: 3, title: 'Falta de Comprometimento', description: 'Decisões aceitas mas não abraçadas. Membros não se sentem ouvidos. {{Intervenção}}: revisar decisões e garantir alinhamento explícito antes de encerrar a pauta.', caseSnippet: 'Sintoma: "sai da reunião concordando e na próxima semana não fez nada." Comprometimento exige clareza.' },
+                  { number: 4, title: 'Evitação de Responsabilidade', description: 'Baixos padrões, ressentimento mútuo. Ninguém cobra ninguém. {{Intervenção}}: publicar metas visíveis e promover feedback entre pares — não só top-down.', caseSnippet: 'Equipes de alto desempenho se cobram mutuamente. O líder não é o único árbitro.' },
+                  { number: 5, title: 'Falta de Atenção aos Resultados', description: 'Ego individual supera objetivos coletivos. Status e carreira pessoal viram a prioridade. {{Intervenção}}: recompensar desempenho coletivo e manter foco obsessivo nos KPIs do time.', caseSnippet: 'Sintoma clássico: cada um defende seu território. Solução: bônus atrelado ao resultado do time, não do indivíduo.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'OKRs — Alinhamento de Estratégia em Escala (John Doerr)',
+              },
+              {
+                kind: 'paragraph',
+                text: 'OKRs (Objectives and Key Results) democratizam a estratégia. Cada equipe define como {{contribuirá}} para os objetivos da organização, promovendo autonomia com direção. Google e Intel usam OKRs desde os anos 1970 — fórmula: para cada Objetivo inspirador, 3 a 5 Resultados-Chave quantificáveis.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: 'Anatomia de um OKR',
+                pillars: [
+                  { icon: '🎯', title: 'Objetivo (O)', description: 'Inspirador, qualitativo, {{sem número}}. Responde ao "para onde vamos?". Ex: "Tornar nosso atendimento o melhor do setor."' },
+                  { icon: '📊', title: 'Key Result 1', description: 'Mensurável e com prazo. Responde ao "como saberemos que chegamos?". Ex: "Reduzir tempo de resposta de 48h para {{4h}} até dezembro."' },
+                  { icon: '📈', title: 'Key Result 2', description: 'Específico e desafiador. OKRs bem calibrados são {{atingidos em 70%}} — 100% significa que eram fáceis demais.', metric: { value: '70%', label: 'taxa ideal de atingimento' } },
+                  { icon: '🔄', title: 'Ritmo', description: 'OKRs são {{trimestrais}} com check-ins semanais. Transparência total: todos veem os OKRs de todos.', metric: { value: '4x/ano', label: 'ciclos de revisão' } },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Liderança de Nível 5 (Jim Collins — Feitas para Vencer)',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Após pesquisar 1.435 empresas, Jim Collins identificou que as que migraram de boas para excelentes tinham um padrão incomum de liderança: {{humildade pessoal + vontade profissional feroz}}. Líderes de Nível 5 atribuem sucesso à equipe e à sorte — e assumem responsabilidade total pelos fracassos. O inverso do líder carismático ego-centrado.',
+              },
+              {
+                kind: 'heading',
+                text: 'Nine Box — Planejamento de Sucessão',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A matriz Nine Box cruza {{desempenho atual}} (eixo X) com {{potencial de crescimento}} (eixo Y), criando 9 quadrantes para estratégias diferenciadas de desenvolvimento. O objetivo: identificar quem desenvolver, quem promover, quem estabilizar e quem reter antes que a organização perca talentos críticos.',
+              },
+              {
+                kind: 'compare-table',
+                title: 'Nine Box Matrix',
+                headers: ['', 'Baixo Desempenho', 'Desempenho Esperado', 'Alto Desempenho'],
+                rows: [
+                  { label: '🚀 Alto Potencial', values: ['Enigma — Treinar ou Mover', 'Futura Estrela — Desenvolver', '⭐ Estrela — Promover e Desafiar'] },
+                  { label: '📈 Potencial Médio', values: ['Dilema — Avaliar', 'Profissional Sólido — Manter', 'High Performer — Valorizar'] },
+                  { label: '🔧 Baixo Potencial', values: ['Risco — Desligar', 'Especialista — Estabilizar', 'Pilar — Recompensar'] },
+                ],
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Cada disfunção tem sua intervenção específica. Classifique.',
+              compare: {
+                columnHeaders: ['Confiança', 'Conflito', 'Comprometimento'],
+                rows: [
+                  { label: 'Sintoma', values: ['Escondem erros', 'Harmonia artificial', 'Saem sem agir'] },
+                  { label: 'Intervenção', values: ['Vulnerabilidade do líder', 'Extrair divergências', 'Alinhamento explícito'] },
+                ],
+              },
+              drag: {
+                instruction: 'Qual disfunção está em jogo em cada cenário?',
+                zones: [
+                  { id: 'conf', label: 'Ausência de Confiança' },
+                  { id: 'medo', label: 'Medo de Conflito' },
+                  { id: 'comp', label: 'Falta de Comprometimento' },
+                  { id: 'resp', label: 'Evitação de Responsabilidade' },
+                ],
+                items: [
+                  { id: 'err', label: 'Ninguém admite que o projeto está atrasado', correctZone: 'conf', correctFeedback: 'Certo. Esconder falhas = Ausência de Confiança.', wrongFeedback: 'Esconder erros é sintoma de falta de confiança.' },
+                  { id: 'reu', label: 'Reunião termina sem discordâncias — todos "concordam"', correctZone: 'medo', correctFeedback: 'Certo. Harmonia falsa = Medo de Conflito.', wrongFeedback: 'Concordância artificial = Medo de Conflito.' },
+                  { id: 'sai', label: 'Equipe sai alinhada da reunião mas não executa', correctZone: 'comp', correctFeedback: 'Certo. Aceitar sem abraçar = Falta de Comprometimento.', wrongFeedback: 'Decisão sem execução = Comprometimento ausente.' },
+                  { id: 'padr', label: 'Ninguém cobra quem entregou abaixo do padrão', correctZone: 'resp', correctFeedback: 'Certo. Não cobrar = Evitação de Responsabilidade.', wrongFeedback: 'Baixo padrão tolerado = Evitação de Responsabilidade.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Equipes de alta performance são {{construídas}}, não encontradas. Confiança → Conflito produtivo → Comprometimento → Responsabilidade → Resultados. OKRs alinham estratégia. Nine Box identifica quem desenvolver. Nível 5 define como liderar.',
+              keyInsights: [
+                'Lencioni: tudo começa pela confiança. Sem vulnerabilidade, há {{zero}} aprendizado organizacional.',
+                'OKRs: Objetivo inspirador + KRs mensuráveis. Taxa ideal de atingimento: {{70%}} — não 100%.',
+                'Jim Collins: Liderança Nível 5 = humildade pessoal + vontade {{feroz}}. Oposto do CEO carismático.',
+              ],
+              nextChapterHint: 'Capítulo 3 · Liderança Digital e Contexto Global',
+              nextChapterBlurb: 'VUCA, equipes remotas, contexto lusófono e liderança sustentável.',
+            },
+          },
+          {
+            id: 'M3-2-cap3',
+            type: 'chapter',
+            number: 3,
+            title: 'Liderança Digital, Contexto Lusófono e ESG',
+            subtitle: 'VUCA/BANI, equipes remotas, Hofstede, DE&I e liderança sustentável',
+            opening: {
+              leadText: 'O mundo contemporâneo é {{VUCA}} (Volátil, Incerto, Complexo, Ambíguo) e, cada vez mais, {{BANI}} (Frágil, Ansioso, Não-linear, Incompreensível). Neste cenário, a liderança autocrática falha — e emerge a necessidade da liderança distribuída, ágil e culturalmente inteligente.',
+            },
+            body: [
+              {
+                kind: 'heading',
+                text: 'Liderança Tradicional vs Ágil/Digital',
+              },
+              {
+                kind: 'compare-table',
+                title: 'Dois paradigmas de liderança',
+                headers: ['Atributo', 'Tradicional (Comando e Controle)', 'Ágil/Digital (Facilitação)'],
+                rows: [
+                  { label: 'Tomada de Decisão', values: ['Centralizada no topo', '{{Descentralizada}} e baseada em dados'] },
+                  { label: 'Fluxo de Informação', values: ['Hierárquico e restrito', '{{Transparente}} e em rede'] },
+                  { label: 'Foco do Líder', values: ['Processos e conformidade', '{{Pessoas}} e agregação de valor'] },
+                  { label: 'Resposta à Mudança', values: ['Resistência e planejamento rígido', '{{Adaptação}} e experimentação'] },
+                  { label: 'Papel do Liderado', values: ['Executor de ordens', '{{Colaborador}} e tomador de decisão'] },
+                ],
+              },
+              {
+                kind: 'paragraph',
+                text: 'Em ambientes VUCA e BANI, a {{agilidade de aprendizado}} (learning agility) torna-se a competência mestre. O líder deve ser capaz de desaprender modelos mentais obsoletos em ciclos curtos. Em metodologias ágeis (Scrum, Kanban), o líder atua mais como Servant Leader ou Scrum Master — facilitador, não comandante.',
+              },
+              {
+                kind: 'heading',
+                text: 'Liderança em Equipes Remotas e Híbridas',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A gestão à distância exigiu a transição da "gestão por presença" para a "gestão por resultados". O líder remoto é um {{mestre da clareza}} — a ausência de pistas não-verbais amplifica ruídos semânticos. Rituais de conexão virtual, documentação rigorosa e comunicação assíncrona eficiente são os novos pilares.',
+              },
+              {
+                kind: 'pillar-grid',
+                title: '4 práticas de liderança remota de alto desempenho',
+                pillars: [
+                  { icon: '📝', title: 'Documentação Radical', description: 'O que não está escrito {{não existe}} para equipes distribuídas. Decisões, contexto e processos precisam ser registrados.' },
+                  { icon: '🔁', title: 'Rituais de Conexão', description: 'Check-ins regulares, celebrações virtuais e momentos informais mantêm o {{senso de pertencimento}} sem contato físico.' },
+                  { icon: '🎯', title: 'Clareza de Expectativas', description: 'Metas, prazos e critérios de sucesso devem ser {{explícitos}}, não implícitos. Ambiguidade custa retrabalho.' },
+                  { icon: '⚡', title: 'Autonomia com Responsabilidade', description: 'Microgerenciar à distância destrói {{confiança}} e produtividade. Delegue resultado, não método.' },
+                ],
+              },
+              {
+                kind: 'heading',
+                text: 'Liderança no Contexto Lusófono — Brasil e Portugal',
+              },
+              {
+                kind: 'paragraph',
+                text: 'As dimensões culturais de Geert Hofstede mostram que Brasil e Portugal possuem {{distância do poder mais elevada}} e foco maior em coletivismo do que culturas anglo-saxãs. No Brasil, o conceito de "cordialidade" (Sérgio Buarque de Holanda) permeia as relações de trabalho: o líder é esperado como figura de apoio pessoal, não apenas técnico. Em Portugal, a formalidade e o respeito à hierarquia são mais acentuados — embora tecnologia e startups acelerem a horizontalidade.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'O desafio do líder lusófono: equilibrar {{proximidade e calor humano}} com profissionalismo, meritocracia e objetividade. A comunicação deve ser clara e direta, mas revestida de cuidado relacional — frieza é percebida como autoritarismo e gera desengajamento.',
+              },
+              {
+                kind: 'heading',
+                text: 'Diversidade, Equidade e Inclusão (DE&I)',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Pesquisas McKinsey (2020) mostram que empresas no quartil superior em diversidade de gênero têm {{25% mais probabilidade}} de superar pares em lucratividade. Equipes diversas tomam melhores decisões — mas diversidade sem inclusão gera conflito e rotatividade. O líder inclusivo tem consciência de seus {{vieses inconscientes}} e cria ativamente um ambiente onde diferenças são fontes de vantagem competitiva.',
+              },
+              {
+                kind: 'heading',
+                text: 'Ética, ESG e Liderança Sustentável',
+              },
+              {
+                kind: 'paragraph',
+                text: 'Na terceira década do século XXI, a liderança é julgada não apenas pelos resultados financeiros, mas pelo compromisso com ESG ({{Ambiental, Social e Governança}}). A liderança servidora (Greenleaf) ganha relevância renovada: o líder que serve à equipe, aos clientes e à comunidade constrói marcas resilientes e engaja Millennials e Geração Z, que buscam propósito no trabalho.',
+              },
+              {
+                kind: 'paragraph',
+                text: 'A cultura organizacional é o reflexo do comportamento dos líderes. O que celebram, o que toleram e como reagem em crises define o "DNA" da empresa. {{Coerência entre discurso e prática}} é o pilar da autoridade moral do líder — e a única forma de liderança que sobrevive ao longo prazo.',
+              },
+            ],
+            application: {
+              kind: 'compare-and-drag',
+              intro: 'Liderança Tradicional ou Ágil/Digital? Classifique cada comportamento.',
+              compare: {
+                columnHeaders: ['Tradicional', 'Ágil/Digital'],
+                rows: [
+                  { label: 'Decisão', values: ['Centralizada', 'Descentralizada'] },
+                  { label: 'Erro', values: ['Punido', 'Aprendizado'] },
+                ],
+              },
+              drag: {
+                instruction: 'Tradicional ou Ágil/Digital?',
+                zones: [
+                  { id: 'trad', label: 'Tradicional' },
+                  { id: 'agil', label: 'Ágil/Digital' },
+                ],
+                items: [
+                  { id: 'aprov', label: 'Todo e-mail ao cliente precisa de aprovação do diretor', correctZone: 'trad', correctFeedback: 'Certo. Centralização excessiva = Tradicional.', wrongFeedback: 'Aprovação hierárquica obrigatória = modelo tradicional.' },
+                  { id: 'okr', label: 'Equipe define seus próprios OKRs alinhados à estratégia', correctZone: 'agil', correctFeedback: 'Certo. Autonomia com direção = Ágil/Digital.', wrongFeedback: 'OKRs descentralizados = liderança ágil.' },
+                  { id: 'rel', label: 'Relatório semanal em PowerPoint para cada gestor', correctZone: 'trad', correctFeedback: 'Certo. Burocracia de status = Tradicional.', wrongFeedback: 'Relatórios hierárquicos = modelo de controle tradicional.' },
+                  { id: 'exp', label: 'Equipe testa solução em 2 semanas antes de planejar 6 meses', correctZone: 'agil', correctFeedback: 'Certo. Experimentação rápida = Ágil/Digital.', wrongFeedback: 'Ciclos curtos de aprendizado = liderança ágil.' },
+                ],
+              },
+            },
+            synthesis: {
+              closingText: 'Liderança no século XXI é {{contextual}}: ágil em VUCA, clara no remoto, relacional no contexto lusófono, inclusiva na diversidade e ética no ESG. O líder que integra tudo isso não apenas gera resultados — transforma a organização em ecossistema de crescimento.',
+              keyInsights: [
+                'VUCA/BANI: liderança autocrática falha. Liderança {{distribuída}} — autoridade vai para quem está perto da informação.',
+                'Contexto lusófono: equilibrar {{calor humano}} com objetividade. Frieza é percebida como autoritarismo.',
+                'ESG: cultura = reflexo dos líderes. {{Coerência}} entre discurso e prática é a única liderança que dura.',
+              ],
+            },
+          },
+          {
+            id: 'M3-2-s1',
+            type: 'simulation',
+            title: 'CNV na Prática — Transforme Críticas em Diálogos',
+            simulationId: 'cnv-practice',
+            description: 'Reescreva comunicações agressivas usando os 4 componentes da CNV.',
+          },
+          {
+            id: 'M3-2-s2',
+            type: 'simulation',
+            title: 'Diagnóstico das 5 Disfunções — Qual Trava Sua Equipe?',
+            simulationId: 'lencioni-diagnostic',
+            description: 'Identifique a disfunção dominante na sua equipe e receba um plano de ação.',
+          },
+          {
+            id: 'M3-2-s3',
+            type: 'simulation',
+            title: 'Construtor de OKR — Objetivo + 3 Key Results',
+            simulationId: 'okr-builder',
+            description: 'Monte um OKR real para sua equipe com feedback instantâneo sobre qualidade.',
+          },
+          {
+            id: 'M3-2-s4',
+            type: 'simulation',
+            title: 'Nine Box — Mapeie Sua Equipe',
+            simulationId: 'nine-box-mapping',
+            description: 'Posicione membros da equipe na matriz e receba estratégias de desenvolvimento.',
+          },
+        ],
+      },
 
     ],
   },
