@@ -278,6 +278,73 @@ function EnergyOrb({ score, d6mult }: { score: number; d6mult: number }) {
   )
 }
 
+// ─── Snapshot + team types ────────────────────────────────────────────────────
+interface Snap { date: string; index6D: number; dims: number[] }
+interface SnapStore { snaps: Snap[] }
+interface Liderado { id: string; nome: string; scores: number[] }
+interface TeamStore { liderados: Liderado[] }
+
+// ─── Hex Radar ────────────────────────────────────────────────────────────────
+function HexRadar({ pcts, colors }: { pcts: number[]; colors: string[] }) {
+  const cx = 116, cy = 116, r = 88
+  const angles = Array.from({ length: 6 }, (_, i) => (i * Math.PI * 2) / 6 - Math.PI / 2)
+  const labels = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6']
+  const grid = (s: number) => angles.map(a => `${cx + Math.cos(a) * r * s},${cy + Math.sin(a) * r * s}`).join(' ')
+  const dataStr = pcts.map((p, i) => {
+    const d = (p / 100) * r
+    return `${cx + Math.cos(angles[i]) * d},${cy + Math.sin(angles[i]) * d}`
+  }).join(' ')
+  return (
+    <svg width={232} height={232} className="mx-auto">
+      {[0.2, 0.4, 0.6, 0.8, 1].map(s => (
+        <polygon key={s} points={grid(s)} fill="none"
+          stroke={s === 1 ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.04)'}
+          strokeWidth={s === 1 ? 0.8 : 0.4} />
+      ))}
+      {angles.map((a, i) => (
+        <line key={i} x1={cx} y1={cy} x2={cx + Math.cos(a) * r} y2={cy + Math.sin(a) * r}
+          stroke="rgba(255,255,255,0.06)" strokeWidth="0.5" />
+      ))}
+      <motion.polygon points={dataStr}
+        fill={`${TEAL}14`} stroke={TEAL} strokeWidth="1.5"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7 }}
+        style={{ filter: `drop-shadow(0 0 8px ${TEAL}30)` }} />
+      {pcts.map((p, i) => {
+        const d = (p / 100) * r
+        return <motion.circle key={i} cx={cx + Math.cos(angles[i]) * d} cy={cy + Math.sin(angles[i]) * d}
+          r={3.5} fill={colors[i]} initial={{ r: 0 }} animate={{ r: 3.5 }} transition={{ delay: i * 0.06 }}
+          style={{ filter: `drop-shadow(0 0 4px ${colors[i]})` }} />
+      })}
+      {angles.map((a, i) => (
+        <text key={i} x={cx + Math.cos(a) * (r + 16)} y={cy + Math.sin(a) * (r + 16)}
+          textAnchor="middle" dominantBaseline="middle"
+          fill={colors[i]} fontSize="8" fontFamily="monospace" fontWeight="bold" opacity="0.65">
+          {labels[i]}
+        </text>
+      ))}
+    </svg>
+  )
+}
+
+// ─── Sparkline ────────────────────────────────────────────────────────────────
+function Sparkline({ data, color, sw = 80, sh = 28 }: { data: number[]; color: string; sw?: number; sh?: number }) {
+  if (data.length < 2) return <div style={{ width: sw, height: sh }} />
+  const min = Math.min(...data), max = Math.max(...data), range = max - min || 1
+  const pts = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * (sw - 4) + 2
+    const y = sh - 2 - ((v - min) / range) * (sh - 8)
+    return `${x},${y}`
+  })
+  const last = pts[pts.length - 1].split(',')
+  return (
+    <svg width={sw} height={sh}>
+      <polyline points={pts.join(' ')} fill="none" stroke={color} strokeWidth="1.5"
+        strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx={last[0]} cy={last[1]} r={2.5} fill={color} />
+    </svg>
+  )
+}
+
 // ─── Dim panel inputs ─────────────────────────────────────────────────────────
 function DimPanel({ id, s, update }: { id: number; s: PesState; update: (p: Partial<PesState>) => void }) {
   const c = DIM_COLORS[id]
@@ -583,12 +650,16 @@ function getDimIaQ(id: number, s: PesState): string[] {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function PessoasLideranca() {
   const { data: s, update } = useWorkspaceData<PesState>('pessoas-lideranca', DEFAULT)
+  const { data: snapStore, update: updateSnapStore } = useWorkspaceData<SnapStore>('pessoas-snaps', { snaps: [] })
+  const { data: teamStore, update: updateTeamStore } = useWorkspaceData<TeamStore>('pessoas-team', { liderados: [] })
   const [activeCard, setActiveCard] = useState<number | null>(null)
   const [iaLoading, setIaLoading] = useState(false)
   const [iaAnswer, setIaAnswer] = useState('')
   const [dimIaLoading, setDimIaLoading] = useState<number | null>(null)
   const [dimIaAnswers, setDimIaAnswers] = useState<Record<number, string>>({})
   const [showClear, setShowClear] = useState(false)
+  const [presentMode, setPresentMode] = useState(false)
+  const [activeTab, setActiveTab] = useState<'individual' | 'time'>('individual')
 
   // Cross-module context
   const { data: cockpit } = useWorkspaceData<typeof COCKPIT_ZERO>('cockpit', COCKPIT_ZERO)
@@ -615,6 +686,28 @@ export default function PessoasLideranca() {
   const overallColor = index6D >= 70 ? TEAL : index6D >= 45 ? AMBER : RED
   const lowestId = pcts.indexOf(Math.min(...pcts))
   const d6Low = rawDims[5] < 8
+
+  // Snap + team derived
+  const snaps = snapStore.snaps ?? []
+  const liderados = teamStore.liderados ?? []
+  const lastSnap = snaps.length > 0 ? snaps[snaps.length - 1] : null
+
+  // Auto-snapshot: save when index changes ≥5 pts (debounced 2s)
+  const snapsRef = useRef(snaps)
+  const rawDimsRef = useRef(rawDims)
+  snapsRef.current = snaps
+  rawDimsRef.current = rawDims
+  useEffect(() => {
+    if (index6D === 0) return
+    const t = setTimeout(() => {
+      const cur = snapsRef.current
+      const last = cur.length > 0 ? cur[cur.length - 1].index6D : -99
+      if (Math.abs(index6D - last) < 5) return
+      updateSnapStore({ snaps: [...cur.slice(-11), { date: new Date().toISOString(), index6D, dims: [...rawDimsRef.current] }] })
+    }, 2000)
+    return () => clearTimeout(t)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index6D])
 
   // Cross-module risk signals
   const riskSignals: { level: 'critical' | 'warn' | 'ok'; msg: string }[] = []
@@ -702,6 +795,145 @@ export default function PessoasLideranca() {
     return { level: 'info', msg: `Dimensão mais fraca: ${DIMS[lowestId].label} (${pcts[lowestId]}%). Melhorar este ponto tem o maior impacto no índice agora.` }
   })()
 
+  // ── Presentation Mode ──────────────────────────────────────────────────────
+  if (presentMode) return (
+    <div className="flex flex-col gap-4 pb-8">
+
+      {/* Header compact */}
+      <div className="flex items-center justify-between px-1 pt-1">
+        <div className="flex items-center gap-3">
+          <div>
+            <p className="text-[8.5px] font-mono tracking-wider text-white/18 uppercase">Neural Leadership OS</p>
+            <div className="flex items-center gap-2 mt-0.5">
+              <motion.span key={index6D} initial={{ scale: 0.8 }} animate={{ scale: 1 }}
+                className="text-[36px] font-black font-mono leading-none" style={{ color: overallColor, textShadow: `0 0 20px ${overallColor}50` }}>
+                {index6D}
+              </motion.span>
+              <div className="flex flex-col">
+                <span className="text-[9px] font-mono text-white/25">/100 · Índice 6D</span>
+                {lastSnap && Math.abs(index6D - lastSnap.index6D) > 0 && (
+                  <span className="text-[10px] font-mono font-bold" style={{ color: index6D >= lastSnap.index6D ? TEAL : RED }}>
+                    {index6D >= lastSnap.index6D ? '▲' : '▼'}{Math.abs(index6D - lastSnap.index6D)} pts
+                  </span>
+                )}
+              </div>
+              {snaps.length >= 2 && <Sparkline data={snaps.map(s => s.index6D)} color={overallColor} sw={72} sh={30} />}
+            </div>
+          </div>
+        </div>
+        <button onClick={() => setPresentMode(false)}
+          className="text-[9px] font-mono text-white/30 px-2.5 py-1.5 rounded-lg transition-colors"
+          style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+          ← editar
+        </button>
+      </div>
+
+      {/* Hex Radar */}
+      <div className="rounded-2xl pt-3 pb-1" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <HexRadar pcts={pcts} colors={DIM_COLORS} />
+        <p className="text-[8.5px] font-mono text-white/15 text-center pb-3">
+          Score = (D1+D2+D3+D4+D5) × D6<sub className="text-[7px]">mult</sub> + Bônus
+        </p>
+      </div>
+
+      {/* 6D Cards read-only */}
+      <div className="grid grid-cols-2 gap-2">
+        {DIMS.map(d => {
+          const pct = pcts[d.id]
+          const prevDim = lastSnap ? Math.round((lastSnap.dims[d.id] / 20) * 100) : null
+          const delta = prevDim !== null ? pct - prevDim : null
+          return (
+            <div key={d.id} className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="flex items-center gap-3">
+                <div className="relative shrink-0">
+                  <ArcGauge pct={pct} color={d.color} size={48} />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-[11px] font-black font-mono" style={{ color: d.color }}>{pct}</span>
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[9px] font-mono" style={{ color: d.color, opacity: 0.6 }}>{d.code}</p>
+                  <p className="text-[12px] font-bold text-white/70 leading-tight">{d.label}</p>
+                  {delta !== null && delta !== 0 && (
+                    <span className="text-[9px] font-mono font-bold" style={{ color: delta > 0 ? TEAL : RED }}>
+                      {delta > 0 ? '+' : ''}{delta} pts
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Risk signals compact */}
+      {riskSignals.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          {riskSignals.slice(0, 4).map((r, i) => (
+            <div key={i} className="flex items-start gap-2 rounded-lg px-3 py-2"
+              style={{ background: r.level === 'critical' ? `${RED}0c` : `${AMBER}0c`, border: `1px solid ${r.level === 'critical' ? RED : AMBER}25` }}>
+              <AlertTriangle size={10} style={{ color: r.level === 'critical' ? RED : AMBER, marginTop: 2, flexShrink: 0 }} />
+              <p className="text-[10px] leading-relaxed" style={{ color: r.level === 'critical' ? RED : 'rgba(255,255,255,0.4)' }}>{r.msg}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Snapshot timeline */}
+      {snaps.length > 1 && (
+        <div className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <p className="text-[8.5px] font-mono text-white/20 uppercase tracking-widest mb-3">Histórico de Snapshots</p>
+          <div className="flex flex-col gap-1.5">
+            {[...snaps].reverse().slice(0, 10).map((snap, i) => {
+              const d = new Date(snap.date)
+              const label = `${d.getDate()}/${d.getMonth() + 1} ${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`
+              const c = snap.index6D >= 70 ? TEAL : snap.index6D >= 45 ? AMBER : RED
+              return (
+                <div key={i} className="flex items-center gap-2.5">
+                  <span className="text-[8px] font-mono text-white/18 w-20 shrink-0">{label}</span>
+                  <div className="flex-1 h-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    <motion.div className="h-full rounded-full"
+                      initial={{ width: 0 }} animate={{ width: `${snap.index6D}%` }} transition={{ duration: 0.5, delay: i * 0.04 }}
+                      style={{ background: c }} />
+                  </div>
+                  <span className="text-[10px] font-mono font-black w-6 text-right" style={{ color: c }}>{snap.index6D}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Team in presentation mode */}
+      {liderados.filter(l => l.nome.trim()).length > 0 && (
+        <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="px-3 py-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <p className="text-[9px] font-mono text-white/20 uppercase tracking-widest">Time · Scores 6D</p>
+          </div>
+          {liderados.filter(l => l.nome.trim()).map((l, li) => {
+            const lScore = calcIndex6D(l.scores, 0)
+            const lColor = lScore >= 70 ? TEAL : lScore >= 45 ? AMBER : RED
+            return (
+              <div key={l.id} className="flex items-center gap-3 px-3 py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                <p className="text-[11px] text-white/55 font-semibold w-24 shrink-0 truncate">{l.nome}</p>
+                <div className="flex-1 flex gap-1">
+                  {l.scores.map((sc, si) => (
+                    <div key={si} className="flex-1 text-center">
+                      <div className="h-1 rounded-full mb-0.5" style={{ background: `${DIM_COLORS[si]}${Math.round((sc / 20) * 255).toString(16).padStart(2, '0')}` }} />
+                      <span className="text-[8px] font-mono" style={{ color: DIM_COLORS[si], opacity: 0.6 }}>{Math.round((sc / 20) * 100)}</span>
+                    </div>
+                  ))}
+                </div>
+                <span className="text-[13px] font-black font-mono w-8 text-right shrink-0" style={{ color: lColor }}>{lScore}</span>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+    </div>
+  )
+
   return (
     <div className="flex flex-col gap-5 pb-8">
 
@@ -733,11 +965,16 @@ export default function PessoasLideranca() {
               </motion.div>
             )}
           </AnimatePresence>
+          <button onClick={() => setPresentMode(true)}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-mono font-bold transition-all"
+            style={{ border: `1px solid rgba(255,255,255,0.12)`, background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.45)' }}>
+            ▶ apresentar
+          </button>
           <motion.div animate={{ opacity: [0.6, 1, 0.6] }} transition={{ duration: 2.4, repeat: Infinity }}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-full"
             style={{ border: `1px solid ${TEAL}45`, background: `${TEAL}0a` }}>
             <div className="w-1.5 h-1.5 rounded-full" style={{ background: TEAL, boxShadow: `0 0 6px ${TEAL}` }} />
-            <span className="text-[9px] font-mono font-bold" style={{ color: TEAL }}>SISTEMA ATIVO</span>
+            <span className="text-[9px] font-mono font-bold" style={{ color: TEAL }}>ATIVO</span>
           </motion.div>
         </div>
       </div>
@@ -807,7 +1044,82 @@ export default function PessoasLideranca() {
         </div>
       )}
 
-      {/* ── Energy Orb + particles ── */}
+      {/* ── Tab toggle: Individual / Time ── */}
+      <div className="flex gap-1.5">
+        {(['individual', 'time'] as const).map(tab => (
+          <button key={tab} onClick={() => setActiveTab(tab)}
+            className="flex-1 py-2 rounded-xl text-[11px] font-bold font-mono transition-all"
+            style={{ background: activeTab === tab ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.2)', border: `1px solid ${activeTab === tab ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.05)'}`, color: activeTab === tab ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)' }}>
+            {tab === 'individual' ? 'Individual' : 'Time'}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Team Table ── */}
+      {activeTab === 'time' && (
+        <div>
+          <div className="flex items-center justify-between px-1 mb-3">
+            <p className="text-[14px] font-black text-white/70">Tabela do Time</p>
+            <button onClick={() => updateTeamStore({ liderados: [...liderados, { id: Date.now().toString(), nome: '', scores: [0, 0, 0, 0, 0, 0] }] })}
+              className="text-[10px] font-mono px-2.5 py-1 rounded-lg transition-all"
+              style={{ background: `${TEAL}15`, color: TEAL, border: `1px solid ${TEAL}30` }}>
+              + liderado
+            </button>
+          </div>
+          <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            {/* Header row */}
+            <div className="grid items-center px-3 py-2" style={{ gridTemplateColumns: '1fr repeat(6, 36px) 44px 20px', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+              <p className="text-[8px] font-mono text-white/20 uppercase">Nome</p>
+              {DIMS.map(d => <p key={d.id} className="text-[8px] font-mono text-center uppercase" style={{ color: d.color, opacity: 0.5 }}>{d.code}</p>)}
+              <p className="text-[8px] font-mono text-white/20 uppercase text-center">6D</p>
+              <div />
+            </div>
+            {liderados.length === 0 && (
+              <p className="text-[10px] text-white/18 text-center py-5 font-mono">Clique em + liderado para adicionar</p>
+            )}
+            {liderados.map((l, li) => {
+              const lScore = calcIndex6D(l.scores, 0)
+              const lColor = lScore >= 70 ? TEAL : lScore >= 45 ? AMBER : RED
+              return (
+                <div key={l.id} className="grid items-center px-3 py-2" style={{ gridTemplateColumns: '1fr repeat(6, 36px) 44px 20px', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                  <input value={l.nome} onChange={e => { const u = [...liderados]; u[li] = { ...l, nome: e.target.value }; updateTeamStore({ liderados: u }) }}
+                    placeholder="nome..." className="text-[11px] bg-transparent outline-none font-mono text-white/55 min-w-0"
+                    style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }} />
+                  {l.scores.map((sc, si) => (
+                    <input key={si} type="number" min={0} max={20} value={sc || ''}
+                      onChange={e => { const v = Math.min(20, Math.max(0, parseInt(e.target.value) || 0)); const u = [...liderados]; u[li] = { ...l, scores: l.scores.map((x, i) => i === si ? v : x) }; updateTeamStore({ liderados: u }) }}
+                      className="w-full text-center text-[10px] font-mono font-bold bg-transparent outline-none rounded py-0.5"
+                      style={{ color: DIM_COLORS[si], border: `1px solid ${DIM_COLORS[si]}20` }} />
+                  ))}
+                  <span className="text-[13px] font-black font-mono text-center" style={{ color: lColor }}>{lScore > 0 ? lScore : '—'}</span>
+                  <button onClick={() => updateTeamStore({ liderados: liderados.filter((_, i) => i !== li) })}
+                    className="text-[11px] text-white/15 hover:text-red-400 transition-colors text-center">×</button>
+                </div>
+              )
+            })}
+          </div>
+          {liderados.length > 1 && (
+            <div className="mt-2 rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <p className="text-[8.5px] font-mono text-white/18 uppercase tracking-widest mb-2">Distribuição do time</p>
+              {DIMS.map(d => {
+                const avg = Math.round(liderados.reduce((acc, l) => acc + l.scores[d.id], 0) / liderados.length / 20 * 100)
+                return (
+                  <div key={d.id} className="flex items-center gap-2 mb-1.5">
+                    <span className="text-[8.5px] font-mono w-6 shrink-0" style={{ color: d.color, opacity: 0.6 }}>{d.code}</span>
+                    <div className="flex-1 h-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                      <motion.div className="h-full rounded-full" animate={{ width: `${avg}%` }} transition={{ duration: 0.5 }} style={{ background: d.color }} />
+                    </div>
+                    <span className="text-[9px] font-mono w-7 text-right" style={{ color: d.color, opacity: 0.7 }}>{avg}%</span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Individual content ── */}
+      {activeTab === 'individual' && (<>
       <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="pt-5 pb-3 flex flex-col items-center gap-1">
           <EnergyOrb score={index6D} d6mult={d6mult} />
@@ -1087,6 +1399,7 @@ export default function PessoasLideranca() {
           )}
         </div>
       </div>
+      </>)}
 
     </div>
   )
