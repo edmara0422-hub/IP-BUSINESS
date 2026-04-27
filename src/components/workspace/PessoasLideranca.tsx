@@ -337,6 +337,12 @@ function DimPanel({ id, s, update }: { id: number; s: PesState; update: (p: Part
   )
 }
 
+// ─── Cross-module type stubs (minimal — only fields we read) ─────────────────
+interface OKR { objetivo: string; krs: { texto: string; pct: number }[] }
+const COCKPIT_ZERO = { receita: 0, despesas: 0, caixa: 0, clientesAtivos: 0 }
+const ADMIN_ZERO = { faseEmpresa: 0, norteStar: '', cultura: '', okrs: [] as OKR[] }
+const FASE_LABELS = ['Infra', 'Processo', 'Estratégia', 'Digitização', 'Transformação', 'Nativa']
+
 // ─── IA questions per dimension ───────────────────────────────────────────────
 const DIM_IA_Q: Record<number, string[]> = {
   0: ['Como definir uma meta de equipe eficaz?', 'O que torna um KPI realmente acionável?', 'Minha meta está clara o suficiente?'],
@@ -356,19 +362,57 @@ export default function PessoasLideranca() {
   const [dimIaLoading, setDimIaLoading] = useState<number | null>(null)
   const [dimIaAnswers, setDimIaAnswers] = useState<Record<number, string>>({})
 
+  // Cross-module context
+  const { data: cockpit } = useWorkspaceData<typeof COCKPIT_ZERO>('cockpit', COCKPIT_ZERO)
+  const { data: admin } = useWorkspaceData<typeof ADMIN_ZERO>('admin-cockpit', ADMIN_ZERO)
+
+  // Business derived signals
+  const runway   = cockpit.despesas > 0 ? Math.round(cockpit.caixa / cockpit.despesas) : 99
+  const margem   = cockpit.receita > 0 ? Math.round(((cockpit.receita - cockpit.despesas) / cockpit.receita) * 100) : 0
+  const hasFinanceiro = cockpit.receita > 0
+  const okrs     = (admin.okrs ?? []).filter(o => o.objetivo.trim())
+  const okrAvgPct = okrs.length > 0
+    ? Math.round(okrs.reduce((acc, o) => acc + (o.krs.reduce((a, k) => a + (k.pct ?? 0), 0) / Math.max(1, o.krs.length)), 0) / okrs.length)
+    : 0
+  const faseLabel = FASE_LABELS[admin.faseEmpresa] ?? 'Fase ?'
+  const daysSince1a1 = s.pesUltimo1a1
+    ? Math.floor((Date.now() - new Date(s.pesUltimo1a1).getTime()) / 86400000)
+    : null
+
   const rawDims = calcRawDims(s)
   const practicedCount = (s.pesDig ?? []).filter(Boolean).length
   const index6D = calcIndex6D(rawDims, practicedCount)
   const d6mult = 0.5 + (rawDims[5] / 20) * 1.0
-  const pcts = rawDims.map(d => Math.round((d / 20) * 100)) // normalize to 0–100% for display
+  const pcts = rawDims.map(d => Math.round((d / 20) * 100))
   const overallColor = index6D >= 70 ? TEAL : index6D >= 45 ? AMBER : RED
   const lowestId = pcts.indexOf(Math.min(...pcts))
   const d6Low = rawDims[5] < 8
 
+  // Cross-module risk signals
+  const riskSignals: { level: 'critical' | 'warn' | 'ok'; msg: string }[] = []
+  if (hasFinanceiro && runway < 3 && pcts[1] < 50)
+    riskSignals.push({ level: 'critical', msg: `Runway em ${runway} mês${runway === 1 ? '' : 'es'} + D2 (Diálogo) em ${pcts[1]}% — equipe sem informação em crise financeira. Faça 1:1 de contexto esta semana.` })
+  if (hasFinanceiro && runway < 6 && d6Low)
+    riskSignals.push({ level: 'warn', msg: `Caixa curto (${runway}m) + cultura fraca (D6 ${pcts[5]}%) = combinação de alto risco de churn de talentos.` })
+  if (daysSince1a1 !== null && daysSince1a1 > 21 && pcts[4] < 50)
+    riskSignals.push({ level: 'critical', msg: `${daysSince1a1} dias sem 1:1 + performance abaixo do esperado (D5 ${pcts[4]}%). Sem diálogo não há liderança.` })
+  if (okrs.length > 0 && okrAvgPct < 20 && pcts[0] < 40)
+    riskSignals.push({ level: 'warn', msg: `OKRs em ${okrAvgPct}% de progresso + D1 (Direção) em ${pcts[0]}% — equipe sem clareza de onde estamos indo.` })
+  if (margem > 0 && margem < 15 && pcts[4] < 60)
+    riskSignals.push({ level: 'warn', msg: `Margem apertada (${margem}%) com performance abaixo (D5 ${pcts[4]}%) — o negócio precisa de resultado agora.` })
+
   async function askCoach(q: string) {
     setIaLoading(true); setIaAnswer('')
     try {
-      const ctx = `Índice 6D: ${index6D}/100 | Multiplicador D6: ×${d6mult.toFixed(2)} | D1=${pcts[0]} D2=${pcts[1]} D3=${pcts[2]} D4=${pcts[3]} D5=${pcts[4]} D6=${pcts[5]} | ${practicedCount}/5 princípios praticados | Liderados: ${s.pesLiderados || '?'} | Meta: ${s.pesMetaEquipe || 'não definida'}`
+      const ctx = [
+        `Índice 6D: ${index6D}/100 | D1=${pcts[0]} D2=${pcts[1]} D3=${pcts[2]} D4=${pcts[3]} D5=${pcts[4]} D6=${pcts[5]} (×${d6mult.toFixed(2)})`,
+        `Liderados: ${s.pesLiderados || '?'} | Fase empresa: ${faseLabel} | ${practicedCount}/5 princípios do Manifesto praticados`,
+        hasFinanceiro ? `Receita: R$${cockpit.receita.toLocaleString('pt-BR')} | Runway: ${runway === 99 ? '∞' : runway + 'm'} | Margem: ${margem}%` : 'Dados financeiros: não preenchidos',
+        okrs.length > 0 ? `OKRs (${okrs.length}): progresso médio ${okrAvgPct}% | ${okrs.map(o => o.objetivo).join('; ')}` : 'OKRs: não definidos',
+        admin.norteStar ? `Norte Estr.: "${admin.norteStar.slice(0, 120)}"` : '',
+        `Meta equipe: ${s.pesMetaEquipe || 'não definida'} | Gap: ${s.pesGapHabilidade || 'não mapeado'}`,
+        daysSince1a1 !== null ? `Último 1:1: ${daysSince1a1} dias atrás` : 'Último 1:1: nunca registrado',
+      ].filter(Boolean).join(' | ')
       const res = await fetch('/api/advisor-chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: q, marketContext: ctx, role: 'lider' }),
@@ -417,6 +461,71 @@ export default function PessoasLideranca() {
           <span className="text-[9px] font-mono font-bold" style={{ color: TEAL }}>SISTEMA ATIVO</span>
         </motion.div>
       </div>
+
+      {/* ── Intelligence Strip — dados cruzados de outros módulos ── */}
+      <div className="grid grid-cols-2 gap-2">
+        {/* Runway */}
+        <div className="rounded-xl px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <p className="text-[8.5px] font-mono text-white/20 uppercase tracking-wider mb-1">Runway</p>
+          <div className="flex items-end gap-1">
+            <span className="text-[20px] font-black font-mono leading-none"
+              style={{ color: !hasFinanceiro ? 'rgba(255,255,255,0.15)' : runway < 3 ? RED : runway < 6 ? AMBER : TEAL }}>
+              {!hasFinanceiro ? '—' : runway === 99 ? '∞' : runway}
+            </span>
+            {hasFinanceiro && runway !== 99 && <span className="text-[10px] text-white/25 pb-0.5 font-mono">m</span>}
+          </div>
+          <p className="text-[9px] text-white/20 mt-0.5">{!hasFinanceiro ? 'Preencha o Cockpit' : runway < 3 ? 'CRÍTICO' : runway < 6 ? 'atenção' : 'saudável'}</p>
+        </div>
+
+        {/* Margem */}
+        <div className="rounded-xl px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <p className="text-[8.5px] font-mono text-white/20 uppercase tracking-wider mb-1">Margem</p>
+          <div className="flex items-end gap-1">
+            <span className="text-[20px] font-black font-mono leading-none"
+              style={{ color: !hasFinanceiro ? 'rgba(255,255,255,0.15)' : margem < 10 ? RED : margem < 25 ? AMBER : TEAL }}>
+              {!hasFinanceiro ? '—' : margem}
+            </span>
+            {hasFinanceiro && <span className="text-[10px] text-white/25 pb-0.5 font-mono">%</span>}
+          </div>
+          <p className="text-[9px] text-white/20 mt-0.5">{!hasFinanceiro ? 'Preencha o Cockpit' : margem < 10 ? 'pressão alta' : 'operacional'}</p>
+        </div>
+
+        {/* OKR Progress */}
+        <div className="rounded-xl px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <p className="text-[8.5px] font-mono text-white/20 uppercase tracking-wider mb-1">OKRs</p>
+          <div className="flex items-end gap-1">
+            <span className="text-[20px] font-black font-mono leading-none"
+              style={{ color: okrs.length === 0 ? 'rgba(255,255,255,0.15)' : okrAvgPct < 30 ? RED : okrAvgPct < 70 ? AMBER : TEAL }}>
+              {okrs.length === 0 ? '—' : okrAvgPct}
+            </span>
+            {okrs.length > 0 && <span className="text-[10px] text-white/25 pb-0.5 font-mono">%</span>}
+          </div>
+          <p className="text-[9px] text-white/20 mt-0.5">{okrs.length === 0 ? 'Defina OKRs no Painel' : `${okrs.length} objetivo${okrs.length > 1 ? 's' : ''}`}</p>
+        </div>
+
+        {/* Fase + 1:1 */}
+        <div className="rounded-xl px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <p className="text-[8.5px] font-mono text-white/20 uppercase tracking-wider mb-1">Fase · 1:1</p>
+          <p className="text-[13px] font-black text-white/60 leading-none">{faseLabel}</p>
+          <p className="text-[9px] mt-1" style={{ color: daysSince1a1 === null ? 'rgba(255,255,255,0.2)' : daysSince1a1 > 14 ? RED : daysSince1a1 > 7 ? AMBER : TEAL }}>
+            {daysSince1a1 === null ? '1:1 nunca registrado' : daysSince1a1 === 0 ? '1:1 hoje' : `1:1 ${daysSince1a1}d atrás`}
+          </p>
+        </div>
+      </div>
+
+      {/* Risk signals cross-module */}
+      {riskSignals.length > 0 && (
+        <div className="flex flex-col gap-2">
+          {riskSignals.map((r, i) => (
+            <motion.div key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
+              className="flex items-start gap-2.5 rounded-xl px-3 py-2.5"
+              style={{ background: r.level === 'critical' ? `${RED}0c` : `${AMBER}0c`, border: `1px solid ${r.level === 'critical' ? RED : AMBER}30` }}>
+              <AlertTriangle size={12} style={{ color: r.level === 'critical' ? RED : AMBER, marginTop: 1.5, flexShrink: 0 }} />
+              <p className="text-[10.5px] leading-relaxed" style={{ color: r.level === 'critical' ? RED : 'rgba(255,255,255,0.45)' }}>{r.msg}</p>
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       {/* ── Energy Orb + particles ── */}
       <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -634,6 +743,46 @@ export default function PessoasLideranca() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* ════════════════════════════════════
+          OKR ALIGNMENT
+          ════════════════════════════════════ */}
+      {okrs.length > 0 && (
+        <div>
+          <div className="px-1 mb-3">
+            <p className="text-[9px] font-mono tracking-[0.25em] text-white/18 uppercase mb-1">Alinhamento</p>
+            <p className="text-[14px] font-black text-white/70">OKRs do Negócio</p>
+          </div>
+          {okrs.map((okr, oi) => {
+            const avg = Math.round(okr.krs.reduce((a, k) => a + (k.pct ?? 0), 0) / Math.max(1, okr.krs.length))
+            const c = avg >= 70 ? TEAL : avg >= 30 ? AMBER : RED
+            return (
+              <div key={oi} className="rounded-xl p-3 mb-2"
+                style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[11px] font-bold text-white/65 flex-1 pr-2">{okr.objetivo}</p>
+                  <span className="text-[13px] font-black font-mono shrink-0" style={{ color: c }}>{avg}%</span>
+                </div>
+                {okr.krs.filter(k => k.texto.trim()).map((kr, ki) => (
+                  <div key={ki} className="mb-1.5">
+                    <div className="flex justify-between mb-0.5">
+                      <p className="text-[9.5px] text-white/30 truncate flex-1 pr-2">{kr.texto}</p>
+                      <p className="text-[9.5px] font-mono text-white/30 shrink-0">{kr.pct}%</p>
+                    </div>
+                    <div className="h-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                      <motion.div className="h-full rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${kr.pct}%` }}
+                        transition={{ duration: 0.6, delay: ki * 0.08 }}
+                        style={{ background: c }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       {/* ════════════════════════════════════
           AI TERMINAL
