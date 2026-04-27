@@ -55,43 +55,104 @@ const MANIFESTO = [
   },
 ]
 
+// ─── Maturity levels — Situational Leadership ────────────────────────────────
+const MATURITY = [
+  { id: 1, label: 'M1', title: 'Iniciante entusiasmado',
+    sub: 'Baixa competência · Alto entusiasmo',
+    script: 'E1 — Direcionar: dê instruções específicas, supervisione de perto, explique o "como" e o "porquê".' },
+  { id: 2, label: 'M2', title: 'Aprendiz desapontado',
+    sub: 'Alguma competência · Comprometimento variável',
+    script: 'E2 — Treinar: continue instruindo com mais explicações, peça opiniões, reforce o progresso visível.' },
+  { id: 3, label: 'M3', title: 'Capaz relutante',
+    sub: 'Boa competência · Confiança variável',
+    script: 'E3 — Apoiar: encoraje, ouça ativamente, colabore nas decisões, demonstre confiança na capacidade.' },
+  { id: 4, label: 'M4', title: 'Especialista autônomo',
+    sub: 'Alta competência · Alto comprometimento',
+    script: 'E4 — Delegar: transfira responsabilidade, monitore resultados (não o processo), celebre autonomia.' },
+]
+
+// ─── Sentiment analysis — client-side ────────────────────────────────────────
+const WEAK_WORDS = ['tentar', 'tentarei', 'vou tentar', 'difícil', 'talvez', 'pode ser', 'veremos', 'não sei', 'depende', 'verei', 'devo tentar', 'quero tentar', 'provavelmente não', 'complicado']
+
+function analyzeSentiment(text: string): { score: number; weakWords: string[]; label: string; color: string } {
+  if (!text.trim()) return { score: 0, weakWords: [], label: '', color: 'rgba(255,255,255,0.2)' }
+  const lower = text.toLowerCase()
+  const found = WEAK_WORDS.filter(w => lower.includes(w))
+  const score = Math.max(0, Math.min(10, 10 - found.length * 1.8))
+  const label = score >= 8 ? 'alto comprometimento' : score >= 5 ? 'comprometimento moderado' : 'risco de não cumprimento'
+  const color = score >= 8 ? TEAL : score >= 5 ? AMBER : RED
+  return { score, weakWords: found, label, color }
+}
+
 // ─── State ───────────────────────────────────────────────────────────────────
 interface PesState {
   pesLiderados: number
   pesMetaEquipe: string; pesKpiEquipe: string
+  pesNotaLider: number; pesNotaLiderado: number
   pesUltimo1a1: string; pesAcordos: string
   pesGapHabilidade: string; pesPlanoDev: string
+  pesMaturidade: number
   pesRituais: boolean[]
+  pesBloqueios: string; pesDesbloqueioHoras: number
   pesPerfScore: number; pesReconhecimento: boolean; pesReflexao: string
+  pesNpsUtilidade: number
   pesDig: boolean[]
 }
 
 const DEFAULT: PesState = {
   pesLiderados: 0, pesMetaEquipe: '', pesKpiEquipe: '',
+  pesNotaLider: 0, pesNotaLiderado: 0,
   pesUltimo1a1: '', pesAcordos: '',
   pesGapHabilidade: '', pesPlanoDev: '',
+  pesMaturidade: 0,
   pesRituais: [false, false, false],
+  pesBloqueios: '', pesDesbloqueioHoras: 0,
   pesPerfScore: 0, pesReconhecimento: false, pesReflexao: '',
+  pesNpsUtilidade: 0,
   pesDig: [false, false, false, false, false],
 }
 
-// ─── Vector score engine (D6 multiplies D1–D5) ───────────────────────────────
-// Each raw D: 0–20 pts — mirrors the Python/FastAPI model
+// ─── Vector score engine ──────────────────────────────────────────────────────
 function calcRawDims(s: PesState): number[] {
-  const d1 = (s.pesMetaEquipe.trim() ? 10 : 0) + (s.pesKpiEquipe.trim() ? 10 : 0)
+  // D1 — meta + KPI + alinhamento de expectativa (score de vetor)
+  const metaScore  = s.pesMetaEquipe.trim() ? 7 : 0
+  const kpiScore   = s.pesKpiEquipe.trim() ? 7 : 0
+  const hasAlign   = s.pesNotaLider > 0 && s.pesNotaLiderado > 0
+  const alignGap   = hasAlign ? Math.abs(s.pesNotaLider - s.pesNotaLiderado) : 5
+  const avgNota    = hasAlign ? (s.pesNotaLider + s.pesNotaLiderado) / 2 : 0
+  const alignScore = hasAlign ? Math.max(0, (avgNota / 10) * 6 - alignGap * 0.8) : 0
+  const d1 = Math.min(20, metaScore + kpiScore + alignScore)
 
+  // D2 — frequência 1:1 + sentiment analysis dos acordos
   let d2date = 0
   if (s.pesUltimo1a1) {
     const diff = Math.floor((Date.now() - new Date(s.pesUltimo1a1).getTime()) / 86400000)
     d2date = diff <= 7 ? 10 : diff <= 14 ? 6 : 2
   }
-  const d2 = Math.min(20, d2date + (s.pesAcordos.trim() ? 10 : 0))
+  const sent = analyzeSentiment(s.pesAcordos)
+  const d2 = Math.min(20, d2date + (s.pesAcordos.trim() ? Math.round(sent.score) : 0))
 
-  const d3 = (s.pesGapHabilidade.trim() ? 10 : 0) + (s.pesPlanoDev.trim() ? 10 : 0)
-  const d4 = Math.round((s.pesRituais.filter(Boolean).length / 3) * 20)
+  // D3 — gap + plano + adequação de maturidade M1-M4
+  const gapScore   = s.pesGapHabilidade.trim() ? 7 : 0
+  const planoScore = s.pesPlanoDev.trim() ? 7 : 0
+  const matScore   = s.pesMaturidade > 0 && s.pesGapHabilidade.trim()
+    ? ([0, 2, 4, 5, 6][s.pesMaturidade] ?? 0) : 0
+  const d3 = Math.min(20, gapScore + planoScore + matScore)
 
-  const perfMap = [0, 5, 11, 16, 20]
-  const d5 = Math.min(20, (perfMap[s.pesPerfScore] ?? 0) + (s.pesReconhecimento && s.pesPerfScore > 0 ? 4 : 0))
+  // D4 — rituais + velocidade de desbloqueio
+  const rituaisScore = Math.round((s.pesRituais.filter(Boolean).length / 3) * 12)
+  let velocityScore = 0
+  if (s.pesBloqueios.trim() && s.pesDesbloqueioHoras > 0) {
+    velocityScore = s.pesDesbloqueioHoras <= 24 ? 8
+      : s.pesDesbloqueioHoras <= 72 ? 5
+      : s.pesDesbloqueioHoras <= 168 ? 2 : 0
+  }
+  const d4 = Math.min(20, rituaisScore + velocityScore)
+
+  // D5 — NPS interno de utilidade + reconhecimento
+  const npsScore   = s.pesNpsUtilidade > 0 ? Math.round((s.pesNpsUtilidade / 10) * 16) : 0
+  const reconScore = s.pesReconhecimento && s.pesNpsUtilidade > 5 ? 4 : s.pesReconhecimento ? 2 : 0
+  const d5 = Math.min(20, npsScore + reconScore)
 
   const practiced = (s.pesDig ?? []).filter(Boolean).length
   const d6 = Math.round((practiced / 5) * 20)
@@ -101,9 +162,9 @@ function calcRawDims(s: PesState): number[] {
 
 function calcIndex6D(dims: number[], practicedCount: number): number {
   const [d1, d2, d3, d4, d5, d6] = dims
-  const base = d1 + d2 + d3 + d4 + d5              // 0–100
-  const mult = 0.5 + (d6 / 20) * 1.0               // interp [0,20] → [0.5, 1.5]
-  const bonus = (practicedCount / 5) * 10           // up to +10
+  const base  = d1 + d2 + d3 + d4 + d5
+  const mult  = 0.5 + (d6 / 20) * 1.0
+  const bonus = (practicedCount / 5) * 10
   return Math.min(100, Math.round(base * mult + bonus))
 }
 
@@ -224,99 +285,238 @@ function DimPanel({ id, s, update }: { id: number; s: PesState; update: (p: Part
   const inpStyle = { background: 'rgba(0,0,0,0.4)', border: `1px solid ${c}25`, color: 'rgba(255,255,255,0.8)' }
   const ta = `${inp} resize-none`
 
-  if (id === 0) return (
-    <div className="flex flex-col gap-3">
-      <div><p className="text-[10px] text-white/30 mb-1.5">Meta da equipe para o trimestre</p>
-        <input value={s.pesMetaEquipe} onChange={e => update({ pesMetaEquipe: e.target.value })}
-          placeholder="Ex: Fechar 10 contratos até 30/06" className={inp} style={inpStyle} /></div>
-      <div><p className="text-[10px] text-white/30 mb-1.5">KPI principal — como medir?</p>
-        <input value={s.pesKpiEquipe} onChange={e => update({ pesKpiEquipe: e.target.value })}
-          placeholder="Ex: Conversão ≥ 25% | NPS ≥ 70" className={inp} style={inpStyle} /></div>
-      {!s.pesMetaEquipe && <p className="text-[11px] px-3 py-2 rounded-lg" style={{ background: `${c}08`, border: `1px solid ${c}20`, color: c }}>Sem meta clara não há liderança — há apenas gerenciamento de agenda.</p>}
-    </div>
-  )
+  // D1 — Clareza + Alinhamento de Expectativa (Score de Vetor)
+  if (id === 0) {
+    const hasAlign = s.pesNotaLider > 0 && s.pesNotaLiderado > 0
+    const gap = hasAlign ? Math.abs(s.pesNotaLider - s.pesNotaLiderado) : null
+    const isRuido = gap !== null && gap > 2
+    return (
+      <div className="flex flex-col gap-3">
+        <div><p className="text-[10px] text-white/30 mb-1.5">Meta da equipe para o trimestre</p>
+          <input value={s.pesMetaEquipe} onChange={e => update({ pesMetaEquipe: e.target.value })}
+            placeholder="Ex: Fechar 10 contratos até 30/06" className={inp} style={inpStyle} /></div>
+        <div><p className="text-[10px] text-white/30 mb-1.5">KPI principal — como medir?</p>
+          <input value={s.pesKpiEquipe} onChange={e => update({ pesKpiEquipe: e.target.value })}
+            placeholder="Ex: Conversão ≥ 25% | NPS ≥ 70" className={inp} style={inpStyle} /></div>
+        <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <p className="text-[9px] font-mono text-white/25 uppercase tracking-widest mb-3">Alinhamento de Expectativa</p>
+          {(['pesNotaLider', 'pesNotaLiderado'] as const).map((key, ki) => (
+            <div key={key} className="mb-2.5">
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-[10px] text-white/30">{ki === 0 ? 'Líder — clareza da meta' : 'Liderado — clareza percebida'}</p>
+                <span className="text-[10px] font-mono font-bold" style={{ color: c }}>{s[key] || '—'}/10</span>
+              </div>
+              <div className="flex gap-0.5">
+                {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
+                  <button key={n} onClick={() => update({ [key]: n })}
+                    className="flex-1 py-1.5 rounded text-[8px] font-mono font-bold transition-all"
+                    style={{ background: s[key] === n ? `${c}30` : 'rgba(0,0,0,0.3)', border: `1px solid ${s[key] === n ? c + '60' : 'rgba(255,255,255,0.05)'}`, color: s[key] === n ? c : 'rgba(255,255,255,0.2)' }}>
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+          {isRuido && (
+            <div className="flex items-start gap-2 mt-1 px-2.5 py-2 rounded-lg" style={{ background: `${RED}0c`, border: `1px solid ${RED}30` }}>
+              <AlertTriangle size={11} style={{ color: RED, marginTop: 1, flexShrink: 0 }} />
+              <p className="text-[10px] leading-relaxed" style={{ color: RED }}>
+                Ruído de Direção — gap de {gap} pontos. Revise as metas em conjunto antes do próximo ciclo.
+              </p>
+            </div>
+          )}
+          {hasAlign && !isRuido && (
+            <p className="text-[9.5px] mt-1.5 text-center font-mono" style={{ color: TEAL }}>Alinhado ✓ — gap {gap} pt</p>
+          )}
+        </div>
+        {!s.pesMetaEquipe && <p className="text-[11px] px-3 py-2 rounded-lg" style={{ background: `${c}08`, border: `1px solid ${c}20`, color: c }}>Sem meta clara não há liderança — há apenas gerenciamento de agenda.</p>}
+      </div>
+    )
+  }
 
-  if (id === 1) return (
-    <div className="flex flex-col gap-3">
-      <div>
-        <p className="text-[10px] text-white/30 mb-1.5">Último 1:1 realizado</p>
-        <div className="flex items-center gap-3">
-          <input type="date" value={s.pesUltimo1a1} onChange={e => update({ pesUltimo1a1: e.target.value })}
-            className="rounded-lg px-3 py-2 text-[12px] outline-none" style={inpStyle} />
-          {s.pesUltimo1a1 && (() => {
-            const diff = Math.floor((Date.now() - new Date(s.pesUltimo1a1).getTime()) / 86400000)
-            return <span className="text-[11px] font-mono font-bold" style={{ color: diff > 14 ? RED : diff > 7 ? AMBER : c }}>{diff === 0 ? 'hoje' : `${diff}d atrás`}</span>
-          })()}
+  // D2 — Diálogo + Sentiment Analysis dos acordos
+  if (id === 1) {
+    const sentiment = analyzeSentiment(s.pesAcordos)
+    const hasSentiment = s.pesAcordos.trim().length > 10
+    return (
+      <div className="flex flex-col gap-3">
+        <div>
+          <p className="text-[10px] text-white/30 mb-1.5">Último 1:1 realizado</p>
+          <div className="flex items-center gap-3">
+            <input type="date" value={s.pesUltimo1a1} onChange={e => update({ pesUltimo1a1: e.target.value })}
+              className="rounded-lg px-3 py-2 text-[12px] outline-none" style={inpStyle} />
+            {s.pesUltimo1a1 && (() => {
+              const diff = Math.floor((Date.now() - new Date(s.pesUltimo1a1).getTime()) / 86400000)
+              return <span className="text-[11px] font-mono font-bold" style={{ color: diff > 14 ? RED : diff > 7 ? AMBER : c }}>{diff === 0 ? 'hoje' : `${diff}d atrás`}</span>
+            })()}
+          </div>
+        </div>
+        <div>
+          <p className="text-[10px] text-white/30 mb-1.5">Acordos e compromissos</p>
+          <textarea value={s.pesAcordos} onChange={e => update({ pesAcordos: e.target.value })}
+            placeholder="O que ficou combinado? Quem faz o quê?" rows={3} className={ta} style={{ ...inpStyle, lineHeight: 1.6 }} />
+          {hasSentiment && (
+            <div className="flex items-center justify-between mt-1.5 px-2.5 py-2 rounded-lg"
+              style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div className="flex items-center gap-2 flex-1 min-w-0 mr-2">
+                <span className="text-[8px] font-mono text-white/20 uppercase tracking-wider shrink-0">Sentiment</span>
+                {sentiment.weakWords.length > 0 && (
+                  <span className="text-[8.5px] font-mono truncate" style={{ color: RED }}>
+                    ↓ {sentiment.weakWords.slice(0, 3).join(', ')}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="text-[9px] font-mono" style={{ color: sentiment.color }}>{sentiment.label}</span>
+                <span className="text-[10px] font-black font-mono" style={{ color: sentiment.color }}>{Math.round(sentiment.score)}/10</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-      <div><p className="text-[10px] text-white/30 mb-1.5">Acordos e compromissos</p>
-        <textarea value={s.pesAcordos} onChange={e => update({ pesAcordos: e.target.value })}
-          placeholder="O que ficou combinado? Quem faz o quê?" rows={3} className={ta} style={{ ...inpStyle, lineHeight: 1.6 }} /></div>
-    </div>
-  )
+    )
+  }
 
-  if (id === 2) return (
-    <div className="flex flex-col gap-3">
-      <div><p className="text-[10px] text-white/30 mb-1.5">Principal gap de habilidade do time</p>
-        <input value={s.pesGapHabilidade} onChange={e => update({ pesGapHabilidade: e.target.value })}
-          placeholder="Ex: Negociação, produto, gestão do tempo..." className={inp} style={inpStyle} /></div>
-      <div><p className="text-[10px] text-white/30 mb-1.5">Plano de desenvolvimento ativo</p>
-        <textarea value={s.pesPlanoDev} onChange={e => update({ pesPlanoDev: e.target.value })}
-          placeholder="Curso, shadowing, leitura, feedback..." rows={3} className={ta} style={{ ...inpStyle, lineHeight: 1.6 }} /></div>
-    </div>
-  )
-
-  if (id === 3) return (
-    <div className="flex flex-col gap-2.5">
-      <p className="text-[10px] text-white/30">Rituais ativos esta semana</p>
-      {[
-        { l: 'Daily — 15 min / dia', s: 'Fiz, farei, bloqueios' },
-        { l: 'Reunião semanal de time', s: 'Metas, prioridades, desbloqueios' },
-        { l: 'Retrospectiva mensal', s: 'O que funcionou, o que muda' },
-      ].map((r, ri) => (
-        <button key={ri} onClick={() => { const arr = [...s.pesRituais]; arr[ri] = !arr[ri]; update({ pesRituais: arr }) }}
-          className="flex items-start gap-3 text-left p-3 rounded-lg transition-all"
-          style={{ background: s.pesRituais[ri] ? `${c}12` : 'rgba(0,0,0,0.2)', border: `1px solid ${s.pesRituais[ri] ? c + '40' : 'rgba(255,255,255,0.06)'}` }}>
-          {s.pesRituais[ri] ? <CheckCircle2 size={14} style={{ color: c, marginTop: 1, flexShrink: 0 }} /> : <Circle size={14} style={{ color: 'rgba(255,255,255,0.15)', marginTop: 1, flexShrink: 0 }} />}
-          <div>
-            <p className="text-[12px] font-semibold" style={{ color: s.pesRituais[ri] ? c : 'rgba(255,255,255,0.5)' }}>{r.l}</p>
-            <p className="text-[10px] text-white/25 mt-0.5">{r.s}</p>
-          </div>
-        </button>
-      ))}
-    </div>
-  )
-
-  if (id === 4) return (
-    <div className="flex flex-col gap-3">
-      <div>
-        <p className="text-[10px] text-white/30 mb-2">Performance geral da equipe este mês</p>
-        <div className="flex gap-2">
-          {[{ v: 1, l: 'Abaixo', c: RED }, { v: 2, l: 'Regular', c: AMBER }, { v: 3, l: 'Boa', c: '#5dade2' }, { v: 4, l: 'Excelente', c: TEAL }]
-            .map(o => (
-              <button key={o.v} onClick={() => update({ pesPerfScore: o.v })}
-                className="flex-1 py-2.5 rounded-lg text-[11px] font-bold transition-all"
-                style={{ background: s.pesPerfScore === o.v ? `${o.c}20` : 'rgba(0,0,0,0.3)', border: `1px solid ${s.pesPerfScore === o.v ? o.c + '50' : 'rgba(255,255,255,0.07)'}`, color: s.pesPerfScore === o.v ? o.c : 'rgba(255,255,255,0.25)' }}>
-                {o.l}
+  // D3 — Capacitação + Maturidade M1–M4
+  if (id === 2) {
+    const selectedMat = MATURITY.find(m => m.id === s.pesMaturidade)
+    return (
+      <div className="flex flex-col gap-3">
+        <div><p className="text-[10px] text-white/30 mb-1.5">Principal gap de habilidade do time</p>
+          <input value={s.pesGapHabilidade} onChange={e => update({ pesGapHabilidade: e.target.value })}
+            placeholder="Ex: Negociação, produto, gestão do tempo..." className={inp} style={inpStyle} /></div>
+        <div><p className="text-[10px] text-white/30 mb-1.5">Plano de desenvolvimento ativo</p>
+          <textarea value={s.pesPlanoDev} onChange={e => update({ pesPlanoDev: e.target.value })}
+            placeholder="Curso, shadowing, leitura, feedback..." rows={3} className={ta} style={{ ...inpStyle, lineHeight: 1.6 }} /></div>
+        <div>
+          <p className="text-[10px] text-white/30 mb-2">Maturidade do liderado nesta habilidade</p>
+          <div className="grid grid-cols-2 gap-1.5">
+            {MATURITY.map(m => (
+              <button key={m.id} onClick={() => update({ pesMaturidade: m.id })}
+                className="text-left p-2.5 rounded-lg transition-all"
+                style={{ background: s.pesMaturidade === m.id ? `${c}18` : 'rgba(0,0,0,0.25)', border: `1px solid ${s.pesMaturidade === m.id ? c + '45' : 'rgba(255,255,255,0.06)'}` }}>
+                <p className="text-[10px] font-bold font-mono" style={{ color: s.pesMaturidade === m.id ? c : 'rgba(255,255,255,0.35)' }}>{m.label}</p>
+                <p className="text-[9px] text-white/25 mt-0.5 leading-tight">{m.title}</p>
               </button>
             ))}
+          </div>
+        </div>
+        {s.pesGapHabilidade.trim() && selectedMat && (
+          <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+            className="rounded-lg px-3 py-2.5" style={{ background: `${c}08`, border: `1px solid ${c}22` }}>
+            <p className="text-[8.5px] font-mono uppercase tracking-widest mb-1.5" style={{ color: c, opacity: 0.7 }}>Script Situacional</p>
+            <p className="text-[10.5px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>{selectedMat.script}</p>
+            <p className="text-[9px] text-white/20 mt-1 italic">{selectedMat.sub}</p>
+          </motion.div>
+        )}
+      </div>
+    )
+  }
+
+  // D4 — Disciplina + Health Check de Desbloqueio
+  if (id === 3) {
+    const hasBloqueio = s.pesBloqueios.trim().length > 0
+    const vel = !hasBloqueio || s.pesDesbloqueioHoras === 0 ? null
+      : s.pesDesbloqueioHoras <= 24  ? { l: 'alta velocidade', c: TEAL }
+      : s.pesDesbloqueioHoras <= 72  ? { l: 'desbloqueio médio', c: AMBER }
+      : s.pesDesbloqueioHoras <= 168 ? { l: 'lento', c: RED }
+      : { l: 'bloqueio crônico', c: RED }
+    return (
+      <div className="flex flex-col gap-2.5">
+        <p className="text-[10px] text-white/30">Rituais ativos esta semana</p>
+        {[
+          { l: 'Daily — 15 min / dia', s: 'Fiz, farei, bloqueios' },
+          { l: 'Reunião semanal de time', s: 'Metas, prioridades, desbloqueios' },
+          { l: 'Retrospectiva mensal', s: 'O que funcionou, o que muda' },
+        ].map((r, ri) => (
+          <button key={ri} onClick={() => { const arr = [...s.pesRituais]; arr[ri] = !arr[ri]; update({ pesRituais: arr }) }}
+            className="flex items-start gap-3 text-left p-3 rounded-lg transition-all"
+            style={{ background: s.pesRituais[ri] ? `${c}12` : 'rgba(0,0,0,0.2)', border: `1px solid ${s.pesRituais[ri] ? c + '40' : 'rgba(255,255,255,0.06)'}` }}>
+            {s.pesRituais[ri] ? <CheckCircle2 size={14} style={{ color: c, marginTop: 1, flexShrink: 0 }} /> : <Circle size={14} style={{ color: 'rgba(255,255,255,0.15)', marginTop: 1, flexShrink: 0 }} />}
+            <div>
+              <p className="text-[12px] font-semibold" style={{ color: s.pesRituais[ri] ? c : 'rgba(255,255,255,0.5)' }}>{r.l}</p>
+              <p className="text-[10px] text-white/25 mt-0.5">{r.s}</p>
+            </div>
+          </button>
+        ))}
+        <div className="mt-1 rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <p className="text-[9px] font-mono text-white/25 uppercase tracking-widest mb-2.5">Health Check — Desbloqueio</p>
+          <div><p className="text-[10px] text-white/30 mb-1.5">Último bloqueio reportado pelo time</p>
+            <input value={s.pesBloqueios} onChange={e => update({ pesBloqueios: e.target.value })}
+              placeholder="Ex: Acesso ao sistema, aprovação pendente..." className={inp} style={inpStyle} /></div>
+          {hasBloqueio && (
+            <div className="mt-2.5">
+              <p className="text-[10px] text-white/30 mb-1.5">Horas para resolver</p>
+              <div className="flex gap-1.5 flex-wrap">
+                {[8, 24, 48, 72, 120, 168].map(h => (
+                  <button key={h} onClick={() => update({ pesDesbloqueioHoras: h })}
+                    className="px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all"
+                    style={{ background: s.pesDesbloqueioHoras === h ? `${c}25` : 'rgba(0,0,0,0.3)', border: `1px solid ${s.pesDesbloqueioHoras === h ? c + '50' : 'rgba(255,255,255,0.05)'}`, color: s.pesDesbloqueioHoras === h ? c : 'rgba(255,255,255,0.22)' }}>
+                    {h < 24 ? h + 'h' : Math.round(h / 24) + 'd'}
+                  </button>
+                ))}
+              </div>
+              {vel && <p className="text-[10px] font-mono font-bold mt-1.5" style={{ color: vel.c }}>Velocidade: {vel.l}</p>}
+            </div>
+          )}
         </div>
       </div>
-      <button onClick={() => update({ pesReconhecimento: !s.pesReconhecimento })}
-        className="flex items-center gap-3 p-3 rounded-lg transition-all text-left"
-        style={{ background: s.pesReconhecimento ? `${TEAL}12` : 'rgba(0,0,0,0.2)', border: `1px solid ${s.pesReconhecimento ? TEAL + '40' : 'rgba(255,255,255,0.06)'}` }}>
-        {s.pesReconhecimento ? <CheckCircle2 size={14} style={{ color: TEAL, flexShrink: 0 }} /> : <Circle size={14} style={{ color: 'rgba(255,255,255,0.15)', flexShrink: 0 }} />}
-        <div>
-          <p className="text-[12px] font-semibold" style={{ color: s.pesReconhecimento ? TEAL : 'rgba(255,255,255,0.5)' }}>Reconhecimento público feito esta semana</p>
-          <p className="text-[10px] text-white/25 mt-0.5">Celebrei resultados e comportamentos que quero repetir</p>
+    )
+  }
+
+  // D5 — NPS Interno de Utilidade (substituiu Excelente/Regular)
+  if (id === 4) {
+    const npsColor = s.pesNpsUtilidade === 0 ? 'rgba(255,255,255,0.15)'
+      : s.pesNpsUtilidade <= 4 ? RED : s.pesNpsUtilidade <= 6 ? AMBER : TEAL
+    const npsLabels = ['', 'inutilidade percebida', 'baixíssima utilidade', 'utilidade baixa', 'utilidade limitada',
+      'neutro', 'alguma utilidade', 'útil', 'muito útil', 'grande impacto', 'máximo impacto']
+    const retention = s.pesNpsUtilidade === 0 ? null
+      : s.pesNpsUtilidade <= 4 ? { l: 'risco alto de desengajamento', c: RED }
+      : s.pesNpsUtilidade <= 6 ? { l: 'atenção — monitorar', c: AMBER }
+      : { l: 'equipe engajada', c: TEAL }
+    return (
+      <div className="flex flex-col gap-3">
+        <div className="rounded-lg p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="flex items-center justify-between mb-1.5">
+            <p className="text-[10px] text-white/30">NPS Interno de Utilidade</p>
+            {s.pesNpsUtilidade > 0 && <span className="text-[9.5px] font-mono" style={{ color: npsColor }}>{npsLabels[s.pesNpsUtilidade]}</span>}
+          </div>
+          <p className="text-[9px] text-white/20 mb-3 italic">"Sinto que meu trabalho foi útil esta semana?"</p>
+          <div className="flex gap-0.5">
+            {Array.from({ length: 11 }, (_, i) => i).map(n => {
+              const nc = n === 0 ? 'rgba(255,255,255,0.15)' : n <= 4 ? RED : n <= 6 ? AMBER : TEAL
+              return (
+                <button key={n} onClick={() => update({ pesNpsUtilidade: n })}
+                  className="flex-1 py-2 rounded text-[8.5px] font-mono font-black transition-all"
+                  style={{ background: s.pesNpsUtilidade === n ? `${nc}28` : 'rgba(0,0,0,0.3)', border: `1px solid ${s.pesNpsUtilidade === n ? nc + '60' : 'rgba(255,255,255,0.05)'}`, color: s.pesNpsUtilidade === n ? nc : 'rgba(255,255,255,0.2)' }}>
+                  {n}
+                </button>
+              )
+            })}
+          </div>
+          {retention && (
+            <div className="flex items-center justify-between mt-2 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+              <span className="text-[8.5px] font-mono text-white/18 uppercase tracking-wider">Retenção de Talentos</span>
+              <span className="text-[9.5px] font-mono font-bold" style={{ color: retention.c }}>{retention.l}</span>
+            </div>
+          )}
         </div>
-      </button>
-      <div><p className="text-[10px] text-white/30 mb-1.5">Reflexão de liderança</p>
-        <textarea value={s.pesReflexao} onChange={e => update({ pesReflexao: e.target.value })}
-          placeholder="O que limitou os resultados? O que eu, como líder, posso mudar?" rows={3}
-          className={ta} style={{ ...inpStyle, lineHeight: 1.6 }} /></div>
-    </div>
-  )
+        <button onClick={() => update({ pesReconhecimento: !s.pesReconhecimento })}
+          className="flex items-center gap-3 p-3 rounded-lg transition-all text-left"
+          style={{ background: s.pesReconhecimento ? `${TEAL}12` : 'rgba(0,0,0,0.2)', border: `1px solid ${s.pesReconhecimento ? TEAL + '40' : 'rgba(255,255,255,0.06)'}` }}>
+          {s.pesReconhecimento ? <CheckCircle2 size={14} style={{ color: TEAL, flexShrink: 0 }} /> : <Circle size={14} style={{ color: 'rgba(255,255,255,0.15)', flexShrink: 0 }} />}
+          <div>
+            <p className="text-[12px] font-semibold" style={{ color: s.pesReconhecimento ? TEAL : 'rgba(255,255,255,0.5)' }}>Reconhecimento público feito esta semana</p>
+            <p className="text-[10px] text-white/25 mt-0.5">Celebrei resultados e comportamentos que quero repetir</p>
+          </div>
+        </button>
+        <div><p className="text-[10px] text-white/30 mb-1.5">Reflexão de liderança</p>
+          <textarea value={s.pesReflexao} onChange={e => update({ pesReflexao: e.target.value })}
+            placeholder="O que limitou os resultados? O que eu, como líder, posso mudar?" rows={3}
+            className={ta} style={{ ...inpStyle, lineHeight: 1.6 }} /></div>
+      </div>
+    )
+  }
 
   // D6 — linked to manifesto
   return (
@@ -345,11 +545,11 @@ const FASE_LABELS = ['Infra', 'Processo', 'Estratégia', 'Digitização', 'Trans
 
 // ─── IA questions per dimension ───────────────────────────────────────────────
 const DIM_IA_Q: Record<number, string[]> = {
-  0: ['Como definir uma meta de equipe eficaz?', 'O que torna um KPI realmente acionável?', 'Minha meta está clara o suficiente?'],
+  0: ['Como reduzir o Ruído de Direção na equipe?', 'Como alinhar expectativas de meta com o liderado?', 'O que torna um KPI realmente acionável?'],
   1: ['Como conduzir um 1:1 que gera resultado?', 'O que devo registrar como acordo?', 'Com que frequência fazer 1:1?'],
   2: ['Como identificar o gap de habilidade certo?', 'Como criar um plano de desenvolvimento real?', 'Qual método de desenvolvimento funciona melhor?'],
   3: ['Como implementar uma daily que não vira reunião?', 'Como salvar uma retrospectiva que está vazia?', 'Rituais não estão funcionando — o que fazer?'],
-  4: ['Como dar feedback difícil com impacto positivo?', 'Como reconhecer entrega sem parecer forçado?', 'Minha equipe está entregando bem — como sustentar?'],
+  4: ['NPS Interno baixo — o que fazer agora?', 'Como criar senso de utilidade no trabalho do time?', 'Como reconhecer entrega sem parecer forçado?'],
   5: ['Qual princípio do Manifesto praticar primeiro?', 'Como criar senso de propósito no dia a dia?', 'Como medir se a cultura está sendo vivida?'],
 }
 
@@ -400,6 +600,18 @@ export default function PessoasLideranca() {
     riskSignals.push({ level: 'warn', msg: `OKRs em ${okrAvgPct}% de progresso + D1 (Direção) em ${pcts[0]}% — equipe sem clareza de onde estamos indo.` })
   if (margem > 0 && margem < 15 && pcts[4] < 60)
     riskSignals.push({ level: 'warn', msg: `Margem apertada (${margem}%) com performance abaixo (D5 ${pcts[4]}%) — o negócio precisa de resultado agora.` })
+  // D1 — Ruído de Direção
+  if (s.pesNotaLider > 0 && s.pesNotaLiderado > 0 && Math.abs(s.pesNotaLider - s.pesNotaLiderado) > 2)
+    riskSignals.push({ level: 'warn', msg: `Ruído de Direção — gap de ${Math.abs(s.pesNotaLider - s.pesNotaLiderado)} pts (Líder ${s.pesNotaLider}/10 · Liderado ${s.pesNotaLiderado}/10). O time não vê a meta com a mesma clareza.` })
+  // D2 — Comprometimento fraco detectado via sentiment
+  const sentMain = analyzeSentiment(s.pesAcordos)
+  if (s.pesAcordos.trim().length > 10 && sentMain.score < 5)
+    riskSignals.push({ level: 'critical', msg: `Comprometimento fraco no 1:1 — score ${Math.round(sentMain.score)}/10. Palavras de risco: ${sentMain.weakWords.slice(0, 2).join(', ')}.` })
+  // D5 — NPS interno baixo = risco de churn de talento
+  if (s.pesNpsUtilidade > 0 && s.pesNpsUtilidade <= 3)
+    riskSignals.push({ level: 'critical', msg: `NPS Interno de Utilidade em ${s.pesNpsUtilidade}/10 — alto risco de desengajamento e churn de talentos.` })
+  if (s.pesNpsUtilidade >= 4 && s.pesNpsUtilidade <= 5)
+    riskSignals.push({ level: 'warn', msg: `NPS Interno em ${s.pesNpsUtilidade}/10 — equipe no limiar. Clareza de propósito e reconhecimento podem reverter.` })
 
   async function askCoach(q: string) {
     setIaLoading(true); setIaAnswer('')
@@ -542,18 +754,24 @@ export default function PessoasLideranca() {
         </div>
 
         {/* Liderados — compact inline */}
-        <div className="flex items-center gap-2 px-4 pb-4">
-          <p className="text-[9px] font-mono text-white/18 uppercase tracking-wider shrink-0">Time</p>
-          <div className="flex gap-1.5 flex-wrap">
-            {[1, 2, 3, 4, 5, 6, 8, 10].map(n => (
+        <div className="flex items-start gap-2 px-4 pb-4">
+          <p className="text-[9px] font-mono text-white/18 uppercase tracking-wider shrink-0 mt-2">Time</p>
+          <div className="flex gap-1.5 flex-wrap flex-1">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20].map(n => (
               <button key={n} onClick={() => update({ pesLiderados: n })}
                 className="w-7 h-7 rounded-md text-[10px] font-mono font-bold transition-all"
                 style={{ background: s.pesLiderados === n ? `${TEAL}28` : 'rgba(255,255,255,0.03)', border: `1px solid ${s.pesLiderados === n ? TEAL + '60' : 'rgba(255,255,255,0.06)'}`, color: s.pesLiderados === n ? TEAL : 'rgba(255,255,255,0.2)' }}>
                 {n}
               </button>
             ))}
+            <input
+              type="number" min={1} max={999}
+              placeholder="outro"
+              value={s.pesLiderados > 20 ? s.pesLiderados : ''}
+              onChange={e => { const v = parseInt(e.target.value); if (!isNaN(v) && v > 0) update({ pesLiderados: v }) }}
+              className="w-14 h-7 rounded-md text-[10px] font-mono outline-none text-center"
+              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.4)' }} />
           </div>
-          {s.pesLiderados > 0 && <p className="text-[9px] text-white/20 font-mono">{s.pesLiderados} pessoa{s.pesLiderados > 1 ? 's' : ''}</p>}
         </div>
       </div>
 
