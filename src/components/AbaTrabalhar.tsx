@@ -28,6 +28,7 @@ const AdminPanel = dynamic(() => import('@/components/workspace/AdminPanel'), { 
 const Governanca = dynamic(() => import('@/components/workspace/Governanca'), { ssr: false })
 const InovacaoCockpit = dynamic(() => import('@/components/workspace/InovacaoCockpit'), { ssr: false })
 const ModoConsultoria = dynamic(() => import('@/components/workspace/ModoConsultoria'), { ssr: false })
+const PessoasLideranca = dynamic(() => import('@/components/workspace/PessoasLideranca'), { ssr: false })
 
 // ─────────────────────────────────────────────
 // Tipos e constantes
@@ -179,6 +180,7 @@ export default function AbaTrabalhar() {
       case 'denuncia':   return <CanalDenuncias />
       case 'governanca': return <Governanca />
       case 'admin':      return <AdminPanel />
+      case 'pessoas':    return <PessoasLideranca />
       default:           return <Placeholder mod={active} />
     }
   }
