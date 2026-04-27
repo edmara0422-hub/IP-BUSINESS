@@ -337,12 +337,24 @@ function DimPanel({ id, s, update }: { id: number; s: PesState; update: (p: Part
   )
 }
 
+// ─── IA questions per dimension ───────────────────────────────────────────────
+const DIM_IA_Q: Record<number, string[]> = {
+  0: ['Como definir uma meta de equipe eficaz?', 'O que torna um KPI realmente acionável?', 'Minha meta está clara o suficiente?'],
+  1: ['Como conduzir um 1:1 que gera resultado?', 'O que devo registrar como acordo?', 'Com que frequência fazer 1:1?'],
+  2: ['Como identificar o gap de habilidade certo?', 'Como criar um plano de desenvolvimento real?', 'Qual método de desenvolvimento funciona melhor?'],
+  3: ['Como implementar uma daily que não vira reunião?', 'Como salvar uma retrospectiva que está vazia?', 'Rituais não estão funcionando — o que fazer?'],
+  4: ['Como dar feedback difícil com impacto positivo?', 'Como reconhecer entrega sem parecer forçado?', 'Minha equipe está entregando bem — como sustentar?'],
+  5: ['Qual princípio do Manifesto praticar primeiro?', 'Como criar senso de propósito no dia a dia?', 'Como medir se a cultura está sendo vivida?'],
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function PessoasLideranca() {
   const { data: s, update } = useWorkspaceData<PesState>('pessoas-lideranca', DEFAULT)
   const [activeCard, setActiveCard] = useState<number | null>(null)
   const [iaLoading, setIaLoading] = useState(false)
   const [iaAnswer, setIaAnswer] = useState('')
+  const [dimIaLoading, setDimIaLoading] = useState<number | null>(null)
+  const [dimIaAnswers, setDimIaAnswers] = useState<Record<number, string>>({})
 
   const rawDims = calcRawDims(s)
   const practicedCount = (s.pesDig ?? []).filter(Boolean).length
@@ -364,6 +376,20 @@ export default function PessoasLideranca() {
       const j = await res.json()
       setIaAnswer(j.answer ?? '')
     } finally { setIaLoading(false) }
+  }
+
+  async function askDimIa(dimId: number, q: string) {
+    setDimIaLoading(dimId)
+    try {
+      const dim = DIMS[dimId]
+      const ctx = `Dimensão ${dim.code} (${dim.label}) — score atual: ${pcts[dimId]}/100. Índice 6D: ${index6D}/100. Meta: ${s.pesMetaEquipe || 'não definida'}. Liderados: ${s.pesLiderados || '?'}.`
+      const res = await fetch('/api/advisor-chat', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q, marketContext: ctx, role: 'lider' }),
+      })
+      const j = await res.json()
+      setDimIaAnswers(prev => ({ ...prev, [dimId]: j.answer ?? '' }))
+    } finally { setDimIaLoading(null) }
   }
 
   // Auto-generate contextual IA alert
@@ -393,10 +419,10 @@ export default function PessoasLideranca() {
       </div>
 
       {/* ── Energy Orb + particles ── */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(2,6,18,0.85)', border: `1px solid ${overallColor}20`, boxShadow: `0 0 40px ${overallColor}10` }}>
-        <div className="pt-5 pb-3 flex flex-col items-center gap-2">
+      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="pt-5 pb-3 flex flex-col items-center gap-1">
           <EnergyOrb score={index6D} d6mult={d6mult} />
-          <p className="text-[10px] font-mono text-white/20 text-center px-6 leading-relaxed">
+          <p className="text-[9.5px] font-mono text-white/18 text-center px-6 leading-relaxed">
             Score = (D1+D2+D3+D4+D5) × D6<sub className="text-[8px]">mult</sub> + Bônus Manifesto
           </p>
         </div>
@@ -534,7 +560,7 @@ export default function PessoasLideranca() {
               <motion.button key={d.id}
                 onClick={() => setActiveCard(isActive ? null : d.id)}
                 className="rounded-xl p-3 text-left transition-all"
-                style={{ background: isActive ? `${d.color}10` : 'rgba(2,6,18,0.6)', border: `1px solid ${isActive ? d.color + '50' : 'rgba(255,255,255,0.06)'}`, boxShadow: isActive ? `0 0 20px ${d.color}15` : 'none' }}
+                style={{ background: isActive ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.3)', border: `1px solid ${isActive ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.06)'}` }}
                 whileTap={{ scale: 0.96 }}>
                 <div className="flex items-center gap-3">
                   <div className="relative shrink-0">
@@ -567,13 +593,43 @@ export default function PessoasLideranca() {
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.17 }}
               className="rounded-xl p-4 mt-2"
-              style={{ background: `${DIM_COLORS[activeCard]}08`, border: `1px solid ${DIM_COLORS[activeCard]}30` }}>
+              style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded" style={{ background: `${DIM_COLORS[activeCard]}20`, color: DIM_COLORS[activeCard] }}>{DIMS[activeCard].code}</span>
                 <span className="text-[13px] font-bold" style={{ color: DIM_COLORS[activeCard] }}>{DIMS[activeCard].label}</span>
                 <span className="text-[11px] font-mono font-black ml-auto" style={{ color: DIM_COLORS[activeCard] }}>{pcts[activeCard]}/100</span>
               </div>
               <DimPanel id={activeCard} s={s} update={update} />
+
+              {/* IA por dimensão */}
+              <div className="mt-4 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <Brain size={11} style={{ color: TEAL }} />
+                  <span className="text-[9.5px] font-mono text-white/30">IA pode ajudar nesta dimensão</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {(DIM_IA_Q[activeCard] ?? []).map(q => (
+                    <button key={q} onClick={() => askDimIa(activeCard, q)}
+                      className="px-2.5 py-1 rounded-lg text-[10px] font-mono transition-all"
+                      style={{ background: 'rgba(23,165,137,0.08)', border: '1px solid rgba(23,165,137,0.2)', color: TEAL }}>
+                      › {q}
+                    </button>
+                  ))}
+                </div>
+                {dimIaLoading === activeCard && (
+                  <div className="flex items-center gap-2">
+                    <Loader2 size={11} style={{ color: TEAL }} className="animate-spin" />
+                    <span className="text-[10px] font-mono" style={{ color: TEAL }}>analisando {DIMS[activeCard].code}...</span>
+                  </div>
+                )}
+                {dimIaAnswers[activeCard] && dimIaLoading !== activeCard && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    className="rounded-lg px-3 py-2.5 mt-1"
+                    style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <p className="text-[11.5px] text-white/60 leading-relaxed whitespace-pre-wrap">{dimIaAnswers[activeCard]}</p>
+                  </motion.div>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -582,15 +638,15 @@ export default function PessoasLideranca() {
       {/* ════════════════════════════════════
           AI TERMINAL
           ════════════════════════════════════ */}
-      <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(2,6,18,0.9)', border: `1px solid ${TEAL}25`, boxShadow: `0 0 30px ${TEAL}08` }}>
+      <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08)' }}>
         {/* Terminal bar */}
-        <div className="flex items-center gap-2 px-4 py-2.5" style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div className="flex items-center gap-2 px-4 py-2.5" style={{ background: 'rgba(0,0,0,0.3)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="flex gap-1.5">
             {[RED, AMBER, TEAL].map((c, i) => <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: c + '70' }} />)}
           </div>
           <div className="flex items-center gap-2 ml-2">
-            <Brain size={12} style={{ color: TEAL }} />
-            <span className="text-[10px] font-mono" style={{ color: TEAL }}>coach@neural-leadership-os ~ %</span>
+            <Brain size={12} style={{ color: 'rgba(255,255,255,0.4)' }} />
+            <span className="text-[10px] font-mono text-white/35">coach · neural leadership os</span>
           </div>
         </div>
 
