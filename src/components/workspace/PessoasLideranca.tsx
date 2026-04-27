@@ -1209,11 +1209,6 @@ export default function PessoasLideranca() {
               </motion.div>
             )}
           </AnimatePresence>
-          <button onClick={() => setPresentMode(true)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-mono font-bold transition-all"
-            style={{ border: `1px solid rgba(255,255,255,0.12)`, background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.45)' }}>
-            ▶ apresentar
-          </button>
           <motion.div animate={{ opacity: [0.6, 1, 0.6] }} transition={{ duration: 2.4, repeat: Infinity }}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-full"
             style={{ border: `1px solid ${TEAL}45`, background: `${TEAL}0a` }}>
@@ -1418,79 +1413,132 @@ export default function PessoasLideranca() {
       </AnimatePresence>
 
       {/* ════════════════════════════════════
-          MANIFESTO — Nódulos Neurais
+          MANIFESTO — Interativo + Dados
           ════════════════════════════════════ */}
-      <div>
-        <div className="px-1 mb-4">
-          <p className="text-[9px] font-mono tracking-[0.25em] text-white/18 uppercase mb-1">Código de Cultura</p>
-          <div className="flex items-end gap-2">
-            <h2 className="text-[17px] font-black text-white/80 leading-tight">Manifesto · Cultura de<br />Valor e Utilidade</h2>
-            <span className="text-[10px] font-mono font-bold mb-0.5 px-2 py-0.5 rounded" style={{ background: `${RED}18`, color: RED }}>
-              D6 ×{d6mult.toFixed(2)}
-            </span>
-          </div>
-        </div>
+      {(() => {
+        // Each principle links to a dimension — shows real score + impact
+        const LINKS = [[0], [4], [2, 3], [3], [1]]
+        const impactPerPrinciple = 0.1 // each principle adds ~0.1 to d6mult
+        return (
+          <div>
+            <div className="px-1 mb-4">
+              <p className="text-[9px] font-mono tracking-[0.25em] text-white/18 uppercase mb-1">Código de Cultura · D6</p>
+              <div className="flex items-end gap-3">
+                <h2 className="text-[17px] font-black text-white/80 leading-tight">Manifesto de Liderança</h2>
+                <div className="flex flex-col items-end mb-0.5">
+                  <span className="text-[18px] font-black font-mono leading-none" style={{ color: d6Low ? RED : d6mult >= 1.3 ? TEAL : AMBER }}>
+                    ×{d6mult.toFixed(2)}
+                  </span>
+                  <span className="text-[8px] font-mono text-white/20">{practicedCount}/5 ativos</span>
+                </div>
+              </div>
+              {/* Multiplier bar */}
+              <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                <motion.div className="h-full rounded-full" animate={{ width: `${Math.min(100, d6mult * 66.7)}%` }} transition={{ duration: 0.6 }}
+                  style={{ background: d6Low ? RED : d6mult >= 1.3 ? TEAL : AMBER }} />
+              </div>
+              <div className="flex justify-between mt-0.5">
+                <span className="text-[7.5px] font-mono text-white/15">×0.5 — sem cultura</span>
+                <span className="text-[7.5px] font-mono text-white/15">×1.5 — cultura forte</span>
+              </div>
+            </div>
 
-        {/* Neural node list */}
-        <div className="relative flex flex-col">
-          {/* Vertical connecting wire */}
-          <div className="absolute left-5 top-5 bottom-5 w-px" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.02))' }} />
+            <div className="relative flex flex-col">
+              <div className="absolute left-5 top-5 bottom-5 w-px" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.02))' }} />
 
-          {MANIFESTO.map((m, mi) => {
-            const practiced = (s.pesDig ?? [])[mi]
-            return (
-              <motion.div key={mi} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: mi * 0.07 }}
-                className="flex gap-4 pb-4">
+              {MANIFESTO.map((m, mi) => {
+                const practiced = (s.pesDig ?? [])[mi]
+                const linkedDims = LINKS[mi]
+                const linkedScores = linkedDims.map(id => pcts[id])
+                const lowestLinked = Math.min(...linkedScores)
+                const linkedLow = lowestLinked < 45 && !practiced
+                const potentialMult = practiced ? null : (d6mult + impactPerPrinciple).toFixed(2)
 
-                {/* Node circle */}
-                <div className="relative shrink-0 z-10">
-                  <motion.div
-                    animate={practiced ? { boxShadow: [`0 0 0px ${m.color}00`, `0 0 14px ${m.color}70`, `0 0 0px ${m.color}00`] } : {}}
-                    transition={{ duration: 2.2, repeat: Infinity }}
-                    className="w-10 h-10 rounded-full flex items-center justify-center"
-                    style={{ background: practiced ? `${m.color}20` : 'rgba(2,6,18,0.9)', border: `1.5px solid ${practiced ? m.color + '60' : 'rgba(255,255,255,0.08)'}` }}>
-                    <span className="text-[11px] font-mono font-black" style={{ color: practiced ? m.color : 'rgba(255,255,255,0.2)' }}>{m.num}</span>
+                return (
+                  <motion.div key={mi} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: mi * 0.07 }}
+                    className="flex gap-4 pb-4">
+
+                    <div className="relative shrink-0 z-10">
+                      <motion.div
+                        animate={practiced ? { boxShadow: [`0 0 0px ${m.color}00`, `0 0 14px ${m.color}70`, `0 0 0px ${m.color}00`] } : {}}
+                        transition={{ duration: 2.2, repeat: Infinity }}
+                        className="w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{ background: practiced ? `${m.color}20` : 'rgba(2,6,18,0.9)', border: `1.5px solid ${practiced ? m.color + '60' : 'rgba(255,255,255,0.08)'}` }}>
+                        <span className="text-[11px] font-mono font-black" style={{ color: practiced ? m.color : 'rgba(255,255,255,0.2)' }}>{m.num}</span>
+                      </motion.div>
+                    </div>
+
+                    <div className="flex-1 min-w-0 rounded-xl p-3 pb-3.5"
+                      style={{ background: practiced ? `${m.color}08` : linkedLow ? `${RED}06` : 'rgba(0,0,0,0.2)', border: `1px solid ${practiced ? m.color + '28' : linkedLow ? RED + '20' : 'rgba(255,255,255,0.05)'}` }}>
+
+                      <p className="text-[12.5px] font-bold leading-tight mb-1.5" style={{ color: practiced ? m.color : 'rgba(255,255,255,0.65)' }}>{m.title}</p>
+
+                      {/* Live connection — linked dimensions */}
+                      <div className="flex items-center gap-2 mb-2.5">
+                        {linkedDims.map(id => (
+                          <div key={id} className="flex items-center gap-1 px-1.5 py-0.5 rounded"
+                            style={{ background: `${DIM_COLORS[id]}12`, border: `1px solid ${DIM_COLORS[id]}25` }}>
+                            <span className="text-[7.5px] font-mono" style={{ color: DIM_COLORS[id] }}>{DIMS[id].code}</span>
+                            <span className="text-[9px] font-black font-mono" style={{ color: pcts[id] < 45 ? RED : DIM_COLORS[id] }}>{pcts[id]}</span>
+                          </div>
+                        ))}
+                        {linkedLow && (
+                          <span className="text-[8px] font-mono" style={{ color: RED, opacity: 0.7 }}>← score explicado por aqui</span>
+                        )}
+                        {!practiced && potentialMult && (
+                          <span className="text-[8px] font-mono ml-auto" style={{ color: TEAL, opacity: 0.6 }}>
+                            praticar → ×{potentialMult}
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-[11px] text-white/38 leading-relaxed mb-3">{m.body}</p>
+
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="h-px flex-1" style={{ background: `${m.color}18` }} />
+                        <span className="text-[8.5px] font-mono" style={{ color: m.color, opacity: 0.5 }}>RITUAL</span>
+                        <div className="h-px flex-1" style={{ background: `${m.color}18` }} />
+                      </div>
+                      <p className="text-[10.5px] italic leading-relaxed" style={{ color: m.color, opacity: practiced ? 0.7 : 0.3 }}>"{m.ritual}"</p>
+
+                      <div className="flex items-center justify-between mt-3">
+                        {linkedLow ? (
+                          <span className="text-[9px] font-mono" style={{ color: RED, opacity: 0.65 }}>
+                            ⚠ {DIMS[linkedDims[0]].label} em {lowestLinked}%
+                          </span>
+                        ) : <span />}
+                        <button
+                          onClick={() => { const arr = [...(s.pesDig ?? [false,false,false,false,false])]; arr[mi] = !arr[mi]; update({ pesDig: arr }) }}
+                          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9.5px] font-bold font-mono transition-all uppercase tracking-wider"
+                          style={{ background: practiced ? `${m.color}20` : 'rgba(255,255,255,0.04)', border: `1px solid ${practiced ? m.color + '45' : 'rgba(255,255,255,0.07)'}`, color: practiced ? m.color : 'rgba(255,255,255,0.22)' }}>
+                          {practiced ? <CheckCircle2 size={10} /> : <Circle size={10} />}
+                          {practiced ? 'praticamos' : 'marcar'}
+                        </button>
+                      </div>
+                    </div>
                   </motion.div>
-                </div>
+                )
+              })}
+            </div>
 
-                {/* Principle content */}
-                <div className="flex-1 min-w-0 rounded-xl p-3 pb-3.5"
-                  style={{ background: practiced ? `${m.color}08` : 'rgba(0,0,0,0.2)', border: `1px solid ${practiced ? m.color + '28' : 'rgba(255,255,255,0.05)'}` }}>
-                  <p className="text-[12.5px] font-bold leading-tight mb-2" style={{ color: practiced ? m.color : 'rgba(255,255,255,0.65)' }}>{m.title}</p>
-                  <p className="text-[11px] text-white/38 leading-relaxed mb-3">{m.body}</p>
-
-                  {/* Ritual divider */}
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="h-px flex-1" style={{ background: `${m.color}18` }} />
-                    <span className="text-[8.5px] font-mono" style={{ color: m.color, opacity: 0.5 }}>RITUAL</span>
-                    <div className="h-px flex-1" style={{ background: `${m.color}18` }} />
-                  </div>
-                  <p className="text-[10.5px] italic leading-relaxed" style={{ color: m.color, opacity: practiced ? 0.7 : 0.3 }}>"{m.ritual}"</p>
-
-                  {/* Praticamos toggle */}
-                  <div className="flex justify-end mt-3">
-                    <button
-                      onClick={() => { const arr = [...(s.pesDig ?? [false,false,false,false,false])]; arr[mi] = !arr[mi]; update({ pesDig: arr }) }}
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9.5px] font-bold font-mono transition-all uppercase tracking-wider"
-                      style={{ background: practiced ? `${m.color}20` : 'rgba(255,255,255,0.04)', border: `1px solid ${practiced ? m.color + '45' : 'rgba(255,255,255,0.07)'}`, color: practiced ? m.color : 'rgba(255,255,255,0.22)' }}>
-                      {practiced ? <CheckCircle2 size={10} /> : <Circle size={10} />}
-                      {practiced ? 'praticamos' : 'marcar'}
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            )
-          })}
-        </div>
-
-        {/* Como usar */}
-        <div className="rounded-xl px-3 py-3 mt-1" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
-          <p className="text-[8.5px] font-mono text-white/18 uppercase tracking-widest mb-2">Como usar este manifesto</p>
-          {['Integração: entregar aos novos líderes no primeiro dia de cargo.', 'Rituais: ler um ponto antes de reuniões importantes de planejamento.', 'Ambiente: visível no canal de comunicação da equipe ou na parede.'].map((t, i) => (
-            <p key={i} className="text-[10px] text-white/25 leading-relaxed"><span className="font-mono text-white/12">{i + 1}. </span>{t}</p>
-          ))}
-        </div>
-      </div>
+            {/* Impacto estratégico */}
+            {practicedCount === 0 && (
+              <div className="rounded-xl px-3 py-3" style={{ background: `${AMBER}08`, border: `1px solid ${AMBER}20` }}>
+                <p className="text-[10px] leading-relaxed" style={{ color: AMBER, opacity: 0.75 }}>
+                  Nenhum princípio marcado como praticado. O multiplicador D6 permanece em ×{d6mult.toFixed(2)}, reduzindo todos os outros scores em {Math.round((1 - d6mult) * 100)}%.
+                </p>
+              </div>
+            )}
+            {practicedCount === 5 && (
+              <div className="rounded-xl px-3 py-3" style={{ background: `${TEAL}08`, border: `1px solid ${TEAL}20` }}>
+                <p className="text-[10px] leading-relaxed" style={{ color: TEAL, opacity: 0.75 }}>
+                  Todos os princípios ativos — cultura operando em força máxima. Multiplicador ×{d6mult.toFixed(2)} amplificando todos os outros scores.
+                </p>
+              </div>
+            )}
+          </div>
+        )
+      })()}
 
       {/* ════════════════════════════════════
           6D DIAGNÓSTICO
@@ -1610,21 +1658,33 @@ export default function PessoasLideranca() {
             </p>
           </div>
 
-          {/* Quick prompts */}
-          <div className="flex flex-wrap gap-2 mb-3">
-            {[
-              'O que fazer com o score mais baixo?',
-              'Como dar feedback difícil?',
-              'Time não bate meta — diagnóstico',
-              'Como estruturar o próximo 1:1?',
-              `D6 está em ${pcts[5]}% — como melhorar?`,
-            ].map(q => (
-              <button key={q} onClick={() => askCoach(q)}
-                className="px-2.5 py-1.5 rounded-lg text-[10.5px] font-mono transition-all"
-                style={{ background: `${TEAL}10`, border: `1px solid ${TEAL}25`, color: TEAL }}>
-                › {q}
-              </button>
-            ))}
+          {/* Dynamic contextual prompts — gerados dos dados reais */}
+          <div className="flex flex-col gap-1.5 mb-3">
+            {(() => {
+              const qs: string[] = []
+              if (daysSince1a1 !== null && daysSince1a1 > 7)
+                qs.push(`${daysSince1a1} dias sem 1:1 — como retomar sem parecer forçado?`)
+              if (s.pesNpsUtilidade > 0 && s.pesNpsUtilidade <= 5)
+                qs.push(`NPS Interno em ${s.pesNpsUtilidade}/10 — o que está matando o engajamento?`)
+              if (s.pesGapHabilidade.trim())
+                qs.push(`Gap: "${s.pesGapHabilidade.slice(0, 45)}" — que plano de desenvolvimento funciona?`)
+              if (s.pesBloqueios.trim())
+                qs.push(`Bloqueio: "${s.pesBloqueios.slice(0, 45)}" — como eliminar esta semana?`)
+              if (sentMain.score < 5 && s.pesAcordos.trim().length > 10)
+                qs.push(`Comprometimento fraco nos acordos — como reformular para comprometer de verdade?`)
+              if (s.pesNotaLider > 0 && s.pesNotaLiderado > 0 && Math.abs(s.pesNotaLider - s.pesNotaLiderado) > 2)
+                qs.push(`Gap de percepção: eu vejo ${s.pesNotaLider}/10, liderado vê ${s.pesNotaLiderado}/10 — o que fazer?`)
+              if (pcts[lowestId] < 50)
+                qs.push(`${DIMS[lowestId].label} em ${pcts[lowestId]}% — diagnóstico real e primeiro passo?`)
+              qs.push(`Índice 6D em ${index6D}/100 — quais 3 ações têm mais impacto esta semana?`)
+              return qs.slice(0, 4).map(q => (
+                <button key={q} onClick={() => askCoach(q)}
+                  className="text-left px-3 py-2 rounded-lg text-[10.5px] font-mono transition-all leading-relaxed"
+                  style={{ background: `${TEAL}08`, border: `1px solid ${TEAL}20`, color: TEAL }}>
+                  › {q}
+                </button>
+              ))
+            })()}
           </div>
 
           {iaLoading && (
