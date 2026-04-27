@@ -1031,46 +1031,6 @@ export default function PessoasLideranca() {
       </div>
 
       {/* ════════════════════════════════════
-          OKR ALIGNMENT
-          ════════════════════════════════════ */}
-      {okrs.length > 0 && (
-        <div>
-          <div className="px-1 mb-3">
-            <p className="text-[9px] font-mono tracking-[0.25em] text-white/18 uppercase mb-1">Alinhamento</p>
-            <p className="text-[14px] font-black text-white/70">OKRs do Negócio</p>
-          </div>
-          {okrs.map((okr, oi) => {
-            const avg = Math.round(okr.krs.reduce((a, k) => a + (k.pct ?? 0), 0) / Math.max(1, okr.krs.length))
-            const c = avg >= 70 ? TEAL : avg >= 30 ? AMBER : RED
-            return (
-              <div key={oi} className="rounded-xl p-3 mb-2"
-                style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-[11px] font-bold text-white/65 flex-1 pr-2">{okr.objetivo}</p>
-                  <span className="text-[13px] font-black font-mono shrink-0" style={{ color: c }}>{avg}%</span>
-                </div>
-                {okr.krs.filter(k => k.texto.trim()).map((kr, ki) => (
-                  <div key={ki} className="mb-1.5">
-                    <div className="flex justify-between mb-0.5">
-                      <p className="text-[9.5px] text-white/30 truncate flex-1 pr-2">{kr.texto}</p>
-                      <p className="text-[9.5px] font-mono text-white/30 shrink-0">{kr.pct}%</p>
-                    </div>
-                    <div className="h-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                      <motion.div className="h-full rounded-full"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${kr.pct}%` }}
-                        transition={{ duration: 0.6, delay: ki * 0.08 }}
-                        style={{ background: c }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )
-          })}
-        </div>
-      )}
-
-      {/* ════════════════════════════════════
           AI TERMINAL
           ════════════════════════════════════ */}
       <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.08)' }}>
