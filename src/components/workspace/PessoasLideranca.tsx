@@ -659,6 +659,7 @@ export default function PessoasLideranca() {
   const [dimIaAnswers, setDimIaAnswers] = useState<Record<number, string>>({})
   const [showClear, setShowClear] = useState(false)
   const [presentMode, setPresentMode] = useState(false)
+  const [slideIndex, setSlideIndex] = useState(0)
   const [activeTab, setActiveTab] = useState<'individual' | 'time'>('individual')
 
   // Cross-module context
@@ -832,219 +833,350 @@ export default function PessoasLideranca() {
     return acts.slice(0, 4)
   })()
 
-  if (presentMode) return (
-    <div className="flex flex-col gap-3 pb-8">
+  if (presentMode) {
+    const hasTeam = liderados.filter(l => l.nome.trim()).length > 0
+    const slides = [
+      'capa',
+      'acoes',
+      'diagnostico',
+      'negocios',
+      ...(hasTeam ? ['time'] : []),
+      ...(snaps.length > 1 ? ['evolucao'] : []),
+    ]
+    const totalSlides = slides.length
+    const curSlide = slides[Math.min(slideIndex, totalSlides - 1)]
 
-      {/* ── Header ── */}
-      <div className="flex items-center justify-between px-1 pt-1">
-        <div>
-          <p className="text-[8px] font-mono tracking-[0.2em] text-white/18 uppercase mb-1">Análise de Liderança</p>
-          <div className="flex items-center gap-2.5">
-            <motion.span key={index6D} initial={{ scale: 0.85 }} animate={{ scale: 1 }}
-              className="text-[38px] font-black font-mono leading-none"
-              style={{ color: overallColor, textShadow: `0 0 24px ${overallColor}40` }}>
-              {index6D}
-            </motion.span>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[9px] font-mono text-white/22">/100 · Índice 6D</span>
-              {lastSnap && Math.abs(index6D - lastSnap.index6D) > 0 && (
-                <span className="text-[10px] font-mono font-bold leading-none" style={{ color: index6D >= lastSnap.index6D ? TEAL : RED }}>
-                  {index6D >= lastSnap.index6D ? '▲' : '▼'}{Math.abs(index6D - lastSnap.index6D)} pts vs último
-                </span>
-              )}
-              <span className="text-[9px] font-mono text-white/20">
-                {s.pesLiderados > 0 ? `${s.pesLiderados} pessoa${s.pesLiderados > 1 ? 's' : ''}` : 'time'} · D6 ×{d6mult.toFixed(2)}
-              </span>
+    const goNext = () => setSlideIndex(i => Math.min(i + 1, totalSlides - 1))
+    const goPrev = () => setSlideIndex(i => Math.max(i - 1, 0))
+
+    return (
+    <div className="flex flex-col" style={{ minHeight: 'calc(100vh - 120px)' }}>
+
+      {/* ── Slide area ── */}
+      <div className="flex-1 relative">
+        <AnimatePresence mode="wait">
+          <motion.div key={curSlide}
+            initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}
+            transition={{ duration: 0.22 }}
+            className="flex flex-col gap-4 px-1 pt-2 pb-4"
+          >
+
+          {/* ══ SLIDE: CAPA ══ */}
+          {curSlide === 'capa' && (<>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-[8px] font-mono tracking-[0.22em] text-white/18 uppercase">Neural Leadership OS</p>
+                <p className="text-[10px] font-mono text-white/20 mt-0.5">{faseLabel} · {s.pesLiderados > 0 ? `${s.pesLiderados} pessoa${s.pesLiderados > 1 ? 's' : ''}` : 'sem equipe definida'}</p>
+              </div>
             </div>
-            {snaps.length >= 3 && <Sparkline data={snaps.map(sn => sn.index6D)} color={overallColor} sw={80} sh={34} />}
-          </div>
-        </div>
-        <button onClick={() => setPresentMode(false)}
-          className="text-[9px] font-mono text-white/28 px-2.5 py-1.5 rounded-lg transition-colors hover:text-white/50"
-          style={{ border: '1px solid rgba(255,255,255,0.09)' }}>
-          ← editar
-        </button>
-      </div>
 
-      {/* ── Ações Prioritárias ── */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.38)', border: '1px solid rgba(255,255,255,0.08)' }}>
-        <div className="px-3 py-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
-          <p className="text-[8.5px] font-mono tracking-[0.18em] text-white/30 uppercase">Ações Prioritárias</p>
-        </div>
-        {dashActions.length === 0 ? (
-          <div className="px-3 py-4 text-center">
-            <p className="text-[11px] text-white/25 font-mono">Preencha os dados para gerar ações</p>
-          </div>
-        ) : (
-          <div className="flex flex-col">
-            {dashActions.map((act, i) => {
-              const priorityConfig = {
-                urgente: { label: 'URGENTE', bg: `${RED}12`, border: `${RED}30`, color: RED },
-                alta: { label: 'ALTA', bg: `${AMBER}0d`, border: `${AMBER}28`, color: AMBER },
-                media: { label: 'MED', bg: 'rgba(255,255,255,0.03)', border: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.35)' },
-              }[act.priority]
-              return (
-                <div key={i} className="flex items-start gap-3 px-3 py-3"
-                  style={{ borderBottom: i < dashActions.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
-                  <span className="text-[7px] font-mono font-black px-1.5 py-0.5 rounded mt-0.5 shrink-0"
-                    style={{ background: priorityConfig.bg, border: `1px solid ${priorityConfig.border}`, color: priorityConfig.color, letterSpacing: '0.1em' }}>
-                    {priorityConfig.label}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-semibold text-white/80 leading-snug">{act.action}</p>
-                    <p className="text-[9.5px] text-white/28 mt-0.5 leading-relaxed">{act.why}</p>
-                  </div>
+            <div className="rounded-2xl p-6 flex flex-col items-center gap-3" style={{ background: `linear-gradient(135deg, ${overallColor}14, rgba(0,0,0,0.5))`, border: `1px solid ${overallColor}30` }}>
+              <p className="text-[9px] font-mono tracking-widest text-white/25 uppercase">Índice de Liderança 6D</p>
+              <motion.div key={index6D} initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.5 }}
+                className="text-[88px] font-black font-mono leading-none"
+                style={{ color: overallColor, textShadow: `0 0 60px ${overallColor}50` }}>
+                {index6D}
+              </motion.div>
+              <div className="flex items-center gap-4 text-center">
+                <div>
+                  <p className="text-[18px] font-black font-mono" style={{ color: overallColor }}>×{d6mult.toFixed(2)}</p>
+                  <p className="text-[8px] font-mono text-white/22">multiplicador D6</p>
                 </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* ── Business Signals ── */}
-      <div className="grid grid-cols-4 gap-1.5">
-        {[
-          {
-            label: 'Runway', value: !hasFinanceiro ? '—' : runway === 99 ? '∞' : String(runway),
-            unit: hasFinanceiro && runway !== 99 ? 'm' : '',
-            color: !hasFinanceiro ? 'rgba(255,255,255,0.15)' : runway < 3 ? RED : runway < 6 ? AMBER : TEAL,
-            sub: !hasFinanceiro ? 'sem dados' : runway < 3 ? 'crítico' : runway < 6 ? 'atenção' : 'ok',
-          },
-          {
-            label: 'Margem', value: margem > 0 ? String(margem) : '—',
-            unit: margem > 0 ? '%' : '',
-            color: margem <= 0 ? 'rgba(255,255,255,0.15)' : margem < 10 ? RED : margem < 20 ? AMBER : TEAL,
-            sub: margem <= 0 ? 'sem dados' : margem < 10 ? 'apertada' : margem < 20 ? 'regular' : 'saudável',
-          },
-          {
-            label: 'D6 ×mult', value: `×${d6mult.toFixed(1)}`,
-            unit: '',
-            color: d6Low ? RED : d6mult >= 1.3 ? TEAL : AMBER,
-            sub: d6Low ? 'drenando' : d6mult >= 1.3 ? 'amplificando' : 'neutro',
-          },
-          {
-            label: 'NPS Intern', value: s.pesNpsUtilidade > 0 ? String(s.pesNpsUtilidade) : '—',
-            unit: s.pesNpsUtilidade > 0 ? '/10' : '',
-            color: s.pesNpsUtilidade <= 0 ? 'rgba(255,255,255,0.15)' : s.pesNpsUtilidade <= 4 ? RED : s.pesNpsUtilidade <= 6 ? AMBER : TEAL,
-            sub: s.pesNpsUtilidade <= 0 ? 'não avaliado' : s.pesNpsUtilidade <= 4 ? 'risco churn' : s.pesNpsUtilidade <= 6 ? 'passivo' : 'engajado',
-          },
-        ].map((sig, i) => (
-          <div key={i} className="rounded-xl px-2 py-2.5 flex flex-col gap-0.5" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <p className="text-[7.5px] font-mono text-white/20 uppercase tracking-wide truncate">{sig.label}</p>
-            <div className="flex items-end gap-0.5">
-              <span className="text-[18px] font-black font-mono leading-none" style={{ color: sig.color }}>{sig.value}</span>
-              {sig.unit && <span className="text-[9px] font-mono pb-0.5" style={{ color: sig.color, opacity: 0.6 }}>{sig.unit}</span>}
-            </div>
-            <p className="text-[8px] text-white/22 truncate">{sig.sub}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* ── Radar + Dimensões ── */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.07)' }}>
-        <div className="flex items-start gap-2 p-2">
-          <div className="shrink-0">
-            <HexRadar pcts={pcts} colors={DIM_COLORS} />
-          </div>
-          <div className="flex-1 flex flex-col gap-1 pt-1 pr-1">
-            {DIMS.map(d => {
-              const pct = pcts[d.id]
-              const prevDim = lastSnap ? Math.round((lastSnap.dims[d.id] / 20) * 100) : null
-              const delta = prevDim !== null ? pct - prevDim : null
-              return (
-                <div key={d.id} className="flex items-center gap-2">
-                  <span className="text-[8px] font-mono w-5 shrink-0" style={{ color: d.color, opacity: 0.7 }}>{d.code}</span>
-                  <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                    <motion.div className="h-full rounded-full"
-                      initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.6, delay: d.id * 0.05 }}
-                      style={{ background: pct < 40 ? RED : pct < 65 ? AMBER : d.color }} />
+                {lastSnap && (
+                  <div>
+                    <p className="text-[18px] font-black font-mono" style={{ color: index6D >= lastSnap.index6D ? TEAL : RED }}>
+                      {index6D >= lastSnap.index6D ? '+' : ''}{index6D - lastSnap.index6D}
+                    </p>
+                    <p className="text-[8px] font-mono text-white/22">vs último</p>
                   </div>
-                  <span className="text-[10px] font-mono font-bold w-6 text-right shrink-0" style={{ color: pct < 40 ? RED : pct < 65 ? AMBER : d.color }}>{pct}</span>
-                  {delta !== null && delta !== 0 && (
-                    <span className="text-[8px] font-mono w-7 shrink-0" style={{ color: delta > 0 ? TEAL : RED }}>
-                      {delta > 0 ? '+' : ''}{delta}
-                    </span>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Evolução ── */}
-      {snaps.length > 1 && (
-        <div className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <div className="flex items-center justify-between mb-2.5">
-            <p className="text-[8.5px] font-mono text-white/22 uppercase tracking-widest">Evolução do Índice</p>
-            {snaps.length >= 3 && (
-              <span className="text-[9px] font-mono" style={{ color: snaps[snaps.length - 1].index6D >= snaps[0].index6D ? TEAL : RED }}>
-                {snaps[snaps.length - 1].index6D >= snaps[0].index6D ? '▲' : '▼'} {Math.abs(snaps[snaps.length - 1].index6D - snaps[0].index6D)} pts total
-              </span>
-            )}
-          </div>
-          <div className="flex flex-col gap-1.5">
-            {[...snaps].reverse().slice(0, 8).map((snap, i) => {
-              const d = new Date(snap.date)
-              const label = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
-              const c = snap.index6D >= 70 ? TEAL : snap.index6D >= 45 ? AMBER : RED
-              return (
-                <div key={i} className="flex items-center gap-2">
-                  <span className="text-[8px] font-mono text-white/18 w-20 shrink-0">{label}</span>
-                  <div className="flex-1 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                    <motion.div className="h-full rounded-full"
-                      initial={{ width: 0 }} animate={{ width: `${snap.index6D}%` }} transition={{ duration: 0.5, delay: i * 0.04 }}
-                      style={{ background: c }} />
-                  </div>
-                  <span className="text-[10px] font-mono font-black w-6 text-right shrink-0" style={{ color: c }}>{snap.index6D}</span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* ── Time ── */}
-      {liderados.filter(l => l.nome.trim()).length > 0 && (
-        <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <div className="px-3 py-2.5 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-            <p className="text-[8.5px] font-mono text-white/22 uppercase tracking-widest">Time — Radar Individual</p>
-            <span className="text-[9px] font-mono text-white/20">{liderados.filter(l => l.nome.trim()).length} pessoas</span>
-          </div>
-          {liderados.filter(l => l.nome.trim()).map(l => {
-            const lScore = calcIndex6D(l.scores, 0)
-            const lColor = lScore >= 70 ? TEAL : lScore >= 45 ? AMBER : RED
-            const lowestTeam = l.scores.indexOf(Math.min(...l.scores))
-            return (
-              <div key={l.id} className="px-3 py-2.5" style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <p className="text-[11px] text-white/60 font-semibold truncate">{l.nome}</p>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[8px] font-mono text-white/20">foco: {DIMS[lowestTeam]?.code}</span>
-                    <span className="text-[14px] font-black font-mono" style={{ color: lColor }}>{lScore}</span>
-                  </div>
-                </div>
-                <div className="flex gap-1">
-                  {l.scores.map((sc, si) => {
-                    const dimPct = Math.round((sc / 20) * 100)
-                    return (
-                      <div key={si} className="flex-1">
-                        <div className="h-1.5 rounded-full mb-0.5" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                          <div className="h-full rounded-full" style={{ width: `${dimPct}%`, background: dimPct < 40 ? RED : dimPct < 65 ? AMBER : DIM_COLORS[si] }} />
-                        </div>
-                        <span className="text-[7.5px] font-mono block text-center" style={{ color: DIM_COLORS[si], opacity: 0.5 }}>{dimPct}</span>
-                      </div>
-                    )
-                  })}
+                )}
+                <div>
+                  <p className="text-[18px] font-black font-mono text-white/60">{pcts.filter(p => p >= 60).length}/6</p>
+                  <p className="text-[8px] font-mono text-white/22">dimensões ok</p>
                 </div>
               </div>
-            )
-          })}
+            </div>
+
+            <div className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <p className="text-[9px] font-mono text-white/20 mb-2 uppercase tracking-wider">Status por dimensão</p>
+              <div className="flex gap-1.5">
+                {DIMS.map(d => {
+                  const pct = pcts[d.id]
+                  const c = pct < 40 ? RED : pct < 65 ? AMBER : d.color
+                  return (
+                    <div key={d.id} className="flex-1 flex flex-col items-center gap-1">
+                      <div className="w-full rounded-full overflow-hidden" style={{ height: `${Math.max(4, Math.round(pct / 100 * 48))}px`, background: `${c}22`, border: `1px solid ${c}30` }}>
+                        <motion.div className="w-full h-full rounded-full" style={{ background: c }}
+                          initial={{ scaleY: 0, originY: 1 }} animate={{ scaleY: 1 }} transition={{ duration: 0.5, delay: d.id * 0.07 }} />
+                      </div>
+                      <span className="text-[8px] font-mono" style={{ color: c, opacity: 0.7 }}>{d.code}</span>
+                      <span className="text-[9px] font-bold font-mono" style={{ color: c }}>{pct}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {admin.norteStar && (
+              <div className="rounded-xl px-3 py-2.5" style={{ background: 'rgba(0,0,0,0.28)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <p className="text-[8px] font-mono text-white/18 uppercase tracking-wider mb-1">Norte Estratégico</p>
+                <p className="text-[11px] text-white/55 leading-relaxed italic">"{admin.norteStar}"</p>
+              </div>
+            )}
+          </>)}
+
+          {/* ══ SLIDE: AÇÕES ══ */}
+          {curSlide === 'acoes' && (<>
+            <div>
+              <p className="text-[8px] font-mono tracking-[0.22em] text-white/18 uppercase">Slide 2 — Tomada de Decisão</p>
+              <p className="text-[18px] font-bold text-white/80 mt-1">Ações Prioritárias</p>
+              <p className="text-[10px] text-white/25 mt-0.5">Geradas automaticamente a partir dos dados</p>
+            </div>
+
+            {dashActions.length === 0 ? (
+              <div className="rounded-2xl p-8 flex flex-col items-center gap-2" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <p className="text-[13px] text-white/25">Nenhuma ação gerada</p>
+                <p className="text-[10px] text-white/18 text-center">Preencha os dados nas dimensões<br/>para ativar o diagnóstico automático</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2.5">
+                {dashActions.map((act, i) => {
+                  const cfg = {
+                    urgente: { label: 'URGENTE', bg: `${RED}14`, border: `${RED}35`, color: RED, num: `${RED}` },
+                    alta:    { label: 'ALTA',    bg: `${AMBER}10`, border: `${AMBER}30`, color: AMBER, num: AMBER },
+                    media:   { label: 'MÉDIA',   bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)', num: 'rgba(255,255,255,0.3)' },
+                  }[act.priority]
+                  return (
+                    <div key={i} className="rounded-xl p-4" style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }}>
+                      <div className="flex items-start gap-3">
+                        <div className="flex flex-col items-center gap-1.5 shrink-0">
+                          <span className="text-[20px] font-black font-mono leading-none" style={{ color: cfg.num, opacity: 0.35 }}>{i + 1}</span>
+                          <span className="text-[7px] font-mono font-black px-1.5 py-0.5 rounded"
+                            style={{ background: `${cfg.border}`, color: cfg.color, border: `1px solid ${cfg.border}`, letterSpacing: '0.1em' }}>
+                            {cfg.label}
+                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-[14px] font-semibold text-white/85 leading-snug">{act.action}</p>
+                          <p className="text-[10px] text-white/30 mt-1.5 leading-relaxed">{act.why}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            {riskSignals.filter(r => r.level === 'critical').length > 0 && (
+              <div className="rounded-xl px-3 py-2.5" style={{ background: `${RED}08`, border: `1px solid ${RED}20` }}>
+                <p className="text-[8.5px] font-mono uppercase tracking-wider mb-1.5" style={{ color: RED, opacity: 0.6 }}>Alertas críticos</p>
+                {riskSignals.filter(r => r.level === 'critical').slice(0, 2).map((r, i) => (
+                  <p key={i} className="text-[10px] leading-relaxed mb-1" style={{ color: RED, opacity: 0.75 }}>• {r.msg}</p>
+                ))}
+              </div>
+            )}
+          </>)}
+
+          {/* ══ SLIDE: DIAGNÓSTICO ══ */}
+          {curSlide === 'diagnostico' && (<>
+            <div>
+              <p className="text-[8px] font-mono tracking-[0.22em] text-white/18 uppercase">Slide 3 — Diagnóstico</p>
+              <p className="text-[18px] font-bold text-white/80 mt-1">Análise 6 Dimensões</p>
+            </div>
+
+            <div className="rounded-2xl p-3" style={{ background: 'rgba(0,0,0,0.38)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <HexRadar pcts={pcts} colors={DIM_COLORS} />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              {DIMS.map(d => {
+                const pct = pcts[d.id]
+                const prevDim = lastSnap ? Math.round((lastSnap.dims[d.id] / 20) * 100) : null
+                const delta = prevDim !== null ? pct - prevDim : null
+                const c = pct < 40 ? RED : pct < 65 ? AMBER : d.color
+                return (
+                  <div key={d.id} className="rounded-xl px-3 py-2.5 flex items-center gap-3"
+                    style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${c}18` }}>
+                    <span className="text-[10px] font-mono w-6 shrink-0" style={{ color: d.color, opacity: 0.6 }}>{d.code}</span>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[11px] font-semibold text-white/65">{d.label}</span>
+                        <div className="flex items-center gap-1.5">
+                          {delta !== null && delta !== 0 && (
+                            <span className="text-[9px] font-mono" style={{ color: delta > 0 ? TEAL : RED }}>{delta > 0 ? '+' : ''}{delta}</span>
+                          )}
+                          <span className="text-[14px] font-black font-mono" style={{ color: c }}>{pct}</span>
+                        </div>
+                      </div>
+                      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                        <motion.div className="h-full rounded-full" style={{ background: c }}
+                          initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.5, delay: d.id * 0.06 }} />
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>)}
+
+          {/* ══ SLIDE: NEGÓCIOS ══ */}
+          {curSlide === 'negocios' && (<>
+            <div>
+              <p className="text-[8px] font-mono tracking-[0.22em] text-white/18 uppercase">Slide 4 — Contexto</p>
+              <p className="text-[18px] font-bold text-white/80 mt-1">Sinais do Negócio</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              {[
+                { label: 'Runway', value: !hasFinanceiro ? '—' : runway === 99 ? '∞' : String(runway), unit: hasFinanceiro && runway !== 99 ? 'm' : '', color: !hasFinanceiro ? 'rgba(255,255,255,0.15)' : runway < 3 ? RED : runway < 6 ? AMBER : TEAL, sub: !hasFinanceiro ? 'Preencha o Cockpit' : runway < 3 ? 'CRÍTICO — caixa em risco' : runway < 6 ? 'Atenção — runway curto' : 'Saudável' },
+                { label: 'Margem Líq.', value: margem > 0 ? `${margem}` : '—', unit: margem > 0 ? '%' : '', color: margem <= 0 ? 'rgba(255,255,255,0.15)' : margem < 10 ? RED : margem < 20 ? AMBER : TEAL, sub: margem <= 0 ? 'Sem dados financeiros' : margem < 10 ? 'Margem crítica' : margem < 20 ? 'Margem regular' : 'Margem saudável' },
+                { label: 'Multiplicador D6', value: `×${d6mult.toFixed(2)}`, unit: '', color: d6Low ? RED : d6mult >= 1.3 ? TEAL : AMBER, sub: d6Low ? 'Cultura drenando resultado' : d6mult >= 1.3 ? 'Cultura amplificando' : 'Cultura neutra' },
+                { label: 'NPS Interno', value: s.pesNpsUtilidade > 0 ? String(s.pesNpsUtilidade) : '—', unit: s.pesNpsUtilidade > 0 ? '/10' : '', color: s.pesNpsUtilidade <= 0 ? 'rgba(255,255,255,0.15)' : s.pesNpsUtilidade <= 4 ? RED : s.pesNpsUtilidade <= 6 ? AMBER : TEAL, sub: s.pesNpsUtilidade <= 0 ? 'Não avaliado' : s.pesNpsUtilidade <= 4 ? 'Risco alto de churn' : s.pesNpsUtilidade <= 6 ? 'Equipe no limiar' : 'Equipe engajada' },
+              ].map((sig, i) => (
+                <div key={i} className="rounded-2xl px-4 py-4 flex flex-col gap-1.5"
+                  style={{ background: 'rgba(0,0,0,0.38)', border: `1px solid ${sig.color}22` }}>
+                  <p className="text-[8.5px] font-mono text-white/22 uppercase tracking-wide">{sig.label}</p>
+                  <div className="flex items-end gap-1">
+                    <span className="text-[32px] font-black font-mono leading-none" style={{ color: sig.color }}>{sig.value}</span>
+                    {sig.unit && <span className="text-[12px] font-mono pb-1" style={{ color: sig.color, opacity: 0.55 }}>{sig.unit}</span>}
+                  </div>
+                  <p className="text-[10px] text-white/28 leading-snug">{sig.sub}</p>
+                </div>
+              ))}
+            </div>
+
+            {okrs.length > 0 && (
+              <div className="rounded-xl px-3 py-3" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[8.5px] font-mono text-white/22 uppercase tracking-wider">OKRs da Empresa</p>
+                  <span className="text-[10px] font-mono font-bold" style={{ color: okrAvgPct >= 70 ? TEAL : okrAvgPct >= 40 ? AMBER : RED }}>{okrAvgPct}% progresso</span>
+                </div>
+                {okrs.slice(0, 3).map((o, i) => (
+                  <p key={i} className="text-[10px] text-white/40 mb-0.5 truncate">• {o.objetivo}</p>
+                ))}
+              </div>
+            )}
+          </>)}
+
+          {/* ══ SLIDE: TIME ══ */}
+          {curSlide === 'time' && (<>
+            <div>
+              <p className="text-[8px] font-mono tracking-[0.22em] text-white/18 uppercase">Slide 5 — Time</p>
+              <p className="text-[18px] font-bold text-white/80 mt-1">Análise Individual</p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              {liderados.filter(l => l.nome.trim()).map(l => {
+                const lScore = calcIndex6D(l.scores, 0)
+                const lColor = lScore >= 70 ? TEAL : lScore >= 45 ? AMBER : RED
+                const lLowest = l.scores.indexOf(Math.min(...l.scores))
+                return (
+                  <div key={l.id} className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.35)', border: `1px solid ${lColor}20` }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-[13px] font-bold text-white/70">{l.nome}</p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-mono text-white/22">foco: {DIMS[lLowest]?.label}</span>
+                        <span className="text-[22px] font-black font-mono" style={{ color: lColor }}>{lScore}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1.5">
+                      {l.scores.map((sc, si) => {
+                        const dp = Math.round((sc / 20) * 100)
+                        const dc = dp < 40 ? RED : dp < 65 ? AMBER : DIM_COLORS[si]
+                        return (
+                          <div key={si} className="flex-1 flex flex-col items-center gap-0.5">
+                            <div className="w-full h-10 rounded-lg flex flex-col justify-end overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                              <motion.div className="w-full rounded-lg"
+                                style={{ height: `${dp}%`, background: dc, opacity: 0.8 }}
+                                initial={{ scaleY: 0, originY: 1 }} animate={{ scaleY: 1 }} transition={{ duration: 0.4, delay: si * 0.05 }} />
+                            </div>
+                            <span className="text-[7.5px] font-mono" style={{ color: DIM_COLORS[si], opacity: 0.55 }}>{DIMS[si].code}</span>
+                            <span className="text-[9px] font-bold font-mono" style={{ color: dc }}>{dp}</span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>)}
+
+          {/* ══ SLIDE: EVOLUÇÃO ══ */}
+          {curSlide === 'evolucao' && (<>
+            <div>
+              <p className="text-[8px] font-mono tracking-[0.22em] text-white/18 uppercase">Slide — Histórico</p>
+              <p className="text-[18px] font-bold text-white/80 mt-1">Evolução do Índice</p>
+              {snaps.length >= 2 && (
+                <p className="text-[11px] mt-1" style={{ color: snaps[snaps.length - 1].index6D >= snaps[0].index6D ? TEAL : RED }}>
+                  {snaps[snaps.length - 1].index6D >= snaps[0].index6D ? '▲' : '▼'} {Math.abs(snaps[snaps.length - 1].index6D - snaps[0].index6D)} pts desde o início
+                </p>
+              )}
+            </div>
+
+            {snaps.length >= 3 && (
+              <div className="rounded-2xl p-4" style={{ background: 'rgba(0,0,0,0.38)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <Sparkline data={snaps.map(sn => sn.index6D)} color={overallColor} sw={280} sh={80} />
+              </div>
+            )}
+
+            <div className="flex flex-col gap-1.5">
+              {[...snaps].reverse().slice(0, 10).map((snap, i) => {
+                const d = new Date(snap.date)
+                const label = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+                const c = snap.index6D >= 70 ? TEAL : snap.index6D >= 45 ? AMBER : RED
+                return (
+                  <div key={i} className="flex items-center gap-3">
+                    <span className="text-[9px] font-mono text-white/20 w-20 shrink-0">{label}</span>
+                    <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                      <motion.div className="h-full rounded-full" style={{ background: c }}
+                        initial={{ width: 0 }} animate={{ width: `${snap.index6D}%` }} transition={{ duration: 0.5, delay: i * 0.04 }} />
+                    </div>
+                    <span className="text-[12px] font-black font-mono w-7 text-right shrink-0" style={{ color: c }}>{snap.index6D}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </>)}
+
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* ── Navigation bar ── */}
+      <div className="sticky bottom-0 pt-3 pb-2" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)' }}>
+        <div className="flex items-center justify-between px-1">
+          <button onClick={() => { setPresentMode(false); setSlideIndex(0) }}
+            className="text-[9px] font-mono text-white/25 px-2.5 py-1.5 rounded-lg"
+            style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+            ← sair
+          </button>
+
+          <div className="flex items-center gap-1.5">
+            {slides.map((_, i) => (
+              <button key={i} onClick={() => setSlideIndex(i)}
+                className="rounded-full transition-all"
+                style={{ width: i === slideIndex ? 16 : 6, height: 6, background: i === slideIndex ? overallColor : 'rgba(255,255,255,0.15)' }} />
+            ))}
+          </div>
+
+          <div className="flex items-center gap-1.5">
+            <button onClick={goPrev} disabled={slideIndex === 0}
+              className="px-2.5 py-1.5 rounded-lg text-[9px] font-mono transition-all"
+              style={{ border: '1px solid rgba(255,255,255,0.08)', color: slideIndex === 0 ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.4)' }}>
+              ‹
+            </button>
+            <button onClick={goNext} disabled={slideIndex === totalSlides - 1}
+              className="px-2.5 py-1.5 rounded-lg text-[9px] font-mono font-bold transition-all"
+              style={{ border: `1px solid ${slideIndex === totalSlides - 1 ? 'rgba(255,255,255,0.08)' : overallColor + '50'}`, color: slideIndex === totalSlides - 1 ? 'rgba(255,255,255,0.12)' : overallColor }}>
+              ›
+            </button>
+          </div>
         </div>
-      )}
+      </div>
 
     </div>
-  )
+  )}
 
   return (
     <div className="flex flex-col gap-5 pb-8">
