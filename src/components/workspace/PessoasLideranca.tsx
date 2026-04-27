@@ -657,6 +657,8 @@ export default function PessoasLideranca() {
   const [iaAnswer, setIaAnswer] = useState('')
   const [dimIaLoading, setDimIaLoading] = useState<number | null>(null)
   const [dimIaAnswers, setDimIaAnswers] = useState<Record<number, string>>({})
+  const [manifIaLoading, setManifIaLoading] = useState<number | null>(null)
+  const [manifIaAnswers, setManifIaAnswers] = useState<Record<number, string>>({})
   const [showClear, setShowClear] = useState(false)
   const [presentMode, setPresentMode] = useState(false)
   const [slideIndex, setSlideIndex] = useState(0)
@@ -785,6 +787,28 @@ export default function PessoasLideranca() {
       const j = await res.json()
       setDimIaAnswers(prev => ({ ...prev, [dimId]: j.answer ?? '' }))
     } finally { setDimIaLoading(null) }
+  }
+
+  async function askManifIa(mi: number, q: string) {
+    setManifIaLoading(mi)
+    try {
+      const ctx = [
+        `Manifesto princípio ${mi + 1}: ${MANIFESTO[mi].title} | Praticado: ${(s.pesDig ?? [])[mi] ? 'sim' : 'não'}`,
+        `Índice 6D: ${index6D}/100 | D6 mult ×${d6mult.toFixed(2)} | ${practicedCount}/5 princípios ativos`,
+        `Time: ${s.pesLiderados || '?'} pessoas | Fase: ${faseLabel}`,
+        daysSince1a1 !== null ? `Último 1:1: ${daysSince1a1}d atrás` : 'Último 1:1: nunca',
+        s.pesNpsUtilidade > 0 ? `NPS Interno: ${s.pesNpsUtilidade}/10` : '',
+        s.pesBloqueios.trim() ? `Bloqueio atual: "${s.pesBloqueios.slice(0, 80)}"` : '',
+        s.pesGapHabilidade.trim() ? `Gap de habilidade: "${s.pesGapHabilidade.slice(0, 80)}"` : '',
+        s.pesAcordos.trim() ? `Acordos 1:1: "${s.pesAcordos.slice(0, 100)}"` : '',
+      ].filter(Boolean).join(' | ')
+      const res = await fetch('/api/advisor-chat', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q, marketContext: ctx, role: 'lider' }),
+      })
+      const j = await res.json()
+      setManifIaAnswers(prev => ({ ...prev, [mi]: j.answer ?? '' }))
+    } finally { setManifIaLoading(null) }
   }
 
   // Auto-generate contextual IA alert
@@ -1413,132 +1437,147 @@ export default function PessoasLideranca() {
       </AnimatePresence>
 
       {/* ════════════════════════════════════
-          MANIFESTO — Interativo + Dados
+          MANIFESTO — 5 Princípios + IA
           ════════════════════════════════════ */}
-      {(() => {
-        // Each principle links to a dimension — shows real score + impact
-        const LINKS = [[0], [4], [2, 3], [3], [1]]
-        const impactPerPrinciple = 0.1 // each principle adds ~0.1 to d6mult
-        return (
-          <div>
-            <div className="px-1 mb-4">
-              <p className="text-[9px] font-mono tracking-[0.25em] text-white/18 uppercase mb-1">Código de Cultura · D6</p>
-              <div className="flex items-end gap-3">
-                <h2 className="text-[17px] font-black text-white/80 leading-tight">Manifesto de Liderança</h2>
-                <div className="flex flex-col items-end mb-0.5">
-                  <span className="text-[18px] font-black font-mono leading-none" style={{ color: d6Low ? RED : d6mult >= 1.3 ? TEAL : AMBER }}>
-                    ×{d6mult.toFixed(2)}
-                  </span>
-                  <span className="text-[8px] font-mono text-white/20">{practicedCount}/5 ativos</span>
-                </div>
-              </div>
-              {/* Multiplier bar */}
-              <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                <motion.div className="h-full rounded-full" animate={{ width: `${Math.min(100, d6mult * 66.7)}%` }} transition={{ duration: 0.6 }}
-                  style={{ background: d6Low ? RED : d6mult >= 1.3 ? TEAL : AMBER }} />
-              </div>
-              <div className="flex justify-between mt-0.5">
-                <span className="text-[7.5px] font-mono text-white/15">×0.5 — sem cultura</span>
-                <span className="text-[7.5px] font-mono text-white/15">×1.5 — cultura forte</span>
-              </div>
+      <div>
+        {/* Header com multiplicador ao vivo */}
+        <div className="px-1 mb-4">
+          <p className="text-[9px] font-mono tracking-[0.25em] text-white/18 uppercase mb-1">Código de Cultura · D6</p>
+          <div className="flex items-end gap-3">
+            <h2 className="text-[17px] font-black text-white/80 leading-tight">Manifesto de Liderança</h2>
+            <div className="flex flex-col items-end mb-0.5">
+              <span className="text-[18px] font-black font-mono leading-none" style={{ color: d6Low ? RED : d6mult >= 1.3 ? TEAL : AMBER }}>
+                ×{d6mult.toFixed(2)}
+              </span>
+              <span className="text-[8px] font-mono text-white/20">{practicedCount}/5 ativos</span>
             </div>
-
-            <div className="relative flex flex-col">
-              <div className="absolute left-5 top-5 bottom-5 w-px" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.02))' }} />
-
-              {MANIFESTO.map((m, mi) => {
-                const practiced = (s.pesDig ?? [])[mi]
-                const linkedDims = LINKS[mi]
-                const linkedScores = linkedDims.map(id => pcts[id])
-                const lowestLinked = Math.min(...linkedScores)
-                const linkedLow = lowestLinked < 45 && !practiced
-                const potentialMult = practiced ? null : (d6mult + impactPerPrinciple).toFixed(2)
-
-                return (
-                  <motion.div key={mi} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: mi * 0.07 }}
-                    className="flex gap-4 pb-4">
-
-                    <div className="relative shrink-0 z-10">
-                      <motion.div
-                        animate={practiced ? { boxShadow: [`0 0 0px ${m.color}00`, `0 0 14px ${m.color}70`, `0 0 0px ${m.color}00`] } : {}}
-                        transition={{ duration: 2.2, repeat: Infinity }}
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ background: practiced ? `${m.color}20` : 'rgba(2,6,18,0.9)', border: `1.5px solid ${practiced ? m.color + '60' : 'rgba(255,255,255,0.08)'}` }}>
-                        <span className="text-[11px] font-mono font-black" style={{ color: practiced ? m.color : 'rgba(255,255,255,0.2)' }}>{m.num}</span>
-                      </motion.div>
-                    </div>
-
-                    <div className="flex-1 min-w-0 rounded-xl p-3 pb-3.5"
-                      style={{ background: practiced ? `${m.color}08` : linkedLow ? `${RED}06` : 'rgba(0,0,0,0.2)', border: `1px solid ${practiced ? m.color + '28' : linkedLow ? RED + '20' : 'rgba(255,255,255,0.05)'}` }}>
-
-                      <p className="text-[12.5px] font-bold leading-tight mb-1.5" style={{ color: practiced ? m.color : 'rgba(255,255,255,0.65)' }}>{m.title}</p>
-
-                      {/* Live connection — linked dimensions */}
-                      <div className="flex items-center gap-2 mb-2.5">
-                        {linkedDims.map(id => (
-                          <div key={id} className="flex items-center gap-1 px-1.5 py-0.5 rounded"
-                            style={{ background: `${DIM_COLORS[id]}12`, border: `1px solid ${DIM_COLORS[id]}25` }}>
-                            <span className="text-[7.5px] font-mono" style={{ color: DIM_COLORS[id] }}>{DIMS[id].code}</span>
-                            <span className="text-[9px] font-black font-mono" style={{ color: pcts[id] < 45 ? RED : DIM_COLORS[id] }}>{pcts[id]}</span>
-                          </div>
-                        ))}
-                        {linkedLow && (
-                          <span className="text-[8px] font-mono" style={{ color: RED, opacity: 0.7 }}>← score explicado por aqui</span>
-                        )}
-                        {!practiced && potentialMult && (
-                          <span className="text-[8px] font-mono ml-auto" style={{ color: TEAL, opacity: 0.6 }}>
-                            praticar → ×{potentialMult}
-                          </span>
-                        )}
-                      </div>
-
-                      <p className="text-[11px] text-white/38 leading-relaxed mb-3">{m.body}</p>
-
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="h-px flex-1" style={{ background: `${m.color}18` }} />
-                        <span className="text-[8.5px] font-mono" style={{ color: m.color, opacity: 0.5 }}>RITUAL</span>
-                        <div className="h-px flex-1" style={{ background: `${m.color}18` }} />
-                      </div>
-                      <p className="text-[10.5px] italic leading-relaxed" style={{ color: m.color, opacity: practiced ? 0.7 : 0.3 }}>"{m.ritual}"</p>
-
-                      <div className="flex items-center justify-between mt-3">
-                        {linkedLow ? (
-                          <span className="text-[9px] font-mono" style={{ color: RED, opacity: 0.65 }}>
-                            ⚠ {DIMS[linkedDims[0]].label} em {lowestLinked}%
-                          </span>
-                        ) : <span />}
-                        <button
-                          onClick={() => { const arr = [...(s.pesDig ?? [false,false,false,false,false])]; arr[mi] = !arr[mi]; update({ pesDig: arr }) }}
-                          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9.5px] font-bold font-mono transition-all uppercase tracking-wider"
-                          style={{ background: practiced ? `${m.color}20` : 'rgba(255,255,255,0.04)', border: `1px solid ${practiced ? m.color + '45' : 'rgba(255,255,255,0.07)'}`, color: practiced ? m.color : 'rgba(255,255,255,0.22)' }}>
-                          {practiced ? <CheckCircle2 size={10} /> : <Circle size={10} />}
-                          {practiced ? 'praticamos' : 'marcar'}
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                )
-              })}
-            </div>
-
-            {/* Impacto estratégico */}
-            {practicedCount === 0 && (
-              <div className="rounded-xl px-3 py-3" style={{ background: `${AMBER}08`, border: `1px solid ${AMBER}20` }}>
-                <p className="text-[10px] leading-relaxed" style={{ color: AMBER, opacity: 0.75 }}>
-                  Nenhum princípio marcado como praticado. O multiplicador D6 permanece em ×{d6mult.toFixed(2)}, reduzindo todos os outros scores em {Math.round((1 - d6mult) * 100)}%.
-                </p>
-              </div>
-            )}
-            {practicedCount === 5 && (
-              <div className="rounded-xl px-3 py-3" style={{ background: `${TEAL}08`, border: `1px solid ${TEAL}20` }}>
-                <p className="text-[10px] leading-relaxed" style={{ color: TEAL, opacity: 0.75 }}>
-                  Todos os princípios ativos — cultura operando em força máxima. Multiplicador ×{d6mult.toFixed(2)} amplificando todos os outros scores.
-                </p>
-              </div>
-            )}
           </div>
-        )
-      })()}
+          <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <motion.div className="h-full rounded-full" animate={{ width: `${Math.min(100, d6mult * 66.7)}%` }} transition={{ duration: 0.6 }}
+              style={{ background: d6Low ? RED : d6mult >= 1.3 ? TEAL : AMBER }} />
+          </div>
+          <div className="flex justify-between mt-0.5">
+            <span className="text-[7.5px] font-mono text-white/15">×0.5 — inativo</span>
+            <span className="text-[7.5px] font-mono text-white/15">×1.5 — plena força</span>
+          </div>
+        </div>
+
+        {/* Princípios */}
+        <div className="relative flex flex-col">
+          <div className="absolute left-5 top-5 bottom-5 w-px" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(255,255,255,0.02))' }} />
+
+          {MANIFESTO.map((m, mi) => {
+            const practiced = (s.pesDig ?? [])[mi]
+            const manifQs = (() => {
+              const nps = s.pesNpsUtilidade
+              const gap = s.pesGapHabilidade.trim()
+              const bloq = s.pesBloqueios.trim()
+              const acord = s.pesAcordos.trim()
+              if (mi === 0) return [
+                s.pesMetaEquipe.trim() ? `Como conectar a meta "${s.pesMetaEquipe.slice(0,45)}" com propósito real para o time?` : 'Como fazer o time ver o impacto real do trabalho deles no dia a dia?',
+                'Como aplicar a pergunta "a quem isso serve?" antes de cada reunião?',
+              ]
+              if (mi === 1) return [
+                nps > 0 && nps <= 6 ? `NPS Interno em ${nps}/10 — o que está bloqueando o propósito do time?` : 'Como descobrir o que realmente motiva cada pessoa individualmente?',
+                'Como ter a conversa de propósito sem parecer superficial?',
+              ]
+              if (mi === 2) return [
+                bloq.trim() ? `Bloqueio atual: "${bloq.slice(0,50)}" — como remover esta semana como facilitador?` : 'Como criar o hábito de perguntar "o que está te travando?" em cada 1:1?',
+                gap ? `Gap de habilidade: "${gap.slice(0,50)}" — como apoiar sem fazer pelo liderado?` : 'Como liderar com facilitação em vez de cobrança?',
+              ]
+              if (mi === 3) return [
+                s.pesReconhecimento ? 'Como tornar o reconhecimento público específico e genuíno — não genérico?' : 'Como reconhecer uma entrega concreta desta semana de forma que impacte?',
+                'Como calibrar o que é "ir além do esperado" no contexto atual do negócio?',
+              ]
+              return [
+                acord ? `Acordos do 1:1: "${acord.slice(0,50)}" — como garantir que sejam honrados?` : 'Como criar acordos no 1:1 que as pessoas realmente cumprem?',
+                daysSince1a1 !== null && daysSince1a1 > 0 ? `${daysSince1a1} dias desde o último 1:1 — como estruturar a próxima retrospectiva?` : 'Como iniciar retrospectiva mensal sem burocracia?',
+              ]
+            })()
+
+            return (
+              <motion.div key={mi} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: mi * 0.07 }}
+                className="flex gap-4 pb-4">
+
+                <div className="relative shrink-0 z-10">
+                  <motion.div
+                    animate={practiced ? { boxShadow: [`0 0 0px ${m.color}00`, `0 0 14px ${m.color}70`, `0 0 0px ${m.color}00`] } : {}}
+                    transition={{ duration: 2.2, repeat: Infinity }}
+                    className="w-10 h-10 rounded-full flex items-center justify-center"
+                    style={{ background: practiced ? `${m.color}20` : 'rgba(2,6,18,0.9)', border: `1.5px solid ${practiced ? m.color + '60' : 'rgba(255,255,255,0.08)'}` }}>
+                    <span className="text-[11px] font-mono font-black" style={{ color: practiced ? m.color : 'rgba(255,255,255,0.2)' }}>{m.num}</span>
+                  </motion.div>
+                </div>
+
+                <div className="flex-1 min-w-0 rounded-xl p-3 pb-3.5"
+                  style={{ background: practiced ? `${m.color}08` : 'rgba(0,0,0,0.2)', border: `1px solid ${practiced ? m.color + '28' : 'rgba(255,255,255,0.05)'}` }}>
+
+                  <p className="text-[12.5px] font-bold leading-tight mb-2" style={{ color: practiced ? m.color : 'rgba(255,255,255,0.65)' }}>{m.title}</p>
+                  <p className="text-[11px] text-white/38 leading-relaxed mb-3">{m.body}</p>
+
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="h-px flex-1" style={{ background: `${m.color}18` }} />
+                    <span className="text-[8.5px] font-mono" style={{ color: m.color, opacity: 0.5 }}>RITUAL</span>
+                    <div className="h-px flex-1" style={{ background: `${m.color}18` }} />
+                  </div>
+                  <p className="text-[10.5px] italic leading-relaxed mb-3" style={{ color: m.color, opacity: practiced ? 0.7 : 0.3 }}>"{m.ritual}"</p>
+
+                  {/* IA por princípio */}
+                  <div className="pt-2.5" style={{ borderTop: `1px solid ${m.color}15` }}>
+                    <div className="flex flex-col gap-1.5 mb-2">
+                      {manifQs.map(q => (
+                        <button key={q} onClick={() => askManifIa(mi, q)}
+                          className="text-left px-2.5 py-1.5 rounded-lg text-[10px] font-mono leading-snug transition-all"
+                          style={{ background: `${m.color}08`, border: `1px solid ${m.color}20`, color: m.color, opacity: 0.75 }}>
+                          › {q}
+                        </button>
+                      ))}
+                    </div>
+                    {manifIaLoading === mi && (
+                      <div className="flex items-center gap-2">
+                        <Loader2 size={10} style={{ color: m.color }} className="animate-spin" />
+                        <span className="text-[9.5px] font-mono" style={{ color: m.color, opacity: 0.6 }}>analisando...</span>
+                      </div>
+                    )}
+                    {manifIaAnswers[mi] && manifIaLoading !== mi && (
+                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                        className="rounded-lg px-3 py-2.5"
+                        style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${m.color}15` }}>
+                        <p className="text-[11px] text-white/60 leading-relaxed whitespace-pre-wrap">{manifIaAnswers[mi]}</p>
+                      </motion.div>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end mt-3">
+                    <button
+                      onClick={() => { const arr = [...(s.pesDig ?? [false,false,false,false,false])]; arr[mi] = !arr[mi]; update({ pesDig: arr }) }}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9.5px] font-bold font-mono transition-all uppercase tracking-wider"
+                      style={{ background: practiced ? `${m.color}20` : 'rgba(255,255,255,0.04)', border: `1px solid ${practiced ? m.color + '45' : 'rgba(255,255,255,0.07)'}`, color: practiced ? m.color : 'rgba(255,255,255,0.22)' }}>
+                      {practiced ? <CheckCircle2 size={10} /> : <Circle size={10} />}
+                      {practiced ? 'praticamos' : 'marcar'}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )
+          })}
+        </div>
+
+        {practicedCount === 0 && (
+          <div className="rounded-xl px-3 py-3" style={{ background: `${AMBER}08`, border: `1px solid ${AMBER}20` }}>
+            <p className="text-[10px] leading-relaxed" style={{ color: AMBER, opacity: 0.75 }}>
+              Nenhum princípio ativo. Multiplicador ×{d6mult.toFixed(2)} reduzindo todos os scores em {Math.round((1 - d6mult) * 100)}%.
+            </p>
+          </div>
+        )}
+        {practicedCount === 5 && (
+          <div className="rounded-xl px-3 py-3" style={{ background: `${TEAL}08`, border: `1px solid ${TEAL}20` }}>
+            <p className="text-[10px] leading-relaxed" style={{ color: TEAL, opacity: 0.75 }}>
+              Cultura plena — ×{d6mult.toFixed(2)} amplificando todos os scores.
+            </p>
+          </div>
+        )}
+      </div>
 
       {/* ════════════════════════════════════
           6D DIAGNÓSTICO
