@@ -103,7 +103,7 @@ const INTELLIGENCE_MODULES: IntelligenceModule[] = [
     id: 'M3',
     title: 'Mercado e Pessoas',
     icon: Users,
-    theory: ['Economia de Empresa e Analise Mercadologica', 'Lideranca e Gestao de Equipes', 'Comunicacao, Disfuncoes e Lideranca Digital'],
+    theory: ['Economia de Empresa e Analise Mercadologica', 'Lideranca e Gestao de Equipes'],
     overview: 'Este modulo aborda mercado, comportamento de escolha, dinamica competitiva e leitura de pessoas dentro da operacao.',
   },
   {
