@@ -543,7 +543,7 @@ const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
                 transition={{ duration: 3.4 + i * 1.7, repeat: Infinity, delay: i * 1.1, ease: 'easeInOut' }}
               />
             ))}
-            <div style={{ width: '100%', height: '100%' }}><Globe3D /></div>
+            <div style={{ width: '100%', height: '100%' }}><Globe3D chips={chips} /></div>
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 4 }}>
               <motion.div
                 style={{ background: 'rgba(2,2,2,0.92)', border: '1px solid rgba(52,211,153,0.28)', backdropFilter: 'blur(18px)', padding: '9px 22px', borderRadius: 99, display: 'flex', alignItems: 'center', gap: 8 }}
@@ -608,7 +608,7 @@ const GlobeHero = memo(function GlobeHero({ data }: { data: MarketData }) {
                 transition={{ duration: 3.4 + i * 1.7, repeat: Infinity, delay: i * 1.1, ease: 'easeInOut' }}
               />
             ))}
-            <div style={{ width: '100%', height: '100%' }}><Globe3D /></div>
+            <div style={{ width: '100%', height: '100%' }}><Globe3D chips={chips} /></div>
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 4 }}>
               <motion.div style={{ background: 'rgba(2,2,2,0.92)', border: '1px solid rgba(52,211,153,0.28)', backdropFilter: 'blur(18px)', padding: '6px 14px', borderRadius: 99, display: 'flex', alignItems: 'center', gap: 7 }}
                 initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.9, duration: 0.5 }}>
