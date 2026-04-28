@@ -291,6 +291,15 @@ function getDimIaQ(id: number, pesDig: boolean[]): string[] {
   ]
 }
 
+// ─── Cross-module defaults ────────────────────────────────────────────────────
+const COCKPIT_ZERO = { receita: 0, despesas: 0, caixa: 0 }
+const ADMIN_ZERO = {
+  faseEmpresa: 0,
+  norteStar: '',
+  okrs: [] as { objetivo: string; krs: { texto: string; pct: number }[] }[],
+}
+const FASE_LABELS = ['Infra', 'Processo', 'Estratégia', 'Digitização', 'Digitalização', 'Transformação']
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 export default function PessoasLideranca() {
   const { data: s, update } = useWorkspaceData<PesState>('pessoas-lideranca', DEFAULT)
