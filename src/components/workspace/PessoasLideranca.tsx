@@ -278,11 +278,9 @@ function EnergyOrb({ score, d6mult }: { score: number; d6mult: number }) {
   )
 }
 
-// ─── Snapshot + team types ────────────────────────────────────────────────────
+// ─── Snapshot type ────────────────────────────────────────────────────────────
 interface Snap { date: string; index6D: number; dims: number[] }
 interface SnapStore { snaps: Snap[] }
-interface Liderado { id: string; nome: string; scores: number[] }
-interface TeamStore { liderados: Liderado[] }
 
 // ─── Hex Radar ────────────────────────────────────────────────────────────────
 function HexRadar({ pcts, colors }: { pcts: number[]; colors: string[] }) {
@@ -651,10 +649,7 @@ function getDimIaQ(id: number, s: PesState): string[] {
 export default function PessoasLideranca() {
   const { data: s, update } = useWorkspaceData<PesState>('pessoas-lideranca', DEFAULT)
   const { data: snapStore, update: updateSnapStore } = useWorkspaceData<SnapStore>('pessoas-snaps', { snaps: [] })
-  const { data: teamStore, update: updateTeamStore } = useWorkspaceData<TeamStore>('pessoas-team', { liderados: [] })
   const [activeCard, setActiveCard] = useState<number | null>(null)
-  const [iaLoading, setIaLoading] = useState(false)
-  const [iaAnswer, setIaAnswer] = useState('')
   const [dimIaLoading, setDimIaLoading] = useState<number | null>(null)
   const [dimIaAnswers, setDimIaAnswers] = useState<Record<number, string>>({})
   const [manifIaLoading, setManifIaLoading] = useState<number | null>(null)
@@ -689,9 +684,8 @@ export default function PessoasLideranca() {
   const lowestId = pcts.indexOf(Math.min(...pcts))
   const d6Low = rawDims[5] < 8
 
-  // Snap + team derived
+  // Snap derived
   const snaps = snapStore.snaps ?? []
-  const liderados = teamStore.liderados ?? []
   const lastSnap = snaps.length > 0 ? snaps[snaps.length - 1] : null
 
   // Auto-snapshot: save when index changes ≥5 pts (debounced 2s)
@@ -735,27 +729,6 @@ export default function PessoasLideranca() {
     riskSignals.push({ level: 'critical', msg: `NPS Interno de Utilidade em ${s.pesNpsUtilidade}/10 — alto risco de desengajamento e churn de talentos.` })
   if (s.pesNpsUtilidade >= 4 && s.pesNpsUtilidade <= 5)
     riskSignals.push({ level: 'warn', msg: `NPS Interno em ${s.pesNpsUtilidade}/10 — equipe no limiar. Clareza de propósito e reconhecimento podem reverter.` })
-
-  async function askCoach(q: string) {
-    setIaLoading(true); setIaAnswer('')
-    try {
-      const ctx = [
-        `Índice 6D: ${index6D}/100 | D1=${pcts[0]} D2=${pcts[1]} D3=${pcts[2]} D4=${pcts[3]} D5=${pcts[4]} D6=${pcts[5]} (×${d6mult.toFixed(2)})`,
-        `Liderados: ${s.pesLiderados || '?'} | Fase empresa: ${faseLabel} | ${practicedCount}/5 princípios do Manifesto praticados`,
-        hasFinanceiro ? `Receita: R$${cockpit.receita.toLocaleString('pt-BR')} | Runway: ${runway === 99 ? '∞' : runway + 'm'} | Margem: ${margem}%` : 'Dados financeiros: não preenchidos',
-        okrs.length > 0 ? `OKRs (${okrs.length}): progresso médio ${okrAvgPct}% | ${okrs.map(o => o.objetivo).join('; ')}` : 'OKRs: não definidos',
-        admin.norteStar ? `Norte Estr.: "${admin.norteStar.slice(0, 120)}"` : '',
-        `Meta equipe: ${s.pesMetaEquipe || 'não definida'} | Gap: ${s.pesGapHabilidade || 'não mapeado'}`,
-        daysSince1a1 !== null ? `Último 1:1: ${daysSince1a1} dias atrás` : 'Último 1:1: nunca registrado',
-      ].filter(Boolean).join(' | ')
-      const res = await fetch('/api/advisor-chat', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: q, marketContext: ctx, role: 'lider' }),
-      })
-      const j = await res.json()
-      setIaAnswer(j.answer ?? '')
-    } finally { setIaLoading(false) }
-  }
 
   async function askDimIa(dimId: number, q: string) {
     setDimIaLoading(dimId)
@@ -857,13 +830,11 @@ export default function PessoasLideranca() {
   })()
 
   if (presentMode) {
-    const hasTeam = liderados.filter(l => l.nome.trim()).length > 0
     const slides = [
       'capa',
       'acoes',
       'diagnostico',
       'negocios',
-      ...(hasTeam ? ['time'] : []),
       ...(snaps.length > 1 ? ['evolucao'] : []),
     ]
     const totalSlides = slides.length
@@ -1081,50 +1052,6 @@ export default function PessoasLideranca() {
             )}
           </>)}
 
-          {/* ══ SLIDE: TIME ══ */}
-          {curSlide === 'time' && (<>
-            <div>
-              <p className="text-[8px] font-mono tracking-[0.22em] text-white/18 uppercase">Slide 5 — Time</p>
-              <p className="text-[18px] font-bold text-white/80 mt-1">Análise Individual</p>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              {liderados.filter(l => l.nome.trim()).map(l => {
-                const lScore = calcIndex6D(l.scores, 0)
-                const lColor = lScore >= 70 ? TEAL : lScore >= 45 ? AMBER : RED
-                const lLowest = l.scores.indexOf(Math.min(...l.scores))
-                return (
-                  <div key={l.id} className="rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.35)', border: `1px solid ${lColor}20` }}>
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-[13px] font-bold text-white/70">{l.nome}</p>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[9px] font-mono text-white/22">foco: {DIMS[lLowest]?.label}</span>
-                        <span className="text-[22px] font-black font-mono" style={{ color: lColor }}>{lScore}</span>
-                      </div>
-                    </div>
-                    <div className="flex gap-1.5">
-                      {l.scores.map((sc, si) => {
-                        const dp = Math.round((sc / 20) * 100)
-                        const dc = dp < 40 ? RED : dp < 65 ? AMBER : DIM_COLORS[si]
-                        return (
-                          <div key={si} className="flex-1 flex flex-col items-center gap-0.5">
-                            <div className="w-full h-10 rounded-lg flex flex-col justify-end overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
-                              <motion.div className="w-full rounded-lg"
-                                style={{ height: `${dp}%`, background: dc, opacity: 0.8 }}
-                                initial={{ scaleY: 0, originY: 1 }} animate={{ scaleY: 1 }} transition={{ duration: 0.4, delay: si * 0.05 }} />
-                            </div>
-                            <span className="text-[7.5px] font-mono" style={{ color: DIM_COLORS[si], opacity: 0.55 }}>{DIMS[si].code}</span>
-                            <span className="text-[9px] font-bold font-mono" style={{ color: dc }}>{dp}</span>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </>)}
-
           {/* ══ SLIDE: EVOLUÇÃO ══ */}
           {curSlide === 'evolucao' && (<>
             <div>
@@ -1306,7 +1233,7 @@ export default function PessoasLideranca() {
         </div>
       )}
 
-      {/* ── Individual content ── */}
+      {/* ── Orb ── */}
       <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="pt-5 pb-3 flex flex-col items-center gap-1">
           <EnergyOrb score={index6D} d6mult={d6mult} />
@@ -1314,31 +1241,8 @@ export default function PessoasLideranca() {
             Score = (D1+D2+D3+D4+D5) × D6<sub className="text-[8px]">mult</sub> + Bônus Manifesto
           </p>
         </div>
-
-        {/* Particle field */}
         <div className="px-3 pb-3">
           <ParticleField score={index6D} />
-        </div>
-
-        {/* Liderados — compact inline */}
-        <div className="flex items-start gap-2 px-4 pb-4">
-          <p className="text-[9px] font-mono text-white/18 uppercase tracking-wider shrink-0 mt-2">Time</p>
-          <div className="flex gap-1.5 flex-wrap flex-1">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20].map(n => (
-              <button key={n} onClick={() => update({ pesLiderados: n })}
-                className="w-7 h-7 rounded-md text-[10px] font-mono font-bold transition-all"
-                style={{ background: s.pesLiderados === n ? `${TEAL}28` : 'rgba(255,255,255,0.03)', border: `1px solid ${s.pesLiderados === n ? TEAL + '60' : 'rgba(255,255,255,0.06)'}`, color: s.pesLiderados === n ? TEAL : 'rgba(255,255,255,0.2)' }}>
-                {n}
-              </button>
-            ))}
-            <input
-              type="number" min={1} max={999}
-              placeholder="outro"
-              value={s.pesLiderados > 20 ? s.pesLiderados : ''}
-              onChange={e => { const v = parseInt(e.target.value); if (!isNaN(v) && v > 0) update({ pesLiderados: v }) }}
-              className="w-14 h-7 rounded-md text-[10px] font-mono outline-none text-center"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.4)' }} />
-          </div>
         </div>
       </div>
 
@@ -1596,67 +1500,6 @@ export default function PessoasLideranca() {
           )}
         </AnimatePresence>
       </div>
-
-      {/* ── Time Table ── */}
-      <div>
-          <div className="flex items-center justify-between px-1 mb-3">
-            <p className="text-[14px] font-black text-white/70">Tabela do Time</p>
-            <button onClick={() => updateTeamStore({ liderados: [...liderados, { id: Date.now().toString(), nome: '', scores: [0, 0, 0, 0, 0, 0] }] })}
-              className="text-[10px] font-mono px-2.5 py-1 rounded-lg transition-all"
-              style={{ background: `${TEAL}15`, color: TEAL, border: `1px solid ${TEAL}30` }}>
-              + liderado
-            </button>
-          </div>
-          <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            {/* Header row */}
-            <div className="grid items-center px-3 py-2" style={{ gridTemplateColumns: '1fr repeat(6, 36px) 44px 20px', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-              <p className="text-[8px] font-mono text-white/20 uppercase">Nome</p>
-              {DIMS.map(d => <p key={d.id} className="text-[8px] font-mono text-center uppercase" style={{ color: d.color, opacity: 0.5 }}>{d.code}</p>)}
-              <p className="text-[8px] font-mono text-white/20 uppercase text-center">6D</p>
-              <div />
-            </div>
-            {liderados.length === 0 && (
-              <p className="text-[10px] text-white/18 text-center py-5 font-mono">Clique em + liderado para adicionar</p>
-            )}
-            {liderados.map((l, li) => {
-              const lScore = calcIndex6D(l.scores, 0)
-              const lColor = lScore >= 70 ? TEAL : lScore >= 45 ? AMBER : RED
-              return (
-                <div key={l.id} className="grid items-center px-3 py-2" style={{ gridTemplateColumns: '1fr repeat(6, 36px) 44px 20px', gap: '4px', borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                  <input value={l.nome} onChange={e => { const u = [...liderados]; u[li] = { ...l, nome: e.target.value }; updateTeamStore({ liderados: u }) }}
-                    placeholder="nome..." className="text-[11px] bg-transparent outline-none font-mono text-white/55 min-w-0"
-                    style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }} />
-                  {l.scores.map((sc, si) => (
-                    <input key={si} type="number" min={0} max={20} value={sc || ''}
-                      onChange={e => { const v = Math.min(20, Math.max(0, parseInt(e.target.value) || 0)); const u = [...liderados]; u[li] = { ...l, scores: l.scores.map((x, i) => i === si ? v : x) }; updateTeamStore({ liderados: u }) }}
-                      className="w-full text-center text-[10px] font-mono font-bold bg-transparent outline-none rounded py-0.5"
-                      style={{ color: DIM_COLORS[si], border: `1px solid ${DIM_COLORS[si]}20` }} />
-                  ))}
-                  <span className="text-[13px] font-black font-mono text-center" style={{ color: lColor }}>{lScore > 0 ? lScore : '—'}</span>
-                  <button onClick={() => updateTeamStore({ liderados: liderados.filter((_, i) => i !== li) })}
-                    className="text-[11px] text-white/15 hover:text-red-400 transition-colors text-center">×</button>
-                </div>
-              )
-            })}
-          </div>
-          {liderados.length > 1 && (
-            <div className="mt-2 rounded-xl p-3" style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <p className="text-[8.5px] font-mono text-white/18 uppercase tracking-widest mb-2">Distribuição do time</p>
-              {DIMS.map(d => {
-                const avg = Math.round(liderados.reduce((acc, l) => acc + l.scores[d.id], 0) / liderados.length / 20 * 100)
-                return (
-                  <div key={d.id} className="flex items-center gap-2 mb-1.5">
-                    <span className="text-[8.5px] font-mono w-6 shrink-0" style={{ color: d.color, opacity: 0.6 }}>{d.code}</span>
-                    <div className="flex-1 h-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
-                      <motion.div className="h-full rounded-full" animate={{ width: `${avg}%` }} transition={{ duration: 0.5 }} style={{ background: d.color }} />
-                    </div>
-                    <span className="text-[9px] font-mono w-7 text-right" style={{ color: d.color, opacity: 0.7 }}>{avg}%</span>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
 
 
     </div>
