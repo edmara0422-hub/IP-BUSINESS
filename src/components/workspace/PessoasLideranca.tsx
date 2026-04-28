@@ -501,7 +501,7 @@ export default function PessoasLideranca() {
               <div className="flex gap-1.5">
                 {DIMS.map(d => {
                   const pct = pcts[d.id]
-                  const c = pct < 40 ? RED : pct < 65 ? AMBER : d.color
+                  const c = pct < 40 ? RED : pct < 65 ? AMBER : DIM_COLORS[d.id]
                   return (
                     <div key={d.id} className="flex-1 flex flex-col items-center gap-1">
                       <div className="w-full rounded-full overflow-hidden" style={{ height: `${Math.max(4, Math.round(pct / 100 * 48))}px`, background: `${c}22`, border: `1px solid ${c}30` }}>
@@ -592,11 +592,11 @@ export default function PessoasLideranca() {
                 const pct = pcts[d.id]
                 const prevDim = lastSnap ? Math.round((lastSnap.dims[d.id] / 20) * 100) : null
                 const delta = prevDim !== null ? pct - prevDim : null
-                const c = pct < 40 ? RED : pct < 65 ? AMBER : d.color
+                const c = pct < 40 ? RED : pct < 65 ? AMBER : DIM_COLORS[d.id]
                 return (
                   <div key={d.id} className="rounded-xl px-3 py-2.5 flex items-center gap-3"
                     style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${c}18` }}>
-                    <span className="text-[10px] font-mono w-6 shrink-0" style={{ color: d.color, opacity: 0.6 }}>{d.code}</span>
+                    <span className="text-[10px] font-mono w-6 shrink-0" style={{ color: DIM_COLORS[d.id], opacity: 0.6 }}>{d.code}</span>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[11px] font-semibold text-white/65">{d.label}</span>
@@ -1044,14 +1044,14 @@ export default function PessoasLideranca() {
                 whileTap={{ scale: 0.96 }}>
                 <div className="flex items-center gap-3">
                   <div className="relative shrink-0">
-                    <ArcGauge pct={pct} color={d.color} size={52} />
+                    <ArcGauge pct={pct} color={DIM_COLORS[d.id]} size={52} />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-[12px] font-black font-mono leading-none" style={{ color: d.color }}>{pct}</span>
+                      <span className="text-[12px] font-black font-mono leading-none" style={{ color: DIM_COLORS[d.id] }}>{pct}</span>
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1">
-                      <p className="text-[9px] font-mono font-bold" style={{ color: d.color, opacity: 0.55 }}>{d.code}</p>
+                      <p className="text-[9px] font-mono font-bold" style={{ color: DIM_COLORS[d.id], opacity: 0.55 }}>{d.code}</p>
                       {isD6 && <span className="text-[8px] font-mono font-bold" style={{ color: d6mult >= 1 ? TEAL : RED }}>×{d6mult.toFixed(1)}</span>}
                     </div>
                     <p className="text-[12px] font-bold text-white/70 leading-tight mt-0.5">{d.label}</p>
